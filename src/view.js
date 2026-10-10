@@ -151,17 +151,17 @@ export class UiBoundary extends React.Component {
   render() { return this.state.failed ? h('div', { className: 'dgui-root', role: 'alert' }, '交互界面无法显示。', h('pre', null, this.props.fallback)) : this.props.children; }
 }
 export function ToolView(props) {
-  if (props.phase === 'preparing') return h(StreamingToolView, props);
-  if (props.phase === 'start') return h(StreamingPreview, { raw: props.block?.argsRaw ?? '', callId: props.callId, sessionId: props.sessionId });
+  // Tool preview and the turn tail have different lifecycles in DSH. Do not
+  // mount a canvas before the turn ends only to tear it down for later prose.
+  if (props.phase === 'preparing' || props.phase === 'start') return h('p', {className:'dgui-pending',role:'status'}, '正在生成界面，回答结束后显示。');
   const fallback = (props.block.content ?? []).filter(x => x.type === 'text').map(x => x.text).join('\n');
   if (props.block.isError) return h('div', { className: 'dgui-tool-error', role: 'alert' }, h(Icon,{name:'warning'}), h('span',null,fallback || '界面未生成，请检查工具参数。'));
   const raw = props.block.meta?.dshGenerativeUi;
-  if (raw?.version === 1) return h('div', { className: 'dgui-pending' }, '交互界面已生成，请在本轮回答下方操作。', h('details', null, h('summary', null, '文字结果'), h('pre', null, fallback)));
+  if (raw?.version === 1) {
+    try { validateDocument(raw.document); return h('p', { className: 'dgui-pending',role:'status' }, '界面已生成，整轮回答结束后在下方显示。'); }
+    catch { /* Retain the plain-text fallback for malformed historical metadata. */ }
+  }
   return h(ValidatedView, { ...props, raw, fallback });
-}
-function StreamingToolView(props) {
-  const raw = props.useToolCallArgumentsPartial ? props.useToolCallArgumentsPartial() : '';
-  return h(StreamingPreview, { raw, callId: props.callId, sessionId: props.sessionId });
 }
 export function StreamingPreview({ raw, callId = 'stream', sessionId }) {
   const committed=useUiRegistry().some(r=>r.sessionId===sessionId&&r.raw.callId===callId);
@@ -174,7 +174,9 @@ export function StreamingPreview({ raw, callId = 'stream', sessionId }) {
   return h(UiBoundary, { key: callId, fallback: doc.fallback }, h(UiView, { record: { document: doc, documentId: `preview-${callId}` }, sessionId, preview: true }));
 }
 export function TurnUiView(props) {
-  return (props.turn.data.get('dshGenerativeUi') ?? []).filter(r => r.seq < props.seq).map(r => r.isPatch?h(PatchNotice,{key:`patch-${r.seq}`,raw:r.raw}):h(PresentationView, { key: r.raw.documentId, ...r, sessionId: props.sessionId, sendPrompt: props.sendPrompt,scope:props.presentationScope }));
+  // Readiness comes from durable turn/end, never from tool completion, a live
+  // tail seq, elapsed time, or the presence of a partial Markdown marker.
+  return (props.turn.data.get('dshGenerativeUi') ?? []).filter(r=>r.displayReady===true).map(r => r.isPatch?h(PatchNotice,{key:`patch-${r.seq}`,raw:r.raw}):h(PresentationView, { key: r.raw.documentId, ...r, sessionId: props.sessionId, sendPrompt: props.sendPrompt,scope:props.presentationScope }));
 }
 export function PatchNotice({raw}){useEffect(()=>{try{if(raw)publishDocument(raw)}catch{}},[raw]);return h('p',{className:'dgui-copy'},'界面修改已保存；原界面已更新。');}
 export function ValidatedView({ raw, fallback, sessionId, sendPrompt }) {

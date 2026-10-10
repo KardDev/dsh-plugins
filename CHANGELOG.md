@@ -1,5 +1,15 @@
 # DSH Motion UI
 
+## 0.5.6 — 2026-10-10
+
+- Disable tool-time UI preview and defer committed UI presentation until durable turn/end. Reasoning/text still stream normally. Completed, interrupted and failed turns reveal successfully generated UI; partial/failed tools do not produce a flashing canvas.
+- Identify missing/invalid/duplicate node IDs separately with exact nested locations and first duplicate provenance. Mixed canvas/controls accept arbitrary JSON field order. Omitted canvas title/fallback inherit document values; guidance clarifies that state declarations do not create controls.
+- Use durable turn completion rather than live tail anchor values for presentation. Regression checks cover pending tool/result stages, late markers, single presentation, saved input and iframe identity after display.
+- Normalize plain numeric/boolean transport strings only in declared typed fields, and exact item-array wrappers across controls, nested containers, formulas, tables and action scopes. Preserve ordinary text, data and canvas source.
+- Decode a single state-specification JSON object or exact singular object wrapper, with unsafe-key/depth checks reapplied.
+- Name missing numeric fields, invalid ranges, options and formula argument paths in repair guidance. Inject a complete numeric-state example and recommend formula shorthand instead of deep argument trees or probe UIs.
+- Clarify round semantics, shared-state controls and direct UI-tool usage in injected guidance; use ui_catalog for protocol questions instead of searching DSH installation sources.
+
 ## 0.5.5 — 2026-10-10
 
 - Describe all registered component fields in the native tool schema, including the nested steps item shape, and inject a minimal static process example.

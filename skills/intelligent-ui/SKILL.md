@@ -1,5 +1,9 @@
 # DSH Motion UI — 设计与生成技能
 
+生成 UI 时直接使用已注册的 render_ui/render_canvas；不需要先 grep、glob 或用 Shell 查找 DSH 安装源码。协议疑问以本说明和 ui_catalog 为准。这不限制为完成用户实际任务、读取真实数据而使用文件或搜索工具。
+
+`round(x)` 只有一个参数，等同 JavaScript `Math.round`：取最近整数，恰好一半时朝正无穷方向取整，如 `round(2.5)=3`、`round(-2.5)=-2`。它不是向上取整；原生公式不支持 ceil/floor。需要向上/向下取整时，用订阅已声明共享状态的画布及 `Math.ceil/Math.floor` 实现。指标 decimals 只控制显示精度，不改变计算值。
+
 简单公式优先使用 `{expr:"state.V * state.V / state.R"}`，例如 `derived.power` 的表达式，然后用 `{ref:"derived.power"}` 在指标中显示。支持四则运算、比较、三元条件、括号、`min/max/round/abs`；字符串使用双引号，引用写完整的 `state.x/data.x/derived.x/item.x`。这会编译为现有解释器协议，不执行任意 JavaScript。复杂动画仍使用画布。
 
 这是插件主动注入的能力指导；无需用户重复提供，也不依赖你先调用目录才获得这些规则。它是基于公开项目设计思想编写的 DSH 技能，不是 OpenAI 的内部提示词。以下协议与宿主工具权限共同约束输出。

@@ -47,7 +47,9 @@ try {
   await page.getByRole('slider', { name: '拆解程度 %', exact: true }).fill('80');
   await frame.getByText('展开观察部件如何配合', { exact: true }).waitFor();
   assert.equal(await frame.locator('#rearWheel').getAttribute('transform'), 'translate(-38.400000000000006 12)');
-  await frame.getByRole('button', { name: '传动', exact: true }).click(); await page.getByRole('combobox').inputValue().then(v => assert.equal(v, '3'));
+  await frame.getByRole('button', { name: '传动', exact: true }).click();
+  await page.waitForFunction(()=>document.querySelector('select')?.value==='3');
+  assert.equal(await page.getByRole('combobox').inputValue(), '3');
   await frame.getByRole('heading', { name: '传动：把踩踏变为前进', exact: true }).waitFor();
   await page.getByRole('combobox').selectOption('1'); await frame.getByRole('heading', { name: '车架：让各系统成为整车', exact: true }).waitFor();
   assert.equal(await frame.locator('body').getAttribute('data-identity'), 'stable-frame');

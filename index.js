@@ -52,7 +52,7 @@ export function apply(ctx,config={}) {
   })));
   ctx.effect(()=>ctx.tools.register(defineTool({
     name:'render_canvas',description:'Create a static or interactive HTML/SVG/CSS/JavaScript canvas in the conversation. You design all content, controls, layout and motion. No fixed UI composition. Same persistence, isolation and inspect/patch support as render_ui. Use the injected canvas contract; no external resources or host APIs. Direct native calls only.',
-    parameters:{title:{type:'string',required:true},fallback:{type:'string',required:true},state:{type:'json'},data:{type:'json'},derived:{type:'json'},height:{type:'number'},css:{type:'string',description:'Emit before html for styled static streaming preview; use an empty string when no custom styles are needed.'},html:{type:'string',required:true},script:{type:'string'}},
+    parameters:{title:{type:'string',required:true},fallback:{type:'string',required:true},state:{type:'json'},data:{type:'json'},derived:{type:'json'},height:{type:'number'},css:{type:'string',description:'Canvas CSS; use an empty string when no custom styles are needed. UI is displayed after the assistant turn ends.'},html:{type:'string',required:true},script:{type:'string'}},
     output:{schema:{type:'json'},render:(_a,v)=>[{type:'text',text:fallbackText(v.document)+`\nUI documentId=${v.documentId}; documentRevision=${v.documentRevision??0}; canvas nodeId=canvas.`+placement(v)}],presentationMeta:(_a,v)=>({dshGenerativeUi:v})},
     async execute(args,exec){exec.signal.throwIfAborted();const record=await store.create(canvasDocument(args),{sessionId:exec.agent?.id??'unscoped',callId:exec.callId});exec.signal.throwIfAborted();return record;}
   })));

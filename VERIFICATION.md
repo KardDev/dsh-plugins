@@ -1,5 +1,13 @@
 # Verification
 
+## 0.5.6 — authoring compatibility and stable presentation (2026-10-10)
+
+68 automated tests and 14 release stages cover typed transport normalization, decoded-object safety, exact node/argument diagnostics, field-order independence, canvas metadata defaults, durable end-of-turn UI presentation, state recovery, isolation and standalone export. Clean npm ci reports zero vulnerabilities. Production UI preview is disabled; static preview utilities remain internally tested but are not registered tool entry points.
+
+The end-of-turn browser regression uses the real turn extension plus production ToolView/TurnUiView: partial arguments, successful tool results, late prose markers and changing tail anchors do not mount UI/iframe before turn/end. After turn completion, a single UI appears and retains input and iframe identity. Interrupted/error endings also reveal successful results. Text/reasoning streaming and model stopping behavior are unchanged. Replaying the supplied real session events confirms readiness changes only on turn/end.
+
+Original travel-call replay passes eight of ten previously failing calls unchanged; two still need actual missing bounds/formula operands. Another session's three alleged field-order failures each omit sandbox id; adding only that id fixes them without reordering. No general model first-attempt success rate is claimed. Desktop local fixes were package-file verified and user-tested before this release; this does not change the declared Web compatibility range.
+
 ## 0.5.5 — process guide authoring repair (2026-10-10)
 
 61 automated tests and 14 release checks cover the static steps contract, canonicalization before native tool validation, precise error paths and compact failure presentation. Replaying all five original render_ui argument sets from the reported exported session through the registered Host tool succeeds in an isolated temporary DSH_HOME: the first four retain five steps instead of falling back to text. No new model success-rate claim is made. Evidence: test-output/exported-steps-replay.json and test-output/release-verification.json.

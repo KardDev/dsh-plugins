@@ -55,18 +55,15 @@ try {
   await page.screenshot({ path: 'test-output/scene-gallery.png', fullPage: true });
   await page.setViewportSize({ width: 1000, height: 1000 }); await page.goto(url + '/?view=stream'); const requestsBefore = stateRequests;
   const doc = { ...calculatorExample, actions: calculatorExample.actions, nodes: calculatorExample.nodes }, raw = JSON.stringify({ document: doc });
-  const end = raw.indexOf('},{"id":"bits"') + 1; assert.ok(end > 1);
-  await page.evaluate(s => window.stream(s), raw.slice(0, end)); await page.locator('[data-preview=true] [data-ui-node=parameters]').waitFor();
-  assert.equal(await page.locator('[data-ui-node=bits]').count(), 0);
-  await page.evaluate(() => window.firstNode = document.querySelector('[data-ui-node=parameters]'));
-  await page.evaluate(s => window.stream(s), raw);
-  await page.locator('[data-preview=true] [data-ui-node=bits]').waitFor();
-  assert.ok(await page.evaluate(() => window.firstNode === document.querySelector('[data-ui-node=parameters]')), 'stable node DOM identity');
-  for (const control of await page.locator('[data-preview=true] input,[data-preview=true] button').all()) assert.ok(await control.isDisabled());
-  assert.equal(stateRequests, requestsBefore, 'preview cannot read/save state');
-  await page.screenshot({ path: 'test-output/stream-preview.png', fullPage: true });
+  for(const phase of ['preparing','start'])for(const prefix of [raw.slice(0,Math.floor(raw.length/2)),raw]){
+    await page.evaluate(({prefix,phase})=>window.stream(prefix,phase),{prefix,phase});
+    await page.getByText('正在生成界面，回答结束后显示。',{exact:true}).waitFor();
+    assert.equal(await page.locator('[data-dsh-generative-ui],[data-preview],iframe,input,select').count(),0);
+  }
+  assert.equal(stateRequests,requestsBefore,'pending UI does not read/save state');
+  await page.screenshot({path:'test-output/stream-deferred.png',fullPage:true});
   await page.evaluate(s => window.stream(s, 'result'), raw); await page.getByText('已取消生成', { exact: true }).waitFor(); assert.equal(await page.locator('[data-preview=true]').count(), 0);
   await page.evaluate(() => window.commit()); await page.getByText('使用初始参数', { exact: true }).waitFor(); assert.ok(await page.getByRole('slider').isEnabled());
-  checks.push('progressive complete nodes, stable DOM IDs, disabled preview, zero preview state requests, cancellation clears preview, committed UI activates');
+  checks.push('production ToolView defers partial/complete argument UI, zero pending state requests, cancellation stays readable, settled UI activates');
   assert.deepEqual(errors, []); await writeFile('test-output/scenes-stream-verification.json', JSON.stringify({ checks, errors }, null, 2)); console.log(JSON.stringify({ checks, errors }));
 } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); await rm(directory, { recursive: true, force: true }); }

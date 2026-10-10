@@ -52,12 +52,14 @@ test('enforces resource limits and numeric chart values', () => {
   const deep = copy(calculatorExample); let nodes = deep.nodes; for (let i = 0; i < 14; i++) { nodes.push({ id: `nest${i}`, type: 'column', children: [] }); nodes = nodes.at(-1).children; } assert.throws(() => validateDocument(deep), /depth/);
 });
 test('select options all satisfy their state type and numeric range', () => {
-  for (const options of [[4, '8'], [4, 100], [4, 4.5]]) {
+  for (const options of [[4, '8 GiB'], [4, 100], [4, 4.5]]) {
     const doc = copy(calculatorExample); doc.state.bits.options = options;
     assert.throws(() => validateDocument(doc));
   }
   const doc = copy(calculatorExample); doc.state.bits.options = [4, 8, 16];
   assert.doesNotThrow(() => validateDocument(doc));
+  doc.state.bits.options = [4, '8', 16];
+  assert.deepEqual(validateDocument(doc).state.bits.options, [4, 8, 16]);
 });
 
 test('followup snapshots current chained derived values with the renderer evaluator', () => {

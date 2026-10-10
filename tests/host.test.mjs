@@ -44,6 +44,9 @@ test('Host tools use canonical output, durable presentation metadata and authent
   const wrappedRecord=await render.execute({document:wrapped},{callId:'wrapped',agent:{id:'session-real'},signal:new AbortController().signal});
   assert.equal(wrappedRecord.document.nodes[0].items.length,2);assert.equal(wrappedRecord.document.nodes[1].open,false);
   assert.match(render.output.render({},wrappedRecord)[0].text,/1\. 整理文件/);
+  const numericWrapped={version:1,title:'人数',fallback:'示例',state:{people:{type:'number',default:'2',min:'1',max:'12',step:'1'}},nodes:[{id:'group',type:'card',children:{item:[{id:'slider',type:'slider',label:'人数',bind:'state.people'}]}}]};
+  const numericRecord=await render.execute({document:numericWrapped},{callId:'numeric-wrapped',agent:{id:'session-real'},signal:new AbortController().signal});
+  assert.equal(numericRecord.document.state.people.default,2);assert.equal(numericRecord.document.nodes[0].children.length,1);
   assert.match(render.output.render({},value)[0].text,new RegExp(value.documentId));
   const free=tools.find(t=>t.name==='render_canvas');const freeRecord=await free.execute({title:'自由入口',fallback:'文字说明',html:'<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="20"/></svg>',state:JSON.stringify({speed:{type:'number',default:1,min:1,max:3,step:1}})},{callId:'free-call',agent:{id:'session-real'},signal:new AbortController().signal});assert.equal(freeRecord.document.nodes[0].id,'canvas');assert.deepEqual(freeRecord.document.nodes[0].stateKeys,['speed']);assert.equal(free.output.presentationMeta({},freeRecord).dshGenerativeUi.documentId,freeRecord.documentId);
   const inspect=tools.find(x=>x.name==='inspect_ui'),patch=tools.find(x=>x.name==='patch_ui');assert.ok(inspect&&patch);
