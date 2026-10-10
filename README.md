@@ -19,6 +19,36 @@ The release artifact includes the generated browser bundle; users installing the
 
 Development installs of `dsh-generative-ui` must be uninstalled before installing `dsh-motion-ui`; do not enable both because they register the same tools. Existing UI documents remain readable: the internal `dsh-generative-ui` storage directory, result metadata and authenticated route namespace are retained for compatibility. Plugin settings must be selected again under the new plugin entry.
 
+## 模型生成效果 / Model-generated UI
+
+以下是模型在 DSH 中实际生成并运行的界面，展示原生组件与自由 HTML/SVG 画布的组合。截图保留模型的实际布局与内容；动画展示为静态帧。它们来自开发期测试，代表这些案例的结果。
+
+### 电压、电流与发热功率
+
+**DeepSeek V4.1 Flash Fast · 主动选择 UI。** 用户只询问电压变化时电流和发热功率为什么不同，模型生成滑块、指标卡和联动曲线，用线性与平方关系解释差异。
+
+![DeepSeek V4.1 Flash Fast 生成的电阻交互解释：电压滑块、三项指标和电流与功率曲线](https://raw.githubusercontent.com/Scorp1o117/dsh-motion-ui/main/docs/screenshots/fast-resistor.png)
+
+### SVG 轨道动画
+
+**DeepSeek V4.1 Flash · 按文字需求生成。** 模型自行编写 SVG、CSS 和动画逻辑，组合轨道图、速度滑块与运行开关；这是数学动画示意，并非真实天体模拟。
+
+![DeepSeek V4.1 Flash 生成的 SVG 轨道动画：中心与环绕对象、速度控制和暂停开关](https://raw.githubusercontent.com/Scorp1o117/dsh-motion-ui/main/docs/screenshots/flash-orbit.png)
+
+### 周期运动单摆
+
+**DeepSeek V4.1 Flash · 按文字需求生成。** 振幅和频率控件驱动 SVG 摆动，支持暂停并保持当前角度；界面明确标注它是周期运动数学示意，而非真实物理仿真。
+
+![DeepSeek V4.1 Flash 生成的交互单摆：SVG 摆体、摆角读数、振幅与频率滑块](https://raw.githubusercontent.com/Scorp1o117/dsh-motion-ui/main/docs/screenshots/flash-pendulum.png)
+
+### 串联与并联电路
+
+**DeepSeek V4.1 Flash Fast · 主动选择 UI。** 用户要求讲清两只电阻怎样分配电压和电流，模型生成接法切换、三个参数滑块、电路图、指标和对比曲线。下面展示完整界面。
+
+![DeepSeek V4.1 Flash Fast 生成的串并联交互讲解：参数控制、电路图、等效电阻和响应曲线](https://raw.githubusercontent.com/Scorp1o117/dsh-motion-ui/main/docs/screenshots/fast-circuits.png)
+
+[截图来源与生成方式](docs/screenshots/README.md)。
+
 ## Use
 
 ### Canvas delivery improvements (0.5.2)
