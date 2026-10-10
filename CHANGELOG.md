@@ -1,5 +1,11 @@
 # DSH Motion UI
 
+## 0.5.5 — 2026-10-10
+
+- Describe all registered component fields in the native tool schema, including the nested steps item shape, and inject a minimal static process example.
+- Accept the exact lossless `items: {item: [...]}` adapter wrapper before native tool checks; static steps no longer require a task status. Normalize literal boolean strings on details.open.
+- Identify invalid steps by node, item index, actual type/count and correction example. Render tool failures as compact readable messages instead of full UI cards, preserving the actual error.
+
 ## 0.5.4 — 2026-10-10
 
 - Publish a native object schema for render_ui, including the document skeleton and component vocabulary. Legacy JSON strings are decoded internally; models are no longer offered a string branch that encourages double escaping.

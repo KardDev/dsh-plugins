@@ -17,4 +17,5 @@ export const SOFT_CSS=`
 .dgui-root .dgui-content>:last-child{margin-bottom:0}.dgui-root .dgui-canvas-stage iframe{border-radius:16px}
 @media(max-width:600px){.dgui-root{--du-radius:22px;--du-radius-inner:18px}}
 @media(forced-colors:active){.dgui-root,.dgui-root .dgui-card,.dgui-root .dgui-metric,.dgui-root .dgui-chart,.dgui-root .dgui-button{background:Canvas}}
+.dgui-tool-error{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-radius:12px;background:color-mix(in srgb,currentColor 4%,transparent);font-size:13px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}.dgui-tool-error>svg{flex:0 0 16px;width:16px;height:16px;margin-top:2px}
 `;

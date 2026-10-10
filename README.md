@@ -6,6 +6,10 @@ Interactive, declarative tool views for **DeepSeek Harness Web 0.2.0-rc.2**.
 
 The plugin adds `ui_catalog` (protocol + examples + visual vocabulary) and `render_ui` (validated UI). It renders native conversation turn-tail views, computes local expressions, saves per-conversation input state on the Host, and sends explicit follow-up requests with the current parameter snapshot.
 
+### Reliable process guides (0.5.5)
+
+Static steps accept a direct items array without invented task statuses. The native tool schema now describes every registered component field and the nested step item structure. Exact lossless `items: {item: [...]}` adapter wrappers and literal boolean strings on details.open are normalized before native checks; ambiguous or unsafe inputs remain errors. Invalid steps report the node, index and correction. Failed tool calls retain their error in a compact message.
+
 ### Easier authoring and cleaner visuals (0.5.4)
 
 The tool schema exposes the document structure and accepts common authoring forms: inline table/chart rows, Chinese identifiers, text metrics, table captions and structured canvas state (`type:"json"`, array/object, max16KiB per value). Runtime arithmetic and chart series still require numbers; unknown fields and unsafe properties remain errors. Prefer passing a document object directly and use `render_canvas` for HTML/SVG source.

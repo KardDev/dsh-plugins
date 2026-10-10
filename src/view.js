@@ -111,7 +111,7 @@ export function UiView({ record, sessionId, sendPrompt, preview = false }) {
       case 'badge': return h('span', { ...props, className: 'dgui-tag' }, h(Icon, { name: n.icon ?? 'info' }), display(resolve(n.text)));
       case 'details': return h('details', { ...props, className: 'dgui-details', open: n.open }, h('summary', null, h(Icon, { name: n.icon ?? 'info' }), n.title), h('div', { className: 'dgui-column' }, n.children.map(renderNode)));
       case 'progress': { const v = resolve(n.value), max = resolve(n.max); return h('div', { ...props, className: 'dgui-progress' }, h('div', { className: 'dgui-progress-label' }, h('span', null, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('span', null, `${display(v)} / ${display(max)}${n.unit ? ' ' + n.unit : ''}`)), !computed.error && h('progress', { value: v, max, 'aria-label': n.label }), h('small', null, !computed.error ? `${Number((v / max * 100).toFixed(1))}%` : '—')); }
-      case 'steps': return h('ol', { ...props, className: 'dgui-steps' }, n.items.map((item, i) => h('li', { key: i, 'data-step-status': item.status }, h('span', { className: 'dgui-step-dot', 'aria-hidden': true }, item.status === 'done' ? h(Icon, { name: 'check' }) : item.status === 'error' ? h(Icon, { name: 'warning' }) : i + 1), h('div', null, h('strong', null, item.title), h('span', { className: 'dgui-step-state' }, { pending: '待进行', active: '当前步骤', done: '已完成', error: '异常' }[item.status]), item.description && h('p', null, item.description)))));
+      case 'steps': return h('ol', { ...props, className: 'dgui-steps' }, n.items.map((item, i) => h('li', { key: i, 'data-step-status': item.status }, h('span', { className: 'dgui-step-dot', 'aria-hidden': true }, item.status === 'done' ? h(Icon, { name: 'check' }) : item.status === 'error' ? h(Icon, { name: 'warning' }) : i + 1), h('div', null, h('strong', null, item.title), item.status && h('span', { className: 'dgui-step-state' }, { pending: '待进行', active: '当前步骤', done: '已完成', error: '异常' }[item.status]), item.description && h('p', null, item.description)))));
       case 'metric': { const v = resolve(n.value); return h('div', { ...props, className: 'dgui-metric' }, h('span', { className: 'dgui-metric-label' }, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('strong', null, typeof v === 'number' ? formatNumber(v,n.decimals ?? 2) : display(v), ' ', h('small', null, n.unit))); }
       case 'input': case 'slider': case 'select': case 'toggle': {
         const k = n.bind.split('.')[1], spec = doc.state[k], v = state[k], id = `dgui-${record.documentId}-${n.id}-${viewId}`;
@@ -154,7 +154,7 @@ export function ToolView(props) {
   if (props.phase === 'preparing') return h(StreamingToolView, props);
   if (props.phase === 'start') return h(StreamingPreview, { raw: props.block?.argsRaw ?? '', callId: props.callId, sessionId: props.sessionId });
   const fallback = (props.block.content ?? []).filter(x => x.type === 'text').map(x => x.text).join('\n');
-  if (props.block.isError) return h('div', { className: 'dgui-root dgui-error', role: 'alert' }, '界面生成失败', h('pre', null, fallback));
+  if (props.block.isError) return h('div', { className: 'dgui-tool-error', role: 'alert' }, h(Icon,{name:'warning'}), h('span',null,fallback || '界面未生成，请检查工具参数。'));
   const raw = props.block.meta?.dshGenerativeUi;
   if (raw?.version === 1) return h('div', { className: 'dgui-pending' }, '交互界面已生成，请在本轮回答下方操作。', h('details', null, h('summary', null, '文字结果'), h('pre', null, fallback)));
   return h(ValidatedView, { ...props, raw, fallback });

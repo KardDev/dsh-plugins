@@ -7,6 +7,7 @@ const steps = [
   ['canvas', ['tests/verify-canvas.mjs']], ['canvas-delivery', ['tests/verify-canvas-delivery.mjs']], ['scenes-stream', ['tests/verify-scenes-stream.mjs']], ['state-recovery', ['tests/verify-recovery.mjs']],['refinement',['tests/verify-refinement.mjs']],['freeform',['tests/verify-freeform.mjs']],['presentation-history',['tests/verify-presentation.mjs']],['single-presentation-quick-layouts',['tests/verify-single-presentation.mjs']]
 ];
 steps.push(['authoring-compatibility', ['tests/verify-authoring.mjs']]);
+steps.push(['static-steps-and-compact-errors', ['tests/verify-steps.mjs']]);
 if (process.env.DSH_VERIFY_INSTALLED === '1') steps.push(['installed-canvases', ['tests/verify-canvas-web.mjs']], ['installed-legacy', ['tests/verify-design-installed.mjs']]);
 const results = [];
 await mkdir('test-output', { recursive: true });

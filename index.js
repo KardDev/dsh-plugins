@@ -23,11 +23,10 @@ function defineRenderTool(options) {
   return {...tool,async execute(args,exec){
     // Legacy adapters may stringify JSON. Decode here, without advertising a
     // string branch that encourages models to manually escape whole documents.
-    const normalized=args&&Object.hasOwn(args,'document')?{...args,document:toolJson(args.document,'document')}:args;
-    try{return await execute(normalized,exec);}catch(error){
-      if(error.name==='ToolArgsError' && args && Object.hasOwn(args,'document')) validateDocument(toolJson(args.document,'document'));
-      throw error;
-    }
+    // Canonicalize adapter quirks before native schema checks, so a lossless
+    // items:{item:[...]} wrapper receives the same treatment as stored/replayed UI.
+    const normalized=args&&Object.hasOwn(args,'document')?{...args,document:validateDocument(toolJson(args.document,'document'))}:args;
+    return execute(normalized,exec);
   }};
 }
 export const Config=z.object({designMode:z.union(['guided','free']).default('guided').description('guided：设计技能与示例引导；free：只注入画布接口与交互约束，由模型自主设计。'),displayMode:z.union(['tail','inline','sidebar']).default('tail').description('tail：回答下方；inline：正文标记位置；sidebar：PC 侧栏。'),showDetails:z.boolean().default(false).description('显示参数状态、原始说明、视觉诊断和版本历史。默认关闭，保持界面简洁。')}).volatile();

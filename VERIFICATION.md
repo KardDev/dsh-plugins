@@ -1,5 +1,12 @@
 # Verification
 
+## 0.5.5 — process guide authoring repair (2026-10-10)
+
+61 automated tests and 14 release checks cover the static steps contract, canonicalization before native tool validation, precise error paths and compact failure presentation. Replaying all five original render_ui argument sets from the reported exported session through the registered Host tool succeeds in an isolated temporary DSH_HOME: the first four retain five steps instead of falling back to text. No new model success-rate claim is made. Evidence: test-output/exported-steps-replay.json and test-output/release-verification.json.
+
+PC browser checks at 1920/1365px in light/dark themes verify five ordered steps without invented status labels, compact complete error text, no overflow and no document/state recovery warnings. Evidence: test-output/steps-verification.json and test-output/steps-repair-desktop.png. The original host/iframe timing checks now wait for propagated state; offline-export request counts isolate the exported page from host background diagnostics.
+
+
 ## 0.5.4 — main Web release acceptance (2026-10-10)
 
 Build `0.5.4+92e88973eabc` passes all 59 automated tests and 13 release checks after a clean `npm ci --ignore-scripts` (zero reported vulnerabilities). The main Web profile installs the packed package with all 54 distributed files matching. Its composed configuration validates after migration from the old package name. Actual Home → Plugins settings, saved calculator parameters, reload and downloaded offline HTML pass. Evidence: `test-output/motion054-main-web-smoke.json` and `test-output/release-verification.json`.

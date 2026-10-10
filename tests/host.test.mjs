@@ -7,6 +7,7 @@ import { apply } from '../index.js';
 import { calculatorExample } from '../lib/catalog.js';
 import { SKILL_EXAMPLES, UI_SKILL_SECTIONS } from '../lib/ui-skill.js';
 import { validateDocument } from '../lib/protocol.js';
+import { COMPONENTS,componentFields } from '../lib/components.js';
 test('Host tools use canonical output, durable presentation metadata and authenticated Connection route', async t => {
   const directory = await mkdtemp(join(tmpdir(), 'dsh-ui-host-')), previous = process.env.DSH_HOME;
   process.env.DSH_HOME = directory;
@@ -20,6 +21,9 @@ test('Host tools use canonical output, durable presentation metadata and authent
   const documentSchema=render.parameters.properties.document;
   assert.equal(documentSchema.type,'object');assert.ok(documentSchema.required.includes('nodes'));
   assert.ok(documentSchema.properties.nodes.items.properties.type.enum.includes('table'));
+  const nodeFields=documentSchema.properties.nodes.items.properties;
+  for(const type of Object.keys(COMPONENTS))for(const field of componentFields(type))assert.ok(nodeFields[field],`${type}.${field} missing in native tool schema`);
+  assert.equal(nodeFields.items.type,'array');assert.ok(nodeFields.items.items.required.includes('title'));assert.ok(!nodeFields.items.items.required.includes('status'));
   assert.match(resolved[1].text,/Authoring fast path/);
   assert.equal(sections.length, 3); assert.deepEqual(resolved, UI_SKILL_SECTIONS);
   assert.ok(sections.every(s => s.interpolate === false));
@@ -36,6 +40,10 @@ test('Host tools use canonical output, durable presentation metadata and authent
   assert.equal(routes[0].path, '/api/plugins/dsh-generative-ui/state');
   const value = await render.execute({ document: calculatorExample }, { callId: 'call-real', agent: { id: 'session-real' }, signal: new AbortController().signal });
   assert.equal(value.sessionId, 'session-real'); assert.equal(value.callId, 'call-real');
+  const wrapped={version:1,title:'发布步骤',fallback:'先整理再提交。',nodes:[{id:'flow',type:'steps',items:{item:[{title:'整理文件'},{title:'提交代码'}]}},{id:'more',type:'details',title:'说明',open:'false',children:[]}]};
+  const wrappedRecord=await render.execute({document:wrapped},{callId:'wrapped',agent:{id:'session-real'},signal:new AbortController().signal});
+  assert.equal(wrappedRecord.document.nodes[0].items.length,2);assert.equal(wrappedRecord.document.nodes[1].open,false);
+  assert.match(render.output.render({},wrappedRecord)[0].text,/1\. 整理文件/);
   assert.match(render.output.render({},value)[0].text,new RegExp(value.documentId));
   const free=tools.find(t=>t.name==='render_canvas');const freeRecord=await free.execute({title:'自由入口',fallback:'文字说明',html:'<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="20"/></svg>',state:JSON.stringify({speed:{type:'number',default:1,min:1,max:3,step:1}})},{callId:'free-call',agent:{id:'session-real'},signal:new AbortController().signal});assert.equal(freeRecord.document.nodes[0].id,'canvas');assert.deepEqual(freeRecord.document.nodes[0].stateKeys,['speed']);assert.equal(free.output.presentationMeta({},freeRecord).dshGenerativeUi.documentId,freeRecord.documentId);
   const inspect=tools.find(x=>x.name==='inspect_ui'),patch=tools.find(x=>x.name==='patch_ui');assert.ok(inspect&&patch);

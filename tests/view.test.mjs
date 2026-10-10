@@ -11,6 +11,14 @@ test('preparing/running/error states cannot enable actions', () => {
   for (const phase of ['preparing', 'start']) assert.doesNotMatch(renderToStaticMarkup(h(ToolView, { phase })), /<button/);
   const failed = render({ isError: true, content: [{ type: 'text', text: 'Denied' }], meta: { dshGenerativeUi: record(calculatorExample) } });
   assert.match(failed, /Denied/); assert.doesNotMatch(failed, /<button/);
+  assert.match(failed,/dgui-tool-error/);assert.doesNotMatch(failed,/dgui-root|<pre|<details/);
+});
+
+test('static steps render an ordered guide without invented task status',()=>{
+  const doc={version:1,title:'五步流程',fallback:'规划说明',nodes:[{id:'flow',type:'steps',items:{item:[{title:'准备',description:'核对文件。'},{title:'提交'},{title:'发布',status:'active'}]}}]};
+  const html=renderToStaticMarkup(h(ValidatedView,{raw:record(doc),sessionId:'s1'}));
+  assert.match(html,/<ol[^>]+dgui-steps/);assert.equal((html.match(/class="dgui-step-state"/g)??[]).length,1);
+  assert.doesNotMatch(html,/待进行|undefined/);assert.match(html,/当前步骤/);
 });
 test('missing, unsupported and malformed metadata retains plain text fallback', () => {
   for (const meta of [undefined, {}, { dshGenerativeUi: record({ ...calculatorExample, version: 2 }) }]) {

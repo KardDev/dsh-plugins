@@ -9,6 +9,24 @@ import {previewDocument} from '../lib/stream.js';
 import {UiStore} from '../lib/store.js';
 const base=()=>({version:1,title:'写法兼容',fallback:'示例，非实测',nodes:[]});
 
+test('static steps accept only a lossless singular-item wrapper and report exact repair paths',()=>{
+  const items=[{title:'整理文件',description:'保留源码。'},{title:'提交代码',status:'pending'}];
+  const input={...base(),nodes:[{id:'flow',type:'steps',items:{item:items}},{id:'more',type:'details',title:'补充',open:'false',children:[]}]};
+  const doc=validateDocument(input);
+  assert.deepEqual(doc.nodes[0].items,items);assert.equal(doc.nodes[1].open,false);
+  assert.deepEqual(input.nodes[0].items,{item:items});assert.equal(input.nodes[1].open,'false');
+  assert.deepEqual(validateDocument(doc),doc);
+  assert.deepEqual(previewDocument(JSON.stringify({document:input})),doc);
+  assert.match(fallbackText(doc),/1\. 整理文件/);assert.doesNotMatch(fallbackText(doc),/undefined/);
+  for(const value of [{item:items,extra:true},{item:{title:'x'}},'wrong',null]){
+    assert.throws(()=>validateDocument({...base(),nodes:[{id:'flow',type:'steps',items:value}]}),/node\.flow\.items must be an array.*Use items:/);
+  }
+  assert.throws(()=>validateDocument({...base(),nodes:[{id:'flow',type:'steps'}]}),/node\.flow\.items must be an array.*received undefined/);
+  for(const count of [0,13])assert.throws(()=>validateDocument({...base(),nodes:[{id:'flow',type:'steps',items:Array.from({length:count},()=>({title:'x'}))}]}),new RegExp(`node\\.flow\\.items requires 1..12 items; received ${count}`));
+  for(const item of [null,{description:'missing title'},{title:'x',status:'running'},{title:'x',extra:true}])assert.throws(()=>validateDocument({...base(),nodes:[{id:'flow',type:'steps',items:[item]}]}),/node\.flow\.items\[0\]/);
+  assert.throws(()=>validateDocument({...base(),nodes:[{id:'d',type:'details',title:'x',open:'maybe',children:[]}]}),/node\.d\.open must be boolean/);
+});
+
 test('JSON transport accepts fences and trailing commas without rewriting strings or guessing code',()=>{
   const value={...base(),nodes:[{id:'说明',type:'text',text:'a,}\\"\n<script>not executed</script>'}]};
   const encoded='\uFEFF```json\n'+JSON.stringify(value).replace(/}$/,',}')+'\n```';
