@@ -21,7 +21,7 @@ test('Host tools use canonical output, durable presentation metadata and authent
   assert.ok(sections.every(s => s.interpolate === false));
   assert.match(resolved[0].text, /390px/); assert.match(resolved[0].text, /Diagram grammar/);
   assert.match(resolved[1].text, /Registered component fields/);
-  assert.match(resolved[2].text, /DSHUI.animate/);
+  assert.match(resolved[2].text, /static flow and comparison/);
   live.designMode='free';assert.match(sections[0].text(),/No design template/);assert.equal(sections[1].text(),'');assert.equal(sections[2].text(),'');live.designMode='guided';
   for (const example of SKILL_EXAMPLES) assert.doesNotThrow(() => validateDocument(example));
   const overview = await catalog.execute({}), canvas = await catalog.execute({ topic: 'canvas' }), all = await catalog.execute({ topic: 'all' });

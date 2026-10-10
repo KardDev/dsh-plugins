@@ -1,5 +1,12 @@
 # DSH Motion UI
 
+## 0.5.3 — 2026-10-10
+
+- Prefer lightweight static diagrams, concise comparisons, short processes and compact dashboards; controls and animation are added when useful.
+- Inject static flow/comparison examples before the calculator, and add `ui_catalog({topic:"quick"})` with four short layouts.
+- Add reusable theme-aware flow/node/arrow/callout styles; static views omit parameter-save status and use the broader “可视化” label.
+- Elect one answer-area owner per document when multiple tail seats mount, and retire stale tool previews once the committed UI is available. Missing, late or removed inline markers retain a single fallback view. Explicitly opened sidebars remain separate views.
+
 ## 0.5.2 — 2026-10-10
 
 First public release for DeepSeek Harness Web 0.2.0-rc.2.

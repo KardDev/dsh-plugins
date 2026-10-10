@@ -51,6 +51,12 @@ Development installs of `dsh-generative-ui` must be uninstalled before installin
 
 ## Use
 
+### Lightweight by default (0.5.3)
+
+静态图解、简短流程、方案对比和小看板都是完整的 UI，不要求添加控件或动画。引导模式优先注入静态流程与对比示例，计算器随后；复杂动画示例留在按需目录中。`ui_catalog({topic:"quick"})` 提供四个轻量起点。画布可直接使用 `.ui-flow`、`.ui-step`、`.ui-arrow` 和 `.ui-callout`，无需重复编写样式或脚本。模型仍可按用户需求生成复杂界面；这些是默认表达指导，不是思考时间或输出截断。
+
+每个文档在回答区域只保留一个展示实例。正文标记缺失时仅回退一次；标记后来出现或被删除时自动迁移。提交成功后退出同一调用的工具预览。手动打开的侧栏仍可作为独立视图与正文共享参数。
+
 ### Canvas delivery improvements (0.5.2)
 
 Free canvases now include optional theme-aware `.ui-*` primitives for typography, controls, result readouts, SVG nodes, connectors and annotations. Guided mode actively injects a construction handbook covering Chinese label widths, connector routing, actual rendered SVG font sizes, validated calculations and reset behavior. Free mode retains autonomous composition and only receives the interface/delivery contract.
@@ -69,13 +75,13 @@ For simple formulas, write `derived: {power: {expr: "state.V * state.V / state.R
 
 Each UI provides **版本历史** with read-only initial-state previews and restore. Preview never executes canvas scripts or writes input state. Restore appends a new head with the chosen document, retaining prior versions and current saved inputs; stale requests fail rather than overwrite another revision. The previous head is archived before replacement, and a failed head write cannot expose a fictitious future version. Preexisting documents start their available history at the first version observed after this update; overwritten older development revisions cannot be reconstructed. Archived input definitions must remain compatible. History uses the same authenticated Connection bridge and conversation ownership checks as document access.
 
-Ask for the useful result naturally, for example: “Create an interactive theoretical weight-size calculator; distinguish estimated weights from real inference VRAM.” The plugin actively injects its design skill, complete protocol and two minimal worked examples through DSH's system-prompt service; the model does not need to discover a skill file or call a catalog to receive this guidance.
+Ask for the useful result naturally, for example: “Create an interactive theoretical weight-size calculator; distinguish estimated weights from real inference VRAM.” The plugin actively injects its design skill, complete protocol and minimal static and calculator worked examples through DSH's system-prompt service; the model does not need to discover a skill file or call a catalog to receive this guidance.
 
 The packaged skill source is `skills/intelligent-ui/SKILL.md`. It teaches scene selection, composition, diagram grammar, theme/color/icon choices, responsive labels, local state, animation and error repair. `lib/ui-skill.js` injects it together with the shared protocol and concrete calculator/animation examples. It adapts public OpenUI, Diagram Design and Taste Skill ideas to DSH; it is not OpenAI's internal prompt. `ui_catalog` remains available for additional examples. This lowers the discovery/syntax burden for smaller models; it cannot guarantee complex program quality for every model.
 
 Supported components: heading, text, card, row, column, metric, table, bar/line chart, numeric/text input, slider, select, toggle, follow-up button, badge, progress, ordered steps and collapsible details. Charts provide their full data as an accessible table. Controls compute locally without calling a model on each change.
 
-The exact protocol and runnable examples are in `lib/catalog.js` and `examples/`. Component attribute definitions in `lib/components.js` drive both validation and capability discovery. `ui_catalog()` returns the protocol, component fields and two compact examples; `ui_catalog({topic:"canvas"})` adds the full design guide and four distinct visual examples. Other topics are `data`, `scenes`, and `all` (fourteen examples). This avoids sending every example on each request.
+The exact protocol and runnable examples are in `lib/catalog.js` and `examples/`. Component attribute definitions in `lib/components.js` drive both validation and capability discovery. `ui_catalog()` returns the protocol, component fields and two compact static examples; `ui_catalog({topic:"canvas"})` adds the full design guide and four distinct visual examples. Other topics are `quick` (four lightweight static layouts), `data`, `scenes`, and `all` (fourteen examples). This avoids sending every example on each request.
 
 The tool card retains a text result. A state-only conversation extension replays standard successful tool results into the official `conversation.chat.turnTail` list slot, so the interactive UI stays visible when DSH folds work details. It does not modify DSH core or add custom persisted event types.
 

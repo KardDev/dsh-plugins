@@ -1,5 +1,11 @@
 # Verification
 
+## 0.5.3 — lightweight delivery and one answer-area view
+
+55 tests and 12 release checks pass. The new browser regression mounts two native turn-tail seats plus a stale tool preview for the same document in inline mode without a marker: only one committed UI remains. It verifies ownership handoff, saved input restoration, late/removed markers, missing sidebar fallback and independent documents. Four stateless flow/comparison/architecture/dashboard examples render at PC widths without controls or parameter-save chrome.
+
+A natural-completion DeepSeek V4.1 Flash Fast trial, with no UI request in the question, generated a static project-tool comparison with seven nodes, no state and no script. The committed UI appeared at about 31 seconds. The first table submission used invalid inline rows; the model read the catalog and repaired it. This is a successful repaired trial, not a first-attempt pass or guaranteed delivery time. The final prompt and diagnostic now explicitly show the required data reference. A plain GiB follow-up used no UI tools. Inference was neither capped nor cancelled.
+
 ## Public release 0.5.2 — DSH Motion UI (2026-10-10)
 
 The renamed package passes 54 tests and all 11 release verification steps against DSH Web 0.2.0-rc.2. An isolated profile installs the packed package with all 50 distributed files matching source. Native PC browser checks confirm the new Home → Plugins settings entry saves settings, legacy Fast-generated documents replay, calculations and saved parameters survive reload, and actual HTML exports activate offline with the new branding. Earlier natural-completion DeepSeek V4.1 Flash Fast tests exercised an explicit bicycle diagram and a proactively generated resistor explanation; model-authored contrast and typography remained uneven in the bicycle case. Desktop support is not claimed. The sections below are historical development evidence.

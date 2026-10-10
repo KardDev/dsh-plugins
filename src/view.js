@@ -13,6 +13,7 @@ import { AUDIT_MESSAGES } from '../lib/refinement.js';
 import { publishDocument, useCurrentDocument } from './current-document.js';
 import { HistoryView } from './history-view.js';
 import { PresentationView } from './presentation.js';
+import {useUiRegistry} from './presentation-store.js';
 const display = value => value === undefined || value === null ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value);
 function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
   const [draft, setDraft] = useState(String(value)), [invalid, setInvalid] = useState(false);
@@ -128,9 +129,9 @@ export function UiView({ record, sessionId, sendPrompt, preview = false }) {
   }
   const sceneIcons = { dashboard: 'chart', workbench: 'sliders', comparison: 'layers', guide: 'target', status: 'gauge', report: 'info' };
   return h('section', { ref:root,className: 'dgui-root', 'data-document-revision':record.documentRevision??0,'data-dgui-build': BUILD_INFO.id, 'data-dsh-generative-ui': record.documentId, 'data-layout': doc.presentation?.layout, 'data-accent': doc.presentation?.accent, 'data-density': doc.presentation?.density, 'data-preview': preview || undefined, 'aria-label': doc.title, 'aria-busy': preview || undefined },
-    h('header', { className: 'dgui-header' }, h('span', { className: 'dgui-heading-icon' }, h(Icon, { name: sceneIcons[doc.presentation?.layout] ?? 'sliders' })), h('strong', { className: 'dgui-header-title' }, doc.title), h('span', { className: 'dgui-badge' }, h(Icon, { name: 'sparkles' }), preview ? '生成中' : '交互界面')),
+    h('header', { className: 'dgui-header' }, h('span', { className: 'dgui-heading-icon' }, h(Icon, { name: sceneIcons[doc.presentation?.layout] ?? (Object.keys(doc.state).length?'sliders':'layers') })), h('strong', { className: 'dgui-header-title' }, doc.title), h('span', { className: 'dgui-badge' }, h(Icon, { name: 'sparkles' }), preview ? '生成中' : '可视化')),
     h('div', { key: epoch, className: 'dgui-content' }, doc.nodes.map(renderNode)),
-    h('div', { className: 'dgui-status', role: 'status', 'data-status': /失败|冲突/.test(status) ? 'error' : /正在|等待/.test(status) ? 'pending' : 'saved' }, h(Icon, { name: /失败|冲突/.test(status) ? 'warning' : /正在|等待/.test(status) ? 'database' : 'check' }), h('span', null, status), actionStatus && h('span', null, ` · ${actionStatus}`)),
+    (Object.keys(doc.state).length>0||issue||actionStatus)&&h('div', { className: 'dgui-status', role: 'status', 'data-status': /失败|冲突/.test(status) ? 'error' : /正在|等待/.test(status) ? 'pending' : 'saved' }, h(Icon, { name: /失败|冲突/.test(status) ? 'warning' : /正在|等待/.test(status) ? 'database' : 'check' }), h('span', null, status), actionStatus && h('span', null, ` · ${actionStatus}`)),
     issue && h('div', { className: 'dgui-recovery' },
       issue.kind === 'conflict' ? h(React.Fragment, null,
         h('button', { type: 'button', className: 'dgui-secondary', disabled: status === '正在恢复参数…', onClick: useRemote }, '使用已保存参数'),
@@ -161,9 +162,11 @@ function StreamingToolView(props) {
   return h(StreamingPreview, { raw, callId: props.callId, sessionId: props.sessionId });
 }
 export function StreamingPreview({ raw, callId = 'stream', sessionId }) {
+  const committed=useUiRegistry().some(r=>r.sessionId===sessionId&&r.raw.callId===callId);
   const deferred = React.useDeferredValue(raw);
   const doc = useMemo(() => previewDocument(deferred), [deferred]);
   const canvas=useMemo(()=>doc?null:previewCanvas(deferred),[doc,deferred]);
+  if(committed)return h('p',{className:'dgui-copy'},'界面已生成。');
   if(canvas)return h('div',{className:'dgui-root','data-preview':true},h(CanvasPreview,{node:canvas}));
   if (!doc) return h('div', { className: 'dgui-pending', role: 'status' }, '正在组织并校验交互界面…');
   return h(UiBoundary, { key: callId, fallback: doc.fallback }, h(UiView, { record: { document: doc, documentId: `preview-${callId}` }, sessionId, preview: true }));

@@ -35,7 +35,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1000, height: 1000 } }); page.on('pageerror', e => errors.push(e.message));
   const url = 'http://127.0.0.1:' + server.address().port;
   for (let i = 0; i < sceneExamples.length; i++) {
-    await page.goto(url + '/?view=' + i); await page.getByText('使用初始参数', { exact: true }).waitFor();
+    await page.goto(url + '/?view=' + i); await page.locator('.dgui-content').waitFor();if(Object.keys(sceneExamples[i].state??{}).length)await page.getByText('使用初始参数', { exact: true }).waitFor();else assert.equal(await page.locator('.dgui-status').count(),0);
     const layout = sceneExamples[i].presentation.layout;
     await page.screenshot({ path: `test-output/scene-${layout}-light.png`, fullPage: true });
     await page.evaluate(() => document.body.setAttribute('data-ds-dark-theme', ''));
@@ -51,7 +51,7 @@ try {
     }
     checks.push(layout + ': light/dark/tablet/mobile'); await page.setViewportSize({ width: 1000, height: 1000 });
   }
-  await page.setViewportSize({ width: 1500, height: 1200 }); await page.goto(url + '/?view=gallery'); await page.locator('.dgui-status').last().getByText('使用初始参数', { exact: true }).waitFor();
+  await page.setViewportSize({ width: 1500, height: 1200 }); await page.goto(url + '/?view=gallery'); await page.waitForFunction(()=>document.querySelectorAll('[data-dsh-generative-ui]').length===6);
   await page.screenshot({ path: 'test-output/scene-gallery.png', fullPage: true });
   await page.setViewportSize({ width: 1000, height: 1000 }); await page.goto(url + '/?view=stream'); const requestsBefore = stateRequests;
   const doc = { ...calculatorExample, actions: calculatorExample.actions, nodes: calculatorExample.nodes }, raw = JSON.stringify({ document: doc });

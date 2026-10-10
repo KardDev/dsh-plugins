@@ -4,7 +4,7 @@ const tests = (await readdir('tests')).filter(name => name.endsWith('.test.mjs')
 const steps = [
   ['unit-integration', ['--test', ...tests]], ['build', ['scripts/build.mjs']],
   ['host-syntax', ['--check', 'index.js']], ['client-syntax', ['--check', 'client.js']],
-  ['canvas', ['tests/verify-canvas.mjs']], ['canvas-delivery', ['tests/verify-canvas-delivery.mjs']], ['scenes-stream', ['tests/verify-scenes-stream.mjs']], ['state-recovery', ['tests/verify-recovery.mjs']],['refinement',['tests/verify-refinement.mjs']],['freeform',['tests/verify-freeform.mjs']],['presentation-history',['tests/verify-presentation.mjs']]
+  ['canvas', ['tests/verify-canvas.mjs']], ['canvas-delivery', ['tests/verify-canvas-delivery.mjs']], ['scenes-stream', ['tests/verify-scenes-stream.mjs']], ['state-recovery', ['tests/verify-recovery.mjs']],['refinement',['tests/verify-refinement.mjs']],['freeform',['tests/verify-freeform.mjs']],['presentation-history',['tests/verify-presentation.mjs']],['single-presentation-quick-layouts',['tests/verify-single-presentation.mjs']]
 ];
 if (process.env.DSH_VERIFY_INSTALLED === '1') steps.push(['installed-canvases', ['tests/verify-canvas-web.mjs']], ['installed-legacy', ['tests/verify-design-installed.mjs']]);
 const results = [];

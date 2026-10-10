@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 const records=new Map(),listeners=new Set(),locations=new Map();
-let opener;
-const emit=()=>listeners.forEach(fn=>fn());
+let opener,revision=0;
+const emit=()=>{revision++;listeners.forEach(fn=>fn())};
 export const notifyUi=emit;
 export function rememberUi(raw,sessionId,sendPrompt) {
   if(raw?.version!==1||raw.sessionId!==sessionId)return;
@@ -12,7 +12,7 @@ export function rememberUi(raw,sessionId,sendPrompt) {
 }
 export const uiRecords=()=>[...records.values()];
 export const subscribeUi=fn=>{listeners.add(fn);return()=>listeners.delete(fn)};
-export function useUiRegistry(){const[,wake]=useState(0);useEffect(()=>subscribeUi(()=>wake(v=>v+1)),[]);return uiRecords();}
+export function useUiRegistry(){useSyncExternalStore(subscribeUi,()=>revision,()=>0);return uiRecords();}
 export function setPanelOpener(fn){opener=fn;emit();return()=>{if(opener===fn){opener=undefined;emit()}}}
 export const panelAvailable=()=>!!opener;
 export function openUiPanel(id,sessionId){return opener?.(id,sessionId)}

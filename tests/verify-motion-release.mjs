@@ -15,11 +15,14 @@ try{
  const mode=p.getByRole('combobox',{name:'设计模式',exact:true});await mode.waitFor();await p.waitForFunction(()=>!document.getElementById('dgui-design-mode')?.disabled);
  const original=await mode.inputValue();await mode.selectOption(original==='guided'?'free':'guided');await p.getByText('模式已保存；从下一次请求开始生效。',{exact:true}).waitFor();await mode.selectOption(original);await p.getByText('模式已保存；从下一次请求开始生效。',{exact:true}).waitFor();
  await p.screenshot({path:'test-output/motion-release-settings.png'});report.checks.push('renamed plugin owns live saved configuration under Home Plugins');
+ if(process.env.DSH_VERIFY_MISSING_MARKER==='1'){await p.getByRole('combobox',{name:'界面展示位置',exact:true}).selectOption('inline');await p.getByText('展示设置已保存；正文定位指导从下一次请求开始生效。',{exact:true}).waitFor()}
  // Return to conversation browser before replaying a previously generated UI.
  await p.goto(url,{waitUntil:'networkidle'});
  const row=p.locator('[data-row-key="session:'+result.sessionId+'"]');
  for(let i=0;i<10&&!await row.isVisible();i++){const group=p.getByText('测试结果',{exact:true}).first();if(await group.isVisible())await group.click();for(const more of await p.getByText(/^展开其余 \d+ 个会话$/).all())if(await more.isVisible())await more.click();await p.waitForTimeout(300)}await row.click();
  const ui=p.locator('[data-dsh-generative-ui="'+result.cases[0].documentId+'"]:not([data-preview=true])').last();await ui.getByText('已恢复保存的参数',{exact:true}).waitFor();assert.equal(await ui.getAttribute('data-dgui-build'),BUILD_INFO.id);
+ assert.equal(await p.locator('[data-dsh-generative-ui="'+result.cases[0].documentId+'"]:not([data-preview=true])').count(),1);
+ if(process.env.DSH_VERIFY_MISSING_MARKER==='1'){await p.getByText('未提供正文标记，界面显示在回答下方。',{exact:true}).waitFor();report.checks.push('native inline mode without model marker shows exactly one answer-area UI')}
  const slider=ui.getByRole('slider'),saved=await slider.inputValue();
  try{await slider.fill('6');await ui.getByText('参数已保存',{exact:true}).waitFor();await ui.locator('[data-ui-node=mP]').filter({hasText:'3.60'}).waitFor();await p.reload();await ui.getByText('已恢复保存的参数',{exact:true}).waitFor();assert.equal(await slider.inputValue(),'6');}finally{await slider.fill(saved);await ui.getByText('参数已保存',{exact:true}).waitFor()}
  report.checks.push('legacy model-generated UI replays with renamed client; calculations, persistence and reload pass');
