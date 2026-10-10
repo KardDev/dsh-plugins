@@ -10,7 +10,7 @@ import { sceneExamples, calculatorExample } from '../lib/catalog.js';
 const require = createRequire(import.meta.url), { chromium } = require(process.env.DSH_PLAYWRIGHT ?? 'playwright');
 const directory = await mkdtemp(join(tmpdir(), 'dgui-scenes-')), store = new UiStore(directory), handler = stateRoute(store);
 const records = await Promise.all([...sceneExamples, calculatorExample].map(document => store.create(document, { sessionId: 'test', callId: 'test' })));
-const entry = `import React from 'react';import{createRoot}from'react-dom/client';import{ValidatedView,ToolView}from'./src/view.js';import{CSS}from'./src/styles.js';
+const entry = `import './tests/diagnostic-fixture.js';import React from 'react';import{createRoot}from'react-dom/client';import{ValidatedView,ToolView}from'./src/view.js';import{CSS}from'./src/styles.js';
 const records=${JSON.stringify(records)};const style=document.createElement('style');style.textContent=CSS;document.head.append(style);
 const root=createRoot(document.getElementById('app')),view=new URLSearchParams(location.search).get('view');let snapshot='',listeners=new Set();
 const usePartial=()=>React.useSyncExternalStore(cb=>{listeners.add(cb);return()=>listeners.delete(cb)},()=>snapshot);

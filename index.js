@@ -11,21 +11,34 @@ import { UI_SKILL_SECTIONS, promptSections } from './lib/ui-skill.js';
 import { canvasDocument } from './lib/freeform.js';
 import z from '@deepseek-ai/schemastery';
 import { toolJson } from './lib/tool-json.js';
+import { DOCUMENT_PARAMETER } from './lib/tool-schema.js';
 import { inspectRecord } from './lib/inspection.js';
 import {QUICK_EXAMPLES,QUICK_GUIDE} from './lib/quick-examples.js';
 import { PROTOCOL_GUIDE, calculatorExample, comparisonExample, budgetExample, curveExample, sceneExamples, bicycleExample, oscillatorExample } from './lib/catalog.js';
 
 export const name = 'motion-ui';
 export const inject = ['tools', 'connection', 'systemPrompt'];
-export const Config=z.object({designMode:z.union(['guided','free']).default('guided').description('guided：设计技能与示例引导；free：只注入画布接口与交互约束，由模型自主设计。'),displayMode:z.union(['tail','inline','sidebar']).default('tail').description('tail：回答下方；inline：正文标记位置；sidebar：PC 侧栏。')}).volatile();
+function defineRenderTool(options) {
+  const tool=defineTool(options),execute=tool.execute;
+  return {...tool,async execute(args,exec){
+    // Legacy adapters may stringify JSON. Decode here, without advertising a
+    // string branch that encourages models to manually escape whole documents.
+    const normalized=args&&Object.hasOwn(args,'document')?{...args,document:toolJson(args.document,'document')}:args;
+    try{return await execute(normalized,exec);}catch(error){
+      if(error.name==='ToolArgsError' && args && Object.hasOwn(args,'document')) validateDocument(toolJson(args.document,'document'));
+      throw error;
+    }
+  }};
+}
+export const Config=z.object({designMode:z.union(['guided','free']).default('guided').description('guided：设计技能与示例引导；free：只注入画布接口与交互约束，由模型自主设计。'),displayMode:z.union(['tail','inline','sidebar']).default('tail').description('tail：回答下方；inline：正文标记位置；sidebar：PC 侧栏。'),showDetails:z.boolean().default(false).description('显示参数状态、原始说明、视觉诊断和版本历史。默认关闭，保持界面简洁。')}).volatile();
 export function apply(ctx,config={}) {
   const store = new UiStore(dshHomePath('plugins', 'dsh-generative-ui'));
   const settings=()=>typeof config.get==='function'?config.get():config;
   const placement=value=>settings().displayMode==='inline'?`\nPlace this exact fenced marker in your answer at the intended UI position:\n\`\`\`dsh-ui\n${value.documentId}\n\`\`\``:'';
-  ctx.effect(() => ctx.tools.register(defineTool({
+  ctx.effect(() => ctx.tools.register(defineRenderTool({
     name: 'render_ui',
     description: 'Render a static or interactive DSH UI v1 document in this conversation. Proactively use when visual relationships or changing parameters clearly explain the question better, even without an explicit UI request. Ordinary facts and short explanations stay text. Deliver the smallest complete useful UI first. ui_catalog supplies optional details. Direct native calls only; PTC returns text. Calculations stay local. document requires version:1,title,fallback,nodes. Repair errors at most twice or simplify/answer in text.',
-    parameters: { document: { type: 'json', required: true, description: 'DSH UI v1 document. Follow the injected protocol and worked examples; ui_catalog supplies additional schema/examples when needed.' } },
+    parameters: { document: DOCUMENT_PARAMETER },
     output: {
       schema: { type: 'json' },
       render: (_args, value) => [{ type: 'text', text: fallbackText(value.document)+`\nUI documentId=${value.documentId}; documentRevision=${value.documentRevision??0}. Use inspect_ui before refinements.`+placement(value) }],

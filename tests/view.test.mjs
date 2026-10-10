@@ -30,7 +30,7 @@ test('chart exposes a labelled SVG and exact data in an accessible table', () =>
 
 test('stateless view keeps original explanation without an empty parameter block', () => {
   const result = renderToStaticMarkup(h(ValidatedView, { raw: record(comparisonExample), sessionId: 's1' }));
-  assert.match(result, /原始文字说明/);
+  assert.doesNotMatch(result, /原始文字说明|显示检查|版本历史/);
   assert.doesNotMatch(result, /原始文字说明与初始参数|<pre>\{\}<\/pre>/);
 });
 

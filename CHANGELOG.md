@@ -1,5 +1,14 @@
 # DSH Motion UI
 
+## Unreleased — authoring compatibility and cleaner visuals
+
+- Publish a native object schema for render_ui, including the document skeleton and component vocabulary. Legacy JSON strings are decoded internally; models are no longer offered a string branch that encourages double escaping.
+- Accept JSON fences/trailing commas outside strings without guessing malformed quotes or executing source. Errors identify the failed field and JSON location where available.
+- Support string/boolean metrics, optional table captions, inline table/chart rows, scoped row shorthand, and Unicode identifiers consistently across formulas, maps and references.
+- Add bounded structured JSON state for canvas checklists/objects, preserving arrays and objects through persistence and standalone export. A string state with a structured default and no options is canonicalized to json; native inputs still require scalar state.
+- Default to a clean view: hide footer diagnostics, history, parameter status and original-description disclosures. Home → Plugins offers optional details. Canvas actions use a compact menu; charts expose data through a title-row button.
+- Use rounder surfaces and soft theme-aware gradient fills. Committed, preview and exported canvases fit content height rather than keeping a 160px minimum; filtering can shrink them again.
+
 ## 0.5.3 — 2026-10-10
 
 - Prefer lightweight static diagrams, concise comparisons, short processes and compact dashboards; controls and animation are added when useful.

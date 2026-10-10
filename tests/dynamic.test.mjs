@@ -6,8 +6,8 @@ const copy=()=>structuredClone(curveExample);
 test('map diagnostics explain row references and distinguish internal keys from display labels',()=>{
  const inline=copy();inline.derived.curve.map.source=[{fraction:1}];
  assert.throws(()=>validateDocument(inline),/string such as "data.samples".*document.data.samples/);
- const labels=copy();labels.derived.curve.map.fields={'功率W':{const:1}};
- assert.throws(()=>validateDocument(labels),/invalid map field "功率W".*ASCII identifier.*Chinese display text/);
+ const labels=copy();labels.derived.curve.map.fields={'功率 W':{const:1}};
+ assert.throws(()=>validateDocument(labels),/invalid map field "功率 W".*identifier/);
 });
 test('mapped chart/table rows recompute from state and match followup derived snapshot',()=>{
  const d=validateDocument(copy()), original=evaluate(d,initialState(d)).derived;

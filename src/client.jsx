@@ -5,9 +5,11 @@ import { CSS } from './styles.js';
 import { ModeSettings } from './settings.js';
 import { UiPanel,focusUi } from './presentation.js';
 import { setPanelOpener } from './presentation-store.js';
+import {configureViewSettings} from './view-settings.js';
 export const inject = ['slots', 'sessions', 'conversation', 'uiConversation', 'configForms'];
 export function apply(ctx) {
   const scope=ctx.configForms.get('motion-ui');
+  configureViewSettings(scope);
   ctx.slots.inject('plugins.bundle.config',()=>ctx.slots.register({name:'plugins.bundle.config',key:'dsh-motion-ui'},props=>React.createElement(ModeSettings,{...props,scope})));
   ctx.uiConversation.events.register(turnUiDefinition);
   ctx.slots.inject('conversation.chat.turnTail', () => ctx.slots.register({

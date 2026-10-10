@@ -16,9 +16,9 @@ var __export = (target, all) => {
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
-    for (let key3 of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key3) && key3 !== except)
-        __defProp(to, key3, { get: () => from[key3], enumerable: !(desc = __getOwnPropDesc(from, key3)) || desc.enumerable });
+    for (let key2 of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key2) && key2 !== except)
+        __defProp(to, key2, { get: () => from[key2], enumerable: !(desc = __getOwnPropDesc(from, key2)) || desc.enumerable });
   }
   return to;
 };
@@ -504,9 +504,9 @@ var require_react_dom_development = __commonJS({
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
         }
-        var React9 = require("react");
+        var React10 = require("react");
         var Scheduler = require_scheduler();
-        var ReactSharedInternals = React9.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React10.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         var suppressWarning = false;
         function setSuppressWarning(newSuppressWarning) {
           {
@@ -2113,7 +2113,7 @@ var require_react_dom_development = __commonJS({
           {
             if (props.value == null) {
               if (typeof props.children === "object" && props.children !== null) {
-                React9.Children.forEach(props.children, function(child) {
+                React10.Children.forEach(props.children, function(child) {
                   if (child == null) {
                     return;
                   }
@@ -2506,8 +2506,8 @@ var require_react_dom_development = __commonJS({
           strokeOpacity: true,
           strokeWidth: true
         };
-        function prefixKey(prefix2, key3) {
-          return prefix2 + key3.charAt(0).toUpperCase() + key3.substring(1);
+        function prefixKey(prefix2, key2) {
+          return prefix2 + key2.charAt(0).toUpperCase() + key2.substring(1);
         }
         var prefixes = ["Webkit", "ms", "Moz", "O"];
         Object.keys(isUnitlessNumber).forEach(function(prop) {
@@ -2656,10 +2656,10 @@ var require_react_dom_development = __commonJS({
         }
         function expandShorthandMap(styles) {
           var expanded = {};
-          for (var key3 in styles) {
-            var longhands = shorthandToLonghand[key3] || [key3];
+          for (var key2 in styles) {
+            var longhands = shorthandToLonghand[key2] || [key2];
             for (var i = 0; i < longhands.length; i++) {
-              expanded[longhands[i]] = key3;
+              expanded[longhands[i]] = key2;
             }
           }
           return expanded;
@@ -2672,9 +2672,9 @@ var require_react_dom_development = __commonJS({
             var expandedUpdates = expandShorthandMap(styleUpdates);
             var expandedStyles = expandShorthandMap(nextStyles);
             var warnedAbout = {};
-            for (var key3 in expandedUpdates) {
-              var originalKey = expandedUpdates[key3];
-              var correctOriginalKey = expandedStyles[key3];
+            for (var key2 in expandedUpdates) {
+              var originalKey = expandedUpdates[key2];
+              var correctOriginalKey = expandedStyles[key2];
               if (correctOriginalKey && originalKey !== correctOriginalKey) {
                 var warningKey = originalKey + "," + correctOriginalKey;
                 if (warnedAbout[warningKey]) {
@@ -3345,10 +3345,10 @@ var require_react_dom_development = __commonJS({
         function warnInvalidARIAProps(type, props) {
           {
             var invalidProps = [];
-            for (var key3 in props) {
-              var isValid = validateProperty(type, key3);
+            for (var key2 in props) {
+              var isValid = validateProperty(type, key2);
               if (!isValid) {
-                invalidProps.push(key3);
+                invalidProps.push(key2);
               }
             }
             var unknownPropString = invalidProps.map(function(prop) {
@@ -3488,10 +3488,10 @@ var require_react_dom_development = __commonJS({
         var warnUnknownProperties = function(type, props, eventRegistry) {
           {
             var unknownProps = [];
-            for (var key3 in props) {
-              var isValid = validateProperty$1(type, key3, props[key3], eventRegistry);
+            for (var key2 in props) {
+              var isValid = validateProperty$1(type, key2, props[key2], eventRegistry);
               if (!isValid) {
-                unknownProps.push(key3);
+                unknownProps.push(key2);
               }
             }
             var unknownPropString = unknownProps.map(function(prop) {
@@ -3796,14 +3796,14 @@ var require_react_dom_development = __commonJS({
             throw new Error("clearCaughtError was called but no error was captured. This error is likely caused by a bug in React. Please file an issue.");
           }
         }
-        function get(key3) {
-          return key3._reactInternals;
+        function get(key2) {
+          return key2._reactInternals;
         }
-        function has(key3) {
-          return key3._reactInternals !== void 0;
+        function has(key2) {
+          return key2._reactInternals !== void 0;
         }
-        function set(key3, value) {
-          key3._reactInternals = value;
+        function set(key2, value) {
+          key2._reactInternals = value;
         }
         var NoFlags = (
           /*                      */
@@ -5378,9 +5378,9 @@ var require_react_dom_development = __commonJS({
           }
           return true;
         }
-        function attemptReplayContinuousQueuedEventInMap(queuedEvent, key3, map) {
+        function attemptReplayContinuousQueuedEventInMap(queuedEvent, key2, map) {
           if (attemptReplayContinuousQueuedEvent(queuedEvent)) {
-            map.delete(key3);
+            map.delete(key2);
           }
         }
         function replayUnblockedEvents() {
@@ -5976,9 +5976,9 @@ var require_react_dom_development = __commonJS({
         };
         function getEventKey(nativeEvent) {
           if (nativeEvent.key) {
-            var key3 = normalizeKey[nativeEvent.key] || nativeEvent.key;
-            if (key3 !== "Unidentified") {
-              return key3;
+            var key2 = normalizeKey[nativeEvent.key] || nativeEvent.key;
+            if (key2 !== "Unidentified") {
+              return key2;
             }
           }
           if (nativeEvent.type === "keypress") {
@@ -9033,8 +9033,8 @@ var require_react_dom_development = __commonJS({
               return instance.__reactInternalMemoizedMaskedChildContext;
             }
             var context = {};
-            for (var key3 in contextTypes) {
-              context[key3] = unmaskedContext[key3];
+            for (var key2 in contextTypes) {
+              context[key2] = unmaskedContext[key2];
             }
             {
               var name = getComponentNameFromFiber(workInProgress2) || "Unknown";
@@ -10140,9 +10140,9 @@ var require_react_dom_development = __commonJS({
               return existing;
             }
           }
-          function updateFragment2(returnFiber, current3, fragment, lanes, key3) {
+          function updateFragment2(returnFiber, current3, fragment, lanes, key2) {
             if (current3 === null || current3.tag !== Fragment) {
-              var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key3);
+              var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key2);
               created.return = returnFiber;
               return created;
             } else {
@@ -10191,9 +10191,9 @@ var require_react_dom_development = __commonJS({
             return null;
           }
           function updateSlot(returnFiber, oldFiber, newChild, lanes) {
-            var key3 = oldFiber !== null ? oldFiber.key : null;
+            var key2 = oldFiber !== null ? oldFiber.key : null;
             if (typeof newChild === "string" && newChild !== "" || typeof newChild === "number") {
-              if (key3 !== null) {
+              if (key2 !== null) {
                 return null;
               }
               return updateTextNode(returnFiber, oldFiber, "" + newChild, lanes);
@@ -10201,14 +10201,14 @@ var require_react_dom_development = __commonJS({
             if (typeof newChild === "object" && newChild !== null) {
               switch (newChild.$$typeof) {
                 case REACT_ELEMENT_TYPE: {
-                  if (newChild.key === key3) {
+                  if (newChild.key === key2) {
                     return updateElement(returnFiber, oldFiber, newChild, lanes);
                   } else {
                     return null;
                   }
                 }
                 case REACT_PORTAL_TYPE: {
-                  if (newChild.key === key3) {
+                  if (newChild.key === key2) {
                     return updatePortal(returnFiber, oldFiber, newChild, lanes);
                   } else {
                     return null;
@@ -10221,7 +10221,7 @@ var require_react_dom_development = __commonJS({
                 }
               }
               if (isArray(newChild) || getIteratorFn(newChild)) {
-                if (key3 !== null) {
+                if (key2 !== null) {
                   return null;
                 }
                 return updateFragment2(returnFiber, oldFiber, newChild, lanes, null);
@@ -10277,20 +10277,20 @@ var require_react_dom_development = __commonJS({
                 case REACT_ELEMENT_TYPE:
                 case REACT_PORTAL_TYPE:
                   warnForMissingKey(child, returnFiber);
-                  var key3 = child.key;
-                  if (typeof key3 !== "string") {
+                  var key2 = child.key;
+                  if (typeof key2 !== "string") {
                     break;
                   }
                   if (knownKeys === null) {
                     knownKeys = /* @__PURE__ */ new Set();
-                    knownKeys.add(key3);
+                    knownKeys.add(key2);
                     break;
                   }
-                  if (!knownKeys.has(key3)) {
-                    knownKeys.add(key3);
+                  if (!knownKeys.has(key2)) {
+                    knownKeys.add(key2);
                     break;
                   }
-                  error("Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.", key3);
+                  error("Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.", key2);
                   break;
                 case REACT_LAZY_TYPE:
                   var payload = child._payload;
@@ -10538,10 +10538,10 @@ var require_react_dom_development = __commonJS({
             return created;
           }
           function reconcileSingleElement(returnFiber, currentFirstChild, element, lanes) {
-            var key3 = element.key;
+            var key2 = element.key;
             var child = currentFirstChild;
             while (child !== null) {
-              if (child.key === key3) {
+              if (child.key === key2) {
                 var elementType = element.type;
                 if (elementType === REACT_FRAGMENT_TYPE) {
                   if (child.tag === Fragment) {
@@ -10591,10 +10591,10 @@ var require_react_dom_development = __commonJS({
             }
           }
           function reconcileSinglePortal(returnFiber, currentFirstChild, portal, lanes) {
-            var key3 = portal.key;
+            var key2 = portal.key;
             var child = currentFirstChild;
             while (child !== null) {
-              if (child.key === key3) {
+              if (child.key === key2) {
                 if (child.tag === HostPortal && child.stateNode.containerInfo === portal.containerInfo && child.stateNode.implementation === portal.implementation) {
                   deleteRemainingChildren(returnFiber, child.sibling);
                   var existing = useFiber(child, portal.children || []);
@@ -11929,17 +11929,17 @@ var require_react_dom_development = __commonJS({
           }
           return [newState, dispatch];
         }
-        function mountMutableSource(source, getSnapshot, subscribe) {
+        function mountMutableSource(source, getSnapshot, subscribe2) {
           {
             return void 0;
           }
         }
-        function updateMutableSource(source, getSnapshot, subscribe) {
+        function updateMutableSource(source, getSnapshot, subscribe2) {
           {
             return void 0;
           }
         }
-        function mountSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
+        function mountSyncExternalStore(subscribe2, getSnapshot, getServerSnapshot) {
           var fiber = currentlyRenderingFiber$1;
           var hook = mountWorkInProgressHook();
           var nextSnapshot;
@@ -11982,12 +11982,12 @@ var require_react_dom_development = __commonJS({
             getSnapshot
           };
           hook.queue = inst;
-          mountEffect(subscribeToStore.bind(null, fiber, inst, subscribe), [subscribe]);
+          mountEffect(subscribeToStore.bind(null, fiber, inst, subscribe2), [subscribe2]);
           fiber.flags |= Passive;
           pushEffect(HasEffect | Passive$1, updateStoreInstance.bind(null, fiber, inst, nextSnapshot, getSnapshot), void 0, null);
           return nextSnapshot;
         }
-        function updateSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
+        function updateSyncExternalStore(subscribe2, getSnapshot, getServerSnapshot) {
           var fiber = currentlyRenderingFiber$1;
           var hook = updateWorkInProgressHook();
           var nextSnapshot = getSnapshot();
@@ -12007,7 +12007,7 @@ var require_react_dom_development = __commonJS({
             markWorkInProgressReceivedUpdate();
           }
           var inst = hook.queue;
-          updateEffect(subscribeToStore.bind(null, fiber, inst, subscribe), [subscribe]);
+          updateEffect(subscribeToStore.bind(null, fiber, inst, subscribe2), [subscribe2]);
           if (inst.getSnapshot !== getSnapshot || snapshotChanged || // Check if the susbcribe function changed. We can save some memory by
           // checking whether we scheduled a subscription effect above.
           workInProgressHook !== null && workInProgressHook.memoizedState.tag & HasEffect) {
@@ -12050,13 +12050,13 @@ var require_react_dom_development = __commonJS({
             forceStoreRerender(fiber);
           }
         }
-        function subscribeToStore(fiber, inst, subscribe) {
+        function subscribeToStore(fiber, inst, subscribe2) {
           var handleStoreChange = function() {
             if (checkIfSnapshotChanged(inst)) {
               forceStoreRerender(fiber);
             }
           };
-          return subscribe(handleStoreChange);
+          return subscribe2(handleStoreChange);
         }
         function checkIfSnapshotChanged(inst) {
           var latestGetSnapshot = inst.getSnapshot;
@@ -12637,15 +12637,15 @@ var require_react_dom_development = __commonJS({
               mountHookTypesDev();
               return mountTransition();
             },
-            useMutableSource: function(source, getSnapshot, subscribe) {
+            useMutableSource: function(source, getSnapshot, subscribe2) {
               currentHookNameInDev = "useMutableSource";
               mountHookTypesDev();
               return mountMutableSource();
             },
-            useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
+            useSyncExternalStore: function(subscribe2, getSnapshot, getServerSnapshot) {
               currentHookNameInDev = "useSyncExternalStore";
               mountHookTypesDev();
-              return mountSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+              return mountSyncExternalStore(subscribe2, getSnapshot, getServerSnapshot);
             },
             useId: function() {
               currentHookNameInDev = "useId";
@@ -12741,15 +12741,15 @@ var require_react_dom_development = __commonJS({
               updateHookTypesDev();
               return mountTransition();
             },
-            useMutableSource: function(source, getSnapshot, subscribe) {
+            useMutableSource: function(source, getSnapshot, subscribe2) {
               currentHookNameInDev = "useMutableSource";
               updateHookTypesDev();
               return mountMutableSource();
             },
-            useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
+            useSyncExternalStore: function(subscribe2, getSnapshot, getServerSnapshot) {
               currentHookNameInDev = "useSyncExternalStore";
               updateHookTypesDev();
-              return mountSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+              return mountSyncExternalStore(subscribe2, getSnapshot, getServerSnapshot);
             },
             useId: function() {
               currentHookNameInDev = "useId";
@@ -12845,15 +12845,15 @@ var require_react_dom_development = __commonJS({
               updateHookTypesDev();
               return updateTransition();
             },
-            useMutableSource: function(source, getSnapshot, subscribe) {
+            useMutableSource: function(source, getSnapshot, subscribe2) {
               currentHookNameInDev = "useMutableSource";
               updateHookTypesDev();
               return updateMutableSource();
             },
-            useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
+            useSyncExternalStore: function(subscribe2, getSnapshot, getServerSnapshot) {
               currentHookNameInDev = "useSyncExternalStore";
               updateHookTypesDev();
-              return updateSyncExternalStore(subscribe, getSnapshot);
+              return updateSyncExternalStore(subscribe2, getSnapshot);
             },
             useId: function() {
               currentHookNameInDev = "useId";
@@ -12949,15 +12949,15 @@ var require_react_dom_development = __commonJS({
               updateHookTypesDev();
               return rerenderTransition();
             },
-            useMutableSource: function(source, getSnapshot, subscribe) {
+            useMutableSource: function(source, getSnapshot, subscribe2) {
               currentHookNameInDev = "useMutableSource";
               updateHookTypesDev();
               return updateMutableSource();
             },
-            useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
+            useSyncExternalStore: function(subscribe2, getSnapshot, getServerSnapshot) {
               currentHookNameInDev = "useSyncExternalStore";
               updateHookTypesDev();
-              return updateSyncExternalStore(subscribe, getSnapshot);
+              return updateSyncExternalStore(subscribe2, getSnapshot);
             },
             useId: function() {
               currentHookNameInDev = "useId";
@@ -13067,17 +13067,17 @@ var require_react_dom_development = __commonJS({
               mountHookTypesDev();
               return mountTransition();
             },
-            useMutableSource: function(source, getSnapshot, subscribe) {
+            useMutableSource: function(source, getSnapshot, subscribe2) {
               currentHookNameInDev = "useMutableSource";
               warnInvalidHookAccess();
               mountHookTypesDev();
               return mountMutableSource();
             },
-            useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
+            useSyncExternalStore: function(subscribe2, getSnapshot, getServerSnapshot) {
               currentHookNameInDev = "useSyncExternalStore";
               warnInvalidHookAccess();
               mountHookTypesDev();
-              return mountSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+              return mountSyncExternalStore(subscribe2, getSnapshot, getServerSnapshot);
             },
             useId: function() {
               currentHookNameInDev = "useId";
@@ -13188,17 +13188,17 @@ var require_react_dom_development = __commonJS({
               updateHookTypesDev();
               return updateTransition();
             },
-            useMutableSource: function(source, getSnapshot, subscribe) {
+            useMutableSource: function(source, getSnapshot, subscribe2) {
               currentHookNameInDev = "useMutableSource";
               warnInvalidHookAccess();
               updateHookTypesDev();
               return updateMutableSource();
             },
-            useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
+            useSyncExternalStore: function(subscribe2, getSnapshot, getServerSnapshot) {
               currentHookNameInDev = "useSyncExternalStore";
               warnInvalidHookAccess();
               updateHookTypesDev();
-              return updateSyncExternalStore(subscribe, getSnapshot);
+              return updateSyncExternalStore(subscribe2, getSnapshot);
             },
             useId: function() {
               currentHookNameInDev = "useId";
@@ -13309,17 +13309,17 @@ var require_react_dom_development = __commonJS({
               updateHookTypesDev();
               return rerenderTransition();
             },
-            useMutableSource: function(source, getSnapshot, subscribe) {
+            useMutableSource: function(source, getSnapshot, subscribe2) {
               currentHookNameInDev = "useMutableSource";
               warnInvalidHookAccess();
               updateHookTypesDev();
               return updateMutableSource();
             },
-            useSyncExternalStore: function(subscribe, getSnapshot, getServerSnapshot) {
+            useSyncExternalStore: function(subscribe2, getSnapshot, getServerSnapshot) {
               currentHookNameInDev = "useSyncExternalStore";
               warnInvalidHookAccess();
               updateHookTypesDev();
-              return updateSyncExternalStore(subscribe, getSnapshot);
+              return updateSyncExternalStore(subscribe2, getSnapshot);
             },
             useId: function() {
               currentHookNameInDev = "useId";
@@ -13479,9 +13479,9 @@ var require_react_dom_development = __commonJS({
             if (callback === null || typeof callback === "function") {
               return;
             }
-            var key3 = callerName + "_" + callback;
-            if (!didWarnOnInvalidCallback.has(key3)) {
-              didWarnOnInvalidCallback.add(key3);
+            var key2 = callerName + "_" + callback;
+            if (!didWarnOnInvalidCallback.has(key2)) {
+              didWarnOnInvalidCallback.add(key2);
               error("%s(...): Expected the last optional `callback` argument to be a function. Instead received: %s.", callerName, callback);
             }
           };
@@ -16893,15 +16893,15 @@ var require_react_dom_development = __commonJS({
                       }
                     }
                   }
-                  var snapshot = instance.getSnapshotBeforeUpdate(finishedWork.elementType === finishedWork.type ? prevProps : resolveDefaultProps(finishedWork.type, prevProps), prevState);
+                  var snapshot2 = instance.getSnapshotBeforeUpdate(finishedWork.elementType === finishedWork.type ? prevProps : resolveDefaultProps(finishedWork.type, prevProps), prevState);
                   {
                     var didWarnSet = didWarnAboutUndefinedSnapshotBeforeUpdate;
-                    if (snapshot === void 0 && !didWarnSet.has(finishedWork.type)) {
+                    if (snapshot2 === void 0 && !didWarnSet.has(finishedWork.type)) {
                       didWarnSet.add(finishedWork.type);
                       error("%s.getSnapshotBeforeUpdate(): A snapshot value (or null) must be returned. You have returned undefined.", getComponentNameFromFiber(finishedWork));
                     }
                   }
-                  instance.__reactInternalSnapshotBeforeUpdate = snapshot;
+                  instance.__reactInternalSnapshotBeforeUpdate = snapshot2;
                 }
                 break;
               }
@@ -20259,9 +20259,9 @@ var require_react_dom_development = __commonJS({
             hasBadMapPolyfill = true;
           }
         }
-        function FiberNode(tag, pendingProps, key3, mode) {
+        function FiberNode(tag, pendingProps, key2, mode) {
           this.tag = tag;
-          this.key = key3;
+          this.key = key2;
           this.elementType = null;
           this.type = null;
           this.stateNode = null;
@@ -20302,8 +20302,8 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        var createFiber = function(tag, pendingProps, key3, mode) {
-          return new FiberNode(tag, pendingProps, key3, mode);
+        var createFiber = function(tag, pendingProps, key2, mode) {
+          return new FiberNode(tag, pendingProps, key2, mode);
         };
         function shouldConstruct$1(Component) {
           var prototype = Component.prototype;
@@ -20445,7 +20445,7 @@ var require_react_dom_development = __commonJS({
           }
           return createFiber(HostRoot, null, null, mode);
         }
-        function createFiberFromTypeAndProps(type, key3, pendingProps, owner, mode, lanes) {
+        function createFiberFromTypeAndProps(type, key2, pendingProps, owner, mode, lanes) {
           var fiberTag = IndeterminateComponent;
           var resolvedType = type;
           if (typeof type === "function") {
@@ -20464,7 +20464,7 @@ var require_react_dom_development = __commonJS({
           } else {
             getTag: switch (type) {
               case REACT_FRAGMENT_TYPE:
-                return createFiberFromFragment(pendingProps.children, mode, lanes, key3);
+                return createFiberFromFragment(pendingProps.children, mode, lanes, key2);
               case REACT_STRICT_MODE_TYPE:
                 fiberTag = Mode;
                 mode |= StrictLegacyMode;
@@ -20473,13 +20473,13 @@ var require_react_dom_development = __commonJS({
                 }
                 break;
               case REACT_PROFILER_TYPE:
-                return createFiberFromProfiler(pendingProps, mode, lanes, key3);
+                return createFiberFromProfiler(pendingProps, mode, lanes, key2);
               case REACT_SUSPENSE_TYPE:
-                return createFiberFromSuspense(pendingProps, mode, lanes, key3);
+                return createFiberFromSuspense(pendingProps, mode, lanes, key2);
               case REACT_SUSPENSE_LIST_TYPE:
-                return createFiberFromSuspenseList(pendingProps, mode, lanes, key3);
+                return createFiberFromSuspenseList(pendingProps, mode, lanes, key2);
               case REACT_OFFSCREEN_TYPE:
-                return createFiberFromOffscreen(pendingProps, mode, lanes, key3);
+                return createFiberFromOffscreen(pendingProps, mode, lanes, key2);
               case REACT_LEGACY_HIDDEN_TYPE:
               // eslint-disable-next-line no-fallthrough
               case REACT_SCOPE_TYPE:
@@ -20528,7 +20528,7 @@ var require_react_dom_development = __commonJS({
               }
             }
           }
-          var fiber = createFiber(fiberTag, pendingProps, key3, mode);
+          var fiber = createFiber(fiberTag, pendingProps, key2, mode);
           fiber.elementType = type;
           fiber.type = resolvedType;
           fiber.lanes = lanes;
@@ -20543,27 +20543,27 @@ var require_react_dom_development = __commonJS({
             owner = element._owner;
           }
           var type = element.type;
-          var key3 = element.key;
+          var key2 = element.key;
           var pendingProps = element.props;
-          var fiber = createFiberFromTypeAndProps(type, key3, pendingProps, owner, mode, lanes);
+          var fiber = createFiberFromTypeAndProps(type, key2, pendingProps, owner, mode, lanes);
           {
             fiber._debugSource = element._source;
             fiber._debugOwner = element._owner;
           }
           return fiber;
         }
-        function createFiberFromFragment(elements, mode, lanes, key3) {
-          var fiber = createFiber(Fragment, elements, key3, mode);
+        function createFiberFromFragment(elements, mode, lanes, key2) {
+          var fiber = createFiber(Fragment, elements, key2, mode);
           fiber.lanes = lanes;
           return fiber;
         }
-        function createFiberFromProfiler(pendingProps, mode, lanes, key3) {
+        function createFiberFromProfiler(pendingProps, mode, lanes, key2) {
           {
             if (typeof pendingProps.id !== "string") {
               error('Profiler must specify an "id" of type `string` as a prop. Received the type `%s` instead.', typeof pendingProps.id);
             }
           }
-          var fiber = createFiber(Profiler, pendingProps, key3, mode | ProfileMode);
+          var fiber = createFiber(Profiler, pendingProps, key2, mode | ProfileMode);
           fiber.elementType = REACT_PROFILER_TYPE;
           fiber.lanes = lanes;
           {
@@ -20574,20 +20574,20 @@ var require_react_dom_development = __commonJS({
           }
           return fiber;
         }
-        function createFiberFromSuspense(pendingProps, mode, lanes, key3) {
-          var fiber = createFiber(SuspenseComponent, pendingProps, key3, mode);
+        function createFiberFromSuspense(pendingProps, mode, lanes, key2) {
+          var fiber = createFiber(SuspenseComponent, pendingProps, key2, mode);
           fiber.elementType = REACT_SUSPENSE_TYPE;
           fiber.lanes = lanes;
           return fiber;
         }
-        function createFiberFromSuspenseList(pendingProps, mode, lanes, key3) {
-          var fiber = createFiber(SuspenseListComponent, pendingProps, key3, mode);
+        function createFiberFromSuspenseList(pendingProps, mode, lanes, key2) {
+          var fiber = createFiber(SuspenseListComponent, pendingProps, key2, mode);
           fiber.elementType = REACT_SUSPENSE_LIST_TYPE;
           fiber.lanes = lanes;
           return fiber;
         }
-        function createFiberFromOffscreen(pendingProps, mode, lanes, key3) {
-          var fiber = createFiber(OffscreenComponent, pendingProps, key3, mode);
+        function createFiberFromOffscreen(pendingProps, mode, lanes, key2) {
+          var fiber = createFiber(OffscreenComponent, pendingProps, key2, mode);
           fiber.elementType = REACT_OFFSCREEN_TYPE;
           fiber.lanes = lanes;
           var primaryChildInstance = {
@@ -20731,14 +20731,14 @@ var require_react_dom_development = __commonJS({
         }
         var ReactVersion = "18.3.1";
         function createPortal2(children, containerInfo, implementation) {
-          var key3 = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : null;
+          var key2 = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : null;
           {
-            checkKeyStringCoercion(key3);
+            checkKeyStringCoercion(key2);
           }
           return {
             // This tag allow us to uniquely identify this as a React Portal
             $$typeof: REACT_PORTAL_TYPE,
-            key: key3 == null ? null : "" + key3,
+            key: key2 == null ? null : "" + key2,
             children,
             containerInfo,
             implementation
@@ -20966,17 +20966,17 @@ var require_react_dom_development = __commonJS({
         var setSuspenseHandler = null;
         {
           var copyWithDeleteImpl = function(obj, path, index2) {
-            var key3 = path[index2];
+            var key2 = path[index2];
             var updated = isArray(obj) ? obj.slice() : assign({}, obj);
             if (index2 + 1 === path.length) {
               if (isArray(updated)) {
-                updated.splice(key3, 1);
+                updated.splice(key2, 1);
               } else {
-                delete updated[key3];
+                delete updated[key2];
               }
               return updated;
             }
-            updated[key3] = copyWithDeleteImpl(obj[key3], path, index2 + 1);
+            updated[key2] = copyWithDeleteImpl(obj[key2], path, index2 + 1);
             return updated;
           };
           var copyWithDelete = function(obj, path) {
@@ -21022,9 +21022,9 @@ var require_react_dom_development = __commonJS({
             if (index2 >= path.length) {
               return value;
             }
-            var key3 = path[index2];
+            var key2 = path[index2];
             var updated = isArray(obj) ? obj.slice() : assign({}, obj);
-            updated[key3] = copyWithSetImpl(obj[key3], path, index2 + 1, value);
+            updated[key2] = copyWithSetImpl(obj[key2], path, index2 + 1, value);
             return updated;
           };
           var copyWithSet = function(obj, path, value) {
@@ -21583,11 +21583,11 @@ var require_react_dom_development = __commonJS({
         setRestoreImplementation(restoreControlledState$3);
         setBatchingImplementation(batchedUpdates$1, discreteUpdates, flushSync);
         function createPortal$1(children, container) {
-          var key3 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : null;
+          var key2 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : null;
           if (!isValidContainer(container)) {
             throw new Error("Target container is not a DOM element.");
           }
-          return createPortal2(children, container, null, key3);
+          return createPortal2(children, container, null, key2);
         }
         function renderSubtreeIntoContainer(parentComponent, element, containerNode, callback) {
           return unstable_renderSubtreeIntoContainer(parentComponent, element, containerNode, callback);
@@ -21678,10 +21678,10 @@ __export(client_exports, {
   inject: () => inject
 });
 module.exports = __toCommonJS(client_exports);
-var import_react12 = __toESM(require("react"), 1);
+var import_react14 = __toESM(require("react"), 1);
 
 // src/view.js
-var import_react10 = __toESM(require("react"), 1);
+var import_react12 = __toESM(require("react"), 1);
 
 // lib/presentation.js
 var UI_ICONS = Object.freeze(["sparkles", "sliders", "layers", "chart", "gauge", "cpu", "database", "info", "check", "warning", "arrow", "target"]);
@@ -21770,12 +21770,13 @@ function formatNumber(value, decimals = 2) {
 
 // lib/canvas-system.js
 var CANVAS_SYSTEM_CSS = `
-:root{--canvas-radius:12px;--canvas-gap:16px;--canvas-positive:#167456;--canvas-negative:#b13b3b;--canvas-warning:#875b15}
+:root{--canvas-radius:20px;--canvas-gap:16px;--canvas-positive:#167456;--canvas-negative:#b13b3b;--canvas-warning:#875b15}
 :root[data-canvas-scheme=dark]{--canvas-positive:#78d9b4;--canvas-negative:#ffaaaa;--canvas-warning:#edc87e}
-html,body{margin:0;min-width:0;background:var(--canvas-bg,#fff);color:var(--canvas-ink,#182537);font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}*{box-sizing:border-box}svg{max-width:100%;height:auto}button,input,select,textarea{font:inherit;color:inherit}button,input,select,textarea{border:1px solid var(--canvas-line,#ced4df);border-radius:8px;background:var(--canvas-bg,#fff);padding:8px 12px;max-width:100%}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}input[type=range]{padding:0;accent-color:var(--canvas-accent,#3e60d3)}input[type=checkbox],input[type=radio]{accent-color:var(--canvas-accent,#3e60d3)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--canvas-accent,#3e60d3);outline-offset:3px}
+#canvas{display:flow-root}html,body{margin:0;min-width:0;background:var(--canvas-bg,#fff);color:var(--canvas-ink,#182537);font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}*{box-sizing:border-box}svg{max-width:100%;height:auto}button,input,select,textarea{font:inherit;color:inherit}button,input,select,textarea{border:1px solid var(--canvas-line,#ced4df);border-radius:8px;background:var(--canvas-bg,#fff);padding:8px 12px;max-width:100%}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}input[type=range]{padding:0;accent-color:var(--canvas-accent,#3e60d3)}input[type=checkbox],input[type=radio]{accent-color:var(--canvas-accent,#3e60d3)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--canvas-accent,#3e60d3);outline-offset:3px}
 .ui-stack{display:grid;gap:var(--canvas-gap)}.ui-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--canvas-gap)}.ui-surface{padding:20px;border:1px solid var(--canvas-line,#ced4df);border-radius:var(--canvas-radius);background:var(--canvas-soft,#f3f5f8)}.ui-title{margin:0;font-size:clamp(20px,3vw,28px);line-height:1.3;letter-spacing:-.02em}.ui-caption{color:var(--canvas-muted,#526176);margin:8px 0;font-size:14px}.ui-value{font-size:clamp(24px,4vw,36px);font-variant-numeric:tabular-nums;line-height:1.2}.ui-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.ui-field{display:grid;gap:6px;min-width:0}.ui-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px}.ui-status{min-height:1.6em}.ui-error{color:var(--canvas-negative)}.ui-primary{background:var(--canvas-accent,#3e60d3);color:var(--canvas-accent-ink,#fff);border-color:transparent}
 svg .ui-node{fill:var(--canvas-soft,#f3f5f8);stroke:var(--canvas-line,#ced4df);stroke-width:1}svg .ui-edge{fill:none;stroke:var(--canvas-muted,#526176);stroke-width:1.5}svg .ui-label{fill:var(--canvas-ink,#182537);font:500 14px system-ui,sans-serif}svg .ui-note{fill:var(--canvas-muted,#526176);font:400 13px system-ui,sans-serif}svg .ui-leader{fill:none;stroke:var(--canvas-muted,#526176);stroke-dasharray:3 4}svg .ui-accent{fill:color-mix(in srgb,var(--canvas-accent,#3e60d3) 12%,var(--canvas-bg,#fff));stroke:var(--canvas-accent,#3e60d3)}
 .ui-flow{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 8px;flex-wrap:wrap}.ui-step{display:grid;gap:6px;min-width:130px;max-width:240px;padding:16px 20px;border:1px solid var(--canvas-line);border-radius:6px;background:var(--canvas-bg)}.ui-step strong{font-size:16px;font-weight:600}.ui-step span{font-size:14px;color:var(--canvas-muted)}.ui-arrow{color:var(--canvas-muted);font-size:22px}.ui-callout{border-inline-start:3px solid var(--canvas-accent);padding:8px 16px;color:var(--canvas-ink)}
+.ui-surface,.ui-step{border-radius:var(--canvas-radius);background:linear-gradient(135deg,color-mix(in srgb,var(--canvas-accent,#3e60d3) 9%,var(--canvas-bg,#fff)),var(--canvas-soft,#f3f5f8))}button,input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{border-radius:14px}.ui-primary{background:linear-gradient(120deg,var(--canvas-accent,#3e60d3),color-mix(in srgb,var(--canvas-accent,#3e60d3) 85%,#152647))}.ui-callout{border-radius:14px;background:linear-gradient(120deg,color-mix(in srgb,var(--canvas-accent,#3e60d3) 7%,var(--canvas-bg,#fff)),var(--canvas-bg,#fff))}
 @media(max-width:480px){.ui-flow{flex-direction:column;padding:16px 8px;gap:12px}.ui-step{width:100%;max-width:none}.ui-arrow{transform:rotate(90deg)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}`;
 
@@ -21840,13 +21841,13 @@ var COMPONENTS = Object.freeze({
   badge: define(["text"], "Short explicit status label", "tone"),
   progress: define(["label", "value", "max", "unit"], "Declared numeric progress snapshot", "tone"),
   steps: define(["items"], "Ordered declared steps"),
-  metric: define(["label", "value", "unit", "decimals"], "Numeric result with units", "tone"),
+  metric: define(["label", "value", "unit", "decimals"], "Number with units, or a literal/bound status string", "tone"),
   input: define(["label", "bind"], "String or numeric state input"),
   slider: define(["label", "bind"], "Numeric state control"),
   select: define(["label", "bind"], "Selection from declared state options"),
   toggle: define(["label", "bind"], "Boolean state control"),
   button: define(["text", "action"], "Declared Agent follow-up", "icon"),
-  table: define(["rows", "columns"], "Exact supplied or derived values"),
+  table: define(["label", "rows", "columns"], "Supplied or derived values; inline rows or data/derived reference"),
   chart: define(["kind", "rows", "labelKey", "valueKey", "label", "unit", "xScale"], "Bar/line comparison with accessible data"),
   sandbox: define(["title", "html", "css", "script", "fallback", "height", "stateKeys", "dataKeys", "derivedKeys"], "Freeform isolated HTML/SVG/CSS/JavaScript visualization")
 });
@@ -21854,6 +21855,11 @@ function componentFields(type) {
   const c = Object.hasOwn(COMPONENTS, type) ? COMPONENTS[type] : void 0;
   return c && ["id", "type", ...c.fields, ...c.presentation ? ["icon"] : [], ...c.presentation === "tone" ? ["tone"] : []];
 }
+
+// lib/identifiers.js
+var IDENTIFIER_SOURCE = "[\\p{L}_][\\p{L}\\p{M}\\p{N}_]{0,63}";
+var pattern = new RegExp(`^${IDENTIFIER_SOURCE}$`, "u");
+var validIdentifier = (value) => typeof value === "string" && pattern.test(value) && !["constructor", "prototype", "__proto__"].includes(value);
 
 // lib/author-expression.js
 function compileExpression(source) {
@@ -21863,7 +21869,7 @@ function compileExpression(source) {
   if (typeof source !== "string" || !source.trim() || source.length > 2048) fail2();
   const tokens = [];
   let offset = 0;
-  const token = /\s*(?:(\d+(?:\.\d*)?|\.\d+)([eE][+-]?\d+)?|("(?:[^"\\]|\\.)*")|([a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z][a-zA-Z0-9_]*)?)|(===|!==|<=|>=|==|!=|[+*/()?,:<>-]))/y;
+  const token = new RegExp(String.raw`\s*(?:(\d+(?:\.\d*)?|\.\d+)([eE][+-]?\d+)?|("(?:[^"\\]|\\.)*")|(${IDENTIFIER_SOURCE}(?:\.${IDENTIFIER_SOURCE})?)|(===|!==|<=|>=|==|!=|[+*/()?,:<>-]))`, "uy");
   while (offset < source.length) {
     if (!source.slice(offset).trim()) break;
     token.lastIndex = offset;
@@ -21890,7 +21896,7 @@ function compileExpression(source) {
     } else if (t === "-" || t === "+") {
       const arg = parse(5, depth + 1);
       out = t === "-" ? { op: "sub", args: [{ const: 0 }, arg] } : arg;
-    } else if (typeof t === "string" && /^(state|data|derived|item)\.[a-zA-Z][a-zA-Z0-9_]*$/.test(t)) out = { ref: t };
+    } else if (typeof t === "string" && t.split(".").length === 2 && ["state", "data", "derived", "item"].includes(t.split(".")[0]) && validIdentifier(t.split(".")[1])) out = { ref: t };
     else if (["min", "max", "round", "abs"].includes(t)) {
       take("(");
       const args = [parse(0, depth + 1)];
@@ -21949,7 +21955,6 @@ var fail = (message) => {
   throw new Error(`DSH UI: ${message}`);
 };
 var object = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
-var key = (x) => typeof x === "string" && /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/.test(x) && !["constructor", "prototype", "__proto__"].includes(x);
 var finite = (x) => typeof x === "number" && Number.isFinite(x);
 var scalar = (x) => typeof x === "string" || typeof x === "boolean" || finite(x);
 var text = (x, at) => {
@@ -21996,6 +22001,10 @@ function validateState(doc, state) {
       if (!finite(v) || v < s.min || v > s.max) fail(`state.${k} is outside its numeric range`);
       const offset = (v - s.min) / s.step;
       if (Math.abs(offset - Math.round(offset)) > 1e-6) fail(`state.${k} does not match its step`);
+    } else if (s.type === "json") {
+      if (!object(v) && !Array.isArray(v)) fail(`state.${k} must be an array or object for type json`);
+      safeJson(v);
+      if (new TextEncoder().encode(JSON.stringify(v)).length > 16384) fail(`state.${k} JSON exceeds 16 KiB`);
     } else if (s.type === "string") text(v, `state.${k}`);
     else if (typeof v !== "boolean") fail(`state.${k} must be boolean`);
     if (s.options && !s.options.includes(v)) fail(`invalid option for state.${k}`);
@@ -22005,7 +22014,7 @@ function validateState(doc, state) {
 }
 var ARITY = { add: [1, 8], sub: [2, 2], mul: [1, 8], div: [2, 2], min: [1, 8], max: [1, 8], round: [1, 1], abs: [1, 1], eq: [2, 2], neq: [2, 2], lt: [2, 2], lte: [2, 2], gt: [2, 2], gte: [2, 2], if: [3, 3] };
 function reference(doc, ref) {
-  if (typeof ref !== "string" || !/^(state|data|derived)\.[a-zA-Z][a-zA-Z0-9_]{0,63}$/.test(ref)) fail("invalid reference");
+  if (typeof ref !== "string" || !["state", "data", "derived"].includes(ref.split(".")[0]) || ref.split(".").length !== 2 || !validIdentifier(ref.split(".")[1])) fail(`invalid reference ${JSON.stringify(ref)}; use state.key, data.key or derived.key with a letter/underscore identifier`);
   const [group, k] = ref.split(".");
   if (!own(doc[group], k)) fail(`unknown reference ${ref}`);
   return [group, k];
@@ -22116,7 +22125,7 @@ function checkViewValues(doc, evaluated) {
         if (n.type === "chart" && rows.some((r) => !own(r, n.labelKey) || !scalar(r[n.labelKey]) || !own(r, n.valueKey) || !finite(r[n.valueKey]))) fail("chart requires labels and finite numeric values");
         if (n.type === "chart" && n.xScale === "linear" && rows.some((r) => !finite(r[n.labelKey]))) fail("linear chart requires numeric x values");
       }
-      if (n.type === "metric" && !finite(evaluated.resolveValue(n.value))) fail("metric requires a numeric value");
+      if (n.type === "metric" && !scalar(evaluated.resolveValue(n.value))) fail(`node.${n.id}.value must resolve to a number, string or boolean; use table for rows or a canvas for structured data`);
       if (n.type === "progress") {
         const v = evaluated.resolveValue(n.value), max = evaluated.resolveValue(n.max);
         if (!finite(v) || !finite(max) || max <= 0 || v < 0 || v > max) fail("progress requires 0 <= value <= positive max");
@@ -22144,11 +22153,13 @@ function validateDocument(input) {
   for (const group of ["state", "data", "derived", "actions"]) {
     doc[group] ??= {};
     if (!object(doc[group]) || Object.keys(doc[group]).length > 64) fail(`invalid ${group}`);
-    for (const k of Object.keys(doc[group])) if (!key(k)) fail(`invalid key in ${group}`);
+    for (const k of Object.keys(doc[group])) if (!validIdentifier(k)) fail(`invalid key in ${group}: ${JSON.stringify(k)}; use 1..64 letters, numbers or underscores, starting with a letter/underscore (Chinese letters supported); no spaces, dots or hyphens. Put display labels in label/text`);
   }
   for (const [k, s] of Object.entries(doc.state)) {
     fields(s, ["type", "default", "min", "max", "step", "options"], `state.${k}`);
-    if (!["number", "string", "boolean"].includes(s.type)) fail(`unsupported state type ${k}`);
+    if (s.type === "string" && (Array.isArray(s.default) || object(s.default)) && !own(s, "options")) s.type = "json";
+    if (!["number", "string", "boolean", "json"].includes(s.type)) fail(`unsupported state type ${k}; use number, string, boolean or json (arrays/objects)`);
+    if (s.type === "json" && own(s, "options")) fail(`state.${k}: json state does not support select options; use scalar options or a canvas`);
     if (s.type === "number") {
       if (![s.min, s.max, s.step].every(finite) || s.min >= s.max || s.step <= 0) fail(`invalid numeric limits for ${k}`);
       if ((s.max - s.min) / s.step > 1e9) fail(`numeric step too small for ${k}`);
@@ -22171,7 +22182,7 @@ function validateDocument(input) {
       if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object)) fail("map source must be object rows");
       if (!object(e.map.fields) || !Object.keys(e.map.fields).length || Object.keys(e.map.fields).length > 16) fail("map requires 1..16 fields");
       for (const [k2, value2] of Object.entries(e.map.fields)) {
-        if (!key(k2)) fail(`invalid map field ${JSON.stringify(k2).slice(0, 100)}; use an ASCII identifier matching [a-zA-Z][a-zA-Z0-9_]{0,63}, such as powerW. Put Chinese display text in column/chart labels, not internal field keys`);
+        if (!validIdentifier(k2)) fail(`invalid map field ${JSON.stringify(k2).slice(0, 100)}; use a letter/underscore identifier such as powerW or \u529F\u7387, without spaces, dots or hyphens`);
         validateExpression(value2, depth + 1, rows);
       }
       return;
@@ -22185,7 +22196,7 @@ function validateDocument(input) {
       fields(e, ["ref"], "expression");
       if (typeof e.ref === "string" && e.ref.startsWith("item.")) {
         const k = e.ref.slice(5);
-        if (!itemRows || !key(k) || itemRows.some((row) => !own(row, k) || !scalar(row[k]))) fail("invalid or unscoped item reference");
+        if (!itemRows || !validIdentifier(k) || itemRows.some((row) => !own(row, k) || !scalar(row[k]))) fail("invalid or unscoped item reference");
       } else reference(doc, e.ref);
       return;
     }
@@ -22228,9 +22239,10 @@ function validateDocument(input) {
     if (!Array.isArray(list) || depth > LIMITS.depth) fail("invalid node children or depth");
     for (const n of list) {
       if (++count > LIMITS.nodes) fail("too many nodes");
-      if (!object(n) || !key(n.id) || ids.has(n.id)) fail("node ids must be unique identifiers");
+      if (!object(n) || !validIdentifier(n.id) || ids.has(n.id)) fail("node ids must be unique identifiers");
       ids.add(n.id);
       if (!Object.hasOwn(COMPONENTS, n.type)) fail("unsupported component " + n.type);
+      if (["table", "chart"].includes(n.type) && typeof n.rows === "string" && /^(data|derived)\./.test(n.rows)) n.rows = { ref: n.rows };
       switch (n.type) {
         case "sandbox": {
           text(n.title, "canvas title");
@@ -22290,6 +22302,7 @@ function validateDocument(input) {
           const [, k] = reference(doc, n.bind), spec = doc.state[k];
           if (n.type === "slider" && spec.type !== "number") fail("slider requires numeric state");
           if (n.type === "toggle" && spec.type !== "boolean") fail("toggle requires boolean state");
+          if (["input", "select"].includes(n.type) && spec.type === "json") fail(`node.${n.id}: structured state requires a sandbox with DSHUI.setState; use separate boolean states and toggle nodes for a native checklist`);
           if (n.type === "input" && spec.type === "boolean") fail("use toggle for boolean state");
           if (n.type === "select" && !spec.options) fail("select requires options");
           break;
@@ -22299,13 +22312,13 @@ function validateDocument(input) {
           if (!own(doc.actions, n.action)) fail("unknown action");
           break;
         case "table": {
-          if (Array.isArray(n.rows)) fail('table.rows must use {ref:"data.rows"}; move the array into document.data.rows, not inline in the table');
-          value(n.rows, "table rows");
+          if (n.label !== void 0) text(n.label, "table label");
+          if (!Array.isArray(n.rows)) value(n.rows, "table rows");
           if (!Array.isArray(n.columns) || !n.columns.length || n.columns.length > 16) fail("invalid table columns");
           const cols = /* @__PURE__ */ new Set();
           for (const c of n.columns) {
             fields(c, ["key", "label", "unit"], "column");
-            if (!key(c.key) || cols.has(c.key)) fail("invalid or duplicate column key");
+            if (!validIdentifier(c.key) || cols.has(c.key)) fail("invalid or duplicate column key");
             cols.add(c.key);
             text(c.label, "column label");
             if (c.unit !== void 0) text(c.unit, "column unit");
@@ -22313,8 +22326,8 @@ function validateDocument(input) {
           break;
         }
         case "chart":
-          value(n.rows, "chart rows");
-          if (!["bar", "line"].includes(n.kind) || !key(n.labelKey) || !key(n.valueKey)) fail("invalid chart");
+          if (!Array.isArray(n.rows)) value(n.rows, "chart rows");
+          if (!["bar", "line"].includes(n.kind) || !validIdentifier(n.labelKey) || !validIdentifier(n.valueKey)) fail("invalid chart");
           text(n.label, "chart label");
           if (n.unit !== void 0) text(n.unit, "chart unit");
           if (n.xScale !== void 0 && (!["category", "linear"].includes(n.xScale) || n.xScale === "linear" && n.kind !== "line")) fail("invalid xScale");
@@ -22378,9 +22391,9 @@ var import_react2 = require("react");
 
 // src/state-channel.js
 var listeners = /* @__PURE__ */ new Map();
-var key2 = (id, sessionId) => id + "\0" + sessionId;
+var key = (id, sessionId) => id + "\0" + sessionId;
 function subscribeState(id, sessionId, fn) {
-  const k = key2(id, sessionId), set = listeners.get(k) ?? /* @__PURE__ */ new Set();
+  const k = key(id, sessionId), set = listeners.get(k) ?? /* @__PURE__ */ new Set();
   listeners.set(k, set);
   set.add(fn);
   return () => {
@@ -22389,7 +22402,7 @@ function subscribeState(id, sessionId, fn) {
   };
 }
 function broadcastState(id, sessionId, saved, origin) {
-  for (const fn of listeners.get(key2(id, sessionId)) ?? []) if (fn !== origin) fn(saved);
+  for (const fn of listeners.get(key(id, sessionId)) ?? []) if (fn !== origin) fn(saved);
 }
 
 // src/saved-state.js
@@ -22538,6 +22551,40 @@ function useSavedState(record, sessionId, preview = false) {
   return { state: preview ? initialState(doc) : state, setState, ready: !preview && ready, status: preview ? "\u751F\u6210\u9884\u89C8 \xB7 \u5B8C\u6210\u6821\u9A8C\u540E\u53EF\u64CD\u4F5C" : status, issue, epoch, retry, useRemote: () => load(), keepLocal: () => load(true) };
 }
 
+// lib/tool-json.js
+function clean(source) {
+  let input = source.trim().replace(/^\uFEFF/, "");
+  const fence = input.match(/^```(?:json)?\s*\n([\s\S]*?)\n```$/i);
+  if (fence) input = fence[1];
+  let output = "", quoted = false, escaped = false;
+  for (let i = 0; i < input.length; i++) {
+    const c = input[i];
+    if (quoted) {
+      output += c;
+      if (escaped) escaped = false;
+      else if (c === "\\") escaped = true;
+      else if (c === '"') quoted = false;
+      continue;
+    }
+    if (c === '"') quoted = true;
+    if (c === "," && /^\s*[}\]]/.test(input.slice(i + 1))) continue;
+    output += c;
+  }
+  return output;
+}
+function toolJson(value, field, maxBytes = 131072) {
+  if (typeof value !== "string") return value;
+  if (new TextEncoder().encode(value).length > maxBytes) throw new Error(`DSH UI: ${field} JSON exceeds size limit`);
+  const source = clean(value);
+  try {
+    return JSON.parse(source);
+  } catch (error) {
+    const position = error.message.match(/position (\d+)/)?.[1];
+    const location = position === void 0 ? "" : ` at line ${source.slice(0, Number(position)).split("\n").length}, column ${Number(position) - source.lastIndexOf("\n", Number(position) - 1)}`;
+    throw new Error(`DSH UI: ${field} must contain valid JSON${location}. Pass an object directly, not a manually escaped JSON string. Do not use single-quoted keys or raw newlines inside strings. For HTML/SVG use render_canvas with separate html/css/script fields. No partial document was saved.`);
+  }
+}
+
 // lib/stream.js
 function parseToolArguments(raw) {
   if (typeof raw !== "string" || raw.length > LIMITS.bytes || new TextEncoder().encode(raw).length > LIMITS.bytes) return null;
@@ -22629,7 +22676,7 @@ function previewDocument(raw) {
     const root = parseToolArguments(raw);
     if (!root) return null;
     const document2 = root.members?.get("document");
-    if (document2?.complete && typeof document2.value === "string" && root.members.size === 1) return validateDocument(JSON.parse(document2.value));
+    if (document2?.complete && typeof document2.value === "string" && root.members.size === 1) return validateDocument(toolJson(document2.value, "document"));
     if (!document2?.members) return null;
     if ([...root.members.keys()].some((k) => k !== "document")) return null;
     const doc = { ...document2.value }, nodes = document2.members.get("nodes");
@@ -22698,12 +22745,13 @@ function updatePreview(html) {
   morph(document.getElementById("canvas"), template.content);
 }
 function previewFrameDocument(channel, nonce) {
-  return `<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none';script-src 'nonce-${nonce}';style-src 'unsafe-inline';img-src data:;base-uri 'none';form-action 'none';frame-src 'none'"><style>${CANVAS_SYSTEM_CSS}</style><style id="custom"></style><style>#canvas,#canvas *,#canvas *::before,#canvas *::after{animation:none!important;transition:none!important}html,body{overflow:hidden}</style><main id="canvas" inert></main><script nonce="${nonce}">const update=${updatePreview.toString()};addEventListener('message',e=>{if(e.source!==parent||e.data?.channel!==${JSON.stringify(channel)})return;document.getElementById('custom').textContent=e.data.css;for(const [k,v] of Object.entries(e.data.theme||{}))document.documentElement.style.setProperty('--canvas-'+k,v);document.documentElement.dataset.canvasScheme=e.data.theme?.scheme||'light';update(e.data.html)});<\/script>`;
+  return `<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none';script-src 'nonce-${nonce}';style-src 'unsafe-inline';img-src data:;base-uri 'none';form-action 'none';frame-src 'none'"><style>${CANVAS_SYSTEM_CSS}</style><style id="custom"></style><style>#canvas,#canvas *,#canvas *::before,#canvas *::after{animation:none!important;transition:none!important}html,body{overflow:hidden}</style><main id="canvas" inert></main><script nonce="${nonce}">const update=${updatePreview.toString()};addEventListener('message',e=>{if(e.source!==parent||e.data?.channel!==${JSON.stringify(channel)})return;document.getElementById('custom').textContent=e.data.css;for(const [k,v] of Object.entries(e.data.theme||{}))document.documentElement.style.setProperty('--canvas-'+k,v);document.documentElement.dataset.canvasScheme=e.data.theme?.scheme||'light';update(e.data.html)});new ResizeObserver(()=>parent.postMessage({channel:${JSON.stringify(channel)},previewHeight:Math.ceil(document.getElementById('canvas').getBoundingClientRect().height)},'*')).observe(document.getElementById('canvas'));<\/script>`;
 }
 
 // src/canvas-preview.js
 var h2 = import_react3.default.createElement;
 function CanvasPreview({ node }) {
+  const [height, setHeight] = (0, import_react3.useState)(node.height ?? 420);
   const frame = (0, import_react3.useRef)(null), latest = (0, import_react3.useRef)(node);
   latest.current = node;
   const config = (0, import_react3.useMemo)(() => {
@@ -22728,14 +22776,22 @@ function CanvasPreview({ node }) {
     observer.observe(document.body, { attributes: true });
     return () => observer.disconnect();
   }, []);
-  return h2("section", { className: "dgui-canvas", "data-canvas-phase": "preview", "aria-label": node.title }, h2("p", { className: "dgui-copy", role: "status" }, "\u9759\u6001\u9884\u89C8 \xB7 \u63D0\u4EA4\u6210\u529F\u540E\u542F\u7528\u4EA4\u4E92"), h2("iframe", { ref: frame, title: node.title + "\uFF08\u9759\u6001\u9884\u89C8\uFF09", sandbox: "allow-scripts", referrerPolicy: "no-referrer", srcDoc, onLoad: publish, style: { display: "block", width: "100%", height: node.height ?? 420, border: 0, pointerEvents: "none" } }));
+  (0, import_react3.useEffect)(() => {
+    const receive = (event) => {
+      const m = event.data;
+      if (event.source === frame.current?.contentWindow && m?.channel === config.channel && Number.isFinite(m.previewHeight) && m.previewHeight >= 0) setHeight(Math.max(32, Math.min(1e3, Math.ceil(m.previewHeight))));
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, [config]);
+  return h2("section", { className: "dgui-canvas", "data-canvas-phase": "preview", "aria-label": node.title }, h2("p", { className: "dgui-copy", role: "status" }, "\u9759\u6001\u9884\u89C8 \xB7 \u63D0\u4EA4\u6210\u529F\u540E\u542F\u7528\u4EA4\u4E92"), h2("iframe", { ref: frame, title: node.title + "\uFF08\u9759\u6001\u9884\u89C8\uFF09", sandbox: "allow-scripts", referrerPolicy: "no-referrer", srcDoc, onLoad: publish, style: { display: "block", width: "100%", height, border: 0, pointerEvents: "none" } }));
 }
 
 // src/sandbox.js
-var import_react4 = __toESM(require("react"), 1);
+var import_react6 = __toESM(require("react"), 1);
 
 // lib/export-runtime-bundle.js
-var EXPORT_RUNTIME = '(() => {\n  // lib/presentation.js\n  var UI_ICONS = Object.freeze(["sparkles", "sliders", "layers", "chart", "gauge", "cpu", "database", "info", "check", "warning", "arrow", "target"]);\n  var UI_TONES = Object.freeze(["neutral", "accent", "success", "warning", "danger"]);\n  var UI_LAYOUTS = Object.freeze(["dashboard", "workbench", "comparison", "guide", "status", "report"]);\n  var UI_ACCENTS = Object.freeze(["blue", "teal", "violet", "amber", "rose"]);\n  var UI_SURFACES = Object.freeze(["outline", "soft", "featured"]);\n\n  // lib/visual-audit.js\n  function measureVisual(root, nodeId = "") {\n    const issues = [], seen = /* @__PURE__ */ new Set(), coverage = { nodeId, elements: 0, truncated: false, contrastChecked: 0, contrastUncovered: 0 };\n    const add = (code, value, el2) => {\n      const id = el2?.closest("[data-ui-node]")?.getAttribute("data-ui-node") ?? nodeId;\n      const k = id + ":" + code + ":" + Math.round(value ?? 0);\n      if (!seen.has(k) && issues.length < 40) {\n        seen.add(k);\n        issues.push({ code, nodeId: id, ...value === void 0 ? {} : { value: Number(value.toFixed(2)) } });\n      }\n    };\n    const color = (s) => {\n      let m = s.match(/^rgba?\\(([^)]+)\\)/);\n      if (m) {\n        const a = m[1].split(/[\\s,\\/]+/).map(Number);\n        return [a[0] / 255, a[1] / 255, a[2] / 255, a[3] ?? 1];\n      }\n      m = s.match(/^color\\(srgb ([^)]+)\\)/);\n      if (m) {\n        const a = m[1].split(/[\\s\\/]+/).map(Number);\n        return [a[0], a[1], a[2], a[3] ?? 1];\n      }\n      return null;\n    };\n    const luminance = (c) => c.slice(0, 3).map((v) => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);\n    const widthRoot = root.id === "canvas" ? document.documentElement : root;\n    if (widthRoot.scrollWidth > widthRoot.clientWidth + 2) add("overflow", widthRoot.scrollWidth - widthRoot.clientWidth);\n    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);\n    let el;\n    while (el = walker.nextNode()) {\n      if (coverage.elements >= 2e3) {\n        coverage.truncated = true;\n        break;\n      }\n      coverage.elements++;\n      if (el.matches("[data-canvas-phase=error]")) add("runtimeError", void 0, el);\n      const css = getComputedStyle(el), box = el.getBoundingClientRect();\n      if (!box.width || !box.height || css.visibility === "hidden" || css.display === "none") continue;\n      const text2 = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());\n      if (text2) {\n        let size = parseFloat(css.fontSize);\n        if (el instanceof SVGElement && el.getScreenCTM) {\n          const m = el.getScreenCTM();\n          if (m) size *= Math.hypot(m.c, m.d);\n        }\n        if (size < 11.9) add("smallText", size, el);\n        const fg = color(css.color);\n        let ancestor = el, bg = null, depth = 0;\n        while (ancestor && depth++ < 64) {\n          const style = getComputedStyle(ancestor);\n          if (style.backgroundImage !== "none") break;\n          const c = color(style.backgroundColor);\n          if (c?.[3] === 1) {\n            bg = c;\n            break;\n          }\n          if (c?.[3] > 0) break;\n          ancestor = ancestor.parentElement;\n        }\n        if (!(el instanceof SVGElement) && fg?.[3] === 1 && bg) {\n          coverage.contrastChecked++;\n          const a = luminance(fg), b = luminance(bg), ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);\n          if (ratio < (size >= 24 || size >= 18.66 && parseFloat(css.fontWeight) >= 700 ? 3 : 4.5)) add("contrast", ratio, el);\n        } else coverage.contrastUncovered++;\n      }\n      if (el.matches("input:not([type=hidden]),select,textarea,button,[role=button]") && !el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby") && !el.labels?.length && !el.textContent.trim() && !el.getAttribute("title")) add("missingLabel", void 0, el);\n    }\n    Object.defineProperty(issues, "coverage", { value: coverage });\n    return issues;\n  }\n\n  // lib/format-number.js\n  function formatNumber(value, decimals = 2) {\n    if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("DSH UI: formatNumber requires a finite number");\n    if (!Number.isInteger(decimals) || decimals < 0 || decimals > 6) throw new Error("DSH UI: formatNumber decimals must be an integer from 0 to 6");\n    return value.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });\n  }\n\n  // lib/canvas-system.js\n  var CANVAS_SYSTEM_CSS = `\n:root{--canvas-radius:12px;--canvas-gap:16px;--canvas-positive:#167456;--canvas-negative:#b13b3b;--canvas-warning:#875b15}\n:root[data-canvas-scheme=dark]{--canvas-positive:#78d9b4;--canvas-negative:#ffaaaa;--canvas-warning:#edc87e}\nhtml,body{margin:0;min-width:0;background:var(--canvas-bg,#fff);color:var(--canvas-ink,#182537);font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}*{box-sizing:border-box}svg{max-width:100%;height:auto}button,input,select,textarea{font:inherit;color:inherit}button,input,select,textarea{border:1px solid var(--canvas-line,#ced4df);border-radius:8px;background:var(--canvas-bg,#fff);padding:8px 12px;max-width:100%}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}input[type=range]{padding:0;accent-color:var(--canvas-accent,#3e60d3)}input[type=checkbox],input[type=radio]{accent-color:var(--canvas-accent,#3e60d3)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--canvas-accent,#3e60d3);outline-offset:3px}\n.ui-stack{display:grid;gap:var(--canvas-gap)}.ui-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--canvas-gap)}.ui-surface{padding:20px;border:1px solid var(--canvas-line,#ced4df);border-radius:var(--canvas-radius);background:var(--canvas-soft,#f3f5f8)}.ui-title{margin:0;font-size:clamp(20px,3vw,28px);line-height:1.3;letter-spacing:-.02em}.ui-caption{color:var(--canvas-muted,#526176);margin:8px 0;font-size:14px}.ui-value{font-size:clamp(24px,4vw,36px);font-variant-numeric:tabular-nums;line-height:1.2}.ui-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.ui-field{display:grid;gap:6px;min-width:0}.ui-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px}.ui-status{min-height:1.6em}.ui-error{color:var(--canvas-negative)}.ui-primary{background:var(--canvas-accent,#3e60d3);color:var(--canvas-accent-ink,#fff);border-color:transparent}\nsvg .ui-node{fill:var(--canvas-soft,#f3f5f8);stroke:var(--canvas-line,#ced4df);stroke-width:1}svg .ui-edge{fill:none;stroke:var(--canvas-muted,#526176);stroke-width:1.5}svg .ui-label{fill:var(--canvas-ink,#182537);font:500 14px system-ui,sans-serif}svg .ui-note{fill:var(--canvas-muted,#526176);font:400 13px system-ui,sans-serif}svg .ui-leader{fill:none;stroke:var(--canvas-muted,#526176);stroke-dasharray:3 4}svg .ui-accent{fill:color-mix(in srgb,var(--canvas-accent,#3e60d3) 12%,var(--canvas-bg,#fff));stroke:var(--canvas-accent,#3e60d3)}\n.ui-flow{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 8px;flex-wrap:wrap}.ui-step{display:grid;gap:6px;min-width:130px;max-width:240px;padding:16px 20px;border:1px solid var(--canvas-line);border-radius:6px;background:var(--canvas-bg)}.ui-step strong{font-size:16px;font-weight:600}.ui-step span{font-size:14px;color:var(--canvas-muted)}.ui-arrow{color:var(--canvas-muted);font-size:22px}.ui-callout{border-inline-start:3px solid var(--canvas-accent);padding:8px 16px;color:var(--canvas-ink)}\n@media(max-width:480px){.ui-flow{flex-direction:column;padding:16px 8px;gap:12px}.ui-step{width:100%;max-width:none}.ui-arrow{transform:rotate(90deg)}}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}`;\n\n  // lib/sandbox.js\n  var SANDBOX_LIMITS = Object.freeze({ source: 49152, height: 1e3, message: 16384, rate: 30 });\n  function canvasSnapshot(node2, state2, data, derived, disabled, theme) {\n    const pick = (keys, values) => Object.fromEntries((keys ?? []).map((k) => [k, values[k]]));\n    return { state: pick(node2.stateKeys, state2), data: pick(node2.dataKeys, data), derived: pick(node2.derivedKeys, derived), disabled, theme };\n  }\n  function canvasPatch(message, node2) {\n    if (!message || typeof message !== "object" || Array.isArray(message)) throw new Error("Invalid canvas patch");\n    const keys = Object.keys(message);\n    if (!keys.length || keys.length > 64 || keys.some((k) => !(node2.stateKeys ?? []).includes(k))) throw new Error("Canvas state key is not declared");\n    if (JSON.stringify(message).length > SANDBOX_LIMITS.message) throw new Error("Canvas patch is too large");\n    return message;\n  }\n  function sandboxDocument(node2, channel2, nonce2) {\n    const json = (value) => JSON.stringify(value).replace(/</g, "\\\\u003c").replace(/\\u2028/g, "\\\\u2028").replace(/\\u2029/g, "\\\\u2029");\n    return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'nonce-${nonce2}\'; style-src \'unsafe-inline\'; img-src data:; font-src \'none\'; connect-src \'none\'; media-src \'none\'; object-src \'none\'; frame-src \'none\'; worker-src \'none\'; base-uri \'none\'; form-action \'none\'"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${CANVAS_SYSTEM_CSS}</style></head><body><main id="canvas"></main><script nonce="${nonce2}">(()=>{\n  const channel=${json(channel2)}, source=${json({ html: node2.html, css: node2.css ?? "", script: node2.script ?? "" })};\n  let snapshot={state:{},data:{},derived:{},disabled:true,theme:{}}, started=false;\n  const listeners=new Set(), send=(type,payload)=>parent.postMessage({dshCanvas:1,channel,type,payload},\'*\');\n  const report=e=>send(\'error\',String(e?.message??e).slice(0,1000));\n  const audit=${measureVisual.toString()};let auditTimer;const scheduleAudit=()=>{clearTimeout(auditTimer);auditTimer=setTimeout(()=>{const issues=audit(document.getElementById(\'canvas\'),${json(node2.id ?? "")});send(\'audit\',{issues,coverage:issues.coverage})},400)};\n  addEventListener(\'resize\',scheduleAudit);\n  addEventListener(\'error\',e=>report(e.error??e.message));addEventListener(\'unhandledrejection\',e=>report(e.reason));\n  const animations=new Set(), motion=matchMedia(\'(prefers-reduced-motion: reduce)\');\n  let raf=0,last=0,time=0;\n  const visible=()=>snapshot.visible!==false&&!document.hidden;\n  const canAnimate=()=>visible()&&!snapshot.disabled&&!motion.matches;\n  const draw=delta=>{for(const fn of animations)try{fn({time,delta,reducedMotion:motion.matches,visible:visible()})}catch(e){animations.delete(fn);report(e)}};\n  const tick=t=>{raf=0;if(!canAnimate()||!animations.size){last=0;draw(0);return}const delta=last?Math.min(.05,(t-last)/1000):0;last=t;time+=delta;draw(delta);if(animations.size)raf=requestAnimationFrame(tick)};\n  const refresh=()=>{draw(0);if(canAnimate()&&animations.size){if(!raf){last=0;raf=requestAnimationFrame(tick)}}else{cancelAnimationFrame(raf);raf=0;last=0}};\n  motion.addEventListener(\'change\',refresh);document.addEventListener(\'visibilitychange\',refresh);\n  const formatNumber=${formatNumber.toString()};\n  const api={formatNumber,get snapshot(){return structuredClone(snapshot)},subscribe(fn){if(typeof fn!==\'function\')throw Error(\'Listener required\');listeners.add(fn);fn(api.snapshot);return()=>listeners.delete(fn)},setState(patch){if(!snapshot.disabled)send(\'patch\',patch)},animate(fn){if(typeof fn!==\'function\')throw Error(\'Animation callback required\');animations.add(fn);refresh();return()=>{animations.delete(fn);if(!animations.size){cancelAnimationFrame(raf);raf=0;last=0}}}};\n  Object.defineProperty(window,\'DSHUI\',{value:Object.freeze(api),writable:false});\n  for(const type of [\'click\',\'input\',\'change\',\'keydown\',\'pointerdown\'])document.addEventListener(type,e=>{if(snapshot.disabled){e.preventDefault();e.stopImmediatePropagation()}},true);\n  addEventListener(\'message\',event=>{\n    const m=event.data;if(event.source!==parent||m?.dshCanvas!==1||m.channel!==channel||m.type!==\'snapshot\')return;\n    snapshot=m.payload;for(const [k,v] of Object.entries(snapshot.theme??{}))document.documentElement.style.setProperty(\'--canvas-\'+k,v);\n    document.documentElement.style.colorScheme=snapshot.theme?.scheme??\'light\';document.documentElement.dataset.canvasScheme=snapshot.theme?.scheme??\'light\';\n    const wasStarted=started;\n    if(!started){started=true;document.getElementById(\'canvas\').innerHTML=source.html;const style=document.createElement(\'style\');style.textContent=source.css;document.head.append(style);const script=document.createElement(\'script\');script.nonce=${json(nonce2)};script.textContent=source.script;document.body.append(script)}\n    if(wasStarted)for(const fn of listeners)try{fn(api.snapshot)}catch(e){report(e)}\n    refresh();if(!wasStarted)send(\'mounted\');scheduleAudit();\n  });\n  let resizePending=false;new ResizeObserver(()=>{if(!started||resizePending)return;resizePending=true;requestAnimationFrame(()=>{resizePending=false;send(\'height\',Math.ceil(document.getElementById(\'canvas\').getBoundingClientRect().height))})}).observe(document.getElementById(\'canvas\'));\n  send(\'ready\');\n})();<\\/script></body></html>`;\n  }\n\n  // lib/components.js\n  var define = (fields2, purpose, presentation = "") => Object.freeze({ fields: Object.freeze(fields2), purpose, presentation });\n  var COMPONENTS = Object.freeze({\n    heading: define(["text"], "Section heading", "tone"),\n    text: define(["text"], "Readable explanation or bound text", "tone"),\n    row: define(["children"], "Wrapping parallel content"),\n    column: define(["children"], "Ordered vertical content"),\n    card: define(["title", "children", "surface"], "Meaningful grouped section", "tone"),\n    details: define(["title", "children", "open"], "Collapsible supporting content", "tone"),\n    badge: define(["text"], "Short explicit status label", "tone"),\n    progress: define(["label", "value", "max", "unit"], "Declared numeric progress snapshot", "tone"),\n    steps: define(["items"], "Ordered declared steps"),\n    metric: define(["label", "value", "unit", "decimals"], "Numeric result with units", "tone"),\n    input: define(["label", "bind"], "String or numeric state input"),\n    slider: define(["label", "bind"], "Numeric state control"),\n    select: define(["label", "bind"], "Selection from declared state options"),\n    toggle: define(["label", "bind"], "Boolean state control"),\n    button: define(["text", "action"], "Declared Agent follow-up", "icon"),\n    table: define(["rows", "columns"], "Exact supplied or derived values"),\n    chart: define(["kind", "rows", "labelKey", "valueKey", "label", "unit", "xScale"], "Bar/line comparison with accessible data"),\n    sandbox: define(["title", "html", "css", "script", "fallback", "height", "stateKeys", "dataKeys", "derivedKeys"], "Freeform isolated HTML/SVG/CSS/JavaScript visualization")\n  });\n  function componentFields(type) {\n    const c = Object.hasOwn(COMPONENTS, type) ? COMPONENTS[type] : void 0;\n    return c && ["id", "type", ...c.fields, ...c.presentation ? ["icon"] : [], ...c.presentation === "tone" ? ["tone"] : []];\n  }\n\n  // lib/author-expression.js\n  function compileExpression(source) {\n    const fail2 = () => {\n      throw new Error("DSH UI: invalid formula; use state.x, data.x, derived.x, item.x, numbers, strings, + - * /, comparisons, ?: and min/max/round/abs");\n    };\n    if (typeof source !== "string" || !source.trim() || source.length > 2048) fail2();\n    const tokens = [];\n    let offset = 0;\n    const token2 = /\\s*(?:(\\d+(?:\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?|("(?:[^"\\\\]|\\\\.)*")|([a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z][a-zA-Z0-9_]*)?)|(===|!==|<=|>=|==|!=|[+*/()?,:<>-]))/y;\n    while (offset < source.length) {\n      if (!source.slice(offset).trim()) break;\n      token2.lastIndex = offset;\n      const m = token2.exec(source);\n      if (!m) fail2();\n      offset = token2.lastIndex;\n      tokens.push(m[1] ? { number: Number(m[1] + (m[2] ?? "")) } : m[3] ? { string: JSON.parse(m[3]) } : m[4] ?? m[5]);\n      if (tokens.length > 256) fail2();\n    }\n    let pos = 0;\n    const operators = { "==": ["eq", 1], "===": ["eq", 1], "!=": ["neq", 1], "!==": ["neq", 1], "<": ["lt", 2], "<=": ["lte", 2], ">": ["gt", 2], ">=": ["gte", 2], "+": ["add", 3], "-": ["sub", 3], "*": ["mul", 4], "/": ["div", 4] };\n    const take = (t) => {\n      if (tokens[pos++] !== t) fail2();\n    };\n    function parse(min = 0, depth = 0) {\n      if (depth > 12) fail2();\n      const t = tokens[pos++];\n      let out;\n      if (t && typeof t === "object") out = { const: Object.hasOwn(t, "number") ? t.number : t.string };\n      else if (t === "true" || t === "false") out = { const: t === "true" };\n      else if (t === "(") {\n        out = parse(0, depth + 1);\n        take(")");\n      } else if (t === "-" || t === "+") {\n        const arg = parse(5, depth + 1);\n        out = t === "-" ? { op: "sub", args: [{ const: 0 }, arg] } : arg;\n      } else if (typeof t === "string" && /^(state|data|derived|item)\\.[a-zA-Z][a-zA-Z0-9_]*$/.test(t)) out = { ref: t };\n      else if (["min", "max", "round", "abs"].includes(t)) {\n        take("(");\n        const args = [parse(0, depth + 1)];\n        while (tokens[pos] === ",") {\n          pos++;\n          args.push(parse(0, depth + 1));\n          if (args.length > 8) fail2();\n        }\n        take(")");\n        out = { op: t, args };\n      } else fail2();\n      while (typeof tokens[pos] === "string" && Object.hasOwn(operators, tokens[pos]) && operators[tokens[pos]][1] >= min) {\n        const [op, precedence] = operators[tokens[pos++]];\n        out = { op, args: [out, parse(precedence + 1, depth + 1)] };\n      }\n      if (min === 0 && tokens[pos] === "?") {\n        pos++;\n        const yes = parse(0, depth + 1);\n        take(":");\n        out = { op: "if", args: [out, yes, parse(0, depth + 1)] };\n      }\n      return out;\n    }\n    const result = parse();\n    if (pos !== tokens.length) fail2();\n    return result;\n  }\n  function expandExpressions(doc2) {\n    const expression = (e) => {\n      if (!e || typeof e !== "object" || Array.isArray(e)) return e;\n      if (Object.hasOwn(e, "expr")) {\n        if (Object.keys(e).length !== 1) throw new Error("DSH UI: expr must be the only formula field");\n        return compileExpression(e.expr);\n      }\n      if (Array.isArray(e.args)) e.args = e.args.map(expression);\n      if (e.map?.fields) for (const k of Object.keys(e.map.fields)) e.map.fields[k] = expression(e.map.fields[k]);\n      return e;\n    };\n    if (doc2.derived && typeof doc2.derived === "object") for (const k of Object.keys(doc2.derived)) doc2.derived[k] = expression(doc2.derived[k]);\n    const walk = (nodes) => {\n      if (!Array.isArray(nodes)) return;\n      for (const node2 of nodes) {\n        if (!node2 || typeof node2 !== "object") continue;\n        for (const field of ["text", "value", "max", "rows"]) if (Object.hasOwn(node2, field)) node2[field] = expression(node2[field]);\n        walk(node2.children);\n      }\n    };\n    walk(doc2.nodes);\n    return doc2;\n  }\n\n  // lib/protocol.js\n  var LIMITS = Object.freeze({ bytes: 131072, nodes: 160, depth: 12, rows: 500, expressions: 128, steps: 4096 });\n  var own = (o, k) => Object.hasOwn(o, k);\n  var fail = (message) => {\n    throw new Error(`DSH UI: ${message}`);\n  };\n  var object = (x) => x !== null && typeof x === "object" && !Array.isArray(x);\n  var key = (x) => typeof x === "string" && /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/.test(x) && !["constructor", "prototype", "__proto__"].includes(x);\n  var finite = (x) => typeof x === "number" && Number.isFinite(x);\n  var scalar = (x) => typeof x === "string" || typeof x === "boolean" || finite(x);\n  var text = (x, at) => {\n    if (typeof x !== "string" || x.length > 8192) fail(`${at} must be a string of at most 8192 characters`);\n  };\n  function fields(value, allowed, at) {\n    if (!object(value)) fail(`${at} must be an object`);\n    for (const k of Object.keys(value)) if (!allowed.includes(k)) {\n      const hint = at === "document" ? " Controls and visual components belong in nodes as registered typed nodes, not extra document fields." : "";\n      fail(`unknown field ${at}.${k}; allowed fields at ${at}: ${allowed.join(", ")}.${hint}`);\n    }\n  }\n  function safeJson(value, depth = 0, source = false) {\n    if (depth > 48) fail("JSON nesting is too deep");\n    if (value === null || typeof value === "boolean") return;\n    if (typeof value === "string") {\n      if (source) {\n        if (value.length > SANDBOX_LIMITS.source) fail("canvas source exceeds 48 Ki characters");\n        return;\n      }\n      return text(value, "value");\n    }\n    if (typeof value === "number") {\n      if (!finite(value)) fail("numbers must be finite");\n      return;\n    }\n    if (typeof value !== "object") fail("only JSON values are accepted");\n    if (Array.isArray(value) && value.length > LIMITS.rows) fail("too many array items");\n    for (const k of Object.keys(value)) {\n      if (["__proto__", "prototype", "constructor"].includes(k)) fail("unsafe property name");\n      safeJson(value[k], depth + 1, value.type === "sandbox" && ["html", "css", "script"].includes(k));\n    }\n  }\n  function initialState(doc2) {\n    return Object.fromEntries(Object.entries(doc2.state).map(([k, spec]) => [k, spec.default]));\n  }\n  function validateState(doc2, state2) {\n    if (!object(state2) || Object.keys(state2).length !== Object.keys(doc2.state).length) fail("state keys do not match the document");\n    const result = {};\n    for (const [k, s] of Object.entries(doc2.state)) {\n      if (!own(state2, k)) fail(`missing state.${k}`);\n      const v = state2[k];\n      if (s.type === "number") {\n        if (!finite(v) || v < s.min || v > s.max) fail(`state.${k} is outside its numeric range`);\n        const offset = (v - s.min) / s.step;\n        if (Math.abs(offset - Math.round(offset)) > 1e-6) fail(`state.${k} does not match its step`);\n      } else if (s.type === "string") text(v, `state.${k}`);\n      else if (typeof v !== "boolean") fail(`state.${k} must be boolean`);\n      if (s.options && !s.options.includes(v)) fail(`invalid option for state.${k}`);\n      result[k] = v;\n    }\n    return result;\n  }\n  var ARITY = { add: [1, 8], sub: [2, 2], mul: [1, 8], div: [2, 2], min: [1, 8], max: [1, 8], round: [1, 1], abs: [1, 1], eq: [2, 2], neq: [2, 2], lt: [2, 2], lte: [2, 2], gt: [2, 2], gte: [2, 2], if: [3, 3] };\n  function reference(doc2, ref) {\n    if (typeof ref !== "string" || !/^(state|data|derived)\\.[a-zA-Z][a-zA-Z0-9_]{0,63}$/.test(ref)) fail("invalid reference");\n    const [group, k] = ref.split(".");\n    if (!own(doc2[group], k)) fail(`unknown reference ${ref}`);\n    return [group, k];\n  }\n  function evaluate(doc2, state2) {\n    const derived = {}, active = /* @__PURE__ */ new Set();\n    let steps = 0, generatedRows = 0;\n    const budget = () => {\n      if (++steps > LIMITS.steps) fail("calculation budget exceeded");\n    };\n    const resolve = (ref) => {\n      budget();\n      const [group, k] = reference(doc2, ref);\n      if (group !== "derived") return (group === "state" ? state2 : doc2.data)[k];\n      if (own(derived, k)) return derived[k];\n      if (active.has(k)) fail(`cyclic calculation ${k}`);\n      active.add(k);\n      const result2 = expression(doc2.derived[k]);\n      active.delete(k);\n      derived[k] = result2;\n      return result2;\n    };\n    const expression = (e, item) => {\n      budget();\n      if (own(e, "map")) {\n        const rows = resolve(e.map.source);\n        if ((generatedRows += rows.length) > LIMITS.rows) fail("generated row limit exceeded");\n        return rows.map((row) => Object.fromEntries(Object.entries(e.map.fields).map(([k, value]) => {\n          const out2 = expression(value, row);\n          if (!scalar(out2)) fail("generated cells must be scalar");\n          return [k, out2];\n        })));\n      }\n      if (own(e, "const")) return e.const;\n      if (own(e, "ref")) {\n        if (e.ref.startsWith("item.")) {\n          const k = e.ref.slice(5);\n          if (!item || !own(item, k) || !scalar(item[k])) fail("invalid item reference");\n          return item[k];\n        }\n        return resolve(e.ref);\n      }\n      if (e.op === "if") {\n        const condition = expression(e.args[0], item);\n        if (typeof condition !== "boolean") fail("if condition must be boolean");\n        return expression(e.args[condition ? 1 : 2], item);\n      }\n      const a = e.args.map((arg) => expression(arg, item));\n      if (e.op === "eq") return a[0] === a[1];\n      if (e.op === "neq") return a[0] !== a[1];\n      if (!a.every(finite)) fail(`operator ${e.op} requires finite numbers`);\n      let out;\n      switch (e.op) {\n        case "add":\n          out = a.reduce((x, y) => x + y, 0);\n          break;\n        case "sub":\n          out = a[0] - a[1];\n          break;\n        case "mul":\n          out = a.reduce((x, y) => x * y, 1);\n          break;\n        case "div":\n          if (a[1] === 0) fail("division by zero");\n          out = a[0] / a[1];\n          break;\n        case "min":\n          out = Math.min(...a);\n          break;\n        case "max":\n          out = Math.max(...a);\n          break;\n        case "round":\n          out = Math.round(a[0]);\n          break;\n        case "abs":\n          out = Math.abs(a[0]);\n          break;\n        case "lt":\n          return a[0] < a[1];\n        case "lte":\n          return a[0] <= a[1];\n        case "gt":\n          return a[0] > a[1];\n        case "gte":\n          return a[0] >= a[1];\n        default:\n          fail(`unsupported operator ${e.op}`);\n      }\n      if (!finite(out)) fail("non-finite calculation result");\n      return out;\n    };\n    for (const k of Object.keys(doc2.derived)) resolve(`derived.${k}`);\n    if (new TextEncoder().encode(JSON.stringify(derived)).length > LIMITS.bytes) fail("derived output exceeds 128 KiB");\n    const result = { derived, resolveValue: (value) => {\n      if (!object(value)) return value;\n      return expression(value);\n    } };\n    checkViewValues(doc2, result);\n    return result;\n  }\n  function checkViewValues(doc2, evaluated) {\n    function walk(list) {\n      for (const n of list) {\n        if (n.type === "table" || n.type === "chart") {\n          const rows = evaluated.resolveValue(n.rows);\n          if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object)) fail("table/chart rows must reference an array of objects");\n          if (n.type === "chart" && rows.some((r) => !own(r, n.labelKey) || !scalar(r[n.labelKey]) || !own(r, n.valueKey) || !finite(r[n.valueKey]))) fail("chart requires labels and finite numeric values");\n          if (n.type === "chart" && n.xScale === "linear" && rows.some((r) => !finite(r[n.labelKey]))) fail("linear chart requires numeric x values");\n        }\n        if (n.type === "metric" && !finite(evaluated.resolveValue(n.value))) fail("metric requires a numeric value");\n        if (n.type === "progress") {\n          const v = evaluated.resolveValue(n.value), max = evaluated.resolveValue(n.max);\n          if (!finite(v) || !finite(max) || max <= 0 || v < 0 || v > max) fail("progress requires 0 <= value <= positive max");\n        }\n        if (n.children) walk(n.children);\n      }\n    }\n    walk(doc2.nodes);\n  }\n  function validateDocument(input) {\n    safeJson(input);\n    const json = JSON.stringify(input);\n    if (new TextEncoder().encode(json).length > LIMITS.bytes) fail("document exceeds 128 KiB");\n    const doc2 = expandExpressions(JSON.parse(json));\n    fields(doc2, ["version", "title", "fallback", "state", "data", "derived", "nodes", "actions", "presentation"], "document");\n    if (doc2.presentation !== void 0) {\n      fields(doc2.presentation, ["layout", "accent", "density"], "presentation");\n      for (const [k, allowed] of Object.entries({ layout: UI_LAYOUTS, accent: UI_ACCENTS, density: ["comfortable", "compact"] }))\n        if (doc2.presentation[k] !== void 0 && !allowed.includes(doc2.presentation[k])) fail(`unknown presentation ${k}`);\n    }\n    if (doc2.version !== 1) fail("unsupported protocol version");\n    text(doc2.title, "title");\n    text(doc2.fallback, "fallback");\n    if (!doc2.title.trim() || !doc2.fallback.trim()) fail("title and fallback cannot be empty");\n    for (const group of ["state", "data", "derived", "actions"]) {\n      doc2[group] ??= {};\n      if (!object(doc2[group]) || Object.keys(doc2[group]).length > 64) fail(`invalid ${group}`);\n      for (const k of Object.keys(doc2[group])) if (!key(k)) fail(`invalid key in ${group}`);\n    }\n    for (const [k, s] of Object.entries(doc2.state)) {\n      fields(s, ["type", "default", "min", "max", "step", "options"], `state.${k}`);\n      if (!["number", "string", "boolean"].includes(s.type)) fail(`unsupported state type ${k}`);\n      if (s.type === "number") {\n        if (![s.min, s.max, s.step].every(finite) || s.min >= s.max || s.step <= 0) fail(`invalid numeric limits for ${k}`);\n        if ((s.max - s.min) / s.step > 1e9) fail(`numeric step too small for ${k}`);\n      } else if (["min", "max", "step"].some((p) => own(s, p))) fail(`numeric limits on non-number ${k}`);\n      if (s.options && (!Array.isArray(s.options) || !s.options.length || s.options.length > 64 || !s.options.every(scalar))) fail(`invalid options for ${k}`);\n    }\n    const defaults = validateState(doc2, initialState(doc2));\n    let expressions = 0;\n    for (const [k, spec] of Object.entries(doc2.state))\n      for (const option of spec.options ?? []) validateState(doc2, { ...defaults, [k]: option });\n    function validateExpression(e, depth = 0, itemRows) {\n      if (++expressions > LIMITS.expressions || depth > LIMITS.depth) fail("expression limit exceeded");\n      if (!object(e)) fail("expression must be an object");\n      if (own(e, "map")) {\n        if (depth !== 0) fail("map is only allowed at the root of a derived value");\n        fields(e, ["map"], "expression");\n        fields(e.map, ["source", "fields"], "map");\n        if (typeof e.map.source !== "string" || !e.map.source.startsWith("data.")) fail(\'map source must reference static data using a string such as "data.samples"; put object rows in document.data.samples, not inline in map.source\');\n        const [, k] = reference(doc2, e.map.source), rows = doc2.data[k];\n        if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object)) fail("map source must be object rows");\n        if (!object(e.map.fields) || !Object.keys(e.map.fields).length || Object.keys(e.map.fields).length > 16) fail("map requires 1..16 fields");\n        for (const [k2, value2] of Object.entries(e.map.fields)) {\n          if (!key(k2)) fail(`invalid map field ${JSON.stringify(k2).slice(0, 100)}; use an ASCII identifier matching [a-zA-Z][a-zA-Z0-9_]{0,63}, such as powerW. Put Chinese display text in column/chart labels, not internal field keys`);\n          validateExpression(value2, depth + 1, rows);\n        }\n        return;\n      }\n      if (own(e, "const")) {\n        fields(e, ["const"], "expression");\n        if (!scalar(e.const)) fail("constant must be scalar");\n        return;\n      }\n      if (own(e, "ref")) {\n        fields(e, ["ref"], "expression");\n        if (typeof e.ref === "string" && e.ref.startsWith("item.")) {\n          const k = e.ref.slice(5);\n          if (!itemRows || !key(k) || itemRows.some((row) => !own(row, k) || !scalar(row[k]))) fail("invalid or unscoped item reference");\n        } else reference(doc2, e.ref);\n        return;\n      }\n      fields(e, ["op", "args"], "expression");\n      const arity = ARITY[e.op];\n      if (!arity || !Array.isArray(e.args) || e.args.length < arity[0] || e.args.length > arity[1]) fail("invalid operator or argument count");\n      e.args.forEach((a) => validateExpression(a, depth + 1, itemRows));\n    }\n    Object.values(doc2.derived).forEach((e) => validateExpression(e));\n    const visited = /* @__PURE__ */ new Set(), active = /* @__PURE__ */ new Set();\n    function visit(k) {\n      if (active.has(k)) fail(`cyclic calculation ${k}`);\n      if (visited.has(k)) return;\n      active.add(k);\n      function walk(e) {\n        if (e.ref?.startsWith("derived.")) visit(e.ref.split(".")[1]);\n        for (const a of e.args ?? []) walk(a);\n        for (const value2 of Object.values(e.map?.fields ?? {})) walk(value2);\n      }\n      walk(doc2.derived[k]);\n      active.delete(k);\n      visited.add(k);\n    }\n    Object.keys(doc2.derived).forEach(visit);\n    for (const [k, a] of Object.entries(doc2.actions)) {\n      fields(a, ["type", "intent", "stateKeys"], `actions.${k}`);\n      if (a.type !== "agent.followup") fail("only agent.followup actions are supported");\n      text(a.intent, "action intent");\n      if (!a.intent.trim() || !Array.isArray(a.stateKeys) || a.stateKeys.length > 64 || new Set(a.stateKeys).size !== a.stateKeys.length || a.stateKeys.some((s) => !own(doc2.state, s))) fail("invalid action stateKeys");\n    }\n    const ids = /* @__PURE__ */ new Set();\n    let count2 = 0;\n    const value = (v, at) => {\n      if (object(v)) {\n        if (own(v, "map")) fail("map belongs in derived");\n        validateExpression(v);\n      } else if (!scalar(v)) fail(`invalid value at ${at}`);\n    };\n    function nodes(list, depth = 0) {\n      if (!Array.isArray(list) || depth > LIMITS.depth) fail("invalid node children or depth");\n      for (const n of list) {\n        if (++count2 > LIMITS.nodes) fail("too many nodes");\n        if (!object(n) || !key(n.id) || ids.has(n.id)) fail("node ids must be unique identifiers");\n        ids.add(n.id);\n        if (!Object.hasOwn(COMPONENTS, n.type)) fail("unsupported component " + n.type);\n        switch (n.type) {\n          case "sandbox": {\n            text(n.title, "canvas title");\n            text(n.fallback, "canvas fallback");\n            if (!n.title.trim() || !n.fallback.trim() || typeof n.html !== "string" || !n.html.trim()) fail("canvas requires title, HTML and fallback");\n            for (const field of ["html", "css", "script"]) if (n[field] !== void 0 && (typeof n[field] !== "string" || n[field].length > SANDBOX_LIMITS.source)) fail("canvas source exceeds 48 Ki characters");\n            if (n.height !== void 0 && (!Number.isInteger(n.height) || n.height < 160 || n.height > SANDBOX_LIMITS.height)) fail("canvas height must be 160..1000");\n            for (const [field, group] of [["stateKeys", "state"], ["dataKeys", "data"], ["derivedKeys", "derived"]]) if (n[field] !== void 0 && (!Array.isArray(n[field]) || n[field].length > 64 || new Set(n[field]).size !== n[field].length || n[field].some((k) => !own(doc2[group], k)))) fail("invalid canvas " + field);\n            break;\n          }\n          case "row":\n          case "column":\n            break;\n          case "card":\n            if (n.title !== void 0) text(n.title, "card title");\n            if (n.surface !== void 0 && !UI_SURFACES.includes(n.surface)) fail("unknown card surface");\n            break;\n          case "details":\n            text(n.title, "details title");\n            if (n.open !== void 0 && typeof n.open !== "boolean") fail("details open must be boolean");\n            break;\n          case "badge":\n            value(n.text, "badge text");\n            break;\n          case "progress":\n            text(n.label, "progress label");\n            value(n.value, "progress value");\n            value(n.max, "progress max");\n            if (n.unit !== void 0) text(n.unit, "progress unit");\n            break;\n          case "steps": {\n            if (!Array.isArray(n.items) || !n.items.length || n.items.length > 12) fail("steps require 1..12 items");\n            for (const item of n.items) {\n              fields(item, ["title", "description", "status"], "step");\n              text(item.title, "step title");\n              if (item.description !== void 0) text(item.description, "step description");\n              if (!["pending", "active", "done", "error"].includes(item.status)) fail("unknown step status");\n            }\n            break;\n          }\n          case "heading":\n          case "text":\n            value(n.text, "text");\n            break;\n          case "metric":\n            text(n.label, "metric label");\n            value(n.value, "metric value");\n            if (n.unit !== void 0) text(n.unit, "unit");\n            if (n.decimals !== void 0 && (!Number.isInteger(n.decimals) || n.decimals < 0 || n.decimals > 6)) fail("invalid decimals");\n            break;\n          case "input":\n          case "slider":\n          case "select":\n          case "toggle": {\n            text(n.label, "control label");\n            if (typeof n.bind !== "string" || !n.bind.startsWith("state.")) fail("controls must bind state");\n            const [, k] = reference(doc2, n.bind), spec = doc2.state[k];\n            if (n.type === "slider" && spec.type !== "number") fail("slider requires numeric state");\n            if (n.type === "toggle" && spec.type !== "boolean") fail("toggle requires boolean state");\n            if (n.type === "input" && spec.type === "boolean") fail("use toggle for boolean state");\n            if (n.type === "select" && !spec.options) fail("select requires options");\n            break;\n          }\n          case "button":\n            text(n.text, "button text");\n            if (!own(doc2.actions, n.action)) fail("unknown action");\n            break;\n          case "table": {\n            if (Array.isArray(n.rows)) fail(\'table.rows must use {ref:"data.rows"}; move the array into document.data.rows, not inline in the table\');\n            value(n.rows, "table rows");\n            if (!Array.isArray(n.columns) || !n.columns.length || n.columns.length > 16) fail("invalid table columns");\n            const cols = /* @__PURE__ */ new Set();\n            for (const c of n.columns) {\n              fields(c, ["key", "label", "unit"], "column");\n              if (!key(c.key) || cols.has(c.key)) fail("invalid or duplicate column key");\n              cols.add(c.key);\n              text(c.label, "column label");\n              if (c.unit !== void 0) text(c.unit, "column unit");\n            }\n            break;\n          }\n          case "chart":\n            value(n.rows, "chart rows");\n            if (!["bar", "line"].includes(n.kind) || !key(n.labelKey) || !key(n.valueKey)) fail("invalid chart");\n            text(n.label, "chart label");\n            if (n.unit !== void 0) text(n.unit, "chart unit");\n            if (n.xScale !== void 0 && (!["category", "linear"].includes(n.xScale) || n.xScale === "linear" && n.kind !== "line")) fail("invalid xScale");\n            break;\n          default:\n            fail(`unsupported component ${n.type}`);\n        }\n        if (["heading", "text", "card", "metric", "button", "badge", "progress", "details"].includes(n.type)) {\n          if (n.icon !== void 0 && !UI_ICONS.includes(n.icon)) fail("unknown UI icon");\n          if (n.type !== "button") {\n            if (n.tone !== void 0 && !UI_TONES.includes(n.tone)) fail("unknown UI tone");\n          }\n        }\n        fields(n, componentFields(n.type), `node.${n.id}`);\n        if (["row", "column", "card", "details"].includes(n.type)) nodes(n.children, depth + 1);\n      }\n    }\n    nodes(doc2.nodes);\n    if (!count2) fail("at least one node is required");\n    evaluate(doc2, defaults);\n    return doc2;\n  }\n\n  // src/export-runtime.js\n  var payload = JSON.parse(document.getElementById("dsh-ui-export").textContent);\n  var doc = validateDocument(payload.document);\n  var node = doc.nodes.flatMap(function flatten(n) {\n    return [n, ...(n.children ?? []).flatMap(flatten)];\n  }).find((n) => n.id === payload.nodeId && n.type === "sandbox");\n  if (!node) throw Error("\\u5BFC\\u51FA\\u7684\\u753B\\u5E03\\u4E0D\\u5B58\\u5728");\n  var state = validateState(doc, payload.state);\n  var connected = false;\n  var start = Date.now();\n  var count = 0;\n  var token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join("");\n  var channel = token();\n  var nonce = payload.nonce;\n  var frame = document.createElement("iframe");\n  frame.title = node.title;\n  frame.sandbox = "allow-scripts";\n  frame.referrerPolicy = "no-referrer";\n  frame.style.cssText = "display:block;width:100%;height:" + (node.height ?? 420) + "px;border:0";\n  var status = document.getElementById("status");\n  var publish = () => {\n    try {\n      frame.contentWindow.postMessage({ dshCanvas: 1, channel, type: "snapshot", payload: { ...canvasSnapshot(node, state, doc.data, evaluate(doc, state).derived, false, payload.theme), visible: !document.hidden } }, "*");\n    } catch (e) {\n      status.textContent = "\\u8BA1\\u7B97\\u5931\\u8D25\\uFF1A" + e.message;\n    }\n  };\n  addEventListener("message", (event) => {\n    const m = event.data;\n    if (event.source !== frame.contentWindow || m?.channel !== channel || m.dshCanvas !== 1) return;\n    if (Date.now() - start > 1e3) {\n      start = Date.now();\n      count = 0;\n    }\n    if (++count > SANDBOX_LIMITS.rate) return;\n    if (m.type === "ready") {\n      connected = true;\n      publish();\n    } else if (m.type === "patch" && connected) {\n      try {\n        const next = validateState(doc, { ...state, ...canvasPatch(m.payload, node) });\n        evaluate(doc, next);\n        state = next;\n        status.textContent = "\\u672C\\u5730\\u53C2\\u6570\\u5DF2\\u66F4\\u65B0\\uFF1B\\u5237\\u65B0\\u6587\\u4EF6\\u4F1A\\u56DE\\u5230\\u5BFC\\u51FA\\u65F6\\u7684\\u53C2\\u6570\\u3002";\n      } catch (e) {\n        status.textContent = "\\u53C2\\u6570\\u65E0\\u6548\\uFF1A" + e.message;\n      }\n      publish();\n    } else if (m.type === "height" && Number.isFinite(m.payload)) frame.style.height = Math.max(160, Math.min(1e3, Math.ceil(m.payload))) + "px";\n    else if (m.type === "error") status.textContent = "\\u753B\\u5E03\\u8FD0\\u884C\\u5F02\\u5E38\\uFF1A" + String(m.payload).slice(0, 1e3);\n  });\n  document.addEventListener("visibilitychange", () => {\n    if (connected) publish();\n  });\n  document.getElementById("surface").append(frame);\n  frame.srcdoc = sandboxDocument(node, channel, nonce);\n})();\n';
+var EXPORT_RUNTIME = '(() => {\n  // lib/presentation.js\n  var UI_ICONS = Object.freeze(["sparkles", "sliders", "layers", "chart", "gauge", "cpu", "database", "info", "check", "warning", "arrow", "target"]);\n  var UI_TONES = Object.freeze(["neutral", "accent", "success", "warning", "danger"]);\n  var UI_LAYOUTS = Object.freeze(["dashboard", "workbench", "comparison", "guide", "status", "report"]);\n  var UI_ACCENTS = Object.freeze(["blue", "teal", "violet", "amber", "rose"]);\n  var UI_SURFACES = Object.freeze(["outline", "soft", "featured"]);\n\n  // lib/visual-audit.js\n  function measureVisual(root, nodeId = "") {\n    const issues = [], seen = /* @__PURE__ */ new Set(), coverage = { nodeId, elements: 0, truncated: false, contrastChecked: 0, contrastUncovered: 0 };\n    const add = (code, value, el2) => {\n      const id = el2?.closest("[data-ui-node]")?.getAttribute("data-ui-node") ?? nodeId;\n      const k = id + ":" + code + ":" + Math.round(value ?? 0);\n      if (!seen.has(k) && issues.length < 40) {\n        seen.add(k);\n        issues.push({ code, nodeId: id, ...value === void 0 ? {} : { value: Number(value.toFixed(2)) } });\n      }\n    };\n    const color = (s) => {\n      let m = s.match(/^rgba?\\(([^)]+)\\)/);\n      if (m) {\n        const a = m[1].split(/[\\s,\\/]+/).map(Number);\n        return [a[0] / 255, a[1] / 255, a[2] / 255, a[3] ?? 1];\n      }\n      m = s.match(/^color\\(srgb ([^)]+)\\)/);\n      if (m) {\n        const a = m[1].split(/[\\s\\/]+/).map(Number);\n        return [a[0], a[1], a[2], a[3] ?? 1];\n      }\n      return null;\n    };\n    const luminance = (c) => c.slice(0, 3).map((v) => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);\n    const widthRoot = root.id === "canvas" ? document.documentElement : root;\n    if (widthRoot.scrollWidth > widthRoot.clientWidth + 2) add("overflow", widthRoot.scrollWidth - widthRoot.clientWidth);\n    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);\n    let el;\n    while (el = walker.nextNode()) {\n      if (coverage.elements >= 2e3) {\n        coverage.truncated = true;\n        break;\n      }\n      coverage.elements++;\n      if (el.matches("[data-canvas-phase=error]")) add("runtimeError", void 0, el);\n      const css = getComputedStyle(el), box = el.getBoundingClientRect();\n      if (!box.width || !box.height || css.visibility === "hidden" || css.display === "none") continue;\n      const text2 = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());\n      if (text2) {\n        let size = parseFloat(css.fontSize);\n        if (el instanceof SVGElement && el.getScreenCTM) {\n          const m = el.getScreenCTM();\n          if (m) size *= Math.hypot(m.c, m.d);\n        }\n        if (size < 11.9) add("smallText", size, el);\n        const fg = color(css.color);\n        let ancestor = el, bg = null, depth = 0;\n        while (ancestor && depth++ < 64) {\n          const style = getComputedStyle(ancestor);\n          if (style.backgroundImage !== "none") break;\n          const c = color(style.backgroundColor);\n          if (c?.[3] === 1) {\n            bg = c;\n            break;\n          }\n          if (c?.[3] > 0) break;\n          ancestor = ancestor.parentElement;\n        }\n        if (!(el instanceof SVGElement) && fg?.[3] === 1 && bg) {\n          coverage.contrastChecked++;\n          const a = luminance(fg), b = luminance(bg), ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);\n          if (ratio < (size >= 24 || size >= 18.66 && parseFloat(css.fontWeight) >= 700 ? 3 : 4.5)) add("contrast", ratio, el);\n        } else coverage.contrastUncovered++;\n      }\n      if (el.matches("input:not([type=hidden]),select,textarea,button,[role=button]") && !el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby") && !el.labels?.length && !el.textContent.trim() && !el.getAttribute("title")) add("missingLabel", void 0, el);\n    }\n    Object.defineProperty(issues, "coverage", { value: coverage });\n    return issues;\n  }\n\n  // lib/format-number.js\n  function formatNumber(value, decimals = 2) {\n    if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("DSH UI: formatNumber requires a finite number");\n    if (!Number.isInteger(decimals) || decimals < 0 || decimals > 6) throw new Error("DSH UI: formatNumber decimals must be an integer from 0 to 6");\n    return value.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });\n  }\n\n  // lib/canvas-system.js\n  var CANVAS_SYSTEM_CSS = `\n:root{--canvas-radius:20px;--canvas-gap:16px;--canvas-positive:#167456;--canvas-negative:#b13b3b;--canvas-warning:#875b15}\n:root[data-canvas-scheme=dark]{--canvas-positive:#78d9b4;--canvas-negative:#ffaaaa;--canvas-warning:#edc87e}\n#canvas{display:flow-root}html,body{margin:0;min-width:0;background:var(--canvas-bg,#fff);color:var(--canvas-ink,#182537);font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}*{box-sizing:border-box}svg{max-width:100%;height:auto}button,input,select,textarea{font:inherit;color:inherit}button,input,select,textarea{border:1px solid var(--canvas-line,#ced4df);border-radius:8px;background:var(--canvas-bg,#fff);padding:8px 12px;max-width:100%}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}input[type=range]{padding:0;accent-color:var(--canvas-accent,#3e60d3)}input[type=checkbox],input[type=radio]{accent-color:var(--canvas-accent,#3e60d3)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--canvas-accent,#3e60d3);outline-offset:3px}\n.ui-stack{display:grid;gap:var(--canvas-gap)}.ui-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--canvas-gap)}.ui-surface{padding:20px;border:1px solid var(--canvas-line,#ced4df);border-radius:var(--canvas-radius);background:var(--canvas-soft,#f3f5f8)}.ui-title{margin:0;font-size:clamp(20px,3vw,28px);line-height:1.3;letter-spacing:-.02em}.ui-caption{color:var(--canvas-muted,#526176);margin:8px 0;font-size:14px}.ui-value{font-size:clamp(24px,4vw,36px);font-variant-numeric:tabular-nums;line-height:1.2}.ui-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.ui-field{display:grid;gap:6px;min-width:0}.ui-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px}.ui-status{min-height:1.6em}.ui-error{color:var(--canvas-negative)}.ui-primary{background:var(--canvas-accent,#3e60d3);color:var(--canvas-accent-ink,#fff);border-color:transparent}\nsvg .ui-node{fill:var(--canvas-soft,#f3f5f8);stroke:var(--canvas-line,#ced4df);stroke-width:1}svg .ui-edge{fill:none;stroke:var(--canvas-muted,#526176);stroke-width:1.5}svg .ui-label{fill:var(--canvas-ink,#182537);font:500 14px system-ui,sans-serif}svg .ui-note{fill:var(--canvas-muted,#526176);font:400 13px system-ui,sans-serif}svg .ui-leader{fill:none;stroke:var(--canvas-muted,#526176);stroke-dasharray:3 4}svg .ui-accent{fill:color-mix(in srgb,var(--canvas-accent,#3e60d3) 12%,var(--canvas-bg,#fff));stroke:var(--canvas-accent,#3e60d3)}\n.ui-flow{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 8px;flex-wrap:wrap}.ui-step{display:grid;gap:6px;min-width:130px;max-width:240px;padding:16px 20px;border:1px solid var(--canvas-line);border-radius:6px;background:var(--canvas-bg)}.ui-step strong{font-size:16px;font-weight:600}.ui-step span{font-size:14px;color:var(--canvas-muted)}.ui-arrow{color:var(--canvas-muted);font-size:22px}.ui-callout{border-inline-start:3px solid var(--canvas-accent);padding:8px 16px;color:var(--canvas-ink)}\n.ui-surface,.ui-step{border-radius:var(--canvas-radius);background:linear-gradient(135deg,color-mix(in srgb,var(--canvas-accent,#3e60d3) 9%,var(--canvas-bg,#fff)),var(--canvas-soft,#f3f5f8))}button,input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{border-radius:14px}.ui-primary{background:linear-gradient(120deg,var(--canvas-accent,#3e60d3),color-mix(in srgb,var(--canvas-accent,#3e60d3) 85%,#152647))}.ui-callout{border-radius:14px;background:linear-gradient(120deg,color-mix(in srgb,var(--canvas-accent,#3e60d3) 7%,var(--canvas-bg,#fff)),var(--canvas-bg,#fff))}\n@media(max-width:480px){.ui-flow{flex-direction:column;padding:16px 8px;gap:12px}.ui-step{width:100%;max-width:none}.ui-arrow{transform:rotate(90deg)}}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}`;\n\n  // lib/sandbox.js\n  var SANDBOX_LIMITS = Object.freeze({ source: 49152, height: 1e3, message: 16384, rate: 30 });\n  function canvasSnapshot(node2, state2, data, derived, disabled, theme) {\n    const pick = (keys, values) => Object.fromEntries((keys ?? []).map((k) => [k, values[k]]));\n    return { state: pick(node2.stateKeys, state2), data: pick(node2.dataKeys, data), derived: pick(node2.derivedKeys, derived), disabled, theme };\n  }\n  function canvasPatch(message, node2) {\n    if (!message || typeof message !== "object" || Array.isArray(message)) throw new Error("Invalid canvas patch");\n    const keys = Object.keys(message);\n    if (!keys.length || keys.length > 64 || keys.some((k) => !(node2.stateKeys ?? []).includes(k))) throw new Error("Canvas state key is not declared");\n    if (JSON.stringify(message).length > SANDBOX_LIMITS.message) throw new Error("Canvas patch is too large");\n    return message;\n  }\n  function sandboxDocument(node2, channel2, nonce2) {\n    const json = (value) => JSON.stringify(value).replace(/</g, "\\\\u003c").replace(/\\u2028/g, "\\\\u2028").replace(/\\u2029/g, "\\\\u2029");\n    return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'nonce-${nonce2}\'; style-src \'unsafe-inline\'; img-src data:; font-src \'none\'; connect-src \'none\'; media-src \'none\'; object-src \'none\'; frame-src \'none\'; worker-src \'none\'; base-uri \'none\'; form-action \'none\'"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${CANVAS_SYSTEM_CSS}</style></head><body><main id="canvas"></main><script nonce="${nonce2}">(()=>{\n  const channel=${json(channel2)}, source=${json({ html: node2.html, css: node2.css ?? "", script: node2.script ?? "" })};\n  let snapshot={state:{},data:{},derived:{},disabled:true,theme:{}}, started=false;\n  const listeners=new Set(), send=(type,payload)=>parent.postMessage({dshCanvas:1,channel,type,payload},\'*\');\n  const report=e=>send(\'error\',String(e?.message??e).slice(0,1000));\n  const audit=${measureVisual.toString()};let auditTimer;const scheduleAudit=()=>{clearTimeout(auditTimer);auditTimer=setTimeout(()=>{const issues=audit(document.getElementById(\'canvas\'),${json(node2.id ?? "")});send(\'audit\',{issues,coverage:issues.coverage})},400)};\n  addEventListener(\'resize\',scheduleAudit);\n  addEventListener(\'error\',e=>report(e.error??e.message));addEventListener(\'unhandledrejection\',e=>report(e.reason));\n  const animations=new Set(), motion=matchMedia(\'(prefers-reduced-motion: reduce)\');\n  let raf=0,last=0,time=0;\n  const visible=()=>snapshot.visible!==false&&!document.hidden;\n  const canAnimate=()=>visible()&&!snapshot.disabled&&!motion.matches;\n  const draw=delta=>{for(const fn of animations)try{fn({time,delta,reducedMotion:motion.matches,visible:visible()})}catch(e){animations.delete(fn);report(e)}};\n  const tick=t=>{raf=0;if(!canAnimate()||!animations.size){last=0;draw(0);return}const delta=last?Math.min(.05,(t-last)/1000):0;last=t;time+=delta;draw(delta);if(animations.size)raf=requestAnimationFrame(tick)};\n  const refresh=()=>{draw(0);if(canAnimate()&&animations.size){if(!raf){last=0;raf=requestAnimationFrame(tick)}}else{cancelAnimationFrame(raf);raf=0;last=0}};\n  motion.addEventListener(\'change\',refresh);document.addEventListener(\'visibilitychange\',refresh);\n  const formatNumber=${formatNumber.toString()};\n  const api={formatNumber,get snapshot(){return structuredClone(snapshot)},subscribe(fn){if(typeof fn!==\'function\')throw Error(\'Listener required\');listeners.add(fn);fn(api.snapshot);return()=>listeners.delete(fn)},setState(patch){if(!snapshot.disabled)send(\'patch\',patch)},animate(fn){if(typeof fn!==\'function\')throw Error(\'Animation callback required\');animations.add(fn);refresh();return()=>{animations.delete(fn);if(!animations.size){cancelAnimationFrame(raf);raf=0;last=0}}}};\n  Object.defineProperty(window,\'DSHUI\',{value:Object.freeze(api),writable:false});\n  for(const type of [\'click\',\'input\',\'change\',\'keydown\',\'pointerdown\'])document.addEventListener(type,e=>{if(snapshot.disabled){e.preventDefault();e.stopImmediatePropagation()}},true);\n  addEventListener(\'message\',event=>{\n    const m=event.data;if(event.source!==parent||m?.dshCanvas!==1||m.channel!==channel||m.type!==\'snapshot\')return;\n    snapshot=m.payload;for(const [k,v] of Object.entries(snapshot.theme??{}))document.documentElement.style.setProperty(\'--canvas-\'+k,v);\n    document.documentElement.style.colorScheme=snapshot.theme?.scheme??\'light\';document.documentElement.dataset.canvasScheme=snapshot.theme?.scheme??\'light\';\n    const wasStarted=started;\n    if(!started){started=true;document.getElementById(\'canvas\').innerHTML=source.html;const style=document.createElement(\'style\');style.textContent=source.css;document.head.append(style);const script=document.createElement(\'script\');script.nonce=${json(nonce2)};script.textContent=source.script;document.body.append(script)}\n    if(wasStarted)for(const fn of listeners)try{fn(api.snapshot)}catch(e){report(e)}\n    refresh();if(!wasStarted)send(\'mounted\');scheduleAudit();\n  });\n  let resizePending=false;new ResizeObserver(()=>{if(!started||resizePending)return;resizePending=true;requestAnimationFrame(()=>{resizePending=false;send(\'height\',Math.ceil(document.getElementById(\'canvas\').getBoundingClientRect().height))})}).observe(document.getElementById(\'canvas\'));\n  send(\'ready\');\n})();<\\/script></body></html>`;\n  }\n\n  // lib/components.js\n  var define = (fields2, purpose, presentation = "") => Object.freeze({ fields: Object.freeze(fields2), purpose, presentation });\n  var COMPONENTS = Object.freeze({\n    heading: define(["text"], "Section heading", "tone"),\n    text: define(["text"], "Readable explanation or bound text", "tone"),\n    row: define(["children"], "Wrapping parallel content"),\n    column: define(["children"], "Ordered vertical content"),\n    card: define(["title", "children", "surface"], "Meaningful grouped section", "tone"),\n    details: define(["title", "children", "open"], "Collapsible supporting content", "tone"),\n    badge: define(["text"], "Short explicit status label", "tone"),\n    progress: define(["label", "value", "max", "unit"], "Declared numeric progress snapshot", "tone"),\n    steps: define(["items"], "Ordered declared steps"),\n    metric: define(["label", "value", "unit", "decimals"], "Number with units, or a literal/bound status string", "tone"),\n    input: define(["label", "bind"], "String or numeric state input"),\n    slider: define(["label", "bind"], "Numeric state control"),\n    select: define(["label", "bind"], "Selection from declared state options"),\n    toggle: define(["label", "bind"], "Boolean state control"),\n    button: define(["text", "action"], "Declared Agent follow-up", "icon"),\n    table: define(["label", "rows", "columns"], "Supplied or derived values; inline rows or data/derived reference"),\n    chart: define(["kind", "rows", "labelKey", "valueKey", "label", "unit", "xScale"], "Bar/line comparison with accessible data"),\n    sandbox: define(["title", "html", "css", "script", "fallback", "height", "stateKeys", "dataKeys", "derivedKeys"], "Freeform isolated HTML/SVG/CSS/JavaScript visualization")\n  });\n  function componentFields(type) {\n    const c = Object.hasOwn(COMPONENTS, type) ? COMPONENTS[type] : void 0;\n    return c && ["id", "type", ...c.fields, ...c.presentation ? ["icon"] : [], ...c.presentation === "tone" ? ["tone"] : []];\n  }\n\n  // lib/identifiers.js\n  var IDENTIFIER_SOURCE = "[\\\\p{L}_][\\\\p{L}\\\\p{M}\\\\p{N}_]{0,63}";\n  var pattern = new RegExp(`^${IDENTIFIER_SOURCE}$`, "u");\n  var validIdentifier = (value) => typeof value === "string" && pattern.test(value) && !["constructor", "prototype", "__proto__"].includes(value);\n\n  // lib/author-expression.js\n  function compileExpression(source) {\n    const fail2 = () => {\n      throw new Error("DSH UI: invalid formula; use state.x, data.x, derived.x, item.x, numbers, strings, + - * /, comparisons, ?: and min/max/round/abs");\n    };\n    if (typeof source !== "string" || !source.trim() || source.length > 2048) fail2();\n    const tokens = [];\n    let offset = 0;\n    const token2 = new RegExp(String.raw`\\s*(?:(\\d+(?:\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?|("(?:[^"\\\\]|\\\\.)*")|(${IDENTIFIER_SOURCE}(?:\\.${IDENTIFIER_SOURCE})?)|(===|!==|<=|>=|==|!=|[+*/()?,:<>-]))`, "uy");\n    while (offset < source.length) {\n      if (!source.slice(offset).trim()) break;\n      token2.lastIndex = offset;\n      const m = token2.exec(source);\n      if (!m) fail2();\n      offset = token2.lastIndex;\n      tokens.push(m[1] ? { number: Number(m[1] + (m[2] ?? "")) } : m[3] ? { string: JSON.parse(m[3]) } : m[4] ?? m[5]);\n      if (tokens.length > 256) fail2();\n    }\n    let pos = 0;\n    const operators = { "==": ["eq", 1], "===": ["eq", 1], "!=": ["neq", 1], "!==": ["neq", 1], "<": ["lt", 2], "<=": ["lte", 2], ">": ["gt", 2], ">=": ["gte", 2], "+": ["add", 3], "-": ["sub", 3], "*": ["mul", 4], "/": ["div", 4] };\n    const take = (t) => {\n      if (tokens[pos++] !== t) fail2();\n    };\n    function parse(min = 0, depth = 0) {\n      if (depth > 12) fail2();\n      const t = tokens[pos++];\n      let out;\n      if (t && typeof t === "object") out = { const: Object.hasOwn(t, "number") ? t.number : t.string };\n      else if (t === "true" || t === "false") out = { const: t === "true" };\n      else if (t === "(") {\n        out = parse(0, depth + 1);\n        take(")");\n      } else if (t === "-" || t === "+") {\n        const arg = parse(5, depth + 1);\n        out = t === "-" ? { op: "sub", args: [{ const: 0 }, arg] } : arg;\n      } else if (typeof t === "string" && t.split(".").length === 2 && ["state", "data", "derived", "item"].includes(t.split(".")[0]) && validIdentifier(t.split(".")[1])) out = { ref: t };\n      else if (["min", "max", "round", "abs"].includes(t)) {\n        take("(");\n        const args = [parse(0, depth + 1)];\n        while (tokens[pos] === ",") {\n          pos++;\n          args.push(parse(0, depth + 1));\n          if (args.length > 8) fail2();\n        }\n        take(")");\n        out = { op: t, args };\n      } else fail2();\n      while (typeof tokens[pos] === "string" && Object.hasOwn(operators, tokens[pos]) && operators[tokens[pos]][1] >= min) {\n        const [op, precedence] = operators[tokens[pos++]];\n        out = { op, args: [out, parse(precedence + 1, depth + 1)] };\n      }\n      if (min === 0 && tokens[pos] === "?") {\n        pos++;\n        const yes = parse(0, depth + 1);\n        take(":");\n        out = { op: "if", args: [out, yes, parse(0, depth + 1)] };\n      }\n      return out;\n    }\n    const result = parse();\n    if (pos !== tokens.length) fail2();\n    return result;\n  }\n  function expandExpressions(doc2) {\n    const expression = (e) => {\n      if (!e || typeof e !== "object" || Array.isArray(e)) return e;\n      if (Object.hasOwn(e, "expr")) {\n        if (Object.keys(e).length !== 1) throw new Error("DSH UI: expr must be the only formula field");\n        return compileExpression(e.expr);\n      }\n      if (Array.isArray(e.args)) e.args = e.args.map(expression);\n      if (e.map?.fields) for (const k of Object.keys(e.map.fields)) e.map.fields[k] = expression(e.map.fields[k]);\n      return e;\n    };\n    if (doc2.derived && typeof doc2.derived === "object") for (const k of Object.keys(doc2.derived)) doc2.derived[k] = expression(doc2.derived[k]);\n    const walk = (nodes) => {\n      if (!Array.isArray(nodes)) return;\n      for (const node2 of nodes) {\n        if (!node2 || typeof node2 !== "object") continue;\n        for (const field of ["text", "value", "max", "rows"]) if (Object.hasOwn(node2, field)) node2[field] = expression(node2[field]);\n        walk(node2.children);\n      }\n    };\n    walk(doc2.nodes);\n    return doc2;\n  }\n\n  // lib/protocol.js\n  var LIMITS = Object.freeze({ bytes: 131072, nodes: 160, depth: 12, rows: 500, expressions: 128, steps: 4096 });\n  var own = (o, k) => Object.hasOwn(o, k);\n  var fail = (message) => {\n    throw new Error(`DSH UI: ${message}`);\n  };\n  var object = (x) => x !== null && typeof x === "object" && !Array.isArray(x);\n  var finite = (x) => typeof x === "number" && Number.isFinite(x);\n  var scalar = (x) => typeof x === "string" || typeof x === "boolean" || finite(x);\n  var text = (x, at) => {\n    if (typeof x !== "string" || x.length > 8192) fail(`${at} must be a string of at most 8192 characters`);\n  };\n  function fields(value, allowed, at) {\n    if (!object(value)) fail(`${at} must be an object`);\n    for (const k of Object.keys(value)) if (!allowed.includes(k)) {\n      const hint = at === "document" ? " Controls and visual components belong in nodes as registered typed nodes, not extra document fields." : "";\n      fail(`unknown field ${at}.${k}; allowed fields at ${at}: ${allowed.join(", ")}.${hint}`);\n    }\n  }\n  function safeJson(value, depth = 0, source = false) {\n    if (depth > 48) fail("JSON nesting is too deep");\n    if (value === null || typeof value === "boolean") return;\n    if (typeof value === "string") {\n      if (source) {\n        if (value.length > SANDBOX_LIMITS.source) fail("canvas source exceeds 48 Ki characters");\n        return;\n      }\n      return text(value, "value");\n    }\n    if (typeof value === "number") {\n      if (!finite(value)) fail("numbers must be finite");\n      return;\n    }\n    if (typeof value !== "object") fail("only JSON values are accepted");\n    if (Array.isArray(value) && value.length > LIMITS.rows) fail("too many array items");\n    for (const k of Object.keys(value)) {\n      if (["__proto__", "prototype", "constructor"].includes(k)) fail("unsafe property name");\n      safeJson(value[k], depth + 1, value.type === "sandbox" && ["html", "css", "script"].includes(k));\n    }\n  }\n  function initialState(doc2) {\n    return Object.fromEntries(Object.entries(doc2.state).map(([k, spec]) => [k, spec.default]));\n  }\n  function validateState(doc2, state2) {\n    if (!object(state2) || Object.keys(state2).length !== Object.keys(doc2.state).length) fail("state keys do not match the document");\n    const result = {};\n    for (const [k, s] of Object.entries(doc2.state)) {\n      if (!own(state2, k)) fail(`missing state.${k}`);\n      const v = state2[k];\n      if (s.type === "number") {\n        if (!finite(v) || v < s.min || v > s.max) fail(`state.${k} is outside its numeric range`);\n        const offset = (v - s.min) / s.step;\n        if (Math.abs(offset - Math.round(offset)) > 1e-6) fail(`state.${k} does not match its step`);\n      } else if (s.type === "json") {\n        if (!object(v) && !Array.isArray(v)) fail(`state.${k} must be an array or object for type json`);\n        safeJson(v);\n        if (new TextEncoder().encode(JSON.stringify(v)).length > 16384) fail(`state.${k} JSON exceeds 16 KiB`);\n      } else if (s.type === "string") text(v, `state.${k}`);\n      else if (typeof v !== "boolean") fail(`state.${k} must be boolean`);\n      if (s.options && !s.options.includes(v)) fail(`invalid option for state.${k}`);\n      result[k] = v;\n    }\n    return result;\n  }\n  var ARITY = { add: [1, 8], sub: [2, 2], mul: [1, 8], div: [2, 2], min: [1, 8], max: [1, 8], round: [1, 1], abs: [1, 1], eq: [2, 2], neq: [2, 2], lt: [2, 2], lte: [2, 2], gt: [2, 2], gte: [2, 2], if: [3, 3] };\n  function reference(doc2, ref) {\n    if (typeof ref !== "string" || !["state", "data", "derived"].includes(ref.split(".")[0]) || ref.split(".").length !== 2 || !validIdentifier(ref.split(".")[1])) fail(`invalid reference ${JSON.stringify(ref)}; use state.key, data.key or derived.key with a letter/underscore identifier`);\n    const [group, k] = ref.split(".");\n    if (!own(doc2[group], k)) fail(`unknown reference ${ref}`);\n    return [group, k];\n  }\n  function evaluate(doc2, state2) {\n    const derived = {}, active = /* @__PURE__ */ new Set();\n    let steps = 0, generatedRows = 0;\n    const budget = () => {\n      if (++steps > LIMITS.steps) fail("calculation budget exceeded");\n    };\n    const resolve = (ref) => {\n      budget();\n      const [group, k] = reference(doc2, ref);\n      if (group !== "derived") return (group === "state" ? state2 : doc2.data)[k];\n      if (own(derived, k)) return derived[k];\n      if (active.has(k)) fail(`cyclic calculation ${k}`);\n      active.add(k);\n      const result2 = expression(doc2.derived[k]);\n      active.delete(k);\n      derived[k] = result2;\n      return result2;\n    };\n    const expression = (e, item) => {\n      budget();\n      if (own(e, "map")) {\n        const rows = resolve(e.map.source);\n        if ((generatedRows += rows.length) > LIMITS.rows) fail("generated row limit exceeded");\n        return rows.map((row) => Object.fromEntries(Object.entries(e.map.fields).map(([k, value]) => {\n          const out2 = expression(value, row);\n          if (!scalar(out2)) fail("generated cells must be scalar");\n          return [k, out2];\n        })));\n      }\n      if (own(e, "const")) return e.const;\n      if (own(e, "ref")) {\n        if (e.ref.startsWith("item.")) {\n          const k = e.ref.slice(5);\n          if (!item || !own(item, k) || !scalar(item[k])) fail("invalid item reference");\n          return item[k];\n        }\n        return resolve(e.ref);\n      }\n      if (e.op === "if") {\n        const condition = expression(e.args[0], item);\n        if (typeof condition !== "boolean") fail("if condition must be boolean");\n        return expression(e.args[condition ? 1 : 2], item);\n      }\n      const a = e.args.map((arg) => expression(arg, item));\n      if (e.op === "eq") return a[0] === a[1];\n      if (e.op === "neq") return a[0] !== a[1];\n      if (!a.every(finite)) fail(`operator ${e.op} requires finite numbers`);\n      let out;\n      switch (e.op) {\n        case "add":\n          out = a.reduce((x, y) => x + y, 0);\n          break;\n        case "sub":\n          out = a[0] - a[1];\n          break;\n        case "mul":\n          out = a.reduce((x, y) => x * y, 1);\n          break;\n        case "div":\n          if (a[1] === 0) fail("division by zero");\n          out = a[0] / a[1];\n          break;\n        case "min":\n          out = Math.min(...a);\n          break;\n        case "max":\n          out = Math.max(...a);\n          break;\n        case "round":\n          out = Math.round(a[0]);\n          break;\n        case "abs":\n          out = Math.abs(a[0]);\n          break;\n        case "lt":\n          return a[0] < a[1];\n        case "lte":\n          return a[0] <= a[1];\n        case "gt":\n          return a[0] > a[1];\n        case "gte":\n          return a[0] >= a[1];\n        default:\n          fail(`unsupported operator ${e.op}`);\n      }\n      if (!finite(out)) fail("non-finite calculation result");\n      return out;\n    };\n    for (const k of Object.keys(doc2.derived)) resolve(`derived.${k}`);\n    if (new TextEncoder().encode(JSON.stringify(derived)).length > LIMITS.bytes) fail("derived output exceeds 128 KiB");\n    const result = { derived, resolveValue: (value) => {\n      if (!object(value)) return value;\n      return expression(value);\n    } };\n    checkViewValues(doc2, result);\n    return result;\n  }\n  function checkViewValues(doc2, evaluated) {\n    function walk(list) {\n      for (const n of list) {\n        if (n.type === "table" || n.type === "chart") {\n          const rows = evaluated.resolveValue(n.rows);\n          if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object)) fail("table/chart rows must reference an array of objects");\n          if (n.type === "chart" && rows.some((r) => !own(r, n.labelKey) || !scalar(r[n.labelKey]) || !own(r, n.valueKey) || !finite(r[n.valueKey]))) fail("chart requires labels and finite numeric values");\n          if (n.type === "chart" && n.xScale === "linear" && rows.some((r) => !finite(r[n.labelKey]))) fail("linear chart requires numeric x values");\n        }\n        if (n.type === "metric" && !scalar(evaluated.resolveValue(n.value))) fail(`node.${n.id}.value must resolve to a number, string or boolean; use table for rows or a canvas for structured data`);\n        if (n.type === "progress") {\n          const v = evaluated.resolveValue(n.value), max = evaluated.resolveValue(n.max);\n          if (!finite(v) || !finite(max) || max <= 0 || v < 0 || v > max) fail("progress requires 0 <= value <= positive max");\n        }\n        if (n.children) walk(n.children);\n      }\n    }\n    walk(doc2.nodes);\n  }\n  function validateDocument(input) {\n    safeJson(input);\n    const json = JSON.stringify(input);\n    if (new TextEncoder().encode(json).length > LIMITS.bytes) fail("document exceeds 128 KiB");\n    const doc2 = expandExpressions(JSON.parse(json));\n    fields(doc2, ["version", "title", "fallback", "state", "data", "derived", "nodes", "actions", "presentation"], "document");\n    if (doc2.presentation !== void 0) {\n      fields(doc2.presentation, ["layout", "accent", "density"], "presentation");\n      for (const [k, allowed] of Object.entries({ layout: UI_LAYOUTS, accent: UI_ACCENTS, density: ["comfortable", "compact"] }))\n        if (doc2.presentation[k] !== void 0 && !allowed.includes(doc2.presentation[k])) fail(`unknown presentation ${k}`);\n    }\n    if (doc2.version !== 1) fail("unsupported protocol version");\n    text(doc2.title, "title");\n    text(doc2.fallback, "fallback");\n    if (!doc2.title.trim() || !doc2.fallback.trim()) fail("title and fallback cannot be empty");\n    for (const group of ["state", "data", "derived", "actions"]) {\n      doc2[group] ??= {};\n      if (!object(doc2[group]) || Object.keys(doc2[group]).length > 64) fail(`invalid ${group}`);\n      for (const k of Object.keys(doc2[group])) if (!validIdentifier(k)) fail(`invalid key in ${group}: ${JSON.stringify(k)}; use 1..64 letters, numbers or underscores, starting with a letter/underscore (Chinese letters supported); no spaces, dots or hyphens. Put display labels in label/text`);\n    }\n    for (const [k, s] of Object.entries(doc2.state)) {\n      fields(s, ["type", "default", "min", "max", "step", "options"], `state.${k}`);\n      if (s.type === "string" && (Array.isArray(s.default) || object(s.default)) && !own(s, "options")) s.type = "json";\n      if (!["number", "string", "boolean", "json"].includes(s.type)) fail(`unsupported state type ${k}; use number, string, boolean or json (arrays/objects)`);\n      if (s.type === "json" && own(s, "options")) fail(`state.${k}: json state does not support select options; use scalar options or a canvas`);\n      if (s.type === "number") {\n        if (![s.min, s.max, s.step].every(finite) || s.min >= s.max || s.step <= 0) fail(`invalid numeric limits for ${k}`);\n        if ((s.max - s.min) / s.step > 1e9) fail(`numeric step too small for ${k}`);\n      } else if (["min", "max", "step"].some((p) => own(s, p))) fail(`numeric limits on non-number ${k}`);\n      if (s.options && (!Array.isArray(s.options) || !s.options.length || s.options.length > 64 || !s.options.every(scalar))) fail(`invalid options for ${k}`);\n    }\n    const defaults = validateState(doc2, initialState(doc2));\n    let expressions = 0;\n    for (const [k, spec] of Object.entries(doc2.state))\n      for (const option of spec.options ?? []) validateState(doc2, { ...defaults, [k]: option });\n    function validateExpression(e, depth = 0, itemRows) {\n      if (++expressions > LIMITS.expressions || depth > LIMITS.depth) fail("expression limit exceeded");\n      if (!object(e)) fail("expression must be an object");\n      if (own(e, "map")) {\n        if (depth !== 0) fail("map is only allowed at the root of a derived value");\n        fields(e, ["map"], "expression");\n        fields(e.map, ["source", "fields"], "map");\n        if (typeof e.map.source !== "string" || !e.map.source.startsWith("data.")) fail(\'map source must reference static data using a string such as "data.samples"; put object rows in document.data.samples, not inline in map.source\');\n        const [, k] = reference(doc2, e.map.source), rows = doc2.data[k];\n        if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object)) fail("map source must be object rows");\n        if (!object(e.map.fields) || !Object.keys(e.map.fields).length || Object.keys(e.map.fields).length > 16) fail("map requires 1..16 fields");\n        for (const [k2, value2] of Object.entries(e.map.fields)) {\n          if (!validIdentifier(k2)) fail(`invalid map field ${JSON.stringify(k2).slice(0, 100)}; use a letter/underscore identifier such as powerW or \\u529F\\u7387, without spaces, dots or hyphens`);\n          validateExpression(value2, depth + 1, rows);\n        }\n        return;\n      }\n      if (own(e, "const")) {\n        fields(e, ["const"], "expression");\n        if (!scalar(e.const)) fail("constant must be scalar");\n        return;\n      }\n      if (own(e, "ref")) {\n        fields(e, ["ref"], "expression");\n        if (typeof e.ref === "string" && e.ref.startsWith("item.")) {\n          const k = e.ref.slice(5);\n          if (!itemRows || !validIdentifier(k) || itemRows.some((row) => !own(row, k) || !scalar(row[k]))) fail("invalid or unscoped item reference");\n        } else reference(doc2, e.ref);\n        return;\n      }\n      fields(e, ["op", "args"], "expression");\n      const arity = ARITY[e.op];\n      if (!arity || !Array.isArray(e.args) || e.args.length < arity[0] || e.args.length > arity[1]) fail("invalid operator or argument count");\n      e.args.forEach((a) => validateExpression(a, depth + 1, itemRows));\n    }\n    Object.values(doc2.derived).forEach((e) => validateExpression(e));\n    const visited = /* @__PURE__ */ new Set(), active = /* @__PURE__ */ new Set();\n    function visit(k) {\n      if (active.has(k)) fail(`cyclic calculation ${k}`);\n      if (visited.has(k)) return;\n      active.add(k);\n      function walk(e) {\n        if (e.ref?.startsWith("derived.")) visit(e.ref.split(".")[1]);\n        for (const a of e.args ?? []) walk(a);\n        for (const value2 of Object.values(e.map?.fields ?? {})) walk(value2);\n      }\n      walk(doc2.derived[k]);\n      active.delete(k);\n      visited.add(k);\n    }\n    Object.keys(doc2.derived).forEach(visit);\n    for (const [k, a] of Object.entries(doc2.actions)) {\n      fields(a, ["type", "intent", "stateKeys"], `actions.${k}`);\n      if (a.type !== "agent.followup") fail("only agent.followup actions are supported");\n      text(a.intent, "action intent");\n      if (!a.intent.trim() || !Array.isArray(a.stateKeys) || a.stateKeys.length > 64 || new Set(a.stateKeys).size !== a.stateKeys.length || a.stateKeys.some((s) => !own(doc2.state, s))) fail("invalid action stateKeys");\n    }\n    const ids = /* @__PURE__ */ new Set();\n    let count2 = 0;\n    const value = (v, at) => {\n      if (object(v)) {\n        if (own(v, "map")) fail("map belongs in derived");\n        validateExpression(v);\n      } else if (!scalar(v)) fail(`invalid value at ${at}`);\n    };\n    function nodes(list, depth = 0) {\n      if (!Array.isArray(list) || depth > LIMITS.depth) fail("invalid node children or depth");\n      for (const n of list) {\n        if (++count2 > LIMITS.nodes) fail("too many nodes");\n        if (!object(n) || !validIdentifier(n.id) || ids.has(n.id)) fail("node ids must be unique identifiers");\n        ids.add(n.id);\n        if (!Object.hasOwn(COMPONENTS, n.type)) fail("unsupported component " + n.type);\n        if (["table", "chart"].includes(n.type) && typeof n.rows === "string" && /^(data|derived)\\./.test(n.rows)) n.rows = { ref: n.rows };\n        switch (n.type) {\n          case "sandbox": {\n            text(n.title, "canvas title");\n            text(n.fallback, "canvas fallback");\n            if (!n.title.trim() || !n.fallback.trim() || typeof n.html !== "string" || !n.html.trim()) fail("canvas requires title, HTML and fallback");\n            for (const field of ["html", "css", "script"]) if (n[field] !== void 0 && (typeof n[field] !== "string" || n[field].length > SANDBOX_LIMITS.source)) fail("canvas source exceeds 48 Ki characters");\n            if (n.height !== void 0 && (!Number.isInteger(n.height) || n.height < 160 || n.height > SANDBOX_LIMITS.height)) fail("canvas height must be 160..1000");\n            for (const [field, group] of [["stateKeys", "state"], ["dataKeys", "data"], ["derivedKeys", "derived"]]) if (n[field] !== void 0 && (!Array.isArray(n[field]) || n[field].length > 64 || new Set(n[field]).size !== n[field].length || n[field].some((k) => !own(doc2[group], k)))) fail("invalid canvas " + field);\n            break;\n          }\n          case "row":\n          case "column":\n            break;\n          case "card":\n            if (n.title !== void 0) text(n.title, "card title");\n            if (n.surface !== void 0 && !UI_SURFACES.includes(n.surface)) fail("unknown card surface");\n            break;\n          case "details":\n            text(n.title, "details title");\n            if (n.open !== void 0 && typeof n.open !== "boolean") fail("details open must be boolean");\n            break;\n          case "badge":\n            value(n.text, "badge text");\n            break;\n          case "progress":\n            text(n.label, "progress label");\n            value(n.value, "progress value");\n            value(n.max, "progress max");\n            if (n.unit !== void 0) text(n.unit, "progress unit");\n            break;\n          case "steps": {\n            if (!Array.isArray(n.items) || !n.items.length || n.items.length > 12) fail("steps require 1..12 items");\n            for (const item of n.items) {\n              fields(item, ["title", "description", "status"], "step");\n              text(item.title, "step title");\n              if (item.description !== void 0) text(item.description, "step description");\n              if (!["pending", "active", "done", "error"].includes(item.status)) fail("unknown step status");\n            }\n            break;\n          }\n          case "heading":\n          case "text":\n            value(n.text, "text");\n            break;\n          case "metric":\n            text(n.label, "metric label");\n            value(n.value, "metric value");\n            if (n.unit !== void 0) text(n.unit, "unit");\n            if (n.decimals !== void 0 && (!Number.isInteger(n.decimals) || n.decimals < 0 || n.decimals > 6)) fail("invalid decimals");\n            break;\n          case "input":\n          case "slider":\n          case "select":\n          case "toggle": {\n            text(n.label, "control label");\n            if (typeof n.bind !== "string" || !n.bind.startsWith("state.")) fail("controls must bind state");\n            const [, k] = reference(doc2, n.bind), spec = doc2.state[k];\n            if (n.type === "slider" && spec.type !== "number") fail("slider requires numeric state");\n            if (n.type === "toggle" && spec.type !== "boolean") fail("toggle requires boolean state");\n            if (["input", "select"].includes(n.type) && spec.type === "json") fail(`node.${n.id}: structured state requires a sandbox with DSHUI.setState; use separate boolean states and toggle nodes for a native checklist`);\n            if (n.type === "input" && spec.type === "boolean") fail("use toggle for boolean state");\n            if (n.type === "select" && !spec.options) fail("select requires options");\n            break;\n          }\n          case "button":\n            text(n.text, "button text");\n            if (!own(doc2.actions, n.action)) fail("unknown action");\n            break;\n          case "table": {\n            if (n.label !== void 0) text(n.label, "table label");\n            if (!Array.isArray(n.rows)) value(n.rows, "table rows");\n            if (!Array.isArray(n.columns) || !n.columns.length || n.columns.length > 16) fail("invalid table columns");\n            const cols = /* @__PURE__ */ new Set();\n            for (const c of n.columns) {\n              fields(c, ["key", "label", "unit"], "column");\n              if (!validIdentifier(c.key) || cols.has(c.key)) fail("invalid or duplicate column key");\n              cols.add(c.key);\n              text(c.label, "column label");\n              if (c.unit !== void 0) text(c.unit, "column unit");\n            }\n            break;\n          }\n          case "chart":\n            if (!Array.isArray(n.rows)) value(n.rows, "chart rows");\n            if (!["bar", "line"].includes(n.kind) || !validIdentifier(n.labelKey) || !validIdentifier(n.valueKey)) fail("invalid chart");\n            text(n.label, "chart label");\n            if (n.unit !== void 0) text(n.unit, "chart unit");\n            if (n.xScale !== void 0 && (!["category", "linear"].includes(n.xScale) || n.xScale === "linear" && n.kind !== "line")) fail("invalid xScale");\n            break;\n          default:\n            fail(`unsupported component ${n.type}`);\n        }\n        if (["heading", "text", "card", "metric", "button", "badge", "progress", "details"].includes(n.type)) {\n          if (n.icon !== void 0 && !UI_ICONS.includes(n.icon)) fail("unknown UI icon");\n          if (n.type !== "button") {\n            if (n.tone !== void 0 && !UI_TONES.includes(n.tone)) fail("unknown UI tone");\n          }\n        }\n        fields(n, componentFields(n.type), `node.${n.id}`);\n        if (["row", "column", "card", "details"].includes(n.type)) nodes(n.children, depth + 1);\n      }\n    }\n    nodes(doc2.nodes);\n    if (!count2) fail("at least one node is required");\n    evaluate(doc2, defaults);\n    return doc2;\n  }\n\n  // src/export-runtime.js\n  var payload = JSON.parse(document.getElementById("dsh-ui-export").textContent);\n  var doc = validateDocument(payload.document);\n  var node = doc.nodes.flatMap(function flatten(n) {\n    return [n, ...(n.children ?? []).flatMap(flatten)];\n  }).find((n) => n.id === payload.nodeId && n.type === "sandbox");\n  if (!node) throw Error("\\u5BFC\\u51FA\\u7684\\u753B\\u5E03\\u4E0D\\u5B58\\u5728");\n  var state = validateState(doc, payload.state);\n  var connected = false;\n  var start = Date.now();\n  var count = 0;\n  var token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join("");\n  var channel = token();\n  var nonce = payload.nonce;\n  var frame = document.createElement("iframe");\n  frame.title = node.title;\n  frame.sandbox = "allow-scripts";\n  frame.referrerPolicy = "no-referrer";\n  frame.style.cssText = "display:block;width:100%;height:" + (node.height ?? 420) + "px;border:0";\n  var status = document.getElementById("status");\n  var publish = () => {\n    try {\n      frame.contentWindow.postMessage({ dshCanvas: 1, channel, type: "snapshot", payload: { ...canvasSnapshot(node, state, doc.data, evaluate(doc, state).derived, false, payload.theme), visible: !document.hidden } }, "*");\n    } catch (e) {\n      status.textContent = "\\u8BA1\\u7B97\\u5931\\u8D25\\uFF1A" + e.message;\n    }\n  };\n  addEventListener("message", (event) => {\n    const m = event.data;\n    if (event.source !== frame.contentWindow || m?.channel !== channel || m.dshCanvas !== 1) return;\n    if (Date.now() - start > 1e3) {\n      start = Date.now();\n      count = 0;\n    }\n    if (++count > SANDBOX_LIMITS.rate) return;\n    if (m.type === "ready") {\n      connected = true;\n      publish();\n    } else if (m.type === "patch" && connected) {\n      try {\n        const next = validateState(doc, { ...state, ...canvasPatch(m.payload, node) });\n        evaluate(doc, next);\n        state = next;\n        status.textContent = "\\u672C\\u5730\\u53C2\\u6570\\u5DF2\\u66F4\\u65B0\\uFF1B\\u5237\\u65B0\\u6587\\u4EF6\\u4F1A\\u56DE\\u5230\\u5BFC\\u51FA\\u65F6\\u7684\\u53C2\\u6570\\u3002";\n      } catch (e) {\n        status.textContent = "\\u53C2\\u6570\\u65E0\\u6548\\uFF1A" + e.message;\n      }\n      publish();\n    } else if (m.type === "height" && Number.isFinite(m.payload) && m.payload >= 0) frame.style.height = Math.max(32, Math.min(1e3, Math.ceil(m.payload))) + "px";\n    else if (m.type === "error") status.textContent = "\\u753B\\u5E03\\u8FD0\\u884C\\u5F02\\u5E38\\uFF1A" + String(m.payload).slice(0, 1e3);\n  });\n  document.addEventListener("visibilitychange", () => {\n    if (connected) publish();\n  });\n  document.getElementById("surface").append(frame);\n  frame.srcdoc = sandboxDocument(node, channel, nonce);\n})();\n';
 
 // lib/canvas-export.js
 function standaloneCanvas(document2, node, state, theme = {}) {
@@ -22746,18 +22802,64 @@ function standaloneCanvas(document2, node, state, theme = {}) {
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none';script-src 'nonce-${token}';style-src 'unsafe-inline';frame-src 'self';base-uri 'none';form-action 'none'"><title>${escape(node.title)}</title><style>body{margin:0;padding:24px;background:${theme.scheme === "dark" ? "#161b23" : "#f4f6fa"};color:${theme.scheme === "dark" ? "#e6edf6" : "#182537"};font:14px/1.6 system-ui,sans-serif}main{max-width:1100px;margin:auto}h1{font-size:22px}p{overflow-wrap:anywhere}#surface{background:${theme.scheme === "dark" ? "#161b23" : "#fff"};border-radius:12px;overflow:hidden}#status{min-height:1.6em}</style></head><body><main><h1>${escape(node.title)}</h1><p>DSH Motion UI \xB7 \u72EC\u7ACB\u526F\u672C\u3002\u5305\u542B\u5BFC\u51FA\u65F6\u53C2\u6570\uFF0C\u672C\u5730\u4EA4\u4E92\u4E0D\u4F1A\u4FDD\u5B58\u5230 DSH\uFF0C\u4E5F\u4E0D\u4F1A\u8C03\u7528 Agent\u3002</p><div id="surface"></div><p id="status" role="status"></p><details><summary>\u6587\u5B57\u8BF4\u660E</summary><p>${escape(node.fallback)}</p></details></main><script type="application/json" id="dsh-ui-export">${json}<\/script><script nonce="${token}">${EXPORT_RUNTIME.replace(/<\/script/gi, "<\\/script")}<\/script></body></html>`;
 }
 
+// src/view-settings.js
+var import_react4 = require("react");
+var scope;
+function configureViewSettings(value) {
+  scope = value;
+}
+var subscribe = (fn) => scope?.subscribe(fn) ?? (() => {
+});
+var snapshot = () => scope?.getSnapshot()?.value?.showDetails === true;
+function useViewDetails() {
+  return (0, import_react4.useSyncExternalStore)(subscribe, snapshot, () => false);
+}
+
+// src/action-menu.js
+var import_react5 = __toESM(require("react"), 1);
+function ActionMenu({ label, children }) {
+  const [open, setOpen] = (0, import_react5.useState)(false), root = (0, import_react5.useRef)(null), button = (0, import_react5.useRef)(null);
+  (0, import_react5.useEffect)(() => {
+    if (!open) return;
+    const outside = (e) => {
+      if (!root.current?.contains(e.target)) setOpen(false);
+    };
+    const escape = (e) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        button.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [open]);
+  return import_react5.default.createElement(
+    "div",
+    { className: "dgui-action-menu", ref: root },
+    import_react5.default.createElement("button", { ref: button, type: "button", className: "dgui-menu-trigger", "aria-label": label, "aria-expanded": open, onClick: () => setOpen(!open) }, "\u22EF"),
+    open && import_react5.default.createElement("div", { className: "dgui-menu-content", "aria-label": label, onClick: (e) => {
+      if (e.target.closest("button")) setOpen(false);
+    } }, children)
+  );
+}
+
 // src/sandbox.js
-var h3 = import_react4.default.createElement;
+var h3 = import_react6.default.createElement;
 var randomToken = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join("");
 function Sandbox({ node, document: doc, state, data, derived, disabled, preview, update, onAudit }) {
-  const frame = (0, import_react4.useRef)(null), latest = (0, import_react4.useRef)(null), connected = (0, import_react4.useRef)(false), loads = (0, import_react4.useRef)(0), visible = (0, import_react4.useRef)(true), errorKind = (0, import_react4.useRef)("");
-  const [error, setError] = (0, import_react4.useState)(""), [stopped, setStopped] = (0, import_react4.useState)(false), [generation, setGeneration] = (0, import_react4.useState)(0);
-  const [height, setHeight] = (0, import_react4.useState)(node.height ?? 420);
-  const [token, setToken] = (0, import_react4.useState)(0);
-  const [mounted, setMounted] = (0, import_react4.useState)(false);
+  const showDetails = useViewDetails();
+  const frame = (0, import_react6.useRef)(null), latest = (0, import_react6.useRef)(null), connected = (0, import_react6.useRef)(false), loads = (0, import_react6.useRef)(0), visible = (0, import_react6.useRef)(true), errorKind = (0, import_react6.useRef)("");
+  const [error, setError] = (0, import_react6.useState)(""), [stopped, setStopped] = (0, import_react6.useState)(false), [generation, setGeneration] = (0, import_react6.useState)(0);
+  const [height, setHeight] = (0, import_react6.useState)(node.height ?? 420);
+  const [token, setToken] = (0, import_react6.useState)(0);
+  const [mounted, setMounted] = (0, import_react6.useState)(false);
   const sourceKey = JSON.stringify(node);
-  const config = (0, import_react4.useMemo)(() => ({ channel: randomToken(), nonce: randomToken() }), [sourceKey, generation]);
-  const srcDoc = (0, import_react4.useMemo)(() => sandboxDocument(node, config.channel, config.nonce), [sourceKey, config]);
+  const config = (0, import_react6.useMemo)(() => ({ channel: randomToken(), nonce: randomToken() }), [sourceKey, generation]);
+  const srcDoc = (0, import_react6.useMemo)(() => sandboxDocument(node, config.channel, config.nonce), [sourceKey, config]);
   latest.current = { node, state, data, derived, disabled, update, onAudit };
   const publish = () => {
     const el = frame.current, current2 = latest.current;
@@ -22767,7 +22869,7 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
     theme.scheme = document.body.hasAttribute("data-ds-dark-theme") || el.closest("[data-preview-theme=dark]") ? "dark" : "light";
     el.contentWindow?.postMessage({ dshCanvas: 1, channel: config.channel, type: "snapshot", payload: { ...canvasSnapshot(current2.node, current2.state, current2.data, current2.derived, current2.disabled, theme), visible: visible.current && !document.hidden } }, "*");
   };
-  (0, import_react4.useEffect)(() => {
+  (0, import_react6.useEffect)(() => {
     if (preview || stopped) return;
     connected.current = false;
     loads.current = 0;
@@ -22795,7 +22897,7 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
         setToken((t) => t + 1);
       } else if (m.type === "mounted" && connected.current) setMounted(true);
       else if (m.type === "audit" && connected.current) latest.current.onAudit?.(node.id, m.payload?.issues, m.payload?.coverage);
-      else if (m.type === "height" && connected.current && Number.isFinite(m.payload) && m.payload > 0) setHeight(Math.max(160, Math.min(SANDBOX_LIMITS.height, Math.ceil(m.payload))));
+      else if (m.type === "height" && connected.current && Number.isFinite(m.payload) && m.payload >= 0) setHeight(Math.max(32, Math.min(SANDBOX_LIMITS.height, Math.ceil(m.payload))));
       else if (m.type === "error") {
         errorKind.current = "runtime";
         setError(typeof m.payload === "string" ? m.payload.slice(0, 1e3) : "\u753B\u5E03\u8FD0\u884C\u5F02\u5E38");
@@ -22841,7 +22943,7 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
       intersection.disconnect();
     };
   }, [config, preview, stopped]);
-  (0, import_react4.useEffect)(() => {
+  (0, import_react6.useEffect)(() => {
     publish();
   }, [state, data, derived, disabled, config, token]);
   const inactive = preview || stopped;
@@ -22867,6 +22969,13 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
   return h3(
     "section",
     { className: "dgui-canvas", "data-ui-node": node.id, "data-canvas-phase": inactive ? stopped ? "stopped" : "preview" : error ? "error" : mounted ? "ready" : "loading", "aria-label": node.title },
+    !preview && !showDetails && h3(
+      ActionMenu,
+      { label: `${node.title}\u64CD\u4F5C` },
+      h3("button", { type: "button", disabled: disabled || !doc || stopped, onClick: download }, "\u5BFC\u51FA\u72EC\u7ACB HTML"),
+      h3("button", { type: "button", disabled, onClick: restart }, stopped ? "\u6062\u590D\u4EA4\u4E92" : "\u91CD\u7F6E\u753B\u5E03"),
+      !stopped && h3("button", { type: "button", onClick: () => setStopped(true) }, "\u505C\u6B62\u753B\u5E03")
+    ),
     preview ? h3(CanvasPreview, { node }) : inactive ? h3("div", { className: "dgui-canvas-placeholder", role: "status" }, h3("p", null, "\u753B\u5E03\u5DF2\u505C\u6B62\u3002"), stopped && h3("button", { type: "button", className: "dgui-secondary", onClick: restart }, "\u6062\u590D\u4EA4\u4E92")) : h3(
       "div",
       { className: "dgui-canvas-stage", style: { minHeight: mounted || error ? void 0 : Math.min(height, 420) } },
@@ -22879,7 +22988,8 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
       }, style: { width: "100%", height, border: 0, display: "block", visibility: mounted || error ? "visible" : "hidden" }, allow: "camera 'none'; microphone 'none'; geolocation 'none'; clipboard-read 'none'; clipboard-write 'none'" })
     ),
     error && h3("div", { className: "dgui-canvas-issue", role: "alert" }, h3("strong", null, "\u4EA4\u4E92\u9047\u5230\u95EE\u9898"), h3("p", null, "\u53EF\u4EE5\u91CD\u65B0\u8F7D\u5165\uFF1B\u5DF2\u4FDD\u5B58\u7684\u53C2\u6570\u4F1A\u4FDD\u7559\u3002"), h3("div", { className: "dgui-recovery" }, h3("button", { type: "button", className: "dgui-secondary", onClick: restart }, "\u91CD\u7F6E\u753B\u5E03"), !stopped && h3("button", { type: "button", className: "dgui-secondary", onClick: () => setStopped(true) }, "\u505C\u6B62\u753B\u5E03")), h3("details", null, h3("summary", null, "\u9519\u8BEF\u8BE6\u60C5"), h3("pre", null, error))),
-    h3(
+    error && !showDetails && h3("p", { className: "dgui-error" }, node.fallback),
+    showDetails && h3(
       "details",
       { className: "dgui-canvas-options" },
       h3("summary", null, "\u8BF4\u660E\u4E0E\u64CD\u4F5C"),
@@ -22891,13 +23001,13 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.5.3", "id": "0.5.3+634080c7e02a", "sourceHash": "634080c7e02ae0667c17a2ce4f94d8999270f1827b7735058deee989caa7777a" });
+var BUILD_INFO = Object.freeze({ "version": "0.5.3", "id": "0.5.3+89c9850332a7", "sourceHash": "89c9850332a7c25ec041b653d2197fb665518e7032ea60242f13e3e44c1f9463" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38" });
 
 // src/current-document.js
-var import_react5 = require("react");
+var import_react7 = require("react");
 var current = /* @__PURE__ */ new Map();
 var listeners2 = /* @__PURE__ */ new Set();
 function publishDocument(raw) {
@@ -22908,9 +23018,9 @@ function publishDocument(raw) {
   listeners2.forEach((fn) => fn());
 }
 function useCurrentDocument(raw, sessionId) {
-  const [, wake] = (0, import_react5.useState)(0);
-  const [attempt, retry] = (0, import_react5.useState)(0), [load, setLoad] = (0, import_react5.useState)({ status: "loading" });
-  (0, import_react5.useEffect)(() => {
+  const [, wake] = (0, import_react7.useState)(0);
+  const [attempt, retry] = (0, import_react7.useState)(0), [load, setLoad] = (0, import_react7.useState)({ status: "loading" });
+  (0, import_react7.useEffect)(() => {
     if (!raw.documentId || !sessionId) return;
     const notify = () => wake((v) => v + 1);
     listeners2.add(notify);
@@ -22936,10 +23046,10 @@ function useCurrentDocument(raw, sessionId) {
 }
 
 // src/history-view.js
-var import_react6 = __toESM(require("react"), 1);
-var h4 = import_react6.default.createElement;
+var import_react8 = __toESM(require("react"), 1);
+var h4 = import_react8.default.createElement;
 function HistoryView({ record, sessionId }) {
-  const [versions, setVersions] = (0, import_react6.useState)(null), [error, setError] = (0, import_react6.useState)(""), [busy, setBusy] = (0, import_react6.useState)(false), [preview, setPreview] = (0, import_react6.useState)(null);
+  const [versions, setVersions] = (0, import_react8.useState)(null), [error, setError] = (0, import_react8.useState)(""), [busy, setBusy] = (0, import_react8.useState)(false), [preview, setPreview] = (0, import_react8.useState)(null);
   const url = "/api/plugins/dsh-generative-ui/history?" + new URLSearchParams({ documentId: record.documentId, sessionId });
   async function request2(options) {
     const r = await fetch(url, { credentials: "same-origin", ...options }), value = await r.json();
@@ -23006,11 +23116,11 @@ function HistoryView({ record, sessionId }) {
 }
 
 // src/presentation.js
-var import_react9 = __toESM(require("react"), 1);
+var import_react11 = __toESM(require("react"), 1);
 var import_react_dom = __toESM(require_react_dom(), 1);
 
 // src/presentation-store.js
-var import_react7 = require("react");
+var import_react9 = require("react");
 var records = /* @__PURE__ */ new Map();
 var listeners3 = /* @__PURE__ */ new Set();
 var locations = /* @__PURE__ */ new Map();
@@ -23035,7 +23145,7 @@ var subscribeUi = (fn) => {
   return () => listeners3.delete(fn);
 };
 function useUiRegistry() {
-  (0, import_react7.useSyncExternalStore)(subscribeUi, () => revision, () => 0);
+  (0, import_react9.useSyncExternalStore)(subscribeUi, () => revision, () => 0);
   return uiRecords();
 }
 function setPanelOpener(fn) {
@@ -23063,10 +23173,10 @@ function removeMarkerLocation(id, host) {
   }
 }
 var markerLocation = (id) => locations.get(id);
-function usePresentation(scope) {
-  const [, wake] = (0, import_react7.useState)(0);
-  (0, import_react7.useEffect)(() => scope?.subscribe(() => wake((v) => v + 1)), [scope]);
-  return scope?.getSnapshot().value?.displayMode ?? "tail";
+function usePresentation(scope2) {
+  const [, wake] = (0, import_react9.useState)(0);
+  (0, import_react9.useEffect)(() => scope2?.subscribe(() => wake((v) => v + 1)), [scope2]);
+  return scope2?.getSnapshot().value?.displayMode ?? "tail";
 }
 
 // src/markers.js
@@ -23127,11 +23237,11 @@ function startUiMarkers(root, sessionId) {
 }
 
 // src/presentation-owner.js
-var import_react8 = require("react");
+var import_react10 = require("react");
 var roots = /* @__PURE__ */ new WeakMap();
 function usePresentationOwner(anchor, documentId, sessionId) {
-  const [owner, setOwner] = (0, import_react8.useState)(false);
-  (0, import_react8.useEffect)(() => {
+  const [owner, setOwner] = (0, import_react10.useState)(false);
+  (0, import_react10.useEffect)(() => {
     const element = anchor.current;
     if (!element) return;
     const root = element.closest("[data-conversation-scroll]") ?? element.parentElement;
@@ -23141,11 +23251,11 @@ function usePresentationOwner(anchor, documentId, sessionId) {
       documents = /* @__PURE__ */ new Map();
       roots.set(root, documents);
     }
-    const key3 = sessionId + ":" + documentId;
-    let entries = documents.get(key3);
+    const key2 = sessionId + ":" + documentId;
+    let entries = documents.get(key2);
     if (!entries) {
       entries = /* @__PURE__ */ new Set();
-      documents.set(key3, entries);
+      documents.set(key2, entries);
     }
     const entry = { element, update: setOwner };
     entries.add(entry);
@@ -23161,23 +23271,24 @@ function usePresentationOwner(anchor, documentId, sessionId) {
     return () => {
       entries.delete(entry);
       elect();
-      if (!entries.size) documents.delete(key3);
+      if (!entries.size) documents.delete(key2);
     };
   }, [anchor, documentId, sessionId]);
   return owner;
 }
 
 // src/presentation.js
-var h5 = import_react9.default.createElement;
+var h5 = import_react11.default.createElement;
 var scanners = /* @__PURE__ */ new WeakMap();
 var focused = /* @__PURE__ */ new Map();
-function PresentationView({ raw, sessionId, sendPrompt, scope }) {
-  const anchor = (0, import_react9.useRef)(null), records2 = useUiRegistry(), mode = usePresentation(scope), host = markerLocation(raw.documentId);
+function PresentationView({ raw, sessionId, sendPrompt, scope: scope2 }) {
+  const showDetails = useViewDetails();
+  const anchor = (0, import_react11.useRef)(null), records2 = useUiRegistry(), mode = usePresentation(scope2), host = markerLocation(raw.documentId);
   const owner = usePresentationOwner(anchor, raw.documentId, sessionId);
-  (0, import_react9.useEffect)(() => {
+  (0, import_react11.useEffect)(() => {
     rememberUi(raw, sessionId, sendPrompt);
   }, [raw, sessionId, sendPrompt]);
-  (0, import_react9.useEffect)(() => {
+  (0, import_react11.useEffect)(() => {
     const root = anchor.current?.closest("[data-conversation-scroll]");
     if (!root) return;
     let entry = scanners.get(root);
@@ -23198,7 +23309,7 @@ function PresentationView({ raw, sessionId, sendPrompt, scope }) {
       }
     };
   }, [sessionId]);
-  (0, import_react9.useEffect)(() => {
+  (0, import_react11.useEffect)(() => {
     const block = host?.uiMarkerBlock;
     if (!block || !owner) return;
     const previous = block.style.display;
@@ -23208,7 +23319,7 @@ function PresentationView({ raw, sessionId, sendPrompt, scope }) {
     };
   }, [host, mode, owner]);
   const available = panelAvailable();
-  (0, import_react9.useEffect)(() => {
+  (0, import_react11.useEffect)(() => {
     if (owner && mode === "sidebar" && available) openUiPanel(raw.documentId, sessionId);
   }, [mode, available, sessionId, raw.documentId, owner]);
   const content = h5(ValidatedView, { raw, fallback: raw.document.fallback, sessionId, sendPrompt });
@@ -23217,12 +23328,12 @@ function PresentationView({ raw, sessionId, sendPrompt, scope }) {
     { ref: anchor, "data-dgui-presentation": raw.documentId },
     owner && available && h5("button", { type: "button", className: "dgui-secondary", onClick: () => openUiPanel(raw.documentId, sessionId) }, "\u5728\u4FA7\u680F\u6253\u5F00"),
     owner && (mode === "sidebar" && available ? h5("p", { className: "dgui-copy" }, `${raw.document.title} \xB7 \u5728\u4FA7\u680F\u4E2D\u64CD\u4F5C`) : mode === "inline" && host ? (0, import_react_dom.createPortal)(content, host) : content),
-    owner && mode === "inline" && !host && h5("small", { className: "dgui-copy" }, "\u672A\u63D0\u4F9B\u6B63\u6587\u6807\u8BB0\uFF0C\u754C\u9762\u663E\u793A\u5728\u56DE\u7B54\u4E0B\u65B9\u3002")
+    showDetails && owner && mode === "inline" && !host && h5("small", { className: "dgui-copy" }, "\u672A\u63D0\u4F9B\u6B63\u6587\u6807\u8BB0\uFF0C\u754C\u9762\u663E\u793A\u5728\u56DE\u7B54\u4E0B\u65B9\u3002")
   );
 }
 function UiPanel({ sessionId, sendPrompt }) {
-  const records2 = useUiRegistry().filter((r) => r.sessionId === sessionId), [selected, setSelected] = (0, import_react9.useState)(focused.get(sessionId));
-  (0, import_react9.useEffect)(() => subscribeUi(() => setSelected(focused.get(sessionId))), [sessionId]);
+  const records2 = useUiRegistry().filter((r) => r.sessionId === sessionId), [selected, setSelected] = (0, import_react11.useState)(focused.get(sessionId));
+  (0, import_react11.useEffect)(() => subscribeUi(() => setSelected(focused.get(sessionId))), [sessionId]);
   const record = records2.find((r) => r.raw.documentId === selected) ?? records2.at(-1);
   return h5(
     "div",
@@ -23240,11 +23351,11 @@ function focusUi(id, sessionId) {
 }
 
 // src/view.js
-var h6 = import_react10.default.createElement;
+var h6 = import_react12.default.createElement;
 var display = (value) => value === void 0 || value === null ? "\u2014" : typeof value === "object" ? JSON.stringify(value) : String(value);
 function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
-  const [draft, setDraft] = (0, import_react10.useState)(String(value)), [invalid, setInvalid] = (0, import_react10.useState)(false);
-  (0, import_react10.useEffect)(() => {
+  const [draft, setDraft] = (0, import_react12.useState)(String(value)), [invalid, setInvalid] = (0, import_react12.useState)(false);
+  (0, import_react12.useEffect)(() => {
     setDraft(String(value));
     setInvalid(false);
     invalidChanged(id, false);
@@ -23268,15 +23379,17 @@ function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
     }
   });
 }
-function Table({ rows, columns, id }) {
+function Table({ rows, columns, id, label }) {
   return h6("div", { className: "dgui-table-wrap" }, h6(
     "table",
     { "data-ui-node": id },
+    label && h6("caption", null, label),
     h6("thead", null, h6("tr", null, columns.map((c) => h6("th", { key: c.key, scope: "col" }, c.label, c.unit ? ` (${c.unit})` : "")))),
     h6("tbody", null, rows.length ? rows.map((row, i) => h6("tr", { key: i }, columns.map((c) => h6("td", { key: c.key, "data-numeric": typeof row[c.key] === "number" }, display(Object.hasOwn(row, c.key) ? row[c.key] : void 0))))) : h6("tr", null, h6("td", { colSpan: columns.length }, "\u6682\u65E0\u6570\u636E")))
   ));
 }
 function Chart({ node, rows }) {
+  const [showData, setShowData] = (0, import_react12.useState)(false);
   const data = rows.slice(0, 40), values = data.map((r) => r[node.valueKey]);
   const low = node.kind === "line" && values.length ? Math.min(...values) : Math.min(0, ...values);
   const high = node.kind === "line" && values.length ? Math.max(...values) : Math.max(0, ...values), range = high - low || 1;
@@ -23289,7 +23402,7 @@ function Chart({ node, rows }) {
   return h6(
     "figure",
     { className: "dgui-chart", "data-ui-node": node.id },
-    h6("figcaption", null, h6(Icon, { name: "chart" }), node.label, node.unit && h6("span", { className: "dgui-chart-unit" }, `(${node.unit})`)),
+    h6("figcaption", null, h6(Icon, { name: "chart" }), node.label, rows.length > 40 && "\uFF08\u56FE\u793A\u524D 40 \u9879\uFF09", node.unit && h6("span", { className: "dgui-chart-unit" }, `(${node.unit})`), h6("button", { type: "button", className: "dgui-chart-data-button", "aria-expanded": showData, onClick: () => setShowData(!showData) }, "\u56FE\u8868\u6570\u636E")),
     h6("div", { className: "dgui-plot", tabIndex: 0, role: "region", "aria-label": `${node.label}\u56FE\u8868\uFF0C\u53EF\u6A2A\u5411\u6EDA\u52A8` }, h6(
       "svg",
       { viewBox: `0 0 ${width} 205`, role: "img", "aria-label": `${node.label}\u3002\u5C55\u5F00\u56FE\u8868\u6570\u636E\u53EF\u67E5\u770B\u6BCF\u9879\u6570\u503C\u3002` },
@@ -23304,16 +23417,15 @@ function Chart({ node, rows }) {
         (data.length <= 12 || i % Math.ceil(data.length / 12) === 0) && h6("text", { x: x(i), y: 192, textAnchor: "middle", fontSize: 14, fill: "var(--du-muted)" }, String(r[node.labelKey]).slice(0, 12))
       ))
     )),
-    h6("small", { className: "dgui-chart-hint" }, "\u7A84\u5C4F\u53EF\u6A2A\u5411\u6ED1\u52A8\u56FE\u8868\uFF1B\u5C55\u5F00\u4E0B\u65B9\u6570\u636E\u53EF\u67E5\u770B\u7CBE\u786E\u503C\u3002"),
-    rows.length > 40 && h6("small", null, "\u56FE\u793A\u524D 40 \u9879\uFF0C\u5B8C\u6574\u6570\u503C\u89C1\u4E0B\u65B9\u6570\u636E\u3002"),
-    h6("details", null, h6("summary", null, "\u56FE\u8868\u6570\u636E"), h6(Table, { rows, columns: [{ key: node.labelKey, label: "\u9879\u76EE" }, { key: node.valueKey, label: node.label, unit: node.unit }], id: `${node.id}-data` }))
+    h6("div", { hidden: !showData }, h6(Table, { rows, columns: [{ key: node.labelKey, label: "\u9879\u76EE" }, { key: node.valueKey, label: node.label, unit: node.unit }], id: `${node.id}-data` }))
   );
 }
 function UiView({ record, sessionId, sendPrompt, preview = false }) {
+  const showDetails = useViewDetails();
   const doc = record.document;
-  const viewId = import_react10.default.useId();
-  const root = (0, import_react10.useRef)(null), canvasAudits = (0, import_react10.useRef)(/* @__PURE__ */ new Map()), [audit, setAudit] = (0, import_react10.useState)(null), auditPending = (0, import_react10.useRef)(0);
-  const collectAudit = import_react10.default.useCallback(() => {
+  const viewId = import_react12.default.useId();
+  const root = (0, import_react12.useRef)(null), canvasAudits = (0, import_react12.useRef)(/* @__PURE__ */ new Map()), [audit, setAudit] = (0, import_react12.useState)(null), auditPending = (0, import_react12.useRef)(0);
+  const collectAudit = import_react12.default.useCallback(() => {
     clearTimeout(auditPending.current);
     auditPending.current = setTimeout(() => {
       if (!root.current || preview) return;
@@ -23325,7 +23437,7 @@ function UiView({ record, sessionId, sendPrompt, preview = false }) {
       });
     }, 250);
   }, [record.documentId, record.documentRevision, sessionId, preview]);
-  (0, import_react10.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     canvasAudits.current.clear();
     collectAudit();
     window.addEventListener("resize", collectAudit);
@@ -23343,22 +23455,22 @@ function UiView({ record, sessionId, sendPrompt, preview = false }) {
     collectAudit();
   };
   const { state, setState, ready, status, issue, epoch, retry, useRemote, keepLocal } = useSavedState(record, sessionId, preview);
-  const [error, setError] = (0, import_react10.useState)(""), [actionStatus, setActionStatus] = (0, import_react10.useState)("");
-  const [busy, setBusy] = (0, import_react10.useState)(false), [invalidFields, setInvalidFields] = (0, import_react10.useState)({});
-  const pending = (0, import_react10.useRef)(false);
-  (0, import_react10.useEffect)(() => {
+  const [error, setError] = (0, import_react12.useState)(""), [actionStatus, setActionStatus] = (0, import_react12.useState)("");
+  const [busy, setBusy] = (0, import_react12.useState)(false), [invalidFields, setInvalidFields] = (0, import_react12.useState)({});
+  const pending = (0, import_react12.useRef)(false);
+  (0, import_react12.useEffect)(() => {
     setInvalidFields({});
   }, [epoch]);
-  const invalidChanged = import_react10.default.useCallback((id, invalid) => setInvalidFields((previous) => previous[id] === invalid ? previous : { ...previous, [id]: invalid }), []);
+  const invalidChanged = import_react12.default.useCallback((id, invalid) => setInvalidFields((previous) => previous[id] === invalid ? previous : { ...previous, [id]: invalid }), []);
   let computed;
   try {
     computed = evaluate(doc, state);
   } catch (e) {
     computed = { error: e.message };
   }
-  const currentState = (0, import_react10.useRef)(state);
+  const currentState = (0, import_react12.useRef)(state);
   currentState.current = state;
-  (0, import_react10.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     collectAudit();
   }, [state, ready, collectAudit]);
   const updatePatch = (patch) => {
@@ -23368,9 +23480,9 @@ function UiView({ record, sessionId, sendPrompt, preview = false }) {
     setError("");
     setActionStatus("");
   };
-  const update = (key3, value) => {
+  const update = (key2, value) => {
     try {
-      updatePatch({ [key3]: value });
+      updatePatch({ [key2]: value });
     } catch (e) {
       setError(e.message);
     }
@@ -23420,7 +23532,7 @@ function UiView({ record, sessionId, sendPrompt, preview = false }) {
         return h6("ol", { ...props, className: "dgui-steps" }, n.items.map((item, i) => h6("li", { key: i, "data-step-status": item.status }, h6("span", { className: "dgui-step-dot", "aria-hidden": true }, item.status === "done" ? h6(Icon, { name: "check" }) : item.status === "error" ? h6(Icon, { name: "warning" }) : i + 1), h6("div", null, h6("strong", null, item.title), h6("span", { className: "dgui-step-state" }, { pending: "\u5F85\u8FDB\u884C", active: "\u5F53\u524D\u6B65\u9AA4", done: "\u5DF2\u5B8C\u6210", error: "\u5F02\u5E38" }[item.status]), item.description && h6("p", null, item.description)))));
       case "metric": {
         const v = resolve(n.value);
-        return h6("div", { ...props, className: "dgui-metric" }, h6("span", { className: "dgui-metric-label" }, h6(Icon, { name: n.icon ?? "gauge" }), n.label), h6("strong", null, typeof v === "number" ? formatNumber(v, n.decimals ?? 2) : "\u2014", " ", h6("small", null, n.unit)));
+        return h6("div", { ...props, className: "dgui-metric" }, h6("span", { className: "dgui-metric-label" }, h6(Icon, { name: n.icon ?? "gauge" }), n.label), h6("strong", null, typeof v === "number" ? formatNumber(v, n.decimals ?? 2) : display(v), " ", h6("small", null, n.unit)));
       }
       case "input":
       case "slider":
@@ -23430,7 +23542,7 @@ function UiView({ record, sessionId, sendPrompt, preview = false }) {
         let control;
         if (n.type === "select") control = h6("select", { id, value: spec.options.indexOf(v), disabled: !ready, onChange: (e) => update(k, spec.options[Number(e.target.value)]) }, spec.options.map((o, i) => h6("option", { key: i, value: i }, display(o))));
         else if (n.type === "toggle") control = h6("input", { id, className: "dgui-toggle", type: "checkbox", checked: v, disabled: !ready, onChange: (e) => update(k, e.target.checked) });
-        else if (n.type === "slider") control = h6(import_react10.default.Fragment, null, h6("input", { id, type: "range", min: spec.min, max: spec.max, step: spec.step, value: v, disabled: !ready, onChange: (e) => update(k, Number(e.target.value)) }), h6("output", { htmlFor: id }, display(v)));
+        else if (n.type === "slider") control = h6(import_react12.default.Fragment, null, h6("input", { id, type: "range", min: spec.min, max: spec.max, step: spec.step, value: v, disabled: !ready, onChange: (e) => update(k, Number(e.target.value)) }), h6("output", { htmlFor: id }, display(v)));
         else if (spec.type === "number") control = h6(NumericInput, { id, spec, value: v, disabled: !ready, invalidChanged, onChange: (value) => update(k, value) });
         else control = h6("input", { id, type: "text", value: v, maxLength: 8192, disabled: !ready, onChange: (e) => update(k, e.target.value) });
         return h6("div", { ...props, className: "dgui-control" }, h6("label", { htmlFor: id }, h6(Icon, { name: n.type === "toggle" ? "layers" : n.type === "select" ? "target" : "sliders" }), h6("span", null, n.label)), control);
@@ -23438,7 +23550,7 @@ function UiView({ record, sessionId, sendPrompt, preview = false }) {
       case "button":
         return h6("button", { ...props, className: "dgui-button", type: "button", disabled: disabled || !sendPrompt, onClick: () => followup(n.action) }, n.text, h6(Icon, { name: n.icon ?? "arrow" }));
       case "table":
-        return computed.error ? null : h6(Table, { key: n.id, id: n.id, rows: resolve(n.rows), columns: n.columns });
+        return computed.error ? null : h6(Table, { key: n.id, id: n.id, label: n.label, rows: resolve(n.rows), columns: n.columns });
       case "chart":
         return computed.error ? null : h6(Chart, { key: n.id, node: n, rows: resolve(n.rows) });
       default:
@@ -23451,12 +23563,12 @@ function UiView({ record, sessionId, sendPrompt, preview = false }) {
     { ref: root, className: "dgui-root", "data-document-revision": record.documentRevision ?? 0, "data-dgui-build": BUILD_INFO.id, "data-dsh-generative-ui": record.documentId, "data-layout": doc.presentation?.layout, "data-accent": doc.presentation?.accent, "data-density": doc.presentation?.density, "data-preview": preview || void 0, "aria-label": doc.title, "aria-busy": preview || void 0 },
     h6("header", { className: "dgui-header" }, h6("span", { className: "dgui-heading-icon" }, h6(Icon, { name: sceneIcons[doc.presentation?.layout] ?? (Object.keys(doc.state).length ? "sliders" : "layers") })), h6("strong", { className: "dgui-header-title" }, doc.title), h6("span", { className: "dgui-badge" }, h6(Icon, { name: "sparkles" }), preview ? "\u751F\u6210\u4E2D" : "\u53EF\u89C6\u5316")),
     h6("div", { key: epoch, className: "dgui-content" }, doc.nodes.map(renderNode)),
-    (Object.keys(doc.state).length > 0 || issue || actionStatus) && h6("div", { className: "dgui-status", role: "status", "data-status": /失败|冲突/.test(status) ? "error" : /正在|等待/.test(status) ? "pending" : "saved" }, h6(Icon, { name: /失败|冲突/.test(status) ? "warning" : /正在|等待/.test(status) ? "database" : "check" }), h6("span", null, status), actionStatus && h6("span", null, ` \xB7 ${actionStatus}`)),
+    (Object.keys(doc.state).length > 0 || issue || actionStatus) && h6("div", { className: showDetails || issue || actionStatus ? "dgui-status" : "dgui-sr-only", role: "status", "data-status": /失败|冲突/.test(status) ? "error" : /正在|等待/.test(status) ? "pending" : "saved" }, h6(Icon, { name: /失败|冲突/.test(status) ? "warning" : /正在|等待/.test(status) ? "database" : "check" }), h6("span", null, status), actionStatus && h6("span", null, ` \xB7 ${actionStatus}`)),
     issue && h6(
       "div",
       { className: "dgui-recovery" },
       issue.kind === "conflict" ? h6(
-        import_react10.default.Fragment,
+        import_react12.default.Fragment,
         null,
         h6("button", { type: "button", className: "dgui-secondary", disabled: status === "\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026", onClick: useRemote }, "\u4F7F\u7528\u5DF2\u4FDD\u5B58\u53C2\u6570"),
         h6("button", { type: "button", className: "dgui-secondary", disabled: status === "\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026", onClick: keepLocal }, "\u4FDD\u7559\u672C\u9875\u53C2\u6570\u5E76\u91CD\u8BD5")
@@ -23464,12 +23576,12 @@ function UiView({ record, sessionId, sendPrompt, preview = false }) {
     ),
     (error || computed.error) && h6("p", { className: "dgui-error", role: "alert" }, error || computed.error),
     Object.values(invalidFields).some(Boolean) && h6("p", { className: "dgui-error", role: "alert" }, "\u8BF7\u8F93\u5165\u8303\u56F4\u5185\u4E14\u7B26\u5408\u6B65\u957F\u7684\u6570\u503C\u3002"),
-    !preview && audit && h6("details", { className: "dgui-fallback dgui-audit" }, h6("summary", null, "\u663E\u793A\u68C0\u67E5"), h6("p", null, `${audit.width}px \xB7 ${audit.theme === "dark" ? "\u6DF1\u8272" : "\u6D45\u8272"} \xB7 \u542F\u53D1\u5F0F\u89C2\u5BDF\uFF0C\u4E0D\u4EE3\u8868\u5B8C\u6574\u89C6\u89C9\u9A8C\u6536\u3002`), h6("p", null, "\u672A\u8986\u76D6\uFF1A\u590D\u6742\u80CC\u666F\u3001\u906E\u6321\u5173\u7CFB\u53CA SVG \u914D\u8272\uFF1B\u62A5\u544A\u4E0D\u7B49\u4E8E\u5B8C\u6574\u65E0\u969C\u788D\u68C0\u67E5\u3002"), audit.coverage?.some((c) => c.truncated) && h6("p", null, "\u5185\u5BB9\u8F83\u591A\uFF0C\u672C\u6B21\u53EA\u68C0\u67E5\u4E86\u6BCF\u4E2A\u533A\u57DF\u7684\u524D 2000 \u4E2A\u5143\u7D20\u3002"), audit.issues.length ? h6("ul", null, audit.issues.map((i, j) => h6("li", { key: j }, AUDIT_MESSAGES[i.code], i.nodeId ? `\uFF08${i.nodeId}\uFF09` : ""))) : h6("p", null, "\u672C\u6B21\u68C0\u67E5\u672A\u53D1\u73B0\u6240\u8986\u76D6\u7684\u95EE\u9898\u3002")),
-    !preview && h6(HistoryView, { record, sessionId }),
-    h6("details", { className: "dgui-fallback" }, h6("summary", null, Object.keys(doc.state).length ? "\u539F\u59CB\u6587\u5B57\u8BF4\u660E\u4E0E\u521D\u59CB\u53C2\u6570" : "\u539F\u59CB\u6587\u5B57\u8BF4\u660E"), h6("p", null, doc.fallback), Object.keys(doc.state).length > 0 && h6("pre", null, JSON.stringify(initialState(doc), null, 2)))
+    showDetails && !preview && audit && h6("details", { className: "dgui-fallback dgui-audit" }, h6("summary", null, "\u663E\u793A\u68C0\u67E5"), h6("p", null, `${audit.width}px \xB7 ${audit.theme === "dark" ? "\u6DF1\u8272" : "\u6D45\u8272"} \xB7 \u542F\u53D1\u5F0F\u89C2\u5BDF\uFF0C\u4E0D\u4EE3\u8868\u5B8C\u6574\u89C6\u89C9\u9A8C\u6536\u3002`), h6("p", null, "\u672A\u8986\u76D6\uFF1A\u590D\u6742\u80CC\u666F\u3001\u906E\u6321\u5173\u7CFB\u53CA SVG \u914D\u8272\uFF1B\u62A5\u544A\u4E0D\u7B49\u4E8E\u5B8C\u6574\u65E0\u969C\u788D\u68C0\u67E5\u3002"), audit.coverage?.some((c) => c.truncated) && h6("p", null, "\u5185\u5BB9\u8F83\u591A\uFF0C\u672C\u6B21\u53EA\u68C0\u67E5\u4E86\u6BCF\u4E2A\u533A\u57DF\u7684\u524D 2000 \u4E2A\u5143\u7D20\u3002"), audit.issues.length ? h6("ul", null, audit.issues.map((i, j) => h6("li", { key: j }, AUDIT_MESSAGES[i.code], i.nodeId ? `\uFF08${i.nodeId}\uFF09` : ""))) : h6("p", null, "\u672C\u6B21\u68C0\u67E5\u672A\u53D1\u73B0\u6240\u8986\u76D6\u7684\u95EE\u9898\u3002")),
+    showDetails && !preview && h6(HistoryView, { record, sessionId }),
+    showDetails && h6("details", { className: "dgui-fallback" }, h6("summary", null, Object.keys(doc.state).length ? "\u539F\u59CB\u6587\u5B57\u8BF4\u660E\u4E0E\u521D\u59CB\u53C2\u6570" : "\u539F\u59CB\u6587\u5B57\u8BF4\u660E"), h6("p", null, doc.fallback), Object.keys(doc.state).length > 0 && h6("pre", null, JSON.stringify(initialState(doc), null, 2)))
   );
 }
-var UiBoundary = class extends import_react10.default.Component {
+var UiBoundary = class extends import_react12.default.Component {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
@@ -23493,9 +23605,9 @@ function StreamingToolView(props) {
 }
 function StreamingPreview({ raw, callId = "stream", sessionId }) {
   const committed = useUiRegistry().some((r) => r.sessionId === sessionId && r.raw.callId === callId);
-  const deferred = import_react10.default.useDeferredValue(raw);
-  const doc = (0, import_react10.useMemo)(() => previewDocument(deferred), [deferred]);
-  const canvas = (0, import_react10.useMemo)(() => doc ? null : previewCanvas(deferred), [doc, deferred]);
+  const deferred = import_react12.default.useDeferredValue(raw);
+  const doc = (0, import_react12.useMemo)(() => previewDocument(deferred), [deferred]);
+  const canvas = (0, import_react12.useMemo)(() => doc ? null : previewCanvas(deferred), [doc, deferred]);
   if (committed) return h6("p", { className: "dgui-copy" }, "\u754C\u9762\u5DF2\u751F\u6210\u3002");
   if (canvas) return h6("div", { className: "dgui-root", "data-preview": true }, h6(CanvasPreview, { node: canvas }));
   if (!doc) return h6("div", { className: "dgui-pending", role: "status" }, "\u6B63\u5728\u7EC4\u7EC7\u5E76\u6821\u9A8C\u4EA4\u4E92\u754C\u9762\u2026");
@@ -23505,7 +23617,7 @@ function TurnUiView(props) {
   return (props.turn.data.get("dshGenerativeUi") ?? []).filter((r) => r.seq < props.seq).map((r) => r.isPatch ? h6(PatchNotice, { key: `patch-${r.seq}`, raw: r.raw }) : h6(PresentationView, { key: r.raw.documentId, ...r, sessionId: props.sessionId, sendPrompt: props.sendPrompt, scope: props.presentationScope }));
 }
 function PatchNotice({ raw }) {
-  (0, import_react10.useEffect)(() => {
+  (0, import_react12.useEffect)(() => {
     try {
       if (raw) publishDocument(raw);
     } catch {
@@ -23515,7 +23627,7 @@ function PatchNotice({ raw }) {
 }
 function ValidatedView({ raw, fallback, sessionId, sendPrompt }) {
   const { record: current2, status, retry } = useCurrentDocument(raw ?? {}, sessionId);
-  const result = (0, import_react10.useMemo)(() => {
+  const result = (0, import_react12.useMemo)(() => {
     try {
       if (!current2 || current2.version !== 1 || typeof current2.documentId !== "string" || typeof current2.callId !== "string") return null;
       return { ...current2, document: validateDocument(current2.document) };
@@ -23525,7 +23637,7 @@ function ValidatedView({ raw, fallback, sessionId, sendPrompt }) {
   }, [current2]);
   if (!result) return h6("div", { className: "dgui-root" }, h6("p", null, "\u6587\u5B57\u7ED3\u679C\uFF08\u672A\u63D0\u4F9B\u517C\u5BB9\u7684\u754C\u9762\u6570\u636E\uFF09"), h6("pre", null, fallback));
   return h6(
-    import_react10.default.Fragment,
+    import_react12.default.Fragment,
     null,
     status === "error" && h6("div", { className: "dgui-root dgui-document-warning", role: "status" }, h6("p", null, "\u672A\u80FD\u786E\u8BA4\u6700\u65B0\u754C\u9762\u7248\u672C\uFF0C\u5F53\u524D\u663E\u793A\u5DF2\u77E5\u7248\u672C\u3002"), h6("button", { type: "button", className: "dgui-secondary", onClick: retry }, "\u91CD\u65B0\u8BFB\u53D6\u6700\u65B0\u754C\u9762")),
     status === "loading" && h6("p", { className: "dgui-copy", role: "status" }, "\u6B63\u5728\u8BFB\u53D6\u6700\u65B0\u754C\u9762\u7248\u672C\u2026"),
@@ -23553,8 +23665,8 @@ var turnUiDefinition = {
     const fallback = (event.data.message.content ?? []).filter((c) => c.type === "text").map((c) => c.text).join("\n");
     return { ...context.state, records: [...context.state.records, { seq: event.seq, raw, fallback, ...isPatch ? { isPatch: true } : {} }] };
   },
-  buildLocationData(context, scope, previous) {
-    if (scope !== "turn" || !context.state) return null;
+  buildLocationData(context, scope2, previous) {
+    if (scope2 !== "turn" || !context.state) return null;
     if (previous?.key === "dshGenerativeUi" && previous.value === context.state.records) return previous;
     return { kind: "turn", turn: context.state.turn, key: "dshGenerativeUi", value: context.state.records };
   }
@@ -23588,8 +23700,30 @@ var CANVAS_CSS = `
 .dgui-canvas{min-width:0}.dgui-canvas-stage{position:relative}.dgui-canvas-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--du-muted);font-size:13px;background:var(--du-soft);border-radius:12px}.dgui-canvas-spinner{width:16px;height:16px;border:2px solid var(--du-line);border-top-color:var(--du-accent);border-radius:50%;animation:dgui-spin .9s linear infinite}.dgui-canvas-placeholder{padding:24px 18px;background:var(--du-soft);border:1px dashed var(--du-line);border-radius:12px;color:var(--du-muted);font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.dgui-canvas-placeholder p{margin:0}.dgui-canvas-options{margin-top:6px}.dgui-root .dgui-canvas-options>summary{font-size:12px;padding:5px 0;color:var(--du-muted);width:fit-content}.dgui-canvas-options[open]{border-top:1px solid var(--du-line);padding-top:8px;margin-top:12px}.dgui-canvas-options>.dgui-copy{padding:8px 0;font-size:12px}.dgui-canvas-issue{border:1px solid color-mix(in srgb,var(--du-amber) 30%,var(--du-line));background:color-mix(in srgb,var(--du-amber) 5%,var(--du-bg));border-radius:10px;padding:14px;margin-top:10px;font-size:12px;color:var(--du-ink)}.dgui-canvas-issue>strong{font-size:13px}.dgui-canvas-issue>p{color:var(--du-muted);margin-top:4px}.dgui-canvas-issue details{margin-top:8px}.dgui-root .dgui-canvas-issue pre{max-height:160px;overflow:auto}.dgui-canvas-options .dgui-secondary{font-size:12px;padding:6px 9px;box-shadow:none}@keyframes dgui-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.dgui-canvas-spinner{animation:none}}@media(forced-colors:active){.dgui-canvas-issue,.dgui-canvas-placeholder{border-color:CanvasText}}
 `;
 
+// src/soft-styles.js
+var SOFT_CSS = `
+.dgui-root{--du-radius:24px;--du-radius-inner:18px;background:linear-gradient(145deg,color-mix(in srgb,var(--du-accent) 4%,var(--du-bg)),var(--du-bg) 42%,color-mix(in srgb,var(--du-violet) 3%,var(--du-bg)));border-radius:var(--du-radius)}
+.dgui-root .dgui-card,.dgui-root .dgui-metric,.dgui-root .dgui-chart,.dgui-root .dgui-progress,.dgui-root .dgui-details{border-radius:var(--du-radius-inner);background:linear-gradient(135deg,color-mix(in srgb,var(--du-tone) 9%,var(--du-bg)),color-mix(in srgb,var(--du-violet) 4%,var(--du-bg)) 65%,var(--du-bg))}
+.dgui-root .dgui-card[data-surface=soft]{background:linear-gradient(135deg,var(--du-soft),color-mix(in srgb,var(--du-accent) 7%,var(--du-bg)))}
+.dgui-root .dgui-card[data-surface=featured]{border-radius:20px;background:linear-gradient(130deg,color-mix(in srgb,var(--du-accent) 14%,var(--du-bg)),color-mix(in srgb,var(--du-violet) 7%,var(--du-bg)));box-shadow:none}
+.dgui-root[data-layout=dashboard] .dgui-metric{background:linear-gradient(135deg,color-mix(in srgb,var(--du-tone) 11%,var(--du-bg)),var(--du-bg))}
+.dgui-root[data-layout=report] .dgui-card{padding:16px 18px;border:1px solid var(--du-line);border-radius:18px}
+.dgui-root .dgui-heading-icon{border-radius:14px;background:linear-gradient(145deg,color-mix(in srgb,var(--du-accent) 14%,var(--du-bg)),color-mix(in srgb,var(--du-violet) 8%,var(--du-bg)))}
+.dgui-root .dgui-button{border-radius:14px;background:linear-gradient(120deg,var(--du-action,#3e60d3),color-mix(in srgb,var(--du-action,#3e60d3) 85%,#152647))}
+.dgui-root input:not([type=range]):not([type=checkbox]),.dgui-root select,.dgui-root textarea,.dgui-root .dgui-secondary,.dgui-root .dgui-menu-trigger{border-radius:12px}
+.dgui-root .dgui-menu-content,.dgui-root .dgui-table-wrap,.dgui-root .dgui-canvas-placeholder,.dgui-root .dgui-canvas-loading,.dgui-root .dgui-canvas-issue{border-radius:18px}
+.dgui-root .dgui-menu-content button{border-radius:12px}.dgui-root .dgui-badge{border-radius:999px;background:linear-gradient(120deg,var(--du-soft),var(--du-tint))}
+.dgui-root .dgui-table-wrap caption{text-align:left;padding:12px 14px;font-size:14px;font-weight:600;color:var(--du-ink);background:linear-gradient(120deg,var(--du-tint),var(--du-bg))}
+.dgui-root[data-layout=status] .dgui-header{border-radius:23px 23px 0 0;background:linear-gradient(120deg,var(--du-tint),var(--du-soft))}
+.dgui-root[data-layout=dashboard]{background:linear-gradient(145deg,var(--du-tint),var(--du-bg) 45%,color-mix(in srgb,var(--du-violet) 4%,var(--du-bg)))}
+.dgui-root .dgui-content>:last-child{margin-bottom:0}.dgui-root .dgui-canvas-stage iframe{border-radius:16px}
+@media(max-width:600px){.dgui-root{--du-radius:22px;--du-radius-inner:18px}}
+@media(forced-colors:active){.dgui-root,.dgui-root .dgui-card,.dgui-root .dgui-metric,.dgui-root .dgui-chart,.dgui-root .dgui-button{background:Canvas}}
+`;
+
 // src/styles.js
 var CSS = `
+.dgui-chart-data-button{margin-left:auto;border:0;background:transparent;color:var(--du-muted);font:inherit;cursor:pointer;padding:4px 8px}.dgui-chart-data-button:hover{color:var(--du-accent)}.dgui-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}.dgui-canvas{position:relative}.dgui-action-menu{position:absolute;top:6px;right:6px;z-index:2}.dgui-menu-trigger{width:32px;height:32px;border:1px solid var(--du-line);border-radius:8px;background:var(--du-bg);color:var(--du-muted);font-size:24px;line-height:1;cursor:pointer}.dgui-menu-content{position:absolute;top:38px;right:0;display:grid;min-width:156px;padding:5px;border:1px solid var(--du-line);border-radius:10px;background:var(--du-bg);box-shadow:0 6px 20px #0002}.dgui-menu-content button{border:0;border-radius:6px;background:transparent;color:var(--du-ink);padding:9px 12px;text-align:left;font:inherit;white-space:nowrap;cursor:pointer}.dgui-menu-content button:hover{background:var(--du-soft)}.dgui-menu-content button:disabled{opacity:.45;cursor:default}.dgui-action-menu button:focus-visible{outline:2px solid var(--du-accent);outline-offset:2px}
 .dgui-root.dgui-settings{border:0;border-radius:0;box-shadow:none;background:transparent;padding:0;margin:0;max-width:720px;display:flex;flex-direction:column;gap:14px;font-size:13px;line-height:1.65}
 .dgui-settings h3{font-size:14px;font-weight:600;margin:0}.dgui-settings label{font-weight:500}.dgui-settings p{color:var(--du-muted)}
 .dgui-settings select{width:100%;max-width:420px;min-height:40px;border:1px solid var(--du-line);border-radius:6px;padding:9px 12px;background:var(--dsw-alias-bg-layer-3,var(--du-bg));color:inherit;font:inherit}.dgui-settings select:focus-visible{outline:2px solid var(--du-accent);outline-offset:3px}.dgui-settings select:disabled{opacity:.5}
@@ -23612,29 +23746,29 @@ body[data-ds-dark-theme] .dgui-root,.dgui-root[data-preview-theme=dark]{--du-acc
 .dgui-panel{padding:16px;min-width:0;overflow:auto;height:100%;box-sizing:border-box}.dgui-panel>.dgui-root{margin-bottom:16px}.dgui-panel label{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.dgui-panel select{max-width:100%;flex:1;min-width:120px;border:1px solid var(--du-line);border-radius:8px;padding:8px;background:var(--du-bg);color:var(--du-ink)}
 .dgui-history-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--du-line)}.dgui-history-row>span{flex:1;min-width:140px}.dgui-version-preview{margin-top:14px;border:1px solid var(--du-line);border-radius:12px;padding:12px}.dgui-version-preview .dgui-root{margin-top:12px}
 [data-dgui-presentation]>.dgui-secondary{margin:8px 0}[data-dgui-marker]{min-width:0}
-`;
+` + SOFT_CSS;
 
 // src/settings.js
-var import_react11 = __toESM(require("react"), 1);
-var h7 = import_react11.default.createElement;
-function ModeSettings({ scope }) {
-  const [snapshot, setSnapshot] = (0, import_react11.useState)(() => scope.getSnapshot()), [busy, setBusy] = (0, import_react11.useState)(false), [message, setMessage] = (0, import_react11.useState)(""), pending = (0, import_react11.useRef)(false);
-  (0, import_react11.useEffect)(() => scope.subscribe(() => setSnapshot(scope.getSnapshot())), [scope]);
-  const ready = snapshot.status === "ready" && snapshot.value !== void 0;
-  async function change(mode, key3 = "designMode") {
+var import_react13 = __toESM(require("react"), 1);
+var h7 = import_react13.default.createElement;
+function ModeSettings({ scope: scope2 }) {
+  const [snapshot2, setSnapshot] = (0, import_react13.useState)(() => scope2.getSnapshot()), [busy, setBusy] = (0, import_react13.useState)(false), [message, setMessage] = (0, import_react13.useState)(""), pending = (0, import_react13.useRef)(false);
+  (0, import_react13.useEffect)(() => scope2.subscribe(() => setSnapshot(scope2.getSnapshot())), [scope2]);
+  const ready = snapshot2.status === "ready" && snapshot2.value !== void 0;
+  async function change(mode, key2 = "designMode") {
     if (pending.current || !ready) return;
     pending.current = true;
     setBusy(true);
     setMessage("");
     try {
-      await scope.mutate([{ op: "set", path: [key3], value: mode }], scope.getSnapshot().revision);
-      const actual = scope.getSnapshot();
+      await scope2.mutate([{ op: "set", path: [key2], value: mode }], scope2.getSnapshot().revision);
+      const actual = scope2.getSnapshot();
       setSnapshot(actual);
-      if (actual.status !== "ready" || actual.value?.[key3] !== mode) throw new Error("\u8BBE\u7F6E\u672A\u4FDD\u5B58\uFF0C\u53EF\u80FD\u53D1\u751F\u914D\u7F6E\u51B2\u7A81\uFF0C\u8BF7\u91CD\u8BD5\u3002");
-      setMessage(key3 === "designMode" ? "\u6A21\u5F0F\u5DF2\u4FDD\u5B58\uFF1B\u4ECE\u4E0B\u4E00\u6B21\u8BF7\u6C42\u5F00\u59CB\u751F\u6548\u3002" : "\u5C55\u793A\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF1B\u6B63\u6587\u5B9A\u4F4D\u6307\u5BFC\u4ECE\u4E0B\u4E00\u6B21\u8BF7\u6C42\u5F00\u59CB\u751F\u6548\u3002");
+      if (actual.status !== "ready" || actual.value?.[key2] !== mode) throw new Error("\u8BBE\u7F6E\u672A\u4FDD\u5B58\uFF0C\u53EF\u80FD\u53D1\u751F\u914D\u7F6E\u51B2\u7A81\uFF0C\u8BF7\u91CD\u8BD5\u3002");
+      setMessage(key2 === "designMode" ? "\u6A21\u5F0F\u5DF2\u4FDD\u5B58\uFF1B\u4ECE\u4E0B\u4E00\u6B21\u8BF7\u6C42\u5F00\u59CB\u751F\u6548\u3002" : "\u5C55\u793A\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF1B\u6B63\u6587\u5B9A\u4F4D\u6307\u5BFC\u4ECE\u4E0B\u4E00\u6B21\u8BF7\u6C42\u5F00\u59CB\u751F\u6548\u3002");
     } catch (e) {
       setMessage(e.message ?? "\u6A21\u5F0F\u4FDD\u5B58\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5\u3002");
-      setSnapshot(scope.getSnapshot());
+      setSnapshot(scope2.getSnapshot());
     } finally {
       pending.current = false;
       setBusy(false);
@@ -23645,14 +23779,16 @@ function ModeSettings({ scope }) {
     { className: "dgui-root dgui-settings", "aria-label": "DSH Motion UI \u8BBE\u7F6E" },
     h7("h3", null, "DSH Motion UI"),
     h7("label", { htmlFor: "dgui-design-mode" }, "\u8BBE\u8BA1\u6A21\u5F0F"),
-    h7("select", { id: "dgui-design-mode", value: snapshot.value?.designMode ?? "guided", disabled: !ready || busy, onChange: (e) => change(e.target.value) }, h7("option", { value: "guided" }, "\u5F15\u5BFC\u6A21\u5F0F"), h7("option", { value: "free" }, "\u81EA\u7531\u8BBE\u8BA1\u6A21\u5F0F")),
+    h7("select", { id: "dgui-design-mode", value: snapshot2.value?.designMode ?? "guided", disabled: !ready || busy, onChange: (e) => change(e.target.value) }, h7("option", { value: "guided" }, "\u5F15\u5BFC\u6A21\u5F0F"), h7("option", { value: "free" }, "\u81EA\u7531\u8BBE\u8BA1\u6A21\u5F0F")),
     h7("p", null, "\u5F15\u5BFC\u6A21\u5F0F\u63D0\u4F9B\u8BBE\u8BA1\u6280\u80FD\u3001\u7EC4\u4EF6\u534F\u8BAE\u4E0E\u793A\u4F8B\u3002\u81EA\u7531\u8BBE\u8BA1\u6A21\u5F0F\u53EA\u63D0\u4F9B\u753B\u5E03\u63A5\u53E3\u4E0E\u4EA4\u4E92\u7EA6\u675F\uFF0C\u5E03\u5C40\u3001\u56FE\u5F62\u3001\u914D\u8272\u548C\u52A8\u753B\u7531\u6A21\u578B\u51B3\u5B9A\uFF1B\u4E24\u79CD\u6A21\u5F0F\u7684\u8FD0\u884C\u6743\u9650\u76F8\u540C\u3002"),
     h7("p", null, "\u4E24\u79CD\u6A21\u5F0F\u90FD\u4F1A\u6307\u5BFC\u6A21\u578B\u5224\u65AD\u4F55\u65F6\u4E3B\u52A8\u4F7F\u7528 UI\uFF0C\u5E76\u4F18\u5148\u4EA4\u4ED8\u5C0F\u800C\u5B8C\u6574\u7684\u754C\u9762\u3002"),
     h7("label", { htmlFor: "dgui-display-mode" }, "\u754C\u9762\u5C55\u793A\u4F4D\u7F6E"),
-    h7("select", { id: "dgui-display-mode", value: snapshot.value?.displayMode ?? "tail", disabled: !ready || busy, onChange: (e) => change(e.target.value, "displayMode") }, h7("option", { value: "tail" }, "\u56DE\u7B54\u4E0B\u65B9"), h7("option", { value: "inline" }, "\u6B63\u6587\u6807\u8BB0\u4F4D\u7F6E"), h7("option", { value: "sidebar" }, "PC \u4FA7\u680F")),
+    h7("select", { id: "dgui-display-mode", value: snapshot2.value?.displayMode ?? "tail", disabled: !ready || busy, onChange: (e) => change(e.target.value, "displayMode") }, h7("option", { value: "tail" }, "\u56DE\u7B54\u4E0B\u65B9"), h7("option", { value: "inline" }, "\u6B63\u6587\u6807\u8BB0\u4F4D\u7F6E"), h7("option", { value: "sidebar" }, "PC \u4FA7\u680F")),
     h7("p", null, "\u6B63\u6587\u6A21\u5F0F\u7531\u6A21\u578B\u7528\u6807\u8BB0\u9009\u62E9\u63D2\u5165\u4F4D\u7F6E\uFF0C\u7F3A\u5C11\u6807\u8BB0\u65F6\u663E\u793A\u5728\u56DE\u7B54\u4E0B\u65B9\u3002\u4FA7\u680F\u4E0D\u53EF\u7528\u65F6\u81EA\u52A8\u56DE\u9000\uFF1B\u6B63\u6587\u548C\u4FA7\u680F\u5171\u4EAB\u5DF2\u4FDD\u5B58\u53C2\u6570\u3002"),
+    h7("label", { htmlFor: "dgui-show-details" }, h7("input", { id: "dgui-show-details", type: "checkbox", checked: snapshot2.value?.showDetails === true, disabled: !ready || busy, onChange: (e) => change(e.target.checked, "showDetails") }), " \u663E\u793A\u754C\u9762\u8BE6\u60C5"),
+    h7("p", null, "\u9ED8\u8BA4\u9690\u85CF\u5E95\u90E8\u7684\u53C2\u6570\u72B6\u6001\u3001\u539F\u59CB\u8BF4\u660E\u3001\u663E\u793A\u68C0\u67E5\u548C\u7248\u672C\u5386\u53F2\u3002\u5BFC\u51FA\u4E0E\u91CD\u7F6E\u53EF\u901A\u8FC7\u753B\u5E03\u53F3\u4E0A\u89D2\u64CD\u4F5C\u83DC\u5355\u4F7F\u7528\uFF1B\u9519\u8BEF\u63D0\u793A\u59CB\u7EC8\u4FDD\u7559\u3002"),
     h7("p", null, "\u6B64\u8BBE\u7F6E\u5F71\u54CD\u5F53\u524D profile \u540E\u7EED\u8BF7\u6C42\u3002\u5DF2\u6709\u4E0A\u4E0B\u6587\u53EF\u80FD\u4FDD\u7559\u65E7\u6307\u5BFC\uFF0C\u5BF9\u6BD4\u6A21\u5F0F\u65F6\u8BF7\u65B0\u5EFA\u4F1A\u8BDD\u3002"),
-    !ready && h7("p", { role: "status" }, snapshot.status === "unavailable" ? "\u63D2\u4EF6\u8BBE\u7F6E\u4E0D\u53EF\u7528\uFF0C\u8BF7\u786E\u8BA4\u5BBF\u4E3B\u5DF2\u52A0\u8F7D\u65B0\u7248\u63D2\u4EF6\u3002" : "\u6B63\u5728\u8BFB\u53D6\u8BBE\u7F6E\u2026"),
+    !ready && h7("p", { role: "status" }, snapshot2.status === "unavailable" ? "\u63D2\u4EF6\u8BBE\u7F6E\u4E0D\u53EF\u7528\uFF0C\u8BF7\u786E\u8BA4\u5BBF\u4E3B\u5DF2\u52A0\u8F7D\u65B0\u7248\u63D2\u4EF6\u3002" : "\u6B63\u5728\u8BFB\u53D6\u8BBE\u7F6E\u2026"),
     message && h7("p", { role: "status" }, message)
   );
 }
@@ -23660,13 +23796,14 @@ function ModeSettings({ scope }) {
 // src/client.jsx
 var inject = ["slots", "sessions", "conversation", "uiConversation", "configForms"];
 function apply(ctx) {
-  const scope = ctx.configForms.get("motion-ui");
-  ctx.slots.inject("plugins.bundle.config", () => ctx.slots.register({ name: "plugins.bundle.config", key: "dsh-motion-ui" }, (props) => import_react12.default.createElement(ModeSettings, { ...props, scope })));
+  const scope2 = ctx.configForms.get("motion-ui");
+  configureViewSettings(scope2);
+  ctx.slots.inject("plugins.bundle.config", () => ctx.slots.register({ name: "plugins.bundle.config", key: "dsh-motion-ui" }, (props) => import_react14.default.createElement(ModeSettings, { ...props, scope: scope2 })));
   ctx.uiConversation.events.register(turnUiDefinition);
   ctx.slots.inject("conversation.chat.turnTail", () => ctx.slots.register({
     name: "conversation.chat.turnTail",
     id: "dsh-generative-ui",
-    inject: (sessionId) => ({ presentationScope: scope, sendPrompt: (prompt) => ctx.sessions.scope(sessionId).get("conversation").send(prompt) })
+    inject: (sessionId) => ({ presentationScope: scope2, sendPrompt: (prompt) => ctx.sessions.scope(sessionId).get("conversation").send(prompt) })
   }, TurnUiView));
   ctx.effect(() => {
     const style = document.createElement("style");

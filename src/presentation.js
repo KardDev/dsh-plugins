@@ -4,8 +4,10 @@ import{ValidatedView}from'./view.js';
 import{rememberUi,useUiRegistry,usePresentation,markerLocation,openUiPanel,panelAvailable,subscribeUi,notifyUi}from'./presentation-store.js';
 import{startUiMarkers}from'./markers.js';
 import{usePresentationOwner}from'./presentation-owner.js';
+import{useViewDetails}from'./view-settings.js';
 const h=React.createElement,scanners=new WeakMap(),focused=new Map();
 export function PresentationView({raw,sessionId,sendPrompt,scope}){
+  const showDetails=useViewDetails();
   const anchor=useRef(null),records=useUiRegistry(),mode=usePresentation(scope),host=markerLocation(raw.documentId);
   const owner=usePresentationOwner(anchor,raw.documentId,sessionId);
   useEffect(()=>{rememberUi(raw,sessionId,sendPrompt)},[raw,sessionId,sendPrompt]);
@@ -22,7 +24,7 @@ export function PresentationView({raw,sessionId,sendPrompt,scope}){
   return h('div',{ref:anchor,'data-dgui-presentation':raw.documentId},
     owner&&available&&h('button',{type:'button',className:'dgui-secondary',onClick:()=>openUiPanel(raw.documentId,sessionId)},'在侧栏打开'),
     owner&&(mode==='sidebar'&&available?h('p',{className:'dgui-copy'},`${raw.document.title} · 在侧栏中操作`):mode==='inline'&&host?createPortal(content,host):content),
-    owner&&mode==='inline'&&!host&&h('small',{className:'dgui-copy'},'未提供正文标记，界面显示在回答下方。'));
+    showDetails&&owner&&mode==='inline'&&!host&&h('small',{className:'dgui-copy'},'未提供正文标记，界面显示在回答下方。'));
 }
 export function UiPanel({sessionId,sendPrompt}){
   const records=useUiRegistry().filter(r=>r.sessionId===sessionId),[selected,setSelected]=useState(focused.get(sessionId));

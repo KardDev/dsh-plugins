@@ -14,6 +14,7 @@ import { publishDocument, useCurrentDocument } from './current-document.js';
 import { HistoryView } from './history-view.js';
 import { PresentationView } from './presentation.js';
 import {useUiRegistry} from './presentation-store.js';
+import {useViewDetails} from './view-settings.js';
 const display = value => value === undefined || value === null ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value);
 function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
   const [draft, setDraft] = useState(String(value)), [invalid, setInvalid] = useState(false);
@@ -28,12 +29,14 @@ function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
     }
   });
 }
-function Table({ rows, columns, id }) {
+function Table({ rows, columns, id, label }) {
   return h('div', { className: 'dgui-table-wrap' }, h('table', { 'data-ui-node': id },
+    label && h('caption', null, label),
     h('thead', null, h('tr', null, columns.map(c => h('th', { key: c.key, scope: 'col' }, c.label, c.unit ? ` (${c.unit})` : '')))),
     h('tbody', null, rows.length ? rows.map((row, i) => h('tr', { key: i }, columns.map(c => h('td', { key: c.key, 'data-numeric': typeof row[c.key] === 'number' }, display(Object.hasOwn(row, c.key) ? row[c.key] : undefined))))) : h('tr', null, h('td', { colSpan: columns.length }, '暂无数据')))));
 }
 function Chart({ node, rows }) {
+  const [showData,setShowData]=useState(false);
   const data = rows.slice(0, 40), values = data.map(r => r[node.valueKey]);
   const low = node.kind === 'line' && values.length ? Math.min(...values) : Math.min(0, ...values);
   const high = node.kind === 'line' && values.length ? Math.max(...values) : Math.max(0, ...values), range = high - low || 1;
@@ -44,7 +47,7 @@ function Chart({ node, rows }) {
   const x = i => node.xScale === 'linear' ? xMax === xMin ? 314 : 44 + (labels[i] - xMin) / (xMax - xMin) * 540 : 44 + cell * (i + 0.5), baseline = y(0);
   const palette = ['var(--du-accent)', 'var(--du-green)', 'var(--du-violet)', 'var(--du-amber)'];
   return h('figure', { className: 'dgui-chart', 'data-ui-node': node.id },
-    h('figcaption', null, h(Icon, { name: 'chart' }), node.label, node.unit && h('span', { className: 'dgui-chart-unit' }, `(${node.unit})`)),
+    h('figcaption', null, h(Icon, { name: 'chart' }), node.label, rows.length>40&&'（图示前 40 项）', node.unit && h('span', { className: 'dgui-chart-unit' }, `(${node.unit})`),h('button',{type:'button',className:'dgui-chart-data-button','aria-expanded':showData,onClick:()=>setShowData(!showData)},'图表数据')),
     h('div', { className: 'dgui-plot', tabIndex: 0, role: 'region', 'aria-label': `${node.label}图表，可横向滚动` }, h('svg', { viewBox: `0 0 ${width} 205`, role: 'img', 'aria-label': `${node.label}。展开图表数据可查看每项数值。` },
       [0, 0.5, 1].map(t => h('g', { key: t }, h('line', { x1: 44, x2: 584, y1: y(low + range * t), y2: y(low + range * t), stroke: 'var(--du-line)', strokeDasharray: '3 5' }), h('text', { x: 35, y: y(low + range * t) + 4, textAnchor: 'end', fontSize: 14, fill: 'var(--du-muted)' }, Number((low + range * t).toPrecision(3)).toLocaleString()))),
       low <= 0 && high >= 0 && h('line', { x1: 44, x2: 584, y1: baseline, y2: baseline, stroke: 'var(--du-line)' }),
@@ -53,11 +56,10 @@ function Chart({ node, rows }) {
         node.kind === 'bar' ? h('rect', { x: x(i) - Math.min(40, cell * 0.3), y: Math.min(y(r[node.valueKey]), baseline), width: Math.max(1, Math.min(80, cell * 0.6)), height: Math.abs(y(r[node.valueKey]) - baseline), rx: 4, fill: palette[i % palette.length] }, h('title', null, `${r[node.labelKey]}: ${r[node.valueKey]}`)) : h('circle', { cx: x(i), cy: y(r[node.valueKey]), r: 3.5, fill: 'var(--du-accent)', stroke: 'var(--du-bg)', strokeWidth: 1.5 }, h('title', null, `${r[node.labelKey]}: ${r[node.valueKey]}`)),
         data.length <= 12 && h('text', { x: x(i), y: y(r[node.valueKey]) + (r[node.valueKey] < 0 ? 14 : -8), textAnchor: node.xScale === 'linear' && i === 0 ? 'start' : node.xScale === 'linear' && i === data.length - 1 ? 'end' : 'middle', fontSize: 14, fontWeight: 550, fill: 'var(--du-ink)' }, Number(r[node.valueKey].toPrecision(4)).toLocaleString()),
         (data.length <= 12 || i % Math.ceil(data.length / 12) === 0) && h('text', { x: x(i), y: 192, textAnchor: 'middle', fontSize: 14, fill: 'var(--du-muted)' }, String(r[node.labelKey]).slice(0, 12)))))),
-    h('small', { className: 'dgui-chart-hint' }, '窄屏可横向滑动图表；展开下方数据可查看精确值。'),
-    rows.length > 40 && h('small', null, '图示前 40 项，完整数值见下方数据。'),
-    h('details', null, h('summary', null, '图表数据'), h(Table, { rows, columns: [{ key: node.labelKey, label: '项目' }, { key: node.valueKey, label: node.label, unit: node.unit }], id: `${node.id}-data` })));
+    h('div', {hidden:!showData}, h(Table, { rows, columns: [{ key: node.labelKey, label: '项目' }, { key: node.valueKey, label: node.label, unit: node.unit }], id: `${node.id}-data` })));
 }
 export function UiView({ record, sessionId, sendPrompt, preview = false }) {
+  const showDetails=useViewDetails();
   const doc = record.document;
   const viewId=React.useId();
   const root=useRef(null),canvasAudits=useRef(new Map()),[audit,setAudit]=useState(null),auditPending=useRef(0);
@@ -110,7 +112,7 @@ export function UiView({ record, sessionId, sendPrompt, preview = false }) {
       case 'details': return h('details', { ...props, className: 'dgui-details', open: n.open }, h('summary', null, h(Icon, { name: n.icon ?? 'info' }), n.title), h('div', { className: 'dgui-column' }, n.children.map(renderNode)));
       case 'progress': { const v = resolve(n.value), max = resolve(n.max); return h('div', { ...props, className: 'dgui-progress' }, h('div', { className: 'dgui-progress-label' }, h('span', null, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('span', null, `${display(v)} / ${display(max)}${n.unit ? ' ' + n.unit : ''}`)), !computed.error && h('progress', { value: v, max, 'aria-label': n.label }), h('small', null, !computed.error ? `${Number((v / max * 100).toFixed(1))}%` : '—')); }
       case 'steps': return h('ol', { ...props, className: 'dgui-steps' }, n.items.map((item, i) => h('li', { key: i, 'data-step-status': item.status }, h('span', { className: 'dgui-step-dot', 'aria-hidden': true }, item.status === 'done' ? h(Icon, { name: 'check' }) : item.status === 'error' ? h(Icon, { name: 'warning' }) : i + 1), h('div', null, h('strong', null, item.title), h('span', { className: 'dgui-step-state' }, { pending: '待进行', active: '当前步骤', done: '已完成', error: '异常' }[item.status]), item.description && h('p', null, item.description)))));
-      case 'metric': { const v = resolve(n.value); return h('div', { ...props, className: 'dgui-metric' }, h('span', { className: 'dgui-metric-label' }, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('strong', null, typeof v === 'number' ? formatNumber(v,n.decimals ?? 2) : '—', ' ', h('small', null, n.unit))); }
+      case 'metric': { const v = resolve(n.value); return h('div', { ...props, className: 'dgui-metric' }, h('span', { className: 'dgui-metric-label' }, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('strong', null, typeof v === 'number' ? formatNumber(v,n.decimals ?? 2) : display(v), ' ', h('small', null, n.unit))); }
       case 'input': case 'slider': case 'select': case 'toggle': {
         const k = n.bind.split('.')[1], spec = doc.state[k], v = state[k], id = `dgui-${record.documentId}-${n.id}-${viewId}`;
         let control;
@@ -122,7 +124,7 @@ export function UiView({ record, sessionId, sendPrompt, preview = false }) {
         return h('div', { ...props, className: 'dgui-control' }, h('label', { htmlFor: id }, h(Icon, { name: n.type === 'toggle' ? 'layers' : n.type === 'select' ? 'target' : 'sliders' }), h('span', null, n.label)), control);
       }
       case 'button': return h('button', { ...props, className: 'dgui-button', type: 'button', disabled: disabled || !sendPrompt, onClick: () => followup(n.action) }, n.text, h(Icon, { name: n.icon ?? 'arrow' }));
-      case 'table': return computed.error ? null : h(Table, { key: n.id, id: n.id, rows: resolve(n.rows), columns: n.columns });
+      case 'table': return computed.error ? null : h(Table, { key: n.id, id: n.id, label:n.label, rows: resolve(n.rows), columns: n.columns });
       case 'chart': return computed.error ? null : h(Chart, { key: n.id, node: n, rows: resolve(n.rows) });
       default: return null;
     }
@@ -131,7 +133,7 @@ export function UiView({ record, sessionId, sendPrompt, preview = false }) {
   return h('section', { ref:root,className: 'dgui-root', 'data-document-revision':record.documentRevision??0,'data-dgui-build': BUILD_INFO.id, 'data-dsh-generative-ui': record.documentId, 'data-layout': doc.presentation?.layout, 'data-accent': doc.presentation?.accent, 'data-density': doc.presentation?.density, 'data-preview': preview || undefined, 'aria-label': doc.title, 'aria-busy': preview || undefined },
     h('header', { className: 'dgui-header' }, h('span', { className: 'dgui-heading-icon' }, h(Icon, { name: sceneIcons[doc.presentation?.layout] ?? (Object.keys(doc.state).length?'sliders':'layers') })), h('strong', { className: 'dgui-header-title' }, doc.title), h('span', { className: 'dgui-badge' }, h(Icon, { name: 'sparkles' }), preview ? '生成中' : '可视化')),
     h('div', { key: epoch, className: 'dgui-content' }, doc.nodes.map(renderNode)),
-    (Object.keys(doc.state).length>0||issue||actionStatus)&&h('div', { className: 'dgui-status', role: 'status', 'data-status': /失败|冲突/.test(status) ? 'error' : /正在|等待/.test(status) ? 'pending' : 'saved' }, h(Icon, { name: /失败|冲突/.test(status) ? 'warning' : /正在|等待/.test(status) ? 'database' : 'check' }), h('span', null, status), actionStatus && h('span', null, ` · ${actionStatus}`)),
+    (Object.keys(doc.state).length>0||issue||actionStatus)&&h('div', { className: showDetails||issue||actionStatus?'dgui-status':'dgui-sr-only', role: 'status', 'data-status': /失败|冲突/.test(status) ? 'error' : /正在|等待/.test(status) ? 'pending' : 'saved' }, h(Icon, { name: /失败|冲突/.test(status) ? 'warning' : /正在|等待/.test(status) ? 'database' : 'check' }), h('span', null, status), actionStatus && h('span', null, ` · ${actionStatus}`)),
     issue && h('div', { className: 'dgui-recovery' },
       issue.kind === 'conflict' ? h(React.Fragment, null,
         h('button', { type: 'button', className: 'dgui-secondary', disabled: status === '正在恢复参数…', onClick: useRemote }, '使用已保存参数'),
@@ -139,9 +141,9 @@ export function UiView({ record, sessionId, sendPrompt, preview = false }) {
         h('button', { type: 'button', className: 'dgui-secondary', disabled: status === '正在恢复参数…', onClick: retry }, issue.kind === 'load' ? '重新读取参数' : '重试保存')),
     (error || computed.error) && h('p', { className: 'dgui-error', role: 'alert' }, error || computed.error),
     Object.values(invalidFields).some(Boolean) && h('p', { className: 'dgui-error', role: 'alert' }, '请输入范围内且符合步长的数值。'),
-    !preview&&audit&&h('details',{className:'dgui-fallback dgui-audit'},h('summary',null,'显示检查'),h('p',null,`${audit.width}px · ${audit.theme==='dark'?'深色':'浅色'} · 启发式观察，不代表完整视觉验收。`),h('p',null,'未覆盖：复杂背景、遮挡关系及 SVG 配色；报告不等于完整无障碍检查。'),audit.coverage?.some(c=>c.truncated)&&h('p',null,'内容较多，本次只检查了每个区域的前 2000 个元素。'),audit.issues.length?h('ul',null,audit.issues.map((i,j)=>h('li',{key:j},AUDIT_MESSAGES[i.code],i.nodeId?`（${i.nodeId}）`:''))):h('p',null,'本次检查未发现所覆盖的问题。')),
-    !preview&&h(HistoryView,{record,sessionId}),
-    h('details', { className: 'dgui-fallback' }, h('summary', null, Object.keys(doc.state).length ? '原始文字说明与初始参数' : '原始文字说明'), h('p', null, doc.fallback), Object.keys(doc.state).length > 0 && h('pre', null, JSON.stringify(initialState(doc), null, 2))));
+    showDetails&&!preview&&audit&&h('details',{className:'dgui-fallback dgui-audit'},h('summary',null,'显示检查'),h('p',null,`${audit.width}px · ${audit.theme==='dark'?'深色':'浅色'} · 启发式观察，不代表完整视觉验收。`),h('p',null,'未覆盖：复杂背景、遮挡关系及 SVG 配色；报告不等于完整无障碍检查。'),audit.coverage?.some(c=>c.truncated)&&h('p',null,'内容较多，本次只检查了每个区域的前 2000 个元素。'),audit.issues.length?h('ul',null,audit.issues.map((i,j)=>h('li',{key:j},AUDIT_MESSAGES[i.code],i.nodeId?`（${i.nodeId}）`:''))):h('p',null,'本次检查未发现所覆盖的问题。')),
+    showDetails&&!preview&&h(HistoryView,{record,sessionId}),
+    showDetails&&h('details', { className: 'dgui-fallback' }, h('summary', null, Object.keys(doc.state).length ? '原始文字说明与初始参数' : '原始文字说明'), h('p', null, doc.fallback), Object.keys(doc.state).length > 0 && h('pre', null, JSON.stringify(initialState(doc), null, 2))));
 }
 export class UiBoundary extends React.Component {
   state = { failed: false };

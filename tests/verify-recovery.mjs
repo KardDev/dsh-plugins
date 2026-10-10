@@ -11,7 +11,7 @@ import {curveExample} from '../lib/catalog.js';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.DSH_PLAYWRIGHT??'playwright');
 const dir=await mkdtemp(join(tmpdir(),'dgui-recovery-'));const store=new UiStore(dir);
 const record=await store.create(curveExample,{sessionId:'test-session',callId:'test-call'}), handler=stateRoute(store);
-const code=`import React from 'react';import{createRoot}from'react-dom/client';import{ValidatedView}from'./src/view.js';import{CSS}from'./src/styles.js';const s=document.createElement('style');s.textContent=CSS;document.head.append(s);window.prompts=[];createRoot(document.getElementById('app')).render(React.createElement(React.StrictMode,null,React.createElement(ValidatedView,{raw:${JSON.stringify(record)},sessionId:'test-session',sendPrompt:async p=>window.prompts.push(p)})));`;
+const code=`import './tests/diagnostic-fixture.js';import React from 'react';import{createRoot}from'react-dom/client';import{ValidatedView}from'./src/view.js';import{CSS}from'./src/styles.js';const s=document.createElement('style');s.textContent=CSS;document.head.append(s);window.prompts=[];createRoot(document.getElementById('app')).render(React.createElement(React.StrictMode,null,React.createElement(ValidatedView,{raw:${JSON.stringify(record)},sessionId:'test-session',sendPrompt:async p=>window.prompts.push(p)})));`;
 const bundle=(await build({stdin:{contents:code,resolveDir:process.cwd()},bundle:true,write:false,format:'iife'})).outputFiles[0].text;
 let failGet=2,failPost=0,ambiguous=0,delay=0,started=()=>{};const counts={get:0,post:0};
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));

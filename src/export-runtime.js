@@ -12,7 +12,7 @@ const publish=()=>{try{frame.contentWindow.postMessage({dshCanvas:1,channel,type
 addEventListener('message',event=>{const m=event.data;if(event.source!==frame.contentWindow||m?.channel!==channel||m.dshCanvas!==1)return;if(Date.now()-start>1000){start=Date.now();count=0}if(++count>SANDBOX_LIMITS.rate)return;
   if(m.type==='ready'){connected=true;publish()}
   else if(m.type==='patch'&&connected){try{const next=validateState(doc,{...state,...canvasPatch(m.payload,node)});evaluate(doc,next);state=next;status.textContent='本地参数已更新；刷新文件会回到导出时的参数。'}catch(e){status.textContent='参数无效：'+e.message}publish()}
-  else if(m.type==='height'&&Number.isFinite(m.payload))frame.style.height=Math.max(160,Math.min(1000,Math.ceil(m.payload)))+'px';
+  else if(m.type==='height'&&Number.isFinite(m.payload)&&m.payload>=0)frame.style.height=Math.max(32,Math.min(1000,Math.ceil(m.payload)))+'px';
   else if(m.type==='error')status.textContent='画布运行异常：'+String(m.payload).slice(0,1000);
 });
 document.addEventListener('visibilitychange',()=>{if(connected)publish()});

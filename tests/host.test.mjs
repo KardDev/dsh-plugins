@@ -17,6 +17,10 @@ test('Host tools use canonical output, durable presentation metadata and authent
   const resolved=sections.map(s=>({...s,text:s.text()}));
   const render = tools.find(x => x.name === 'render_ui'), catalog = tools.find(x => x.name === 'ui_catalog');
   assert.ok(render); assert.ok(catalog); assert.match(resolved[0].text, /plain text/);
+  const documentSchema=render.parameters.properties.document;
+  assert.equal(documentSchema.type,'object');assert.ok(documentSchema.required.includes('nodes'));
+  assert.ok(documentSchema.properties.nodes.items.properties.type.enum.includes('table'));
+  assert.match(resolved[1].text,/Authoring fast path/);
   assert.equal(sections.length, 3); assert.deepEqual(resolved, UI_SKILL_SECTIONS);
   assert.ok(sections.every(s => s.interpolate === false));
   assert.match(resolved[0].text, /390px/); assert.match(resolved[0].text, /Diagram grammar/);

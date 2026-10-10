@@ -6,6 +6,12 @@ Interactive, declarative tool views for **DeepSeek Harness Web 0.2.0-rc.2**.
 
 The plugin adds `ui_catalog` (protocol + examples + visual vocabulary) and `render_ui` (validated UI). It renders native conversation turn-tail views, computes local expressions, saves per-conversation input state on the Host, and sends explicit follow-up requests with the current parameter snapshot.
 
+### Development changes (not yet published)
+
+The development branch exposes the document structure in native tool schemas and accepts common authoring forms: inline table/chart rows, Chinese identifiers, text metrics, table captions and structured canvas state (`type:"json"`, array/object, max16KiB per value). Runtime arithmetic and chart series still require numbers; unknown fields and unsafe properties remain errors. Prefer passing a document object directly and use `render_canvas` for HTML/SVG source.
+
+The default display hides bottom diagnostics/history/parameter disclosures. Canvas export/reset/stop live in a compact top-corner menu. Optional details can be enabled under Home → Plugins. Rounded surfaces and soft gradients follow the host theme; canvas height fits content after rendering and shrinks when content is removed.
+
 ## Install
 
 Install the published plugin (or paste `dsh-motion-ui` into Home → Plugins → Add plugin):

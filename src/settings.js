@@ -13,6 +13,8 @@ export function ModeSettings({scope}){
     h('p',null,'两种模式都会指导模型判断何时主动使用 UI，并优先交付小而完整的界面。'),
     h('label',{htmlFor:'dgui-display-mode'},'界面展示位置'),h('select',{id:'dgui-display-mode',value:snapshot.value?.displayMode??'tail',disabled:!ready||busy,onChange:e=>change(e.target.value,'displayMode')},h('option',{value:'tail'},'回答下方'),h('option',{value:'inline'},'正文标记位置'),h('option',{value:'sidebar'},'PC 侧栏')),
     h('p',null,'正文模式由模型用标记选择插入位置，缺少标记时显示在回答下方。侧栏不可用时自动回退；正文和侧栏共享已保存参数。'),
+    h('label',{htmlFor:'dgui-show-details'},h('input',{id:'dgui-show-details',type:'checkbox',checked:snapshot.value?.showDetails===true,disabled:!ready||busy,onChange:e=>change(e.target.checked,'showDetails')}),' 显示界面详情'),
+    h('p',null,'默认隐藏底部的参数状态、原始说明、显示检查和版本历史。导出与重置可通过画布右上角操作菜单使用；错误提示始终保留。'),
     h('p',null,'此设置影响当前 profile 后续请求。已有上下文可能保留旧指导，对比模式时请新建会话。'),
     !ready&&h('p',{role:'status'},snapshot.status==='unavailable'?'插件设置不可用，请确认宿主已加载新版插件。':'正在读取设置…'),message&&h('p',{role:'status'},message));
 }

@@ -1,5 +1,15 @@
 # Verification
 
+## Unreleased development — forgiving authoring and clean rounded defaults
+
+Development build `0.5.3+89c9850332a7` is distinct from the published 0.5.3 package. All 59 automated tests and 13 release verification steps pass. The packed development installation matches all 54 distributed files in an isolated Web profile; the main Web profile is unchanged.
+
+Browser checks cover Unicode identifiers, inline table data and captions, text metrics, structured checklist state, persistence and standalone export. Default footer disclosures are hidden, optional details update live without losing state, and the compact action menu supports Escape and export. Computed styles confirm rounded corners and gradients. A short canvas shrinks below 120px, grows when 360px of content is appended, then shrinks again when it is removed; the root bottom gap stays within 30px. Evidence: `test-output/authoring-verification.json`, `test-output/authoring-desktop.png`, and `test-output/release-verification.json`.
+
+Actual installed Web acceptance also passes: Home → Plugins saves design mode and the details checkbox across reload, an existing model-authored calculator retains correct calculations and saved values, and the compact menu downloads a working offline HTML copy. Evidence: `test-output/motion-authoring-native-smoke.json`. The smoke harness waits for asynchronous checkbox persistence and reopens the Plugins panel after page reload; initial harness failures were corrected before the successful run.
+
+Natural-completion model trials in the test workspace used the same project-tool comparison question without an explicit UI request. Fast delivered seven nodes in one render_ui call with no tool errors (about 33 seconds); Ling delivered five nodes in one call with no tool errors (about 60 seconds), but its subsequent plain-answer turn ended with an error, so the complete Ling run is not a pass. Those two trials used the earlier native-schema build `6cb03c60f2c8`. MiMo initially selected the advertised legacy JSON-string branch and needed a repair. After exposing only the object form while retaining internal legacy decoding, MiMo on the current build delivered twenty nodes in one call, no tool errors, about 64 seconds to commit, and passed the plain-answer follow-up. These are individual trials, not guaranteed timings or a general first-attempt success rate. No inference was cut off or capped.
+
 ## 0.5.3 — lightweight delivery and one answer-area view
 
 55 tests and 12 release checks pass. The new browser regression mounts two native turn-tail seats plus a stale tool preview for the same document in inline mode without a marker: only one committed UI remains. It verifies ownership handoff, saved input restoration, late/removed markers, missing sidebar fallback and independent documents. Four stateless flow/comparison/architecture/dashboard examples render at PC widths without controls or parameter-save chrome.

@@ -1,7 +1,9 @@
 import { SCENE_CSS } from './scene-styles.js';
 import { CANVAS_CSS } from './canvas-styles.js';
+import { SOFT_CSS } from './soft-styles.js';
 // All colors and spacing belong to the renderer, so legacy documents receive the same design.
 export const CSS = `
+.dgui-chart-data-button{margin-left:auto;border:0;background:transparent;color:var(--du-muted);font:inherit;cursor:pointer;padding:4px 8px}.dgui-chart-data-button:hover{color:var(--du-accent)}.dgui-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}.dgui-canvas{position:relative}.dgui-action-menu{position:absolute;top:6px;right:6px;z-index:2}.dgui-menu-trigger{width:32px;height:32px;border:1px solid var(--du-line);border-radius:8px;background:var(--du-bg);color:var(--du-muted);font-size:24px;line-height:1;cursor:pointer}.dgui-menu-content{position:absolute;top:38px;right:0;display:grid;min-width:156px;padding:5px;border:1px solid var(--du-line);border-radius:10px;background:var(--du-bg);box-shadow:0 6px 20px #0002}.dgui-menu-content button{border:0;border-radius:6px;background:transparent;color:var(--du-ink);padding:9px 12px;text-align:left;font:inherit;white-space:nowrap;cursor:pointer}.dgui-menu-content button:hover{background:var(--du-soft)}.dgui-menu-content button:disabled{opacity:.45;cursor:default}.dgui-action-menu button:focus-visible{outline:2px solid var(--du-accent);outline-offset:2px}
 .dgui-root.dgui-settings{border:0;border-radius:0;box-shadow:none;background:transparent;padding:0;margin:0;max-width:720px;display:flex;flex-direction:column;gap:14px;font-size:13px;line-height:1.65}
 .dgui-settings h3{font-size:14px;font-weight:600;margin:0}.dgui-settings label{font-weight:500}.dgui-settings p{color:var(--du-muted)}
 .dgui-settings select{width:100%;max-width:420px;min-height:40px;border:1px solid var(--du-line);border-radius:6px;padding:9px 12px;background:var(--dsw-alias-bg-layer-3,var(--du-bg));color:inherit;font:inherit}.dgui-settings select:focus-visible{outline:2px solid var(--du-accent);outline-offset:3px}.dgui-settings select:disabled{opacity:.5}
@@ -24,7 +26,7 @@ body[data-ds-dark-theme] .dgui-root,.dgui-root[data-preview-theme=dark]{--du-acc
 .dgui-panel{padding:16px;min-width:0;overflow:auto;height:100%;box-sizing:border-box}.dgui-panel>.dgui-root{margin-bottom:16px}.dgui-panel label{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.dgui-panel select{max-width:100%;flex:1;min-width:120px;border:1px solid var(--du-line);border-radius:8px;padding:8px;background:var(--du-bg);color:var(--du-ink)}
 .dgui-history-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--du-line)}.dgui-history-row>span{flex:1;min-width:140px}.dgui-version-preview{margin-top:14px;border:1px solid var(--du-line);border-radius:12px;padding:12px}.dgui-version-preview .dgui-root{margin-top:12px}
 [data-dgui-presentation]>.dgui-secondary{margin:8px 0}[data-dgui-marker]{min-width:0}
-`;
+` + SOFT_CSS;
 
 
 
