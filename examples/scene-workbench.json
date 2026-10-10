@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "title": "参数工作台 · 下载时间估算",
+  "fallback": "这是布局与交互示例，数据为演示数据；不代表实际测试、任务进度或推荐结论。",
+  "presentation": {
+    "layout": "workbench",
+    "accent": "teal"
+  },
+  "nodes": [
+    {
+      "id": "assumption",
+      "type": "text",
+      "text": "理想持续速度估算，不含协议开销、限速与波动。",
+      "tone": "warning"
+    },
+    {
+      "id": "parameters",
+      "type": "card",
+      "title": "输入参数",
+      "children": [
+        {
+          "id": "size",
+          "type": "input",
+          "label": "文件大小 GiB",
+          "bind": "state.size"
+        },
+        {
+          "id": "speed",
+          "type": "slider",
+          "label": "持续速度 MiB/s",
+          "bind": "state.speed"
+        }
+      ],
+      "surface": "outline"
+    },
+    {
+      "id": "time",
+      "type": "metric",
+      "label": "理论用时",
+      "value": {
+        "ref": "derived.minutes"
+      },
+      "unit": "分钟",
+      "decimals": 1,
+      "icon": "gauge"
+    },
+    {
+      "id": "detail",
+      "type": "details",
+      "title": "计算方式",
+      "children": [
+        {
+          "id": "formula",
+          "type": "text",
+          "text": "分钟 = GiB × 1024 ÷ MiB/s ÷ 60。速度需使用实际持续传输速度。"
+        }
+      ]
+    }
+  ],
+  "state": {
+    "size": {
+      "type": "number",
+      "default": 24,
+      "min": 1,
+      "max": 500,
+      "step": 1
+    },
+    "speed": {
+      "type": "number",
+      "default": 80,
+      "min": 5,
+      "max": 200,
+      "step": 5
+    }
+  },
+  "derived": {
+    "minutes": {
+      "op": "div",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "ref": "state.size"
+            },
+            {
+              "const": 1024
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "ref": "state.speed"
+            },
+            {
+              "const": 60
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

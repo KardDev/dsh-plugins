@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "title": "状态面板 · 批次统计示例",
+  "fallback": "这是布局与交互示例，数据为演示数据；不代表实际测试、任务进度或推荐结论。",
+  "presentation": {
+    "layout": "status",
+    "accent": "teal"
+  },
+  "nodes": [
+    {
+      "id": "tag",
+      "type": "badge",
+      "text": "演示快照 · 非实时任务",
+      "tone": "warning",
+      "icon": "info"
+    },
+    {
+      "id": "counts",
+      "type": "row",
+      "children": [
+        {
+          "id": "done",
+          "type": "metric",
+          "label": "示例已处理",
+          "value": 72,
+          "unit": "项",
+          "tone": "success",
+          "decimals": 0
+        },
+        {
+          "id": "remaining",
+          "type": "metric",
+          "label": "示例待处理",
+          "value": 28,
+          "unit": "项",
+          "tone": "accent",
+          "decimals": 0
+        }
+      ]
+    },
+    {
+      "id": "progress",
+      "type": "progress",
+      "label": "示例处理进度",
+      "value": 72,
+      "max": 100,
+      "unit": "项",
+      "tone": "accent"
+    },
+    {
+      "id": "steps",
+      "type": "steps",
+      "items": [
+        {
+          "title": "读取示例清单",
+          "status": "done"
+        },
+        {
+          "title": "处理示例批次",
+          "description": "当前快照停留在这一阶段。",
+          "status": "active"
+        },
+        {
+          "title": "汇总结果",
+          "status": "pending"
+        }
+      ]
+    }
+  ]
+}

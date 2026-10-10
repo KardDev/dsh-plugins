@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "title": "七速自行车 · 拆解与探索",
+  "fallback": "交互式结构示意，不按工程比例绘制。拖动拆解程度，观察车架、车轮、传动、刹车和操控系统；选择部件查看职责。七速表示后部有七个可选齿比，此图未精确绘制七片飞轮或真实走线。",
+  "presentation": {
+    "layout": "guide",
+    "accent": "teal"
+  },
+  "state": {
+    "explode": {
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    "focus": {
+      "type": "string",
+      "default": "all",
+      "options": [
+        "all",
+        "frame",
+        "wheels",
+        "drive",
+        "brakes",
+        "cockpit"
+      ]
+    },
+    "playing": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "derived": {
+    "phase": {
+      "op": "if",
+      "args": [
+        {
+          "op": "gt",
+          "args": [
+            {
+              "ref": "state.explode"
+            },
+            {
+              "const": 50
+            }
+          ]
+        },
+        {
+          "const": "展开观察部件如何配合"
+        },
+        {
+          "const": "从整车出发理解五个系统"
+        }
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "intro",
+      "type": "text",
+      "text": "一辆车，五个协作系统。拖动滑块拆解结构，点击部件名称聚焦探索。示意图，不是工程装配图。"
+    },
+    {
+      "id": "bike",
+      "type": "sandbox",
+      "title": "自行车交互结构示意",
+      "height": 560,
+      "fallback": "车架连接各系统并承载骑手；车轮支撑与滚动；传动将踩踏转为后轮扭矩；刹车通过摩擦减速；操控系统连接转向与骑手操作。动画仅展示运动关系，不模拟真实物理。",
+      "stateKeys": [
+        "explode",
+        "focus",
+        "playing"
+      ],
+      "derivedKeys": [
+        "phase"
+      ],
+      "html": "<div class=\"demo\"><div class=\"eyebrow\"><span>MECHANICAL EXPLORER</span><span>01 / BICYCLE</span></div><div class=\"stage\"><svg viewBox=\"0 0 720 360\" role=\"img\" aria-labelledby=\"bikeTitle bikeDesc\"><title id=\"bikeTitle\">自行车拆解示意</title><desc id=\"bikeDesc\">拖动下方拆解滑块，或选择部件名称。每个系统的职责在图下解释。</desc><defs><pattern id=\"grid\" width=\"24\" height=\"24\" patternUnits=\"userSpaceOnUse\"><circle cx=\"1\" cy=\"1\" r=\".8\" fill=\"currentColor\" opacity=\".12\"/></pattern></defs><rect width=\"720\" height=\"360\" fill=\"url(#grid)\"/><path class=\"ground\" d=\"M70 323H650\"/>\n<g data-part=\"wheels\"><g id=\"rearWheel\"><circle cx=\"180\" cy=\"250\" r=\"69\" class=\"tyre\"/><circle cx=\"180\" cy=\"250\" r=\"61\" class=\"rim\"/><g class=\"spokes\" data-wheel=\"rear\"></g><circle cx=\"180\" cy=\"250\" r=\"6\" class=\"hub\"/></g><g id=\"frontWheel\"><circle cx=\"540\" cy=\"250\" r=\"69\" class=\"tyre\"/><circle cx=\"540\" cy=\"250\" r=\"61\" class=\"rim\"/><g class=\"spokes\" data-wheel=\"front\"></g><circle cx=\"540\" cy=\"250\" r=\"6\" class=\"hub\"/></g></g>\n<g data-part=\"frame\" class=\"frame\"><path d=\"M180 250L285 130L340 250Z M285 130L455 115L340 250 M455 115L469 150 M285 130L273 98\"/><path d=\"M253 96L282 96\" class=\"saddle\"/></g>\n<g data-part=\"drive\" class=\"drive\"><path d=\"M180 241L340 231A20 20 0 0 1 340 269L180 259Z\" class=\"chain\"/><circle cx=\"340\" cy=\"250\" r=\"18\"/><circle cx=\"180\" cy=\"250\" r=\"13\"/><path d=\"M340 250L365 276H380 M340 250L322 224H307\"/><path d=\"M173 265L170 283L184 291\"/></g>\n<g data-part=\"cockpit\" class=\"cockpit\"><path d=\"M460 132L486 192L540 250 M454 111L446 85L476 76 M476 76L500 64L524 70\"/><path d=\"M500 64L503 80\" class=\"lever\"/></g>\n<g data-part=\"brakes\" class=\"brakes\"><path d=\"M159 181L171 175L183 181 M520 181L531 175L544 181\"/><path d=\"M503 80Q540 110 531 175 M492 75Q335 25 171 175\" class=\"cable\"/></g>\n<g class=\"partlabels\"><text x=\"96\" y=\"339\">滚动</text><text x=\"310\" y=\"38\">承载 · 转向 · 传动</text><text x=\"568\" y=\"339\">协作</text></g></svg><span class=\"stage-note\">结构与运动关系示意 · 非工程比例</span></div><div class=\"partnav\" role=\"group\" aria-label=\"选择系统\"></div><div class=\"explanation\" aria-live=\"polite\"><span class=\"index\">01—05</span><div><h2 id=\"partTitle\">五个相互连接的系统</h2><p id=\"partText\"></p></div></div><div class=\"foot\"><span id=\"phase\"></span><button id=\"play\" type=\"button\">播放轮转</button></div></div>",
+      "css": ".demo{padding:12px 2px;color:var(--canvas-ink)}.eyebrow,.foot{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--canvas-muted);font-size:10px;letter-spacing:1.2px}.stage{position:relative;border-radius:16px;margin:18px 0;background:var(--canvas-soft);overflow:hidden}.stage svg{display:block;width:100%;color:var(--canvas-muted)}.ground{stroke:var(--canvas-line);fill:none;stroke-dasharray:3 5}.stage-note{position:absolute;bottom:10px;left:16px;font-size:10px;color:var(--canvas-muted)}[data-part]{transform-origin:center;transition:opacity .18s}.tyre{stroke:var(--canvas-ink);stroke-width:7;fill:none}.rim,.spokes,.hub{stroke:var(--canvas-muted);fill:none;stroke-width:1.2}.frame{stroke:var(--canvas-accent);stroke-width:9;stroke-linejoin:round;stroke-linecap:round;fill:none}.frame .saddle{stroke-width:11}.drive,.cockpit,.brakes{fill:none;stroke:var(--canvas-ink);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.chain,.cable{stroke-width:1.5}.cockpit{stroke-width:7}.lever{stroke-width:3}.brakes{stroke:var(--canvas-accent);stroke-width:4}.partlabels{font-size:10px;fill:var(--canvas-muted);letter-spacing:2px}.partnav{display:flex;gap:7px;flex-wrap:wrap}.partnav button,#play{border:1px solid var(--canvas-line);background:transparent;color:var(--canvas-muted);padding:5px 12px;border-radius:99px;cursor:pointer;font-size:12px}.partnav button[aria-pressed=true]{background:var(--canvas-accent);border-color:var(--canvas-accent);color:white}.explanation{display:flex;gap:18px;padding:23px 0 18px;min-height:114px}.index{font-size:11px;color:var(--canvas-accent);padding-top:5px;white-space:nowrap}.explanation h2{margin:0 0 7px;font-size:18px;font-weight:600}.explanation p{margin:0;color:var(--canvas-muted);font-size:13px;line-height:1.8}.foot{border-top:1px solid var(--canvas-line);padding-top:12px;font-size:11px;letter-spacing:0}@media(max-width:420px){.eyebrow{font-size:9px}.stage{margin:13px 0}.stage-note{font-size:8px;bottom:5px}.explanation{padding-top:18px}.explanation h2{font-size:16px}.partnav{gap:5px}.partnav button{padding:5px 9px}.foot{flex-wrap:wrap}}",
+      "script": "const parts={all:['全部','五个相互连接的系统','车架承载骑手，车轮负责滚动，传动把踩踏转为后轮扭矩。选择一个系统，观察它如何与整车配合。'],frame:['车架','车架：让各系统成为整车','三角形结构连接车轮、坐垫和转向部件，承受并传递骑手与路面的载荷。图中的位移只是拆解展示。'],wheels:['车轮','车轮：支撑与滚动','轮胎接触地面，轮圈与辐条连接轮毂。前轮随车把转向，后轮接受传动扭矩。'],drive:['传动','传动：把踩踏变为前进','曲柄通过链条驱动后轮。七个可选齿比改变踩踏阻力与每圈前进距离；本示意不精确绘制七片飞轮。'],brakes:['刹车','刹车：用摩擦控制速度','刹把经拉线控制制动机构。这里用简化的轮圈刹车表示，实际走线与装配位置因车型而异。'],cockpit:['操控','操控：把意图传给车辆','车把、把立和前叉组成转向链路，骑手通过车把和刹把控制方向与速度。']};\nconst nav=document.querySelector('.partnav');for(const [key,p]of Object.entries(parts)){const b=document.createElement('button');b.type='button';b.textContent=p[0];b.dataset.focus=key;b.onclick=()=>DSHUI.setState({focus:key});nav.append(b)}\nfor(const [key,x]of [['rear',180],['front',540]]){const g=document.querySelector('[data-wheel='+key+']');for(let i=0;i<16;i++){const a=i*Math.PI/8,l=document.createElementNS('http://www.w3.org/2000/svg','line');for(const [k,v]of Object.entries({x1:x,y1:250,x2:x+60*Math.cos(a),y2:250+60*Math.sin(a)}))l.setAttribute(k,v);g.append(l)}}\nlet current=DSHUI.snapshot,angle=0;\nDSHUI.subscribe(s=>{current=s;const e=s.state.explode/100,f=s.state.focus;for(const g of document.querySelectorAll('[data-part]')){const p=g.dataset.part;g.style.opacity=f==='all'||f===p?'1':'.16';if(p==='wheels'){document.getElementById('rearWheel').setAttribute('transform','translate('+(-48*e)+' '+(15*e)+')');document.getElementById('frontWheel').setAttribute('transform','translate('+(48*e)+' '+(15*e)+')')}else{const v={frame:[0,-18],drive:[0,52],brakes:[18,-45],cockpit:[22,-55]}[p];g.setAttribute('transform','translate('+(v[0]*e)+' '+(v[1]*e)+')')}}for(const b of nav.children){b.setAttribute('aria-pressed',String(b.dataset.focus===f));b.disabled=s.disabled}document.getElementById('partTitle').textContent=parts[f][1];document.getElementById('partText').textContent=parts[f][2];document.getElementById('phase').textContent=s.derived.phase;document.getElementById('play').textContent=s.state.playing?'暂停轮转':'播放轮转';document.getElementById('play').disabled=s.disabled});\ndocument.getElementById('play').onclick=()=>DSHUI.setState({playing:!current.state.playing});\nDSHUI.animate(({delta})=>{if(current.state.playing&&!current.disabled){angle+=delta*90;for(const [key,x]of [['rear',180],['front',540]])document.querySelector('[data-wheel='+key+']').setAttribute('transform','rotate('+angle+' '+x+' 250)')}});"
+    },
+    {
+      "id": "explodeControl",
+      "type": "slider",
+      "label": "拆解程度 %",
+      "bind": "state.explode"
+    },
+    {
+      "id": "focusControl",
+      "type": "select",
+      "label": "聚焦系统（与图内按钮同步）",
+      "bind": "state.focus"
+    },
+    {
+      "id": "rotation",
+      "type": "toggle",
+      "label": "播放示意轮转（非物理仿真）",
+      "bind": "state.playing"
+    },
+    {
+      "id": "phaseText",
+      "type": "text",
+      "text": {
+        "ref": "derived.phase"
+      }
+    }
+  ]
+}

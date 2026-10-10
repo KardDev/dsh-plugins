@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "title": "分析仪表盘 · 示例",
+  "fallback": "这是布局与交互示例，数据为演示数据；不代表实际测试、任务进度或推荐结论。",
+  "presentation": {
+    "layout": "dashboard",
+    "accent": "blue"
+  },
+  "nodes": [
+    {
+      "id": "source",
+      "type": "badge",
+      "text": "演示数据",
+      "tone": "neutral",
+      "icon": "database"
+    },
+    {
+      "id": "metrics",
+      "type": "row",
+      "children": [
+        {
+          "id": "count",
+          "type": "metric",
+          "label": "测试样本",
+          "value": 120,
+          "unit": "项",
+          "tone": "accent",
+          "decimals": 0
+        },
+        {
+          "id": "pass",
+          "type": "metric",
+          "label": "通过样本",
+          "value": 108,
+          "unit": "项",
+          "tone": "success",
+          "decimals": 0
+        },
+        {
+          "id": "review",
+          "type": "metric",
+          "label": "待复核",
+          "value": 12,
+          "unit": "项",
+          "tone": "warning",
+          "decimals": 0
+        }
+      ]
+    },
+    {
+      "id": "chart",
+      "type": "chart",
+      "kind": "bar",
+      "label": "各组通过样本",
+      "unit": "项",
+      "rows": {
+        "ref": "data.groups"
+      },
+      "labelKey": "name",
+      "valueKey": "passed"
+    },
+    {
+      "id": "conclusion",
+      "type": "card",
+      "title": "观察与下一步",
+      "children": [
+        {
+          "id": "observation",
+          "type": "text",
+          "text": "B 组通过样本较少；需要查看失败类型和各组总样本，才能判断差异原因。"
+        }
+      ],
+      "surface": "soft"
+    }
+  ],
+  "data": {
+    "groups": [
+      {
+        "name": "A 组",
+        "passed": 38
+      },
+      {
+        "name": "B 组",
+        "passed": 32
+      },
+      {
+        "name": "C 组",
+        "passed": 38
+      }
+    ]
+  }
+}

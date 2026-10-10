@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "title": "阅读报告 · 评估结论组织",
+  "fallback": "这是布局与交互示例，数据为演示数据；不代表实际测试、任务进度或推荐结论。",
+  "presentation": {
+    "layout": "report",
+    "accent": "rose"
+  },
+  "nodes": [
+    {
+      "id": "tag",
+      "type": "badge",
+      "text": "报告结构示例",
+      "tone": "neutral",
+      "icon": "info"
+    },
+    {
+      "id": "lead",
+      "type": "text",
+      "text": "先写结论及适用条件，再展示支持它的数据。将事实、推测与待验证项分开陈述，方便读者判断结论的边界。"
+    },
+    {
+      "id": "findings",
+      "type": "card",
+      "title": "主要发现",
+      "children": [
+        {
+          "id": "findingText",
+          "type": "text",
+          "text": "本示例展示信息层级，不包含真实模型评估结论。正式报告应说明样本、设置与测量方式。"
+        }
+      ],
+      "surface": "outline"
+    },
+    {
+      "id": "limits",
+      "type": "card",
+      "title": "适用范围",
+      "children": [
+        {
+          "id": "limitText",
+          "type": "text",
+          "text": "单个样例无法代表整体能力；速度与质量结果应关联具体配置。"
+        }
+      ],
+      "surface": "outline"
+    },
+    {
+      "id": "appendix",
+      "type": "details",
+      "title": "方法与复现信息",
+      "children": [
+        {
+          "id": "method",
+          "type": "text",
+          "text": "记录版本、提示词、采样参数、样本来源和失败案例，提供可复核证据。"
+        }
+      ]
+    }
+  ]
+}

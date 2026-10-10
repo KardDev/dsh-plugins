@@ -1,0 +1,7 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url),{chromium}=require(process.env.DSH_PLAYWRIGHT??'playwright');
+const url=(await readFile('J:/Workspace/output/dsh-ui-web.stdout.log','utf8')).match(/http:\/\/127\.0\.0\.1:3080\/\S*/)[0];
+const browser=await chromium.launch({headless:true,channel:'msedge'}),errors=[];
+try{const p=await browser.newPage({viewport:{width:1400,height:1100}});p.on('pageerror',e=>errors.push(e.message));await p.goto(url);await p.waitForLoadState('networkidle');const notice=p.getByRole('button',{name:'继续',exact:true});if(await notice.isVisible())await notice.click();await p.getByRole('button',{name:'插件',exact:true}).click();await p.getByRole('button',{name:'查看 dsh-motion-ui',exact:true}).click();const control=p.getByRole('combobox',{name:'设计模式',exact:true});await control.waitFor();await p.waitForTimeout(500);const hostConfigAvailable=await control.isEnabled();await p.screenshot({path:'test-output/plugin-entry-web.png'});await p.getByRole('button',{name:'设置',exact:true}).click();assert.equal(await p.getByRole('dialog').getByText('智能 UI',{exact:true}).count(),0);assert.deepEqual(errors,[]);const report={profile:'web',pluginDetailOwnsSettings:true,noGlobalSettingsEntry:true,hostConfigAvailable,restartConfirmationRequired:!hostConfigAvailable,errors};await writeFile('test-output/plugin-entry-web.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report))}finally{await browser.close()}

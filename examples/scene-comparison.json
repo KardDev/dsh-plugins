@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "title": "方案对比 · 存储取舍示例",
+  "fallback": "这是布局与交互示例，数据为演示数据；不代表实际测试、任务进度或推荐结论。",
+  "presentation": {
+    "layout": "comparison",
+    "accent": "violet"
+  },
+  "nodes": [
+    {
+      "id": "note",
+      "type": "text",
+      "text": "以下为假设场景；应结合实际读写、价格和数据重要性决策。",
+      "tone": "warning"
+    },
+    {
+      "id": "plans",
+      "type": "row",
+      "children": [
+        {
+          "id": "local",
+          "type": "card",
+          "title": "本地方案",
+          "children": [
+            {
+              "id": "localTag",
+              "type": "badge",
+              "text": "优先低延迟",
+              "tone": "accent",
+              "icon": "cpu"
+            },
+            {
+              "id": "capacityA",
+              "type": "metric",
+              "label": "示例可用容量",
+              "value": 2,
+              "unit": "TiB",
+              "tone": "accent",
+              "decimals": 0
+            },
+            {
+              "id": "localCopy",
+              "type": "text",
+              "text": "直接访问、延迟低。需要自行安排异地备份。"
+            }
+          ],
+          "surface": "outline"
+        },
+        {
+          "id": "hybrid",
+          "type": "card",
+          "title": "混合方案",
+          "children": [
+            {
+              "id": "hybridTag",
+              "type": "badge",
+              "text": "优先异地副本",
+              "tone": "accent",
+              "icon": "layers"
+            },
+            {
+              "id": "capacityB",
+              "type": "metric",
+              "label": "示例可用容量",
+              "value": 2,
+              "unit": "TiB",
+              "tone": "accent",
+              "decimals": 0
+            },
+            {
+              "id": "hybridCopy",
+              "type": "text",
+              "text": "本地工作副本与远端备份。需考虑带宽和持续费用。"
+            }
+          ],
+          "surface": "featured"
+        }
+      ]
+    },
+    {
+      "id": "decision",
+      "type": "text",
+      "text": "强调卡片表示当前讨论重点，不自动代表最佳或最便宜的方案。"
+    }
+  ]
+}

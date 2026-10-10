@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "title": "一次 Agent 请求如何流转",
+  "presentation": {
+    "layout": "report",
+    "accent": "blue"
+  },
+  "fallback": "概念结构图：消息经过上下文整理送入模型；模型可以请求工具，工具结果再进入上下文。这是通用教学示意，不表示正在监控实际 DSH 请求。",
+  "state": {
+    "focus": {
+      "type": "string",
+      "default": "all",
+      "options": [
+        "all",
+        "request",
+        "context",
+        "model",
+        "tools"
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "scope",
+      "type": "text",
+      "text": "从一条消息开始，观察上下文、模型和工具如何协作。概念示意，不是实时任务监控。"
+    },
+    {
+      "id": "architecture",
+      "type": "sandbox",
+      "title": "Agent 消息流向",
+      "height": 370,
+      "stateKeys": [
+        "focus"
+      ],
+      "fallback": "消息 → 上下文 → 模型 → 工具 → 上下文。参考资料也可进入上下文。选择某一环节查看职责；箭头表示概念数据流。",
+      "html": "<div class=\"map\"><div class=\"kicker\">REQUEST / CONTEXT / ACTION</div><div class=\"diagram-scroll\" tabindex=\"0\" role=\"region\" aria-label=\"结构图，窄屏可横向滚动\"><svg viewBox=\"0 0 640 320\" role=\"img\" aria-labelledby=\"mapTitle mapDesc\"><title id=\"mapTitle\">消息、上下文、模型和工具之间的数据流</title><desc id=\"mapDesc\">消息与参考资料送入上下文，上下文送入模型，模型请求工具，工具结果返回上下文。下方选择框提供相同的环节选择。</desc><defs><marker id=\"arrow\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0 0L8 4L0 8Z\" fill=\"var(--canvas-muted)\"/></marker></defs><g class=\"links\" marker-end=\"url(#arrow)\"><path d=\"M140 146H220\"/><path d=\"M380 136H430V66H480\"/><path d=\"M550 92V215\"/><path d=\"M480 241H416V158H380\"/><path d=\"M300 245V172\"/></g><g class=\"labels\"><text x=\"169\" y=\"135\">输入</text><text x=\"437\" y=\"53\">推理</text><text x=\"559\" y=\"155\">调用</text><text x=\"421\" y=\"197\">结果</text><text x=\"308\" y=\"218\">补充</text></g><g data-node=\"request\" class=\"node\" tabindex=\"0\" role=\"button\" aria-label=\"消息环节\"><rect x=\"20\" y=\"120\" width=\"120\" height=\"52\" rx=\"8\"/><text x=\"80\" y=\"151\">用户消息</text></g><g data-node=\"context\" class=\"node\" tabindex=\"0\" role=\"button\" aria-label=\"上下文环节\"><rect x=\"220\" y=\"120\" width=\"160\" height=\"52\" rx=\"8\"/><text x=\"300\" y=\"151\">上下文整理</text></g><g data-node=\"model\" class=\"node\" tabindex=\"0\" role=\"button\" aria-label=\"模型环节\"><rect x=\"480\" y=\"40\" width=\"140\" height=\"52\" rx=\"8\"/><text x=\"550\" y=\"71\">模型</text></g><g data-node=\"tools\" class=\"node\" tabindex=\"0\" role=\"button\" aria-label=\"工具环节\"><rect x=\"480\" y=\"215\" width=\"140\" height=\"52\" rx=\"8\"/><text x=\"550\" y=\"246\">受授权的工具</text></g><g class=\"source\"><rect x=\"220\" y=\"245\" width=\"160\" height=\"52\" rx=\"8\"/><text x=\"300\" y=\"276\">参考资料</text></g></svg></div><p id=\"description\" aria-live=\"polite\"></p></div>",
+      "css": ".map{padding:10px 0}.diagram-scroll{max-width:100%;overflow-x:auto}.diagram-scroll svg{min-width:580px}.kicker{font-size:10px;letter-spacing:1.5px;color:var(--canvas-muted)}svg{display:block;width:100%;margin-top:12px}.links{fill:none;stroke:var(--canvas-muted);stroke-width:1.4;stroke-linejoin:round}.labels{fill:var(--canvas-muted);font-size:11px}.node{cursor:pointer}.node rect,.source rect{fill:var(--canvas-soft);stroke:var(--canvas-line);stroke-width:1.5}.node text,.source text{fill:var(--canvas-ink);font-size:13px;text-anchor:middle}.source rect{stroke-dasharray:3 3}.source text{fill:var(--canvas-muted)}.node[data-selected=true] rect{stroke:var(--canvas-accent);stroke-width:2.5}.node:focus-visible{outline:none}.node:focus-visible rect{stroke:var(--canvas-accent);stroke-width:3}#description{font-size:13px;line-height:1.8;color:var(--canvas-muted);border-left:2px solid var(--canvas-accent);padding-left:12px;min-height:48px}@media(max-width:420px){.labels{font-size:12px}.node text,.source text{font-size:15px}}",
+      "script": "const descriptions={all:'各环节通过上下文形成反馈循环；是否执行工具仍取决于宿主的权限流程。',request:'消息环节：表达问题、目标和约束。它是本次请求的起点。',context:'上下文环节：组织消息、相关资料和工具结果，为下一次模型推理提供依据。',model:'模型环节：依据上下文生成回答，或提出需要由宿主处理的工具请求。',tools:'工具环节：在宿主授权范围内执行操作，将结果送回上下文。图形不会自行执行工具。'};for(const node of document.querySelectorAll('[data-node]')){const choose=()=>DSHUI.setState({focus:node.dataset.node});node.addEventListener('click',choose);node.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();choose()}})}DSHUI.subscribe(s=>{for(const node of document.querySelectorAll('[data-node]')){const selected=s.state.focus===node.dataset.node;node.dataset.selected=String(selected);node.setAttribute('aria-pressed',String(selected))}document.getElementById('description').textContent=descriptions[s.state.focus]});"
+    },
+    {
+      "id": "focus",
+      "type": "select",
+      "label": "选择要了解的环节",
+      "bind": "state.focus"
+    }
+  ]
+}
