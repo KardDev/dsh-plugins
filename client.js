@@ -23001,7 +23001,7 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.5.3", "id": "0.5.3+89c9850332a7", "sourceHash": "89c9850332a7c25ec041b653d2197fb665518e7032ea60242f13e3e44c1f9463" });
+var BUILD_INFO = Object.freeze({ "version": "0.5.4", "id": "0.5.4+92e88973eabc", "sourceHash": "92e88973eabc736e169fbb03366db183ca5cd1fbbe0e3a7e44e5742da708d96e" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38" });

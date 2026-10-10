@@ -1,5 +1,13 @@
 # Verification
 
+## 0.5.4 — main Web release acceptance (2026-10-10)
+
+Build `0.5.4+92e88973eabc` passes all 59 automated tests and 13 release checks after a clean `npm ci --ignore-scripts` (zero reported vulnerabilities). The main Web profile installs the packed package with all 54 distributed files matching. Its composed configuration validates after migration from the old package name. Actual Home → Plugins settings, saved calculator parameters, reload and downloaded offline HTML pass. Evidence: `test-output/motion054-main-web-smoke.json` and `test-output/release-verification.json`.
+
+Two natural-completion DeepSeek V4.1 Flash Fast trials on the main Web, both in the test workspace, pass in one UI tool call with zero tool errors: an unsolicited static project-tool comparison commits at about 37 seconds via render_canvas, and an explicitly requested adjustable resistor explanation commits at about 30 seconds via render_ui. The resistor trial verifies saved input changes, refresh restoration, and bounds at 1920/1365px in light/dark themes; observed visual audits report no issues, but their contrast coverage is partial. Screenshots were also visually reviewed. Both plain GiB follow-ups use no UI tools and answer correctly. Prompt injection and request model identity are verified. No model output was capped, truncated or cancelled. These individual trials do not establish a general first-attempt success rate. Evidence: `test-output/natural-models/guided-deepseek-v4-1-flash-fast-quick-comparison-web-release054/results.json` and `test-output/natural-models/guided-deepseek-v4-1-flash-fast-explicit-resistor-web-release054/results.json`.
+
+This release retains its Web compatibility declaration. Desktop has a separate installed profile and requires post-publication installation and actual Electron acceptance; Web results alone do not establish Desktop support.
+
 ## Unreleased development — forgiving authoring and clean rounded defaults
 
 Development build `0.5.3+89c9850332a7` is distinct from the published 0.5.3 package. All 59 automated tests and 13 release verification steps pass. The packed development installation matches all 54 distributed files in an isolated Web profile; the main Web profile is unchanged.

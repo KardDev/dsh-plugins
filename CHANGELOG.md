@@ -1,6 +1,6 @@
 # DSH Motion UI
 
-## Unreleased — authoring compatibility and cleaner visuals
+## 0.5.4 — 2026-10-10
 
 - Publish a native object schema for render_ui, including the document skeleton and component vocabulary. Legacy JSON strings are decoded internally; models are no longer offered a string branch that encourages double escaping.
 - Accept JSON fences/trailing commas outside strings without guessing malformed quotes or executing source. Errors identify the failed field and JSON location where available.
