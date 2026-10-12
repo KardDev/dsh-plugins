@@ -1,4 +1,106 @@
+# v0.6.0 发布验证（2026-10-12）
+
+本次正式发布汇总此前 0.5.6 本地开发批次的功能。下面的未发布说明与构建号均为历史记录；当前发布验证以 test-output/v060-release-verification.log 及正式安装核验为准。
+
 # Verification
+
+## Empty turn and unfulfilled announcement recovery — 2026-10-12
+
+Final candidate 0.5.6+bad69c62ddd4. Two actual failures are retained: the user's screenshot session (reasoning only) and Desktop acceptance attempt afea5106-cb3b-460e-9e6a-d39b39de6517 (a short visible flowchart announcement, no tool call). The latter reproduced after schema simplification, so reduced schema size alone is demonstrably not a complete fix.
+
+- Both 22-event/announcement failure replays now enqueue one deduplicated same-turn completion notice (test-output/m31-two-failures-replay.json). The visible-announcement detector never examines reasoning; it excludes substantive lists, source fences and UI-concept questions. Reminder permits useful plain text, preserves existing UI and respects explicit silence/cancellation/subagents.
+- Earlier final Desktop assertion correctly failed because no UI was delivered; that test is not a passing acceptance result. Its event log is test-output/m31-final-events.jsonl.
+- Final full regression evidence: test-output/m31-empty-announcement-final-regression.log. Version remains 0.5.6 and nothing is published. Root trigger of the model/provider stop is still unproven; this change fixes observable incomplete-delivery recovery and reduces tool-schema complexity.
+
+
+## M3.1 reasoning-only regression — 2026-10-12 (unpublished)
+
+Screenshot session 06d45422-6105-4fc1-bb8b-c18148afc264 has one reasoning-only assistant response, no visible answer or tool calls, and provider finish stop. Its MiniMax High / maxTokens=256000 configuration and system prompt size match a successful Desktop trial. A stop finish is not evidence that plugin prompts/schema played no role. The exact trigger remains unproven.
+
+- Fix a proven recovery gap: reasoning-only empty turns previously bypassed feedback. Now one deduplicated same-turn completion notice allows either useful plain text or a suitable UI, without inspecting hidden reasoning, requiring UI, setting inference limits, or retrying cancellation/explicit silence/subagents/existing delivery. Replaying the screenshot's 22 events produces exactly one notice.
+- Simplify render_text's native schema from 7176 to 758 characters; keep its direct outer array and exact runtime validation. All strings, nested nodes and component capabilities remain supported. Expanded component unions are no longer duplicated in the tool schema. This is a compatibility improvement, not a proven cause of the original stops.
+- Align the stale authoring lifecycle instruction with actual read-only progressive previews and end-of-turn interaction activation.
+- Live comparisons in J:\测试结果 used the same MiniMax-M3.1-Flash-Preview High without reasoning/time caps or cancellation: two current Web requests, one current Desktop request, one previously published HEAD request, and two compact-schema requests all actually called rendering tools. Small samples cannot establish a reliability rate or prove a root cause. Reports: test-output/m31-current.json, m31-desktop-baseline.json, m31-old-published.json and m31-compact-schema.json. Early harness visual counts used a selector for extended visuals and are not native-UI acceptance evidence.
+- 99 tests pass; 18 verification stages pass in test-output/m31-empty-turn-regression.log. The final lifecycle wording is additionally covered by a fresh build and all 99 tests in test-output/m31-empty-final-unit.log. Final build 0.5.6+9cfd7b980bdd; no publishing or version bump.
+
+
+## Premature-stop investigation — 2026-10-12 (unpublished)
+
+Session ed7a97be contains three user turns. Turns 1 and 2 end with short promises and no rendering calls; turn 3 calls ui_catalog and fails render_text, then ends with reasoning only. All final stream finishes are provider stop, not length/cancel/error. Tools are available; request configuration is MiniMax-M3.1-Flash-Preview, reasoningEffort=max, maxTokens=256000. No render_ui call exists in the export. This evidence cannot distinguish model behavior from upstream service behavior.
+
+- The original failed render_text arguments now validate unchanged: six nodes, all nine table rows retained. Content aliases and exactly identical text/spans normalize without discarding conflicts; typed native object-row tables retain their column presentation through an extended visual.
+- Replaying all 47 exported events yields exactly one same-turn correction notice for the failed-tool/empty-answer ending. Promises without a tool error are addressed by delivery guidance, not forced retry or hidden-reasoning inspection. No reasoning cap, timeout, model configuration change, publishing or version bump.
+- 98 unit/integration tests and 18 stages pass in test-output/stopped-delivery-regression.log. After a tool-description clarification, build and host/focused tests pass again in test-output/stopped-delivery-final-tests.log. Final build: 0.5.6+a8c2739fed9b.
+- Both Web and Desktop packed files match the final build; authenticated PC browser checks confirm matching client/host builds, local resources, registered feedback hook, native sidebar, read-only scene previews and no page errors (test-output/completion-live/stopped-delivery-profiles.json).
+
+
+## Completion optimizations — 2026-10-12 (unpublished)
+
+Final development build `0.5.6+bd244406ae57` passes **95 unit/integration tests and 18 verification stages**. The complete run is `test-output/completion-regression-final-v4.log` with structured results in `test-output/release-verification.json`. No version bump or publishing was performed.
+
+- Canonical partial diagnostics survive repeated validation. Invalid critical questions/controls fail explicitly rather than disappearing from a supposedly complete delivery. Source-fence repair only accepts deterministic grammar repairs, not fabricated completion of truncated JSON. Same-turn notices are deduplicated, cancellation/subagent aware, limited to two notices without stopping inference, and disabled by the optional autoRepair setting.
+- All eight scene examples validate and render read-only in settings. Targeted retrieval injects only a short index in guided mode. Browser checks verify real asset fetching, matching builds, activation/feedback reporting, style-save conflict behavior and PC/light/dark layouts.
+- update_ui covers ownership, atomic revision archives, canonical key-order-independent retries, conflicting operation IDs, stale revisions, unambiguous extended append, root/target replacement and newly introduced input defaults. Existing compatible state survives edits. Browser checks append a defaulted select, reorder a stable-ID plot, and restore parameter 2, panned viewport, selected tab, table sort and quiz state across remount/twin views and offline HTML export.
+- Repeated known same-session markers show one interface without exposing UUID plumbing; foreign IDs remain plain code. Existing progressive-preview stability, script isolation, local computation, export and recovery suites remain passing.
+
+Real-model acceptance used **MiniMax-M3.1-Flash-Preview High**, `J:\测试结果`, and natural completion with no reasoning/time cap or cancellation. The final test build for the model was `0.5.6+d5e32048c472`; the only subsequent production change hides repeated UUID markers, covered by the final regression and installed smoke test.
+
+1. Function explanation/parameter plot: completed in 19.1s, validate_ui + render_ui, zero tool errors, one rendered visual, reload restores it.
+2. Follow-up append: completed in 18.0s, inspect_ui + update_ui, zero tool errors, still one visual and amplitude **2** retained through refresh.
+3. Deliberately malformed quiz source: one plugin correction notice in the same turn; model supplied missing options and naturally finished in 10.8s. The corrected quiz grades locally and retains the answer after refresh. This is an intentional failure probe, not an organic model-error rate.
+
+Both Web and Desktop were replaced with the final build. Authenticated runtime checks confirm matching client/host build, local assets, feedback registration, native sidebar and read-only scene preview; evidence: `test-output/completion-live/installed-profiles.json`. All 176 package files are checked against each installed profile. The final package/audit report is retained under completion-pack.json and completion-audit.json.
+
+Evidence: `test-output/completion-live/acceptance.json`, `interactions.json`, `updated-retained.png`, `repaired-graded.png`. Earlier development retries are retained as initial/second/third/fourth-retry.json. They exposed heading/container spellings, mixed vocabulary and update defects fixed in this batch. One harness assertion incorrectly expected a separate check button on an immediate-grading quiz; the follow-up interaction run used the actual option button and passed. These are a few observed cases, not a guarantee that every model will always generate correct UI in one attempt.
+
+
+## Extended native visuals and source fences — 2026-10-12
+
+Development build `0.5.6+9c515da98b29` passes **89 tests and 18 verification stages**. Browser fixtures execute numeric table sorting/filtering, quiz/input remount restoration, keyboard tabs and KaTeX, local radio-paper grading, one collected form request, ECharts (including word cloud), Mermaid and Three.js lazy loading, source-fence preview/commit/source replacement, and 1920/1365 PC bounds. Ordinary text does not load the visual core or engines. A two-view fixture verifies that untouched snapshots do not save and edited fields synchronize without initialization conflicts. Standalone HTML restores input state, grades quizzes and renders math without HTTP requests.
+
+MiniMax-M3.1-Flash-Preview (High), exclusively in `J:\测试结果`, naturally completed these accepted cases: a three-question Git paper with one local submission (28.9s, ui_catalog + render_ui); a direct assistant source fence containing a table and donut chart (6.7s, no tools); and Mermaid + ECharts + adjustable function plot (10.0s, one render_ui). Each has a rendered visual and no tool/browser errors and survives reload. These are individual observations, not a model-wide reliability benchmark; no reasoning cap or cancellation was used. Evidence: `test-output/visual-live/initial-results.json` (first two cases) and `results.json` (accepted complex rerun).
+
+Earlier attempts exposed real integration defects: omitted buffered GET mode produced HTTP 400 for local assets; typed quiz option wrappers were discarded during partial repair; omitted nodeIds failed explicit node inspection; untouched initial answer snapshots could trigger competing saves. These were corrected and covered by regression fixtures. The initial complex case retained its inspection error in evidence rather than being counted as a pass.
+
+Real Web interaction acceptance also passes: three selected answers grade without starting a model turn and survive refresh; the model's function slider changes locally; ECharts/Mermaid render; the source fence restores exactly one UI without duplicate JSON. Evidence: `test-output/visual-live/acceptance.json` and `interactions.json`.
+
+The npm dry-run package includes local runtime/engine/font assets and the MIT upstream attribution plus licenses of the bundled dependency graph (170 files, approximately 2.96 MB compressed). No test output, vendor source tree, node_modules, profile configuration or credentials are packed. Full dependency audit reports zero vulnerabilities. Web and Desktop installed-file checks match all 170 packaged files to this build. Desktop starts from `F:\DSH-Desktop\DeepSeek Harness.exe` using its own desktop profile and owns the localhost 19387 listener; the unrelated Tailscale listener is untouched. Version stays 0.5.6 and this batch is unpublished.
+
+Scope: this embeds the upstream component core, not its host plugin. Motion UI retains native sidebar placement instead of `/panel` or composer-dock commands and does not expose custom renderer registration. External media still needs its source; standalone exports cannot invoke host Agent actions/files. Function-plot parameters remain component-local; native state/derived or canvas is the supported shared-calculation path.
+
+## Progressive previews and native sidebar — 2026-10-12
+
+Build `0.5.6+2f37d594aac7` passes 79 tests and 17 verification stages. Complete native blocks and inert canvas previews appear during generation. An independent conversation surface retains valid previews across tool-seat remounts and live-to-durable rebasing; explicit failures invalidate only their own calls. Generated scripts and interactive controls activate after the whole reply finishes. Production fixtures cover multiple calls, malformed later prefixes, iframe identity, navigation and cancellation cleanup.
+
+MiniMax-M3.1-Flash-Preview (High) naturally completed a two-document task in `J:\测试结果` with render_text and render_canvas, then continued prose. First preview appeared at about 18.2 seconds and the reply completed at about 35.5 seconds. Across 1048 sampled preview frames there were zero gaps, no tool or browser errors, and both durable UIs restored after reload. No reasoning cap or cancellation was applied. This is one observed case, not a general model success-rate benchmark. Evidence: `test-output/progressive-live/results.json`.
+
+Display-location controls and inline sidebar-opening buttons are removed. Markers position documents in the reply; the native right-sidebar “智能 UI” entry remains available. A real Web smoke check opened that entry, found two current-session documents, and confirmed zero inline sidebar buttons and browser errors. Evidence: `test-output/native-sidebar-verification.json`. Version remains 0.5.6; this development batch is unpublished.
+
+## Default bright flat and five-style real-model acceptance — 2026-10-12
+
+Build `0.5.6+b15c6ac6ff08` passes 75 tests and 16 verification stages. A shared default constant selects 明亮扁平 in Host configuration, model prompt resolution and settings fallback. Existing explicit style choices remain respected; free mode remains free of selected design examples.
+
+MiniMax-M3.1-Flash-Preview (High) completed the same static comparison/three-step task in five fresh `J:\测试结果` sessions. Each completed naturally with one render_canvas call and no tool errors: 清爽阅读 17.9s, 柔和彩色 17.7s, 技术图解 20.7s, 活力展示 21.3s, 明亮扁平 24.3s. Each durable system message includes only its selected style heading; all UIs restore after reload and fit their PC canvas width, with no page errors. Screenshots and computed CSS show distinct style directions. Technical used Host blue rather than the suggested teal, so this does not certify exact palette compliance. These are individual fixed-task observations, not a general success-rate or unsolicited-UI-selection benchmark. Evidence: `test-output/style-matrix/results.json`, `visual-review.md` and the five style screenshots. Web ends on 明亮扁平.
+
+## Style preview and autonomous layout refinement — 2026-10-12
+
+75 tests and 16 verification stages pass for build `0.5.6+528535839d64`. The style is now displayed as 明亮扁平. Five layouts (text, comparison, separated list, data summary, flow) can be previewed for each of five visual directions. Browser checks verify that preview switching makes no settings writes, while clicking a style saves and survives reload. The heading explicitly says guided-only; free-mode prompts still omit all selected style guidance/examples. The default text-layout control was removed. Legacy `defaultPreset` values remain readable for configuration compatibility but are ignored by new tool calls and prompt injection; models retain per-document layout choice, with ordinary reading as the omitted-preset fallback. PC light/dark and narrow-width checks pass.
+
+## Selectable visual styles development build — 2026-10-12
+
+75 automated tests and 16 verification stages pass. Five settings previews share fixed comparison content and cover selection, persistence after reload, rejected writes, keyboard navigation, free-mode preference preservation, PC light/dark screenshots and narrow-width bounds. Every registered style has valid native and sandbox examples. Host checks verify that live style changes affect only design guidance/examples, preserve the protocol section and do not change registered tools; free-mode prompts remain identical for every stored style.
+
+PrismFrame bright-flat guidance was derived from the local v0.2 Occamy examples and style guide. It adapts their five palettes, rounded white panels, colored offset shadows and explanatory graphics to compact chat surfaces. Video subtitles, page counters, full-screen whitespace and glass effects are excluded. Preview cards are fixed illustrative samples; they are not a guarantee of an arbitrary model's design quality. Version remains 0.5.6; no publication for this development batch.
+
+Real Home → Plugins selection/save/reload passes. A fresh MiniMax-M3.1-Flash-Preview session in `J:\测试结果` completed naturally in 54.6 seconds with one render_canvas call and zero tool/browser errors. The durable model-visible system message contains the selected PrismFrame guidance. Its three-stage diagram uses a pale green background, white rounded cards, colored edges and offset shadows; refresh restores it. This is one observed case, not a general success-rate claim. Original Web style/mode preferences were restored. Evidence: `test-output/styles-live-settings.json`, `styles-m31-live.json`, `styles-m31-prismframe.png`, `styles-restored-prefs.json`.
+
+## Everyday reading development build — 2026-10-11
+
+73 automated tests and 15 verification stages pass. New coverage includes eight independent presets, typography and inline emphasis, exact numeric/array transport normalization, bounded authoring, URL validation, native file callbacks, per-document parameter isolation, multiple inline markers, refresh recovery, and 1920/1365 px light/dark layouts. Settings were saved and reloaded through Home → Plugins, then restored to their original value.
+
+MiniMax-M3.1-Flash-Preview was tested on the real Web host in `J:\测试结果`, without a reasoning time cap or early cancellation. The final proactive prompt produced comparison + flow in 19.6 seconds; the mixed-content prompt produced four independent native surfaces in 17.0 seconds, including web and enabled file buttons. Both completed with zero tool errors and restored after refresh. These are two observed cases, not a general first-attempt success rate.
+
+Earlier attempts exposed missing typography transport normalization and incomplete multi-part delivery. The fixes preserve numeric ranges, reject ambiguous fields, unwrap only exact item-array wrappers, and clarify that necessary multiple UI calls are not limited by the optional polishing guidance. Replaying all seven calls from the transport-failure session now passes unchanged. The version remains 0.5.6 as a local development build; no registry release was made for this update.
 
 ## 0.5.6 — authoring compatibility and stable presentation (2026-10-10)
 
@@ -170,3 +272,10 @@ All selected High effort. These single-run wall times include provider response,
 - Separate MiMo display-repair acceptance passed: it inspected the real 390px report and patched its own canvas. The original 7px SVG label warnings disappeared at revision 2; animation, speed=2, paused state and refreshed parameters survived. This took about 242s including browser checks, showing a latency limitation rather than universal quick repair. Evidence: `model-matrix/mimo-v2-5/visual-repair.json`, `visual-repair-mobile.png`. The initial native 11px auxiliary warning is addressed by the final renderer font change, separately verified locally.
 - Model selection also updates DSH's global default. The original entry observed before this user turn's tests (DeepSeek V4.1 Flash, Medium) is restored; each test conversation retains its own model. Original provider configurations were compared without exposing credentials. The named Step Chat test alias is retained. Evidence: `model-matrix/config-restoration.json`.
 
+
+
+### 可复制文本与代码（0.5.6 未发布开发版）
+原生 text(copyable/title) 与 code(lang/title/wrap)，扩展 text/code 的字段校验和修复后保留均已验证。1920×1080 Edge 实测 Clipboard API 原文复制（Windows 原生换行规范化）、拒绝 API 后兼容复制、失败反馈、临时 textarea 清理、字面 HTML 不执行、长行内部滚动、明暗主题及只读预览禁用复制。证据：test-output/copy-verification.json、copy-light.png、copy-dark.png。
+
+### 引导风格覆盖原生组件
+五种风格逐一检查原生指标卡背景、控件配色、PC 明暗主题、横向溢出与切换自由模式后还原；共享状态和链接行为保留。证据：test-output/native-style-verification.json、native-style-prismframe-light.png。

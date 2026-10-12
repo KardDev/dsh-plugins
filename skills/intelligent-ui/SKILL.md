@@ -94,3 +94,10 @@ inspect_ui 默认返回紧凑摘要，不重复传整份程序。要改画布源
 修改已有界面用 patch_ui({documentId,documentRevision,changes:[{id:"已有节点ID",props:{...}}]})。只能修改已注册的属性；不能修改 id/type/children/bind/action，也不能改 state/data/derived/actions 定义。可以修改标题文字、颜色语义 tone、sandbox 的 html/css/script/fallback 等。保持准确的 fallback。用检查结果里的最新 revision；冲突先重新 inspect，再修正，不盲目重试。
 
 例：changes:[{id:"note",props:{text:"补充的准确说明"}}]。画布代码变更只重启该画布，重要参数保留，未修改的节点保留现场状态；瞬时动画相位会重置。新结构或新参数定义需要新的 render_ui，不能假装 patch 可以完成。
+
+
+## Daily text and mixed documents
+For everyday structured explanations use render_text with the injected eight text presets and optional typography. Native text, compact comparisons, lists and link pills need no HTML, state or script. Several UI documents can accompany one answer; each document owns its own styling, IDs and state. Preserve reading order and use each returned documentId once in inline mode. Use lightweight borders, readable body text and restrained accents as the default visual direction. The injected text guide is the precise field reference. Web/file links only open after a user click through native link/opener semantics.
+
+### 可复用文本和代码
+文案、提示词等可直接使用的内容，采用 text + copyable:true + title；普通讲解保持轻量，不必每段加框。命令和配置采用 code 节点（code 原文、lang 语言、title 可选、wrap 可选），右上复制按钮保留缩进、换行，不执行代码。原生文本字段为 text，扩展文本字段为 content。交付后不要在正文再重复整段内容。

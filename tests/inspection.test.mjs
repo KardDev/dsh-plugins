@@ -6,6 +6,7 @@ test('default inspections omit program source; exact selected nodes and full doc
  assert.equal(summary.document,undefined);assert.equal(summary.nodes[0].html,undefined);assert.ok(summary.nodes[0].sourceCharacters.html>0);
  const selected=inspectRecord(record,{speed:2},{},[],{detail:'nodes',nodeIds:['motion']});assert.equal(selected.nodes.length,1);assert.equal(selected.nodes[0].html,record.document.nodes[0].html);
  assert.equal(inspectRecord(record,{}, {},[],{detail:'full'}).document,record.document);
+ assert.deepEqual(inspectRecord(record,{}, {},[],{detail:'nodes'}).nodes,record.document.nodes);
  assert.throws(()=>inspectRecord(record,{},{},[],{detail:'nodes',nodeIds:['absent']}));
  assert.equal(inspectRecord(record,{}, {large:'x'.repeat(9000)},[]).derived.omitted,true);
  assert.equal(inspectRecord(record,{}, {large:'x'.repeat(9000)},[],{detail:'full'}).derived.large.length,9000);

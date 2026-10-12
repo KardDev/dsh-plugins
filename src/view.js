@@ -14,7 +14,12 @@ import { publishDocument, useCurrentDocument } from './current-document.js';
 import { HistoryView } from './history-view.js';
 import { PresentationView } from './presentation.js';
 import {useUiRegistry} from './presentation-store.js';
-import {useViewDetails} from './view-settings.js';
+import {useViewDetails,useNativeStyle} from './view-settings.js';
+import {typographyStyle} from '../lib/typography.js';
+import {StreamSurface} from './stream-surface.js';
+import {VisualView} from './visual-view.js';
+import {deliveryDiagnostics} from '../lib/delivery.js';
+import {CopyBlock} from './copy-block.js';
 const display = value => value === undefined || value === null ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value);
 function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
   const [draft, setDraft] = useState(String(value)), [invalid, setInvalid] = useState(false);
@@ -58,8 +63,9 @@ function Chart({ node, rows }) {
         (data.length <= 12 || i % Math.ceil(data.length / 12) === 0) && h('text', { x: x(i), y: 192, textAnchor: 'middle', fontSize: 14, fill: 'var(--du-muted)' }, String(r[node.labelKey]).slice(0, 12)))))),
     h('div', {hidden:!showData}, h(Table, { rows, columns: [{ key: node.labelKey, label: '项目' }, { key: node.valueKey, label: node.label, unit: node.unit }], id: `${node.id}-data` })));
 }
-export function UiView({ record, sessionId, sendPrompt, preview = false }) {
+export function UiView({ record, sessionId, sendPrompt, openFile, preview = false }) {
   const showDetails=useViewDetails();
+  const nativeStyle=useNativeStyle();
   const doc = record.document;
   const viewId=React.useId();
   const root=useRef(null),canvasAudits=useRef(new Map()),[audit,setAudit]=useState(null),auditPending=useRef(0);
@@ -102,16 +108,19 @@ export function UiView({ record, sessionId, sendPrompt, preview = false }) {
   }
   const resolve = value => computed.error ? '—' : computed.resolveValue(value);
   function renderNode(n) {
-    const props = { key: n.id, 'data-ui-node': n.id, 'data-tone': n.tone };
+    const props = { key: n.id, 'data-ui-node': n.id, 'data-tone': n.tone,style:['text','heading','callout'].includes(n.type)?typographyStyle(n):['row','column'].includes(n.type)?{gap:n.gap,...(n.columns?{'--du-columns':n.columns}:{} )}:undefined };
+    const copy=()=>n.spans?n.spans.map((span,i)=>h('span',{key:i,style:typographyStyle(span)},span.text)):display(resolve(n.text));
     switch (n.type) {
+      case 'visual': return h(VisualView,{key:n.id,node:n,state:state[n.stateKey],update:value=>updatePatch({[n.stateKey]:value}),disabled,preview,sendPrompt,openFile,documentTitle:doc.title,provenance:{documentId:record.documentId,sourceSessionId:record.sessionId,viewedSessionId:sessionId}});
+      case 'code': return h(CopyBlock,{key:n.id,nodeId:n.id,text:n.code,lang:n.lang,title:n.title,wrap:n.wrap,code:true,disabled:preview});
       case 'sandbox': return h(Sandbox, { key: n.id, node: n, document:doc, state, data: doc.data, derived: computed.derived ?? {}, disabled, preview: preview || !ready, update: updatePatch, onAudit });
-      case 'heading': return h('h4', { ...props, className: 'dgui-section-title' }, h(Icon, { name: n.icon ?? 'layers' }), h('span', null, display(resolve(n.text))));
-      case 'text': return h('p', { ...props, className: `dgui-copy${n.icon ? ' dgui-with-icon' : ''}` }, (n.icon || n.tone && n.tone !== 'neutral') && h(Icon, { name: n.icon ?? (n.tone === 'warning' || n.tone === 'danger' ? 'warning' : n.tone === 'success' ? 'check' : 'info') }), h('span', null, display(resolve(n.text))));
-      case 'row': case 'column': case 'card': return h('div', { ...props, className: `dgui-${n.type}`, 'data-surface': n.surface }, n.title && h('h4', { className: 'dgui-section-title' }, h(Icon, { name: n.icon ?? 'layers' }), h('span', null, n.title)), n.children.map(renderNode));
+      case 'heading': return h('h4', { ...props, className: 'dgui-section-title' }, n.icon&&h(Icon, { name: n.icon }), h('span', null, copy()));
+      case 'text': case 'callout': if(n.copyable)return h(CopyBlock,{key:n.id,nodeId:n.id,title:n.title,text:n.spans?n.spans.map(s=>s.text).join(''):display(resolve(n.text)),disabled:preview,style:typographyStyle(n)},copy());return h('p', { ...props, className: `dgui-copy${n.type==='callout'?' dgui-callout':''}${n.icon ? ' dgui-with-icon' : ''}` }, (n.icon || n.tone && n.tone !== 'neutral') && h(Icon, { name: n.icon ?? (n.tone === 'warning' || n.tone === 'danger' ? 'warning' : n.tone === 'success' ? 'check' : 'info') }), h('span', null, copy()));
+      case 'row': case 'column': case 'card': return h('div', { ...props, className: `dgui-${n.type}${n.columns?' dgui-grid':''}`, 'data-surface': n.surface }, n.title && h('h4', { className: 'dgui-section-title' }, n.icon&&h(Icon, { name: n.icon }), h('span', null, n.title)), n.children.map(renderNode));
       case 'badge': return h('span', { ...props, className: 'dgui-tag' }, h(Icon, { name: n.icon ?? 'info' }), display(resolve(n.text)));
       case 'details': return h('details', { ...props, className: 'dgui-details', open: n.open }, h('summary', null, h(Icon, { name: n.icon ?? 'info' }), n.title), h('div', { className: 'dgui-column' }, n.children.map(renderNode)));
       case 'progress': { const v = resolve(n.value), max = resolve(n.max); return h('div', { ...props, className: 'dgui-progress' }, h('div', { className: 'dgui-progress-label' }, h('span', null, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('span', null, `${display(v)} / ${display(max)}${n.unit ? ' ' + n.unit : ''}`)), !computed.error && h('progress', { value: v, max, 'aria-label': n.label }), h('small', null, !computed.error ? `${Number((v / max * 100).toFixed(1))}%` : '—')); }
-      case 'steps': return h('ol', { ...props, className: 'dgui-steps' }, n.items.map((item, i) => h('li', { key: i, 'data-step-status': item.status }, h('span', { className: 'dgui-step-dot', 'aria-hidden': true }, item.status === 'done' ? h(Icon, { name: 'check' }) : item.status === 'error' ? h(Icon, { name: 'warning' }) : i + 1), h('div', null, h('strong', null, item.title), item.status && h('span', { className: 'dgui-step-state' }, { pending: '待进行', active: '当前步骤', done: '已完成', error: '异常' }[item.status]), item.description && h('p', null, item.description)))));
+      case 'steps': return h('section',props,n.title&&h('h4',{className:'dgui-section-title'},n.title),h('ol', {className:'dgui-steps'}, n.items.map((item, i) => h('li', { key: i, 'data-step-status': item.status }, h('span', { className: 'dgui-step-dot', 'aria-hidden': true }, item.status === 'done' ? h(Icon, { name: 'check' }) : item.status === 'error' ? h(Icon, { name: 'warning' }) : i + 1), h('div', null, h('strong', null, item.title), item.status && h('span', { className: 'dgui-step-state' }, { pending: '待进行', active: '当前步骤', done: '已完成', error: '异常' }[item.status]), item.description && h('p', null, item.description))))));
       case 'metric': { const v = resolve(n.value); return h('div', { ...props, className: 'dgui-metric' }, h('span', { className: 'dgui-metric-label' }, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('strong', null, typeof v === 'number' ? formatNumber(v,n.decimals ?? 2) : display(v), ' ', h('small', null, n.unit))); }
       case 'input': case 'slider': case 'select': case 'toggle': {
         const k = n.bind.split('.')[1], spec = doc.state[k], v = state[k], id = `dgui-${record.documentId}-${n.id}-${viewId}`;
@@ -123,15 +132,22 @@ export function UiView({ record, sessionId, sendPrompt, preview = false }) {
         else control = h('input', { id, type: 'text', value: v, maxLength: 8192, disabled: !ready, onChange: e => update(k, e.target.value) });
         return h('div', { ...props, className: 'dgui-control' }, h('label', { htmlFor: id }, h(Icon, { name: n.type === 'toggle' ? 'layers' : n.type === 'select' ? 'target' : 'sliders' }), h('span', null, n.label)), control);
       }
-      case 'button': return h('button', { ...props, className: 'dgui-button', type: 'button', disabled: disabled || !sendPrompt, onClick: () => followup(n.action) }, n.text, h(Icon, { name: n.icon ?? 'arrow' }));
+      case 'button': case 'link': {
+        const common={...props,className:'dgui-button','data-variant':n.variant??(n.action?'primary':'secondary')};
+        if(n.href&&!preview)return h('a',{...common,href:n.href,target:'_blank',rel:'noopener noreferrer',title:n.href},n.text,h(Icon,{name:n.icon??'external'}));
+        if(n.path)return h('button',{...common,type:'button',disabled:preview||!openFile,title:openFile?n.path:'当前宿主没有提供文件打开接口',onClick:async()=>{try{await openFile(n.path);setError('')}catch(e){setError('打开文件失败：'+e.message)}}},n.text,h(Icon,{name:n.icon??'file'}));
+        return h('button',{...common,type:'button',disabled:preview||disabled||!sendPrompt||!n.action,onClick:()=>followup(n.action)},n.text,h(Icon,{name:n.icon??'arrow'}));
+      }
+      case 'divider': return h('div',{...props,className:'dgui-divider',role:'separator'},n.label&&h('span',null,n.label));
       case 'table': return computed.error ? null : h(Table, { key: n.id, id: n.id, label:n.label, rows: resolve(n.rows), columns: n.columns });
       case 'chart': return computed.error ? null : h(Chart, { key: n.id, node: n, rows: resolve(n.rows) });
       default: return null;
     }
   }
-  const sceneIcons = { dashboard: 'chart', workbench: 'sliders', comparison: 'layers', guide: 'target', status: 'gauge', report: 'info' };
-  return h('section', { ref:root,className: 'dgui-root', 'data-document-revision':record.documentRevision??0,'data-dgui-build': BUILD_INFO.id, 'data-dsh-generative-ui': record.documentId, 'data-layout': doc.presentation?.layout, 'data-accent': doc.presentation?.accent, 'data-density': doc.presentation?.density, 'data-preview': preview || undefined, 'aria-label': doc.title, 'aria-busy': preview || undefined },
-    h('header', { className: 'dgui-header' }, h('span', { className: 'dgui-heading-icon' }, h(Icon, { name: sceneIcons[doc.presentation?.layout] ?? (Object.keys(doc.state).length?'sliders':'layers') })), h('strong', { className: 'dgui-header-title' }, doc.title), h('span', { className: 'dgui-badge' }, h(Icon, { name: 'sparkles' }), preview ? '生成中' : '可视化')),
+
+  return h('section', { ref:root,className: 'dgui-root', 'data-document-revision':record.documentRevision??0,'data-dgui-build': BUILD_INFO.id, 'data-dsh-generative-ui': record.documentId, 'data-preset':doc.presentation?.preset??({comparison:'comparison',guide:'list',report:'reading'}[doc.presentation?.layout]??'brief'), 'data-visual-style':nativeStyle, 'data-layout': doc.presentation?.layout, 'data-accent': doc.presentation?.accent, 'data-density': doc.presentation?.density, 'data-preview': preview || undefined, 'aria-label': doc.title, 'aria-busy': preview || undefined },
+    doc.title&&doc.title!=='内容'&&h('header', { className: 'dgui-header' }, h('strong', { className: 'dgui-header-title' }, doc.title)),
+    !preview&&deliveryDiagnostics(doc).length>0&&h('p',{className:'dgui-tool-error',role:'status'},'部分内容未生成；模型可修复当前界面。'),
     h('div', { key: epoch, className: 'dgui-content' }, doc.nodes.map(renderNode)),
     (Object.keys(doc.state).length>0||issue||actionStatus)&&h('div', { className: showDetails||issue||actionStatus?'dgui-status':'dgui-sr-only', role: 'status', 'data-status': /失败|冲突/.test(status) ? 'error' : /正在|等待/.test(status) ? 'pending' : 'saved' }, h(Icon, { name: /失败|冲突/.test(status) ? 'warning' : /正在|等待/.test(status) ? 'database' : 'check' }), h('span', null, status), actionStatus && h('span', null, ` · ${actionStatus}`)),
     issue && h('div', { className: 'dgui-recovery' },
@@ -153,12 +169,12 @@ export class UiBoundary extends React.Component {
 export function ToolView(props) {
   // Tool preview and the turn tail have different lifecycles in DSH. Do not
   // mount a canvas before the turn ends only to tear it down for later prose.
-  if (props.phase === 'preparing' || props.phase === 'start') return h('p', {className:'dgui-pending',role:'status'}, '正在生成界面，回答结束后显示。');
+  if (props.phase === 'preparing' || props.phase === 'start' || typeof props.block?.argsRaw === 'string') return h('p', {className:'dgui-pending',role:'status'}, '正在生成界面；完整内容会逐步预览。');
   const fallback = (props.block.content ?? []).filter(x => x.type === 'text').map(x => x.text).join('\n');
   if (props.block.isError) return h('div', { className: 'dgui-tool-error', role: 'alert' }, h(Icon,{name:'warning'}), h('span',null,fallback || '界面未生成，请检查工具参数。'));
   const raw = props.block.meta?.dshGenerativeUi;
   if (raw?.version === 1) {
-    try { validateDocument(raw.document); return h('p', { className: 'dgui-pending',role:'status' }, '界面已生成，整轮回答结束后在下方显示。'); }
+    try { validateDocument(raw.document); return h('p', { className: 'dgui-pending',role:'status' }, '界面已生成，整轮回答结束后启用交互。'); }
     catch { /* Retain the plain-text fallback for malformed historical metadata. */ }
   }
   return h(ValidatedView, { ...props, raw, fallback });
@@ -176,10 +192,11 @@ export function StreamingPreview({ raw, callId = 'stream', sessionId }) {
 export function TurnUiView(props) {
   // Readiness comes from durable turn/end, never from tool completion, a live
   // tail seq, elapsed time, or the presence of a partial Markdown marker.
-  return (props.turn.data.get('dshGenerativeUi') ?? []).filter(r=>r.displayReady===true).map(r => r.isPatch?h(PatchNotice,{key:`patch-${r.seq}`,raw:r.raw}):h(PresentationView, { key: r.raw.documentId, ...r, sessionId: props.sessionId, sendPrompt: props.sendPrompt,scope:props.presentationScope }));
+  const stream=props.turn.data.get('dshUiStream');
+  return h(React.Fragment,null,stream&&typeof stream==='object'&&!Array.isArray(stream)&&h(StreamSurface,{stream,sessionId:props.sessionId,committedIds:(props.turn.data.get('dshGenerativeUi')??[]).filter(r=>r.displayReady&&!r.isPatch).map(r=>r.raw.documentId)}), (props.turn.data.get('dshGenerativeUi') ?? []).filter(r=>r.displayReady===true).map(r => r.isPatch?h(PatchNotice,{key:`patch-${r.seq}`,raw:r.raw}):h(PresentationView, { key: r.raw.documentId, ...r, sessionId: props.sessionId, sendPrompt: props.sendPrompt,openFile:props.openFile,scope:props.presentationScope })));
 }
 export function PatchNotice({raw}){useEffect(()=>{try{if(raw)publishDocument(raw)}catch{}},[raw]);return h('p',{className:'dgui-copy'},'界面修改已保存；原界面已更新。');}
-export function ValidatedView({ raw, fallback, sessionId, sendPrompt }) {
+export function ValidatedView({ raw, fallback, sessionId, sendPrompt, openFile }) {
   const {record:current,status,retry}=useCurrentDocument(raw??{},sessionId);
   const result = useMemo(() => {
     try {
@@ -191,7 +208,5 @@ export function ValidatedView({ raw, fallback, sessionId, sendPrompt }) {
   return h(React.Fragment,null,
     status==='error'&&h('div',{className:'dgui-root dgui-document-warning',role:'status'},h('p',null,'未能确认最新界面版本，当前显示已知版本。'),h('button',{type:'button',className:'dgui-secondary',onClick:retry},'重新读取最新界面')),
     status==='loading'&&h('p',{className:'dgui-copy',role:'status'},'正在读取最新界面版本…'),
-    h(UiBoundary, { key: `${result.documentId}:${sessionId}`, fallback:fallback??result.document.fallback }, h(UiView, { key: `${result.documentId}:${sessionId}`, record: result, sessionId, sendPrompt })));
+    h(UiBoundary, { key: `${result.documentId}:${sessionId}`, fallback:fallback??result.document.fallback }, h(UiView, { key: `${result.documentId}:${sessionId}`, record: result, sessionId, sendPrompt,openFile })));
 }
-
-

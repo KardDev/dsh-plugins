@@ -57,7 +57,7 @@ try {
   const doc = { ...calculatorExample, actions: calculatorExample.actions, nodes: calculatorExample.nodes }, raw = JSON.stringify({ document: doc });
   for(const phase of ['preparing','start'])for(const prefix of [raw.slice(0,Math.floor(raw.length/2)),raw]){
     await page.evaluate(({prefix,phase})=>window.stream(prefix,phase),{prefix,phase});
-    await page.getByText('正在生成界面，回答结束后显示。',{exact:true}).waitFor();
+    await page.getByText('正在生成界面；完整内容会逐步预览。',{exact:true}).waitFor();
     assert.equal(await page.locator('[data-dsh-generative-ui],[data-preview],iframe,input,select').count(),0);
   }
   assert.equal(stateRequests,requestsBefore,'pending UI does not read/save state');

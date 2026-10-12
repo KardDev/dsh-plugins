@@ -1,6 +1,10 @@
 import React from 'react';
 const h = React.createElement;
 const paths = {
+  copy:['M9 8h11v13H9z','M15 8V3H4v13h5'],
+  external:['M14 4h6v6M20 4l-9 9','M10 4H4v16h16v-6'],
+  file:['M14 3H5v18h14V8l-5-5Z','M14 3v5h5M8 13h8M8 17h5'],
+  globe:['M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z','M3 12h18M12 3c-5 5-5 13 0 18 5-5 5-13 0-18Z'],
   sparkles: ['m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3Z', 'M20 2v4M18 4h4'],
   sliders: ['M4 7h6m4 0h6M4 17h10m4 0h2', 'M10 4v6m4 4v6'],
   layers: ['m12 3 9 5-9 5-9-5 9-5Z', 'm3 12 9 5 9-5M3 16l9 5 9-5'],

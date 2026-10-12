@@ -34,7 +34,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1100, height: 1100 } }); page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => { window.canvasPhases=[];new MutationObserver(()=>{for(const el of document.querySelectorAll('[data-canvas-phase]'))if(!window.canvasPhases.includes(el.dataset.canvasPhase))window.canvasPhases.push(el.dataset.canvasPhase)}).observe(document,{subtree:true,childList:true,attributes:true}); });
   const url = 'http://127.0.0.1:' + server.address().port;
-  await page.goto(url + '/?preview=1'); await page.getByText('静态预览 · 提交成功后启用交互').waitFor(); await page.frameLocator('iframe').locator('svg').waitFor(); assert.equal(await page.frameLocator('iframe').locator('body').evaluate(()=>typeof window.DSHUI),'undefined'); assert.equal(stateRequests, 0);
+  await page.goto(url + '/?preview=1'); await page.getByText('生成预览 · 回复完成后启用交互').waitFor(); await page.frameLocator('iframe').locator('svg').waitFor(); assert.equal(await page.frameLocator('iframe').locator('body').evaluate(()=>typeof window.DSHUI),'undefined'); assert.equal(stateRequests, 0);
   checks.push('preview shows static SVG without generated scripts, state bridge or state requests');
   await page.goto(url); const frame = page.frameLocator('iframe'); await frame.getByRole('button', { name: '全部', exact: true }).waitFor();
   assert.ok((await page.evaluate(() => window.canvasPhases)).includes('loading')); await page.locator('[data-canvas-phase=ready]').waitFor();
@@ -99,7 +99,7 @@ try {
   await page.emulateMedia({ reducedMotion: 'reduce' }); await oscillator.waitForFunction(() => matchMedia('(prefers-reduced-motion: reduce)').matches && document.getElementById('mass').getAttribute('cx') === '250', null, {polling:50,timeout:5000}).catch(async e=>{console.log(JSON.stringify(await oscillator.evaluate(()=>({motion:matchMedia('(prefers-reduced-motion: reduce)').matches,cx:document.getElementById('mass').getAttribute('cx'),snapshot:DSHUI.snapshot,hidden:document.hidden}))));throw e});
   for (const [index, name] of [[3,'architecture'],[4,'scatter']]) {
     await page.setViewportSize({width:1100,height:1100}); await page.goto(url+'/?view='+index); const visual = page.frameLocator('iframe'); await page.locator('[data-canvas-phase=ready]').waitFor();
-    if(index===3){await visual.getByRole('button',{name:'模型环节',exact:true}).focus();await page.keyboard.press('Enter');assert.equal(await page.getByRole('combobox').inputValue(),'3');await page.getByRole('combobox').selectOption('4');await visual.getByRole('button',{name:'工具环节',exact:true}).getAttribute('aria-pressed').then(v=>assert.equal(v,'true'))}
+    if(index===3){await visual.getByRole('button',{name:'模型环节',exact:true}).focus();await page.keyboard.press('Enter');await page.waitForFunction(()=>document.querySelector('select')?.value==='3');assert.equal(await page.getByRole('combobox').inputValue(),'3');await page.getByRole('combobox').selectOption('4');await visual.getByRole('button',{name:'工具环节',exact:true}).getAttribute('aria-pressed').then(v=>assert.equal(v,'true'))}
     else{await page.getByRole('slider').fill('2');await visual.getByText('B · 120',{exact:true}).waitFor();assert.match(await page.locator('table').innerText(),/B\s+20\s+120/)}
     await page.getByText('参数已保存',{exact:true}).waitFor();
     for(const theme of ['light','dark']){

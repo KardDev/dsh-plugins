@@ -4,7 +4,73 @@
 
 Interactive, declarative tool views for **DeepSeek Harness Web 0.2.0-rc.2**.
 
-The plugin adds `ui_catalog` (protocol + examples + visual vocabulary) and `render_ui` (validated UI). It renders native conversation turn-tail views, computes local expressions, saves per-conversation input state on the Host, and sends explicit follow-up requests with the current parameter snapshot.
+The plugin adds `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
+
+### 扩展可视化（v0.6.0）
+
+在原有轻量文字、原生控件和自由 HTML/SVG 画布之外，新增扩展原生组件语言。直接传入 `render_ui({document:{title,items:[...]}})`，或在回答中写 `dsh-ui` / `motion-ui` JSON 源码围栏；无需为普通测验、图表和表单编写 HTML。完整组件依次预览，整轮回复结束后保存并启用交互，正文与原生“智能 UI”侧栏共用同一份文档和参数。
+
+| 场景 | 新增能力 |
+| --- | --- |
+| 日常表达 | 卡片、分栏、列表、时间线、标签、代码、JSON、复制、公式、选项卡 |
+| 数据探索 | 本地表格排序、输入筛选、CSV 导出，轻量柱/线/环图，按需加载 ECharts（含词云等） |
+| 学习解释 | 单题即时判分；多题单选统一提交、正确答案与解析、重新作答，全程本地完成 |
+| 数学与结构 | 带参数的安全函数绘图、Mermaid、定位图解、SVG、可旋转缩放的基础 3D 场景 |
+| 信息收集 | 表单收集参数，一次显式提交后续请求；控件变化不会逐次请求模型 |
+| 保存分享 | 扩展可视化的 HTML / JSON 导出位于可选详情区；HTML 内嵌组件与所需图形引擎，媒体仍使用原地址 |
+
+例如：
+
+```js
+render_ui({document:{title:"Git 小测",items:[
+  {type:"radio",group:"q1",label:"提交记录什么？",options:["暂存区快照","所有未暂存修改"],answer:0,explanation:"git commit 记录暂存区快照。"},
+  {type:"submit",label:"检查答案",groups:["q1"]}
+]}})
+```
+
+`ui_catalog({topic:"visual"})` 提供完整字段和示例；`validate_ui` 可只检查而不创建界面。引导模式注入组件选择、协议与短案例；自由模式只提供必要接口说明。确定无歧义的数组适配包装与声明字段的数字/布尔字符串会先无损归一化，任意 JSON 数据和源码不会被随意改写。
+
+这一扩展复用了 MIT 项目 [dsh-genui](https://github.com/omdsh-dev/dsh-genui) 的组件渲染与校验核心，基于 0.11.4 / `7ff0cf5`，保留其许可证和来源声明。Motion UI 自行管理工具、参数持久化、流式展示、侧栏与风格提示词，并增强测验答案持久化。图形和公式引擎从本地认证路由按需加载，普通文字回答无需加载这些资源。
+
+我们吸收的是可验证的组件能力，并未复制上游宿主插件的所有交互：不提供其 `/panel` 命令或输入框常驻 dock，也未开放自定义渲染器注册 API。独立 HTML 保留本地交互，但无法发送宿主 Agent 请求或打开宿主文件；外部媒体仍需网络。函数图参数沿用组件内状态，跨文档精确共享计算请使用 Motion UI 的 `state/derived` 或画布。
+
+### 连续修改、自动反馈与案例库
+
+- 同一界面继续编辑：`inspect_ui` 获取版本，`update_ui` 追加或替换内容；操作有版本检查和去重重放，不必再生成一张。只有一个扩展根节点时，追加扩展片段会自动合并进去。保留原组件的唯一 `id`，可在重新排版后继续恢复兼容的参数和视图状态。
+- 最终源码围栏若无效或缺少关键控件，插件在同一轮回复结束检查时反馈具体诊断。最多两次去重提醒；不限制思考时长，取消生成后不触发。设置里可关闭。
+- 渲染工具失败后没有交付正文，或整轮只有思考、没有任何正文和工具调用时，也会反馈完成提醒。空交付提醒允许普通文字回答，不强制生成 UI；明确要求不用回复时跳过。
+- 简短正文若只是“现在补上组件”“用流程图看最清楚”等 UI 交付声明，却没有实际界面，也会触发去重提醒。此检查仅匹配可见声明，不读取思考内容；已有界面、完整正文或 UI 概念问答不因这条检查重做。
+- 非关键组件被修复省略时，工具明确返回部分交付及原因；关键题目/输入控件被丢弃时拒绝把结果当成成功。已知的标题、容器拼写与声明类型包装会安全归一化。
+- 首页插件设置新增八类只读场景预览：重点说明、方案对比、简易流程、数据摘要、本地测验、需求表单、函数探索、结构图解。模型通过 `ui_catalog({topic:"templates",scene:"plot"})` 按需取一个短案例，避免每轮塞入整个案例库；自由模式不注入该设计指导。
+- “运行状态”检查前后端构建、客户端渲染通道、原生侧栏、同轮反馈接口和本地资源路由；不会展示 API Key 或本地配置路径。
+- 扩展表单、测验、函数图参数/视窗、表格排序、选项卡、折叠项和开关状态可保存、同步并带入导出。自动播放不按动画帧写入宿主；恢复时保持暂停。删除/改变字段语义时，模型仍应明确告知用户；不承诺把旧答案解释成新的问题答案。
+
+### 日常阅读样式
+
+生成期间支持渐进预览：文字和原生组件按完整且校验通过的块出现，HTML/SVG 先提供不执行模型脚本的静态预览。独立展示容器保留最后有效内容，后续思考不会主动卸载它；整轮结束后恢复参数并启用交互。宿主未传输增量时仍显示正常的正式结果。
+
+展示位置统一通过正文 `dsh-ui` 标记定位，不再提供回答尾部和侧栏模式切换。通过 DSH 原生侧栏“智能 UI”入口查看当前会话的界面，正文和侧栏共享参数。旧 `displayMode` 配置保留兼容读取，但不再影响展示和提示词。
+
+首页 → 插件 → dsh-motion-ui 的「视觉风格（仅限引导模式）」提供五套可点击预览：清爽阅读、柔和彩色、技术图解、活力展示、明亮扁平。每套可切换文字说明、双列对比、分隔列表、数据摘要和流程图解，共 25 种预览组合。切换预览只用于比较，不保存排版限制；点击风格卡片才保存选择。从下一次请求开始，只注入该风格的设计指导和两份短案例。组件、工具、状态、权限和已有界面保持原样。自由设计模式保留选择但不注入风格模板；切回引导模式后恢复使用。已有会话可能保留旧指导，对比时建议新建会话。
+
+未选择过风格时，默认使用「明亮扁平」。已保存的其他风格继续尊重用户选择；自由模式仍不注入视觉风格模板。
+
+明亮扁平参考 PrismFrame v0.2 的 Occamy 案例：浅彩背景、白色大圆角卡片、细彩色边线与偏移阴影，配色随解释内容变化。适配聊天宽度与内容高度，不复制视频字幕、页码或满屏留白，不使用玻璃效果。风格是模型生成偏好，并非强制重绘所有原生组件；简单文字仍走轻量排版。新增风格集中注册在 `lib/visual-styles.js`，设置预览、提示词和案例使用同一个注册表。
+
+`render_text` 直接接收文字或原生节点，自动补齐节点 ID。八种独立预设：自然阅读 `reading`、简洁面板 `brief`、并排对比 `comparison`、分隔列表 `list`、重点提示 `callout`、评分摘要 `scorecard`、纵向流程 `flow`、极简文字 `minimal`。排版由模型按每块内容自选，设置不再提供默认文字排版。旧配置中的 `defaultPreset` 保留兼容读取，但不再影响提示词和生成；工具省略 `preset` 时安全回退到自然正文。
+
+文字支持 `size`（12–48 px 或 sm/md/lg/xl/hero）、`weight`、`color`（语义色或十六进制色）、`align`、`lineHeight`；`spans` 可强调同一段中的部分文字。布局支持 `row.columns`（1–4）、`gap` 和 `divider`。日常默认采用轻边框与少量强调色。
+
+```js
+render_text({preset:"reading",blocks:[
+  {type:"text",spans:[{text:"重点："},{text:"先交付最小完整结果",weight:700,color:"success"}]},
+  {type:"link",text:"查看项目",href:"https://github.com/Scorp1o117/dsh-motion-ui",variant:"primary"}
+]})
+```
+
+同一回复可调用多次，每份文档独立选择预设、配色并保存参数。正文定位时，每份成功结果使用自己的文档 ID 标记一次；没有标记时回退至回答下方。生成期间先逐步预览完整内容，回复结束后恢复参数并启用交互。
+
+`link` 或 `button` 支持三种按钮外观：`primary`、`secondary`、`text`。`href` 打开 HTTP(S) 网页，`path` 通过 DSH 原生文件打开接口打开本地文件（可相对当前工作区）；仅在用户点击后触发。每个按钮只能指定一个目的地：网页、文件或 Agent `action`。不会向画布开放宿主文件或工具权限。
 
 ### Reliable process guides (0.5.5)
 
@@ -25,7 +91,7 @@ dsh plugin --profile web add dsh-motion-ui
 dsh web --no-open
 ```
 
-The release artifact includes the generated browser bundle; users installing the tarball do not need the build tool. Restart an existing Web process after installation, then reload its browser page. Source builds are also supported: `npm ci`, `npm run build`, `npm test`, then `npm pack` and install the generated tarball.
+The release artifact includes the generated browser bundle; users installing the tarball do not need the build tool. Restart an existing Web process after installation, then reload its browser page. Source builds are also supported: `npm ci --legacy-peer-deps` (DSH peers are supplied by the host), `npm run build`, `npm test`, then `npm pack` and install the generated tarball.
 
 Development installs of `dsh-generative-ui` must be uninstalled before installing `dsh-motion-ui`; do not enable both because they register the same tools. Existing UI documents remain readable: the internal `dsh-generative-ui` storage directory, result metadata and authenticated route namespace are retained for compatibility. Plugin settings must be selected again under the new plugin entry.
 
@@ -71,7 +137,7 @@ Development installs of `dsh-generative-ui` must be uninstalled before installin
 
 Free canvases now include optional theme-aware `.ui-*` primitives for typography, controls, result readouts, SVG nodes, connectors and annotations. Guided mode actively injects a construction handbook covering Chinese label widths, connector routing, actual rendered SVG font sizes, validated calculations and reset behavior. Free mode retains autonomous composition and only receives the interface/delivery contract.
 
-UI appears after the entire assistant turn ends, rather than during tool-argument streaming. While the model continues reasoning or writing, the tool shows a compact status without a preview canvas. This prevents a temporary preview flashing and disappearing before the final conversation UI is available. Successfully saved UI is also revealed when a turn is interrupted or ends with an error; incomplete or failed tools never become interactive documents. Controls activate after parameter restoration. Text and reasoning continue streaming normally.
+Validated native blocks and inert HTML/SVG previews appear progressively during generation. Preview roots survive tool-card and tail-seat replacement; incomplete or failed input never activates scripts. The final UI takes over after the entire turn ends and parameter restoration enables controls. Failed calls, retries, cancellation and conversation navigation clean transient previews.
 
 Each committed canvas offers **说明与操作 → 导出独立 HTML**. The downloaded file includes the current parameter snapshot, the shared calculation interpreter and an isolated canvas. Declared state and derived results recompute locally without DSH or external libraries. It is a single-canvas export, not a complete mixed native layout; it does not send Agent requests or save back to DSH. Reloading the file restores the export-time parameters. External resources remain unavailable.
 
@@ -79,7 +145,7 @@ These improvements adapt the public design-system/skill, CSS-first streaming and
 
 ### Presentation, authoring and history (0.5.2)
 
-Home → Plugins → dsh-motion-ui now offers **回答下方 / 正文标记位置 / PC 侧栏**. The default stays below the answer. Inline mode instructs the model to place a fenced `dsh-ui` block containing only the successful tool result's documentId. Missing markers or unavailable sidebar services fall back to the conversation view. Known same-conversation IDs only are eligible; source is never parsed from the marker. DSH 0.2.0-rc.2 exposes no fence-renderer slot, so this small adapter recognizes its rendered code blocks. It preserves the original marker for copying and restores it when unloaded. The native sidebar can also be opened manually from a conversation UI. Two visible copies synchronize successfully saved state; concurrent unsaved drafts retain the existing explicit conflict/retry behavior.
+Presentation uses same-conversation documentId markers in the answer. The model receives marker instructions for every successful UI tool result; missing markers retain a visible fallback. Tail/sidebar mode selectors have been removed. The native Intelligent UI sidebar tab lists current conversation documents; inline UI adds no sidebar button. successfully saved inputs synchronize between the inline view and sidebar, with explicit conflict/retry handling for concurrent drafts.
 
 For simple formulas, write `derived: {power: {expr: "state.V * state.V / state.R"}}` and bind a metric with `{ref:"derived.power"}`. The authoring parser compiles to the existing bounded interpreter, including dependency/cycle validation. It supports arithmetic, comparisons, ternary conditions, parentheses, double-quoted strings, booleans and min/max/round/abs. It does not execute JavaScript or introduce a second calculation runtime. Existing op/args documents remain compatible; freeform animation continues to use the isolated canvas.
 
@@ -207,3 +273,9 @@ Run `npm test`, `npm run build`, and `npm run check` before packing. Browser smo
 
 
 
+
+### 可复制的文本与代码
+
+`render_text` 支持 `{type:"text",title:"文案",text:"正文",copyable:true}` 和 `{type:"code",lang:"bash",code:"git status"}`。文本按需显示复制按钮，代码默认显示；按钮位于右上角，复制后反馈成功或失败。代码保留原始缩进与换行，默认长行横向滚动，可设 `wrap:true` 换行。扩展组件也支持同样的复制面板（文本使用 `content`）。
+
+引导模式的视觉风格会同步应用于原生卡片、指标、控件和可复制内容块，也会注入模型风格提示及案例。切换风格即时更新原生外观和侧栏副本，不修改已生成 HTML 的源码，不改变输入值或计算。自由模式关闭这层风格覆盖。

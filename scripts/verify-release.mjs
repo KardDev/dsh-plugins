@@ -8,6 +8,12 @@ const steps = [
 ];
 steps.push(['authoring-compatibility', ['tests/verify-authoring.mjs']]);
 steps.push(['static-steps-and-compact-errors', ['tests/verify-steps.mjs']]);
+steps.push(['everyday-reading-multiple-documents-links', ['tests/verify-reading.mjs']]);
+steps.push(['visual-style-settings-previews', ['tests/verify-style-settings.mjs']]);
+steps.push(['progressive-stable-preview', ['tests/verify-progressive.mjs']]);
+steps.push(['extended-visuals-fences-and-lazy-engines', ['tests/verify-visual.mjs']]);
+steps.push(['guided-native-style-coverage', ['tests/verify-native-style.mjs']]);
+steps.push(['copyable-text-and-code', ['tests/verify-copy.mjs']]);
 if (process.env.DSH_VERIFY_INSTALLED === '1') steps.push(['installed-canvases', ['tests/verify-canvas-web.mjs']], ['installed-legacy', ['tests/verify-design-installed.mjs']]);
 const results = [];
 await mkdir('test-output', { recursive: true });
