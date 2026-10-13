@@ -29,7 +29,7 @@ export function apply(ctx) {
     inject: sessionId => ({ presentationScope:scope,sendPrompt: prompt => ctx.sessions.scope(sessionId).get("conversation").send(prompt) })
   }, TurnUiView));
   ctx.effect(() => { const style = document.createElement('style'); style.dataset.plugin = 'dsh-generative-ui'; style.textContent = CSS+VISUAL_CSS; document.head.append(style); return () => style.remove(); });
-  for(const name of ['render_ui','render_canvas','render_text'])ctx.slots.inject('tool.call.toolview', () => ctx.slots.register({
+  for(const name of ['render_ui','render_canvas','render_text','render_mechanism'])ctx.slots.inject('tool.call.toolview', () => ctx.slots.register({
     name: 'tool.call.toolview', key: name,
     inject: sessionId => ({ sendPrompt: prompt => ctx.sessions.scope(sessionId).get("conversation").send(prompt) })
   }, ToolView));

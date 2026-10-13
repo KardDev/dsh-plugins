@@ -23,6 +23,7 @@ export function Sandbox({ node, document:doc, state, data, derived, disabled, pr
     if (!el || !connected.current) return;
     const css = getComputedStyle(el.closest('.dgui-root'));
     const theme = Object.fromEntries([['bg','--du-bg'],['ink','--du-ink'],['muted','--du-muted'],['accent','--du-accent'],['line','--du-line'],['soft','--du-soft']].map(([k, v]) => [k, css.getPropertyValue(v).trim()]));
+    theme.visualStyle=el.closest('.dgui-root')?.dataset.visualStyle??'';
     theme.scheme = document.body.hasAttribute('data-ds-dark-theme') || el.closest('[data-preview-theme=dark]') ? 'dark' : 'light';
     el.contentWindow?.postMessage({ dshCanvas: 1, channel: config.channel, type: 'snapshot', payload: { ...canvasSnapshot(current.node, current.state, current.data, current.derived, current.disabled, theme), visible: visible.current && !document.hidden } }, '*');
   };
@@ -57,7 +58,7 @@ export function Sandbox({ node, document:doc, state, data, derived, disabled, pr
   useEffect(() => { publish(); }, [state, data, derived, disabled, config, token]);
   const inactive = preview || stopped;
   const restart = () => { setStopped(false); setGeneration(g => g + 1); };
-  const download=()=>{try{const el=frame.current,css=getComputedStyle(el.closest('.dgui-root'));const theme=Object.fromEntries(['bg','ink','muted','accent','line','soft'].map(k=>[k,css.getPropertyValue('--du-'+k).trim()]));theme.scheme=document.body.hasAttribute('data-ds-dark-theme')||el.closest('[data-preview-theme=dark]')?'dark':'light';const url=URL.createObjectURL(new Blob([standaloneCanvas(doc,node,state,theme)],{type:'text/html;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=(node.title.replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').slice(0,80)||'dsh-ui')+'.html';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){setError('导出失败：'+e.message)}};
+  const download=()=>{try{const el=frame.current,css=getComputedStyle(el.closest('.dgui-root'));const theme=Object.fromEntries(['bg','ink','muted','accent','line','soft'].map(k=>[k,css.getPropertyValue('--du-'+k).trim()]));theme.visualStyle=el.closest('.dgui-root')?.dataset.visualStyle??'';theme.scheme=document.body.hasAttribute('data-ds-dark-theme')||el.closest('[data-preview-theme=dark]')?'dark':'light';const url=URL.createObjectURL(new Blob([standaloneCanvas(doc,node,state,theme)],{type:'text/html;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=(node.title.replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').slice(0,80)||'dsh-ui')+'.html';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){setError('导出失败：'+e.message)}};
   return h('section', { className: 'dgui-canvas', 'data-ui-node': node.id, 'data-canvas-phase': inactive ? stopped ? 'stopped' : 'preview' : error ? 'error' : mounted ? 'ready' : 'loading', 'aria-label': node.title },
     !preview&&!showDetails&&h(ActionMenu,{label:`${node.title}操作`},
       h('button',{type:'button',disabled:disabled||!doc||stopped,onClick:download},'导出独立 HTML'),

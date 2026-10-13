@@ -1,6 +1,6 @@
 {
   "name": "dsh-motion-ui",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Interactive UI, HTML/SVG animation and local calculations for DeepSeek Harness Web, with injected design guidance.",
   "type": "module",
   "main": "index.js",

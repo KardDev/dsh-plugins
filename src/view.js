@@ -1,3 +1,5 @@
+import {ExpressiveAction,ElasticToggle,Stepper} from './expressive-controls.js';
+import {SegmentedControl,MetricValue} from './motion-controls.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { evaluate, initialState, validateDocument, validateState, followupPrompt } from '../lib/protocol.js';
 import { Icon } from './icons.js';
@@ -116,27 +118,30 @@ export function UiView({ record, sessionId, sendPrompt, openFile, preview = fals
       case 'sandbox': return h(Sandbox, { key: n.id, node: n, document:doc, state, data: doc.data, derived: computed.derived ?? {}, disabled, preview: preview || !ready, update: updatePatch, onAudit });
       case 'heading': return h('h4', { ...props, className: 'dgui-section-title' }, n.icon&&h(Icon, { name: n.icon }), h('span', null, copy()));
       case 'text': case 'callout': if(n.copyable)return h(CopyBlock,{key:n.id,nodeId:n.id,title:n.title,text:n.spans?n.spans.map(s=>s.text).join(''):display(resolve(n.text)),disabled:preview,style:typographyStyle(n)},copy());return h('p', { ...props, className: `dgui-copy${n.type==='callout'?' dgui-callout':''}${n.icon ? ' dgui-with-icon' : ''}` }, (n.icon || n.tone && n.tone !== 'neutral') && h(Icon, { name: n.icon ?? (n.tone === 'warning' || n.tone === 'danger' ? 'warning' : n.tone === 'success' ? 'check' : 'info') }), h('span', null, copy()));
-      case 'row': case 'column': case 'card': return h('div', { ...props, className: `dgui-${n.type}${n.columns?' dgui-grid':''}`, 'data-surface': n.surface }, n.title && h('h4', { className: 'dgui-section-title' }, n.icon&&h(Icon, { name: n.icon }), h('span', null, n.title)), n.children.map(renderNode));
+      case 'row': case 'column': case 'card': return h('div', { ...props, className: `dgui-${n.type}${n.columns?' dgui-grid':''}`, 'data-surface': n.surface,'data-columns':n.columns }, n.title && h('h4', { className: 'dgui-section-title' }, n.icon&&h(Icon, { name: n.icon }), h('span', null, n.title)), n.children.map(renderNode));
       case 'badge': return h('span', { ...props, className: 'dgui-tag' }, h(Icon, { name: n.icon ?? 'info' }), display(resolve(n.text)));
       case 'details': return h('details', { ...props, className: 'dgui-details', open: n.open }, h('summary', null, h(Icon, { name: n.icon ?? 'info' }), n.title), h('div', { className: 'dgui-column' }, n.children.map(renderNode)));
       case 'progress': { const v = resolve(n.value), max = resolve(n.max); return h('div', { ...props, className: 'dgui-progress' }, h('div', { className: 'dgui-progress-label' }, h('span', null, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('span', null, `${display(v)} / ${display(max)}${n.unit ? ' ' + n.unit : ''}`)), !computed.error && h('progress', { value: v, max, 'aria-label': n.label }), h('small', null, !computed.error ? `${Number((v / max * 100).toFixed(1))}%` : '—')); }
       case 'steps': return h('section',props,n.title&&h('h4',{className:'dgui-section-title'},n.title),h('ol', {className:'dgui-steps'}, n.items.map((item, i) => h('li', { key: i, 'data-step-status': item.status }, h('span', { className: 'dgui-step-dot', 'aria-hidden': true }, item.status === 'done' ? h(Icon, { name: 'check' }) : item.status === 'error' ? h(Icon, { name: 'warning' }) : i + 1), h('div', null, h('strong', null, item.title), item.status && h('span', { className: 'dgui-step-state' }, { pending: '待进行', active: '当前步骤', done: '已完成', error: '异常' }[item.status]), item.description && h('p', null, item.description))))));
-      case 'metric': { const v = resolve(n.value); return h('div', { ...props, className: 'dgui-metric' }, h('span', { className: 'dgui-metric-label' }, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h('strong', null, typeof v === 'number' ? formatNumber(v,n.decimals ?? 2) : display(v), ' ', h('small', null, n.unit))); }
+      case 'metric': { const v = resolve(n.value); return h('div', { ...props, className: 'dgui-metric' }, h('span', { className: 'dgui-metric-label' }, h(Icon, { name: n.icon ?? 'gauge' }), n.label), h(MetricValue, {value:v,preview:preview||!ready,expressive:true}, typeof v === 'number' ? formatNumber(v,n.decimals ?? 2) : display(v), ' ', h('small', null, n.unit))); }
       case 'input': case 'slider': case 'select': case 'toggle': {
         const k = n.bind.split('.')[1], spec = doc.state[k], v = state[k], id = `dgui-${record.documentId}-${n.id}-${viewId}`;
         let control;
-        if (n.type === 'select') control = h('select', { id, value: spec.options.indexOf(v), disabled: !ready, onChange: e => update(k, spec.options[Number(e.target.value)]) }, spec.options.map((o, i) => h('option', { key: i, value: i }, display(o))));
+        if(n.type==='select'&&n.variant==='segmented'&&spec.options.length>=2&&spec.options.length<=8)control=h(SegmentedControl,{id,label:n.label,options:spec.options,value:v,disabled:!ready,onChange:value=>update(k,value)});
+        else if (n.type === 'select') control = h('select', { id, value: spec.options.indexOf(v), disabled: !ready, onChange: e => update(k, spec.options[Number(e.target.value)]) }, spec.options.map((o, i) => h('option', { key: i, value: i }, display(o))));
+        else if(n.type==='toggle')control=h(ElasticToggle,{id,checked:v,disabled:!ready,onChange:value=>update(k,value)});
         else if (n.type === 'toggle') control = h('input', { id, className: 'dgui-toggle', type: 'checkbox', checked: v, disabled: !ready, onChange: e => update(k, e.target.checked) });
-        else if (n.type === 'slider') control = h(React.Fragment, null, h('input', { id, type: 'range', min: spec.min, max: spec.max, step: spec.step, value: v, disabled: !ready, onChange: e => update(k, Number(e.target.value)) }), h('output', { htmlFor: id }, display(v)));
+        else if (n.type === 'slider') control = h(React.Fragment, null, h('input', { id, style:{'--du-range':(spec.max>spec.min?(v-spec.min)/(spec.max-spec.min)*100:0)+'%'}, type: 'range', min: spec.min, max: spec.max, step: spec.step, value: v, disabled: !ready, onChange: e => update(k, Number(e.target.value)) }), h('output', { htmlFor: id }, display(v)));
         else if (spec.type === 'number') control = h(NumericInput, { id, spec, value: v, disabled: !ready, invalidChanged, onChange: value => update(k, value) });
         else control = h('input', { id, type: 'text', value: v, maxLength: 8192, disabled: !ready, onChange: e => update(k, e.target.value) });
-        return h('div', { ...props, className: 'dgui-control' }, h('label', { htmlFor: id }, h(Icon, { name: n.type === 'toggle' ? 'layers' : n.type === 'select' ? 'target' : 'sliders' }), h('span', null, n.label)), control);
+        if(n.type==='input'&&spec.type==='number')control=h(Stepper,{value:v,spec,label:n.label,disabled:!ready,onChange:value=>update(k,value)},control);
+        return h('div', { ...props, className: 'dgui-control' }, h(n.type==='select'&&n.variant==='segmented'&&spec.options.length>=2&&spec.options.length<=8?'span':'label', { htmlFor: id,className:'dgui-control-label' }, h(Icon, { name: n.type === 'toggle' ? 'layers' : n.type === 'select' ? 'target' : 'sliders' }), h('span', null, n.label)), control);
       }
       case 'button': case 'link': {
         const common={...props,className:'dgui-button','data-variant':n.variant??(n.action?'primary':'secondary')};
-        if(n.href&&!preview)return h('a',{...common,href:n.href,target:'_blank',rel:'noopener noreferrer',title:n.href},n.text,h(Icon,{name:n.icon??'external'}));
-        if(n.path)return h('button',{...common,type:'button',disabled:preview||!openFile,title:openFile?n.path:'当前宿主没有提供文件打开接口',onClick:async()=>{try{await openFile(n.path);setError('')}catch(e){setError('打开文件失败：'+e.message)}}},n.text,h(Icon,{name:n.icon??'file'}));
-        return h('button',{...common,type:'button',disabled:preview||disabled||!sendPrompt||!n.action,onClick:()=>followup(n.action)},n.text,h(Icon,{name:n.icon??'arrow'}));
+        if(n.href&&!preview)return h(ExpressiveAction,{tag:'a',text:n.text,icon:n.icon??'external',...common,href:n.href,target:'_blank',rel:'noopener noreferrer',title:n.href},n.text,h(Icon,{name:n.icon??'external'}));
+        if(n.path)return h(ExpressiveAction,{text:n.text,icon:n.icon??'file',...common,type:'button',disabled:preview||!openFile,title:openFile?n.path:'当前宿主没有提供文件打开接口',onClick:async()=>{try{await openFile(n.path);setError('')}catch(e){setError('打开文件失败：'+e.message)}}},n.text,h(Icon,{name:n.icon??'file'}));
+        return h(ExpressiveAction,{text:n.text,icon:n.icon??'arrow',...common,type:'button',disabled:preview||disabled||!sendPrompt||!n.action,onClick:()=>followup(n.action)},n.text,h(Icon,{name:n.icon??'arrow'}));
       }
       case 'divider': return h('div',{...props,className:'dgui-divider',role:'separator'},n.label&&h('span',null,n.label));
       case 'table': return computed.error ? null : h(Table, { key: n.id, id: n.id, label:n.label, rows: resolve(n.rows), columns: n.columns });
@@ -146,7 +151,7 @@ export function UiView({ record, sessionId, sendPrompt, openFile, preview = fals
   }
 
   return h('section', { ref:root,className: 'dgui-root', 'data-document-revision':record.documentRevision??0,'data-dgui-build': BUILD_INFO.id, 'data-dsh-generative-ui': record.documentId, 'data-preset':doc.presentation?.preset??({comparison:'comparison',guide:'list',report:'reading'}[doc.presentation?.layout]??'brief'), 'data-visual-style':nativeStyle, 'data-layout': doc.presentation?.layout, 'data-accent': doc.presentation?.accent, 'data-density': doc.presentation?.density, 'data-preview': preview || undefined, 'aria-label': doc.title, 'aria-busy': preview || undefined },
-    doc.title&&doc.title!=='内容'&&h('header', { className: 'dgui-header' }, h('strong', { className: 'dgui-header-title' }, doc.title)),
+    doc.title&&doc.title!=='内容'&&!(doc.nodes[0]?.type==='heading'&&typeof doc.nodes[0].text==='string'&&doc.nodes[0].text.trim()===doc.title.trim())&&h('header', { className: 'dgui-header' }, h('strong', { className: 'dgui-header-title' }, doc.title)),
     !preview&&deliveryDiagnostics(doc).length>0&&h('p',{className:'dgui-tool-error',role:'status'},'部分内容未生成；模型可修复当前界面。'),
     h('div', { key: epoch, className: 'dgui-content' }, doc.nodes.map(renderNode)),
     (Object.keys(doc.state).length>0||issue||actionStatus)&&h('div', { className: showDetails||issue||actionStatus?'dgui-status':'dgui-sr-only', role: 'status', 'data-status': /失败|冲突/.test(status) ? 'error' : /正在|等待/.test(status) ? 'pending' : 'saved' }, h(Icon, { name: /失败|冲突/.test(status) ? 'warning' : /正在|等待/.test(status) ? 'database' : 'check' }), h('span', null, status), actionStatus && h('span', null, ` · ${actionStatus}`)),

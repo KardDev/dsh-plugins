@@ -4,7 +4,11 @@
 
 Interactive, declarative tool views for **DeepSeek Harness Web 0.2.0-rc.2**.
 
-The plugin adds `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
+The plugin adds `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
+
+### v0.7.0：风格、交互与机制图解
+
+六种风格拥有各自的构图与组件形态，设置提供六类真实样式预览；原生交互反馈全局增强。新增 `render_mechanism`，无需生成长篇绘图源码即可交付装配拆解、齿轮传动和曲柄连杆。保留现有文档协议、默认明亮扁平风格、自由模式和参数保存。详细更新见 [CHANGELOG.md](CHANGELOG.md)。
 
 ### 扩展可视化（v0.6.0）
 
@@ -279,3 +283,35 @@ Run `npm test`, `npm run build`, and `npm run check` before packing. Browser smo
 `render_text` 支持 `{type:"text",title:"文案",text:"正文",copyable:true}` 和 `{type:"code",lang:"bash",code:"git status"}`。文本按需显示复制按钮，代码默认显示；按钮位于右上角，复制后反馈成功或失败。代码保留原始缩进与换行，默认长行横向滚动，可设 `wrap:true` 换行。扩展组件也支持同样的复制面板（文本使用 `content`）。
 
 引导模式的视觉风格会同步应用于原生卡片、指标、控件和可复制内容块，也会注入模型风格提示及案例。切换风格即时更新原生外观和侧栏副本，不修改已生成 HTML 的源码，不改变输入值或计算。自由模式关闭这层风格覆盖。
+
+### 动态交互与柔光渐彩（v0.7.0）
+
+新增「柔光渐彩」可选风格：浅色渐彩背景、实色圆润卡片、深色胶囊按钮与柔和阴影，无玻璃材质。设置中提供六种布局预览与本地交互演示，不改变现有明亮扁平默认值。
+
+原生 select 可设置 `variant:"segmented"`，适合 2..8 个短选项，其他情况自动回退下拉框。滑块值填充、开关、复制反馈与关联进度提供短促过渡；精确数值即时更新，减少动态效果和只读预览不播放交互动画。`ui_catalog({topic:"motion"})` 返回简短目录，加 `scene:"plan"/"checklist"/"copy"/"plot"` 只取一个完整示例。示例数据需替换为真实任务数据，不能将演示动画当作实际操作结果。
+
+
+### 本地开发修正：动效与风格解耦
+
+原生按钮的磁吸/填充/文字换位、开关拖拽回弹、数字步进和指标更新反馈适用于所有风格；自由模式保留原生交互反馈且不注入视觉风格。柔光渐彩统一文字层级、卡片、指标、表单、表格、流程与复制块外观。五类风格预览移除额外演示按钮，直接展示布局材质。默认仍为明亮扁平，本次不发布或增加版本号。
+
+
+### 本地开发：视觉风格系统重构
+
+六种稳定风格 ID 和明亮扁平默认值保留。新增构图、文字层级、表面、控件、反例的统一风格语法；原生文字/卡片/指标/表单/流程/表格/复制块与扩展卡片/指标有独立形态。所有风格保留共享交互动效，反馈幅度/节奏适配语言，减少动态效果仍优先。设置提供六种布局预览（含控件表单），直接复用生产组件 CSS，预览不包含可操作控件。相同内容的深浅主题、黑白对照、显式文字样式优先、输入焦点及数值保留加入回归。自由模式不注入这些风格。这些改进随 v0.7.0 发布。
+
+### 结构拆解、工作原理与机械动画（v0.7.0）
+
+常见场景直接调用 `render_mechanism({scene:"assembly"|"gears"|"crank",title?,rpm?,teeth?,radius?,running?,angle?,explode?})`，插件生成图形、控件和参数绑定，无需模型复制绘图源码。其他结构可按需读取 `ui_catalog({topic:"mechanism",scene:"assembly"|"gears"|"crank"})`，获取精简调用与自定义接口。三个原创案例分别覆盖分层装配、齿轮传动、曲柄连杆；用户可以选择部件、调整拆解进度、隐藏外壳、改变转速/齿数/曲柄半径、暂停和手动调角度。六种引导风格继续生效，自由模式仍可自行设计。
+
+例如，下面这一小次工具调用会同时生成齿轮图、参数控件和实时读数：
+
+```js
+render_mechanism({scene:"gears", rpm:20, teeth:32})
+```
+
+画布显式声明 `libraries:["mechanism"]` 后，隔离框架内才会启用本地 `DSHUI.mechanism`。可用 box/cylinder/gear/rod/spring 组合自己的结构，使用 mount/pose/update 驱动图形；gearPair、sliderCrank 提供同源数值和运动。无需模型重复生成整套 SVG 引擎。普通画布不注入该辅助库；现有源码限制、共享状态验证、网络隔离、减少动态效果和离线导出保持适用。静态轮廓先预览，回复完成并恢复参数后启用完整立体图解。
+
+这是教学几何与运动学：简化齿形不能用于加工，隐藏盖板不是任意实体剖切，按层与深度排序不构成精确遮挡/碰撞审计。瞬时动画相位不持久化，用户参数仍保存。
+
+投影和轮廓数学参考并使用 [Anatomy](https://github.com/wheresryan22/anatomy) 的 MIT 代码（固定版本及许可证见 `lib/third-party/anatomy-NOTICE.md`）。插件的状态桥接、机制案例、渲染与交互逻辑为本项目实现，没有引入完整上游工作流或其 3D 引擎。

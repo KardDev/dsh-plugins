@@ -1,3 +1,4 @@
+import {MOTION_INTERFACE} from '../lib/motion-library.js';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {canvasDocument,FREE_UI_CONTRACT} from '../lib/freeform.js';
 import {promptSections} from '../lib/ui-skill.js';
@@ -10,7 +11,7 @@ test('free entry carries model-authored source with the same state and resource 
  assert.throws(()=>canvasDocument({...args,state:'[]'}));assert.throws(()=>canvasDocument({...args,html:'x'.repeat(49153)}));assert.throws(()=>canvasDocument({...args,height:1001}));
 });
 test('free prompts remove design curriculum and examples, retaining the executable interface contract',()=>{
- const free=promptSections('free'),guided=promptSections('guided');assert.equal(free[0].text,VISUAL_INTERFACE+'\n\n'+TEXT_INTERFACE+'\n\n'+UI_INTENT_POLICY+'\n\n'+FREE_UI_CONTRACT);assert.equal(free.slice(1).map(s=>s.text).join(''),'');
+ const free=promptSections('free'),guided=promptSections('guided');assert.equal(free[0].text,VISUAL_INTERFACE+'\n\n'+TEXT_INTERFACE+'\n\n'+MOTION_INTERFACE+'\n\n'+UI_INTENT_POLICY+'\n\n'+FREE_UI_CONTRACT);assert.equal(free.slice(1).map(s=>s.text).join(''),'');
  assert.ok(free.reduce((n,s)=>n+s.text.length,0)<guided.reduce((n,s)=>n+s.text.length,0)/3);
  assert.match(free[0].text,/DSHUI.setState/);assert.match(free[0].text,/two rounds/);assert.throws(()=>promptSections('unrestricted-host'));
 });

@@ -1,3 +1,4 @@
+import {previewMechanism} from '../lib/mechanism-entry.js';
 import React,{useLayoutEffect,useRef} from 'react';
 import {createRoot} from 'react-dom/client';
 import {previewDocument,previewCanvas,previewText} from '../lib/stream.js';
@@ -11,7 +12,7 @@ function publish(entry,calls,invalidated=[]){
   // Absence is not failure: retire previews only on an explicit invalidation.
   for(const key of invalidated)entry.previews.delete(key);
   for(const call of calls){
-    const doc=call.name==='render_text'?previewText(call.raw):previewDocument(call.raw);
+    const doc=call.name==='render_mechanism'?previewMechanism(call.raw):call.name==='render_text'?previewText(call.raw):previewDocument(call.raw);
     const canvas=call.name==='render_canvas'?previewCanvas(call.raw):null;
     if(doc||canvas)entry.previews.set(call.callId,{call,doc,canvas});
   }

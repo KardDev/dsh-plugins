@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "title": "曲柄连杆 · 旋转转为往复",
+  "fallback": "旋转曲柄带动定长连杆，滑块沿导轨往复。默认半径20、杆长70，完整行程40，位置由几何约束计算。非动力学仿真。",
+  "state": {
+    "explode": {
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    "selected": {
+      "type": "string",
+      "default": "all"
+    },
+    "cutaway": {
+      "type": "boolean",
+      "default": false
+    },
+    "rpm": {
+      "type": "number",
+      "default": 20,
+      "min": 0,
+      "max": 90,
+      "step": 1
+    },
+    "running": {
+      "type": "boolean",
+      "default": false
+    },
+    "angle": {
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 360,
+      "step": 1
+    },
+    "radius": {
+      "type": "number",
+      "default": 20,
+      "min": 10,
+      "max": 28,
+      "step": 1
+    }
+  },
+  "nodes": [
+    {
+      "id": "mechanism",
+      "type": "sandbox",
+      "title": "曲柄连杆 · 旋转转为往复",
+      "fallback": "旋转曲柄带动定长连杆，滑块沿导轨往复。默认半径20、杆长70，完整行程40，位置由几何约束计算。非动力学仿真。",
+      "height": 560,
+      "libraries": [
+        "mechanism"
+      ],
+      "stateKeys": [
+        "explode",
+        "selected",
+        "cutaway",
+        "rpm",
+        "running",
+        "angle",
+        "radius"
+      ],
+      "html": "<div id=\"diagram\"><section class=\"mui-mechanism\"><svg class=\"mui-mechanism-svg\" viewBox=\"0 0 600 340\" role=\"img\" aria-label=\"结构轮廓预览；完成后显示立体细节\"><path data-material=\"metal\" data-tone=\"0\" d=\"M554.6 204.2L559.2 208.2L559.2 212.8L554.6 216.8L412.1 288L404.1 290.3L394.9 290.3L386.9 288L45.4 117.3L40.8 113.3L40.8 108.7L45.4 104.7L187.9 33.5L195.9 31.2L205.1 31.2L213.1 33.5Z\" fill-rule=\"evenodd\"/><path data-material=\"dark\" data-tone=\"0\" d=\"M306.3 92.1L304.4 92.8L302.3 93.2L300 93.4L297.7 93.2L295.6 92.8L293.7 92.1L292.3 91.2L291.4 90.1L291.1 88.9L291.4 87.8L292.3 86.7L293.7 85.8L295.6 85.1L297.7 84.6L300 84.5L302.3 84.6L304.4 85.1L306.3 85.8L307.7 86.7L308.6 87.8L308.9 88.9L308.6 90.1L307.7 91.2ZM249.7 95.9L243 98.4L235.1 100.1L226.7 100.6L218.2 100.1L210.4 98.4L203.6 95.9L198.4 92.5L195.2 88.5L194.1 84.3L195.2 80.1L198.4 76.2L203.6 72.8L210.4 70.2L218.2 68.6L226.7 68L235.1 68.6L243 70.2L249.7 72.8L254.9 76.2L258.2 80.1L259.3 84.3L258.2 88.5L254.9 92.5ZM236.9 87.3L238.1 85.9L238.5 84.3L238.1 82.8L236.9 81.4L235.1 80.1L232.6 79.2L229.7 78.6L226.7 78.4L223.6 78.6L220.7 79.2L218.3 80.1L216.4 81.4L215.2 82.8L214.8 84.3L215.2 85.9L216.4 87.3L218.3 88.5L220.7 89.5L223.6 90.1L226.7 90.3L229.7 90.1L232.6 89.5L235.1 88.5ZM180.6 154.9L178.7 155.6L176.6 156.1L174.3 156.2L172 156.1L169.9 155.6L168 154.9L166.6 154L165.7 152.9L165.4 151.8L165.7 150.6L166.6 149.6L168 148.6L169.9 147.9L172 147.5L174.3 147.3L176.6 147.5L178.7 147.9L180.6 148.6L182 149.6L182.9 150.6L183.2 151.8L182.9 152.9L182 154ZM432 154.9L430.1 155.6L428 156.1L425.7 156.2L423.4 156.1L421.3 155.6L419.4 154.9L418 154L417.1 152.9L416.8 151.8L417.1 150.6L418 149.6L419.4 148.6L421.3 147.9L423.4 147.5L425.7 147.3L428 147.5L430.1 147.9L432 148.6L433.4 149.6L434.3 150.6L434.6 151.8L434.3 152.9L433.4 154ZM306.3 217.8L304.4 218.5L302.3 218.9L300 219.1L297.7 218.9L295.6 218.5L293.7 217.8L292.3 216.9L291.4 215.8L291.1 214.6L291.4 213.5L292.3 212.4L293.7 211.5L295.6 210.8L297.7 210.3L300 210.2L302.3 210.3L304.4 210.8L306.3 211.5L307.7 212.4L308.6 213.5L308.9 214.6L308.6 215.8L307.7 216.9Z\" fill-rule=\"evenodd\"/><path data-material=\"metal\" data-tone=\"0\" d=\"M234.6 53.7L232.3 54.6L229.6 55.1L226.7 55.3L223.8 55.1L221 54.6L218.7 53.7L216.9 52.5L215.8 51.1L215.4 49.7L215.8 48.2L216.9 46.9L218.7 45.7L221 44.8L223.8 44.3L226.7 44.1L229.6 44.3L232.3 44.8L234.6 45.7L236.4 46.9L237.5 48.2L237.9 49.7L237.5 51.1L236.4 52.5Z\" fill-rule=\"evenodd\"/><path data-material=\"dark\" data-tone=\"0\" d=\"M507.4 182.1L508.2 182.8L508.2 183.5L507.4 184.2L501.1 187.3L499.8 187.7L498.3 187.7L496.9 187.3L323 100.4L322.3 99.7L322.3 99L323 98.3L329.3 95.1L330.7 94.8L332.2 94.8L333.5 95.1ZM440.4 215.6L441.1 216.3L441.1 217L440.4 217.7L434.1 220.8L432.8 221.2L431.2 221.2L429.9 220.8L256 133.9L255.2 133.2L255.2 132.5L256 131.8L262.3 128.7L263.6 128.3L265.2 128.3L266.5 128.7Z\" fill-rule=\"evenodd\"/><path data-material=\"cool\" data-tone=\"0\" d=\"M452.9 132.5L455.2 134.5L455.2 136.8L452.9 138.8L415.2 157.7L411.2 158.8L406.6 158.8L402.7 157.7L377.5 145.1L375.2 143.1L375.2 140.8L377.5 138.8L415.2 120L419.2 118.8L423.8 118.8L427.8 120Z\" fill-rule=\"evenodd\"/><path data-material=\"accent\" data-tone=\"0\" d=\"M281.1 89.8L265.2 95.9L246.6 99.7L226.7 101L206.7 99.7L188.2 95.9L172.2 89.8L160 81.8L152.3 72.5L149.6 62.5L152.3 52.5L160 43.3L172.2 35.3L188.2 29.2L206.7 25.3L226.7 24L246.6 25.3L265.2 29.2L281.1 35.3L293.4 43.3L301.1 52.5L303.7 62.5L301.1 72.5L293.4 81.8ZM236.9 65.5L238.1 64.1L238.5 62.5L238.1 61L236.9 59.6L235.1 58.3L232.6 57.4L229.7 56.8L226.7 56.6L223.6 56.8L220.7 57.4L218.3 58.3L216.4 59.6L215.2 61L214.8 62.5L215.2 64.1L216.4 65.5L218.3 66.7L220.7 67.6L223.6 68.2L226.7 68.4L229.7 68.2L232.6 67.6L235.1 66.7Z\" fill-rule=\"evenodd\"/><path data-material=\"warm\" data-tone=\"0\" d=\"M274.9 58.4L273 59.1L270.9 59.5L268.6 59.7L266.3 59.5L264.1 59.1L262.3 58.4L260.9 57.5L260 56.4L259.7 55.2L260 54.1L260.9 53L262.3 52.1L264.1 51.4L266.3 51L268.6 50.8L270.9 51L273 51.4L274.9 52.1L276.3 53L277.2 54.1L277.5 55.2L277.2 56.4L276.3 57.5ZM421.5 134.3L419.7 135L417.5 135.4L415.2 135.6L412.9 135.4L410.8 135L408.9 134.3L407.5 133.4L406.6 132.3L406.3 131.1L406.6 130L407.5 128.9L408.9 128L410.8 127.3L412.9 126.8L415.2 126.7L417.5 126.8L419.7 127.3L421.5 128L422.9 128.9L423.8 130L424.1 131.1L423.8 132.3L422.9 133.4Z\" fill-rule=\"evenodd\"/><path data-material=\"metal\" data-tone=\"0\" d=\"M270.5 64L272.1 64.5L418.8 137.8L417.2 137.3ZM268.6 64.5L270.5 64L417.2 137.3L415.2 137.8ZM266.6 65.9L268.6 64.5L415.2 137.8L413.3 139.2ZM265 68.1L266.6 65.9L413.3 139.2L411.7 141.4Z\" fill-rule=\"evenodd\"/></svg><p>旋转曲柄带动定长连杆，滑块沿导轨往复。默认半径20、杆长70，完整行程40，位置由几何约束计算。非动力学仿真。</p></section></div>",
+      "css": "\n.mui-mechanism{font:15px/1.7 system-ui,sans-serif;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:24px;padding:20px;max-width:100%;box-sizing:border-box}.mui-mechanism *{box-sizing:border-box}.mui-mechanism h2{font-size:22px;line-height:1.35;margin:0 0 8px;font-weight:750}.mui-mechanism p{margin:0;color:var(--canvas-muted)}\n.mui-mechanism-svg{display:block;width:100%;height:auto;max-height:420px;touch-action:pan-y}.mui-mechanism-svg path{stroke:color-mix(in srgb,var(--canvas-ink) 38%,var(--canvas-bg));stroke-width:.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;fill:var(--mech-base,var(--canvas-soft))}.mui-mechanism-svg [data-material=metal]{--mech-base:color-mix(in srgb,var(--canvas-muted) 32%,var(--canvas-bg))}.mui-mechanism-svg [data-material=dark]{--mech-base:color-mix(in srgb,var(--canvas-ink) 78%,var(--canvas-bg))}.mui-mechanism-svg [data-material=accent]{--mech-base:var(--canvas-accent)}.mui-mechanism-svg [data-material=cool]{--mech-base:color-mix(in srgb,#22998a 70%,var(--canvas-bg))}.mui-mechanism-svg [data-material=warm]{--mech-base:color-mix(in srgb,#dd9c42 75%,var(--canvas-bg))}\n.mui-mechanism-svg [data-tone=\"0\"]{fill:color-mix(in srgb,var(--mech-base) 74%,var(--canvas-bg))}.mui-mechanism-svg [data-tone=\"1\"]{fill:var(--mech-base)}.mui-mechanism-svg [data-tone=\"2\"]{fill:color-mix(in srgb,var(--mech-base) 85%,var(--canvas-ink))}.mui-mechanism-svg [data-tone=\"3\"]{fill:color-mix(in srgb,var(--mech-base) 68%,var(--canvas-ink))}.mui-mechanism-svg [data-line]{fill:none;stroke:var(--mech-base);stroke-width:2}.mui-mechanism-svg [data-active=false]{opacity:.2}.mui-mechanism-svg [data-active=true]{opacity:1}\n.mui-mechanism-nav{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px}.mui-mechanism button{font:inherit;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:999px;padding:6px 13px;cursor:pointer;min-height:36px}.mui-mechanism button[aria-pressed=true]{color:var(--canvas-bg);background:var(--canvas-ink);border-color:var(--canvas-ink)}.mui-mechanism button:focus-visible,.mui-mechanism input:focus-visible{outline:2px solid var(--canvas-accent);outline-offset:3px}.mui-mechanism button:disabled{opacity:.5;cursor:default}\n.mui-mechanism-controls{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:12px 14px;border-radius:16px;background:var(--canvas-soft);margin:8px 0}.mui-mechanism-controls label{display:flex;align-items:center;gap:9px;flex:1 1 180px;min-width:0}.mui-mechanism-controls input[type=range]{flex:1;min-width:70px;accent-color:var(--canvas-accent)}.mui-mechanism-controls input[type=checkbox]{accent-color:var(--canvas-accent)}.mui-mechanism-controls output{font-variant-numeric:tabular-nums;min-width:40px;text-align:right;font-weight:650}.mui-mechanism-readout{display:block;padding:10px 0;font-weight:700;font-variant-numeric:tabular-nums;color:var(--canvas-ink)}.mui-mechanism-description{min-height:0;font-size:14px}\n.mui-mechanism[data-style=editorial]{border:0;border-top:1px solid var(--canvas-line);border-radius:0;padding:16px 0}.mui-mechanism[data-style=editorial] h2{font-family:ui-serif,Georgia,serif;font-weight:650}.mui-mechanism[data-style=editorial] .mui-mechanism-controls{border-radius:0;background:transparent;border-block:1px solid var(--canvas-line)}\n.mui-mechanism[data-style=technical]{border-radius:10px}.mui-mechanism[data-style=technical] button,.mui-mechanism[data-style=technical] .mui-mechanism-controls{border-radius:6px}.mui-mechanism[data-style=technical] .mui-mechanism-readout{font-family:ui-monospace,Consolas,monospace}\n.mui-mechanism[data-style=soft]{border:0;background:var(--canvas-soft);border-radius:28px 28px 28px 10px}.mui-mechanism[data-style=soft] .mui-mechanism-controls{background:var(--canvas-bg);border-radius:22px}.mui-mechanism[data-style=expressive] h2{font-size:28px;font-weight:850;border-left:5px solid var(--canvas-accent);padding-left:14px}.mui-mechanism[data-style=expressive]{border:0;border-radius:0}.mui-mechanism[data-style=prismframe]{border:1.5px solid var(--canvas-line);box-shadow:4px 5px 0 color-mix(in srgb,var(--canvas-accent) 14%,var(--canvas-bg))}.mui-mechanism[data-style=aurora]{border-radius:28px;box-shadow:0 16px 30px -25px #30204d66}.mui-mechanism[data-style=aurora] .mui-mechanism-controls{border-radius:24px}\n@media(max-width:500px){.mui-mechanism{padding:14px;border-radius:20px}.mui-mechanism h2{font-size:20px}.mui-mechanism-controls{padding:10px}.mui-mechanism-nav{gap:5px}.mui-mechanism button{padding:6px 10px;font-size:14px}}\n@media(prefers-reduced-motion:reduce){.mui-mechanism *{animation:none!important;transition:none!important}}\n@media(forced-colors:active){.mui-mechanism-svg path{fill:Canvas;stroke:CanvasText}.mui-mechanism button[aria-pressed=true]{background:Highlight;color:HighlightText}}\n",
+      "script": "const diagram=DSHUI.mechanism.mountDemo(\"#diagram\",\"crank\",{title:\"\",bind:{\"explode\":\"explode\",\"selected\":\"selected\",\"cutaway\":\"cutaway\",\"rpm\":\"rpm\",\"running\":\"running\",\"angle\":\"angle\",\"radius\":\"radius\"}});addEventListener(\"pagehide\",()=>diagram.destroy(),{once:true});"
+    },
+    {
+      "id": "radius",
+      "type": "slider",
+      "label": "曲柄半径（示意长度单位）",
+      "bind": "state.radius"
+    },
+    {
+      "id": "rpm",
+      "type": "slider",
+      "label": "输入转速（rpm）",
+      "bind": "state.rpm"
+    },
+    {
+      "id": "angle",
+      "type": "slider",
+      "label": "手动角度（°，暂停时调节）",
+      "bind": "state.angle"
+    },
+    {
+      "id": "running",
+      "type": "toggle",
+      "label": "运行机械示意",
+      "bind": "state.running"
+    },
+    {
+      "id": "accuracy",
+      "type": "text",
+      "text": "旋转曲柄带动定长连杆，滑块沿导轨往复。默认半径20、杆长70，完整行程40，位置由几何约束计算。非动力学仿真。"
+    }
+  ],
+  "data": {},
+  "derived": {},
+  "actions": {}
+}

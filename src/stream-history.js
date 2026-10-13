@@ -1,5 +1,5 @@
 import {LIMITS} from '../lib/protocol.js';
-const names=new Set(['render_ui','render_canvas','render_text']);
+const names=new Set(['render_ui','render_canvas','render_text','render_mechanism']);
 // This projection is transient. Only successful durable tool results can
 // become interactive documents; replay never invents a successful tool call.
 export const streamUiDefinition={

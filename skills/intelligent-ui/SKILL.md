@@ -2,9 +2,9 @@
 
 生成 UI 时直接使用已注册的 render_ui/render_canvas；不需要先 grep、glob 或用 Shell 查找 DSH 安装源码。协议疑问以本说明和 ui_catalog 为准。这不限制为完成用户实际任务、读取真实数据而使用文件或搜索工具。
 
-`round(x)` 只有一个参数，等同 JavaScript `Math.round`：取最近整数，恰好一半时朝正无穷方向取整，如 `round(2.5)=3`、`round(-2.5)=-2`。它不是向上取整；原生公式不支持 ceil/floor。需要向上/向下取整时，用订阅已声明共享状态的画布及 `Math.ceil/Math.floor` 实现。指标 decimals 只控制显示精度，不改变计算值。
+`round(x)` 只有一个参数，等同 JavaScript `Math.round`：取最近整数，恰好一半时朝正无穷方向取整，如 `round(2.5)=3`、`round(-2.5)=-2`。它不是向上取整；原生公式支持 `ceil(x)` 向上取整、`floor(x)` 向下取整（各一个参数）；房间数直接用 `{expr:"ceil(state.people / 2)"}`，无需画布或条件链。指标 decimals 只控制显示精度，不改变计算值。
 
-简单公式优先使用 `{expr:"state.V * state.V / state.R"}`，例如 `derived.power` 的表达式，然后用 `{ref:"derived.power"}` 在指标中显示。支持四则运算、比较、三元条件、括号、`min/max/round/abs`；字符串使用双引号，引用写完整的 `state.x/data.x/derived.x/item.x`。这会编译为现有解释器协议，不执行任意 JavaScript。复杂动画仍使用画布。
+简单公式优先使用 `{expr:"state.V * state.V / state.R"}`，例如 `derived.power` 的表达式，然后用 `{ref:"derived.power"}` 在指标中显示。支持四则运算、比较、三元条件、括号、`min/max/round/ceil/floor/abs`；字符串使用双引号，引用写完整的 `state.x/data.x/derived.x/item.x`。这会编译为现有解释器协议，不执行任意 JavaScript。复杂动画仍使用画布。
 
 这是插件主动注入的能力指导；无需用户重复提供，也不依赖你先调用目录才获得这些规则。它是基于公开项目设计思想编写的 DSH 技能，不是 OpenAI 的内部提示词。以下协议与宿主工具权限共同约束输出。
 
@@ -101,3 +101,16 @@ For everyday structured explanations use render_text with the injected eight tex
 
 ### 可复用文本和代码
 文案、提示词等可直接使用的内容，采用 text + copyable:true + title；普通讲解保持轻量，不必每段加框。命令和配置采用 code 节点（code 原文、lang 语言、title 可选、wrap 可选），右上复制按钮保留缩进、换行，不执行代码。原生文本字段为 text，扩展文本字段为 content。交付后不要在正文再重复整段内容。
+
+### 动态交互的选择
+只有真实状态变化需要解释时才用动效。原生 select 的 variant:"segmented" 适合 2..8 个短选项；更多选项自动使用下拉框。滑块填充、开关、复制按钮有内置反馈，不用额外写脚本。数值立即更新到精确结果，图形可短促过渡；不要用计时器假装下载、复制或工具执行成功。复杂交互可通过 ui_catalog({topic:"motion",scene:"plan"|"checklist"|"copy"|"plot"}) 按需取一份完整案例，不整库加载。自由模式保持设计自主，减少动态效果设置必须生效。
+
+### 所有风格共用的动作语言
+动效能力与视觉风格分离，所有风格及自由模式的原生组件均支持轻磁吸、文字滚动、弹性拉伸和数字换位。配色、材质与排版跟随所选风格，不能靠添加演示按钮表示整套风格。柔光渐彩使用暖白实色、近黑层级与局部渐彩，覆盖文字、卡片、表单、指标、表格和代码块。原生主 button/link、toggle、数字 input 与 metric 已有对应实现，不必重写。ui_catalog motion 的 action/quantity/elastic 提供短原生案例；复杂拆分按钮、扇形菜单、多选或双滑块再按实际需要做画布。禁止的是玻璃材质、假成功和空闲循环，不是把所有动效压成轻微渐显。
+
+
+短数据构成图直接使用原生 chart/table 的内联公式单元格：`rows:[{label:"餐饮",value:{ref:"derived.food"}},{label:"住宿",value:{expr:"ceil(state.people / 2) * state.room"}}]`，chart 设置 `labelKey:"label",valueKey:"value"`。这些数值随共享状态本地更新，无需 data + map + 多层 if。静态 data 仅存储真实字面数据，不会自动猜测或生成金额。render_ui 一次提交完整文档；修正失败调用时保留 nodes/state/derived，不能只发送准备补充的字段。
+
+
+## 结构拆解与工作原理
+当零件分层、装配关系、齿轮速比或曲柄连杆能帮助解释时，主动考虑机制图解，不需要用户额外说使用UI。常见场景优先直接调用 render_mechanism({scene:"assembly"/"gears"/"crank",rpm?,teeth?,radius?,running?,angle?,explode?,title?})，不用拼接文档、HTML或读取案例；插件负责图形、控件和绑定。需要其他结构再读 ui_catalog({topic:"mechanism"}) 并用自定义画布。按问题选择少量关键部件、分组职责、拆解进度、隐藏外壳与真实联动参数；无需高密度零件或自动导览。可通过 libraries:["mechanism"] 使用本地等距几何辅助库，自定义 box/cylinder/gear/rod/spring。共享参数必须声明并绑定控件，动画使用 DSHUI.animate，重要参数持久化，瞬时相位可重置。说明简化齿形和运动学的适用范围，不宣称受力、碰撞或制造精度。

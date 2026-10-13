@@ -36,10 +36,182 @@ __export(client_exports, {
   inject: () => inject
 });
 module.exports = __toCommonJS(client_exports);
-var import_react21 = __toESM(require("react"), 1);
+var import_react24 = __toESM(require("react"), 1);
+
+// src/expressive-controls.js
+var import_react2 = __toESM(require("react"), 1);
+
+// src/icons.js
+var import_react = __toESM(require("react"), 1);
+var h = import_react.default.createElement;
+var paths = {
+  copy: ["M9 8h11v13H9z", "M15 8V3H4v13h5"],
+  external: ["M14 4h6v6M20 4l-9 9", "M10 4H4v16h16v-6"],
+  file: ["M14 3H5v18h14V8l-5-5Z", "M14 3v5h5M8 13h8M8 17h5"],
+  globe: ["M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z", "M3 12h18M12 3c-5 5-5 13 0 18 5-5 5-13 0-18Z"],
+  sparkles: ["m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3Z", "M20 2v4M18 4h4"],
+  sliders: ["M4 7h6m4 0h6M4 17h10m4 0h2", "M10 4v6m4 4v6"],
+  layers: ["m12 3 9 5-9 5-9-5 9-5Z", "m3 12 9 5 9-5M3 16l9 5 9-5"],
+  chart: ["M4 3v17h17M8 15v-4m5 4V7m5 8v-6"],
+  gauge: ["M5 18a9 9 0 1 1 14 0", "m12 13 4-5M8 18h8"],
+  cpu: ["M8 3v3m4-3v3m4-3v3M8 18v3m4-3v3m4-3v3M3 8h3m-3 4h3m-3 4h3m12-8h3m-3 4h3m-3 4h3", "M6 6h12v12H6zM9 9h6v6H9z"],
+  database: ["M4 6c0-4 16-4 16 0s-16 4-16 0Z", "M4 6v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0"],
+  info: ["M12 11v6M12 7h.01", "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"],
+  check: ["m5 12 4 4L19 6"],
+  warning: ["m12 3 10 18H2L12 3Z", "M12 9v5m0 3h.01"],
+  arrow: ["M4 12h16m-6-6 6 6-6 6"],
+  target: ["M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z", "M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0ZM12 11v2"]
+};
+function Icon({ name = "info", className = "" }) {
+  return h(
+    "svg",
+    { className: `dgui-icon ${className}`, width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.65, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true, focusable: false },
+    (paths[name] ?? paths.info).map((d, i) => h("path", { key: i, d }))
+  );
+}
+
+// src/expressive-controls.js
+var h2 = import_react2.default.createElement;
+function ExpressiveAction({ tag = "button", text: text2, icon = "arrow", ...props }) {
+  const ref = (0, import_react2.useRef)(null);
+  function move(e) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || props.disabled) return;
+    const box2 = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--du-mx", (e.clientX - box2.left - box2.width / 2) * 0.035 + "px");
+    e.currentTarget.style.setProperty("--du-my", (e.clientY - box2.top - box2.height / 2) * 0.07 + "px");
+  }
+  function leave(e) {
+    e.currentTarget.style.setProperty("--du-mx", "0px");
+    e.currentTarget.style.setProperty("--du-my", "0px");
+  }
+  return h2(tag, { ...props, ref, "aria-label": text2, className: (props.className ?? "") + " dgui-expressive-action", onPointerMove: move, onPointerLeave: leave }, h2("span", { className: "dgui-action-fill", "aria-hidden": true }), h2("span", { className: "dgui-action-label", "aria-hidden": true }, h2("span", null, text2), h2("span", null, text2)), h2("span", { className: "dgui-action-orb", "aria-hidden": true }, h2(Icon, { name: icon })));
+}
+function ElasticToggle({ id: id2, checked, disabled, onChange }) {
+  const [stretch, setStretch] = (0, import_react2.useState)(false), timer = (0, import_react2.useRef)(), drag = (0, import_react2.useRef)(null), skip = (0, import_react2.useRef)(false);
+  (0, import_react2.useEffect)(() => () => clearTimeout(timer.current), []);
+  function change(value) {
+    onChange(value);
+    clearTimeout(timer.current);
+    setStretch(true);
+    timer.current = setTimeout(() => setStretch(false), 260);
+  }
+  function end(e, cancel = false) {
+    const d = drag.current;
+    drag.current = null;
+    e.currentTarget.style.removeProperty("--du-drag");
+    if (!d || !d.moved) return;
+    if (!cancel) {
+      skip.current = true;
+      setTimeout(() => {
+        skip.current = false;
+      }, 0);
+      change(d.x > 17);
+    }
+    setStretch(false);
+  }
+  return h2("input", { id: id2, type: "checkbox", checked, disabled, className: "dgui-toggle dgui-elastic" + (stretch ? " is-stretch" : ""), onChange: (e) => {
+    if (skip.current) {
+      skip.current = false;
+      return;
+    }
+    change(e.target.checked);
+  }, onClick: (e) => {
+    if (skip.current) e.preventDefault();
+  }, onPointerDown: (e) => {
+    if (disabled || e.button !== 0) return;
+    drag.current = { start: e.clientX, base: checked ? 34 : 0, x: checked ? 34 : 0, moved: false };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }, onPointerMove: (e) => {
+    const d = drag.current;
+    if (!d) return;
+    const dx = e.clientX - d.start;
+    if (Math.abs(dx) > 4) d.moved = true;
+    if (d.moved) {
+      d.x = Math.max(0, Math.min(34, d.base + dx));
+      e.currentTarget.style.setProperty("--du-drag", d.x + "px");
+    }
+  }, onPointerUp: (e) => end(e), onPointerCancel: (e) => end(e, true) });
+}
+function Stepper({ value, spec, label, disabled, onChange, children }) {
+  const step = (direction) => onChange(Math.max(spec.min, Math.min(spec.max, Number((value + direction * spec.step).toPrecision(15)))));
+  return h2("div", { className: "dgui-stepper" }, h2("button", { type: "button", disabled: disabled || value <= spec.min, "aria-label": "\u51CF\u5C11" + label, onClick: () => step(-1) }, "\u2212"), children, h2("button", { type: "button", disabled: disabled || value >= spec.max, "aria-label": "\u589E\u52A0" + label, onClick: () => step(1) }, "+"));
+}
+var EXPRESSIVE_CSS = `
+.dgui-root .dgui-expressive-action[data-variant=primary]{position:relative;isolation:isolate;overflow:hidden;gap:14px;padding:8px 8px 8px 20px!important;min-height:48px;font-size:inherit;font-weight:700;translate:calc(var(--du-mx,0px) * var(--du-motion-gain,1)) calc(var(--du-my,0px) * var(--du-motion-gain,1));transition:translate .7s cubic-bezier(.34,1.45,.64,1),box-shadow .5s,transform .4s}
+.dgui-action-fill{display:none}.dgui-root .dgui-expressive-action[data-variant=primary] .dgui-action-fill{display:block;position:absolute;inset:0;z-index:-1;background:var(--du-motion-fill,linear-gradient(115deg,var(--du-accent),color-mix(in srgb,var(--du-accent) 65%,#202832)));clip-path:circle(21px at calc(100% - 29px) 50%);transition:clip-path .7s cubic-bezier(.2,.8,.2,1)}
+.dgui-action-label{display:block;position:relative;overflow:hidden;line-height:1.5;padding:3px 0}.dgui-action-label>span{display:block;transition:transform var(--du-label-ms,550ms) cubic-bezier(.34,1.45,.64,1),opacity .3s}.dgui-action-label>span+span{position:absolute;left:0;top:3px;transform:translateY(130%);opacity:0}
+.dgui-root .dgui-expressive-action[data-variant=primary]:is(:hover,:focus-visible):not(:disabled){color:#fff;box-shadow:0 20px 36px -20px color-mix(in srgb,var(--du-accent) 45%,transparent)}
+.dgui-root .dgui-expressive-action[data-variant=primary]:is(:hover,:focus-visible):not(:disabled) .dgui-action-fill{clip-path:circle(160% at calc(100% - 29px) 50%)}
+.dgui-expressive-action:is(:hover,:focus-visible):not(:disabled) .dgui-action-label>span:first-child{transform:translateY(-130%);opacity:0}.dgui-expressive-action:is(:hover,:focus-visible):not(:disabled) .dgui-action-label>span+span{transform:none;opacity:1}
+.dgui-action-orb{width:var(--du-orb-size,42px);height:var(--du-orb-size,42px);border-radius:var(--du-orb-radius,50%);display:grid;place-items:center;background:var(--du-motion-orb,var(--du-accent));color:#fff;flex:none}.dgui-action-orb .dgui-icon{width:20px;height:20px;transition:transform .6s cubic-bezier(.34,1.45,.64,1)}.dgui-expressive-action:hover .dgui-action-orb .dgui-icon{transform:translateX(3px)}
+.dgui-expressive-action:not([data-variant=primary]) .dgui-action-orb{width:20px;height:20px;background:transparent;color:inherit;border-radius:0}.dgui-expressive-action:not([data-variant=primary]) .dgui-action-orb .dgui-icon{width:16px;height:16px}
+.dgui-root .dgui-elastic{position:relative;flex:none;width:78px;height:44px;border:0;border-radius:var(--du-action-radius,999px);background:var(--du-line);box-shadow:inset 0 2px 5px #0002;touch-action:none}
+.dgui-root .dgui-elastic:before{left:6px;top:6px;width:32px;height:32px;background:white;box-shadow:0 4px 10px #0003;transform:translateX(var(--du-drag,0px));transition:transform .5s cubic-bezier(.34,1.45,.64,1),width .25s cubic-bezier(.2,.8,.2,1)}
+.dgui-root .dgui-elastic:after{content:'\xD7';position:absolute;left:6px;top:6px;width:32px;height:32px;display:grid;place-items:center;color:#8c8795;font-size:21px;font-weight:700;transform:translateX(var(--du-drag,0px));transition:transform .5s cubic-bezier(.34,1.45,.64,1)}
+.dgui-root .dgui-elastic:checked{background:var(--du-motion-fill,var(--du-accent));box-shadow:inset 0 1px 3px #0001,0 10px 20px -12px #14b8a688}
+.dgui-root .dgui-elastic:checked:before,.dgui-root .dgui-elastic:checked:after{transform:translateX(var(--du-drag,34px))}.dgui-root .dgui-elastic:checked:after{content:'\u2713';color:var(--du-accent)}
+.dgui-root .dgui-elastic.is-stretch:before{width:44px}.dgui-root .dgui-elastic.is-stretch:checked:before{transform:translateX(22px)}
+.dgui-stepper{display:flex;align-items:center;gap:4px;padding:5px;border:1px solid var(--du-line);border-radius:var(--du-radius-inner,20px);background:var(--du-bg);box-shadow:0 12px 24px -20px #30204d60}
+.dgui-root .dgui-stepper>button{width:40px;height:40px;flex:none;border:0;border-radius:50%;background:var(--du-soft);color:var(--du-ink);font:600 24px/1 system-ui;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.45,.64,1)}.dgui-root .dgui-stepper>button:last-child{background:var(--du-ink);color:var(--du-bg)}.dgui-stepper>button:active:not(:disabled){transform:scale(.85)}.dgui-stepper>button:disabled{opacity:.35;cursor:default}
+.dgui-root .dgui-stepper input{width:84px!important;text-align:center;border:0!important;background:transparent!important;font-size:23px!important;font-weight:700;padding:4px!important}
+.dgui-stepper input::-webkit-inner-spin-button,.dgui-stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+@media(prefers-reduced-motion:reduce){.dgui-root .dgui-expressive-action,.dgui-root .dgui-expressive-action *,.dgui-root .dgui-elastic,.dgui-root .dgui-elastic:before,.dgui-root .dgui-elastic:after,.dgui-root .dgui-stepper button{transition:none!important;animation:none!important;translate:none!important}.dgui-root .dgui-elastic.is-stretch:before{width:32px}.dgui-root .dgui-elastic.is-stretch:checked:before{transform:translateX(34px)}}
+`;
+
+// src/motion-controls.js
+var import_react3 = __toESM(require("react"), 1);
+var h3 = import_react3.default.createElement;
+function SegmentedControl({ id: id2, label, options, value, disabled, onChange }) {
+  const selected = Math.max(0, options.indexOf(value)), buttons = (0, import_react3.useRef)([]);
+  function move(event, index) {
+    const key2 = event.key;
+    let next;
+    if (key2 === "ArrowRight" || key2 === "ArrowDown") next = (index + 1) % options.length;
+    else if (key2 === "ArrowLeft" || key2 === "ArrowUp") next = (index + options.length - 1) % options.length;
+    else if (key2 === "Home") next = 0;
+    else if (key2 === "End") next = options.length - 1;
+    else return;
+    event.preventDefault();
+    onChange(options[next]);
+    buttons.current[next]?.focus();
+  }
+  return h3("div", { id: id2, role: "radiogroup", "aria-label": label, className: "dgui-segmented", style: { "--segment-count": options.length, "--segment-index": selected }, "data-disabled": disabled || void 0 }, h3("span", { className: "dgui-segment-indicator", "aria-hidden": true }), options.map((option, i) => h3("button", { key: i, ref: (el) => {
+    buttons.current[i] = el;
+  }, type: "button", role: "radio", "aria-checked": i === selected, tabIndex: i === selected ? 0 : -1, disabled, onClick: () => onChange(option), onKeyDown: (e) => move(e, i) }, String(option))));
+}
+function MetricValue({ value, children, preview, expressive = false }) {
+  const ref = (0, import_react3.useRef)(null), previous = (0, import_react3.useRef)(value), armed = (0, import_react3.useRef)(!preview);
+  (0, import_react3.useEffect)(() => {
+    const changed = previous.current !== value, wasArmed = armed.current;
+    previous.current = value;
+    armed.current = !preview;
+    if (!changed || !wasArmed || preview || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const tokens = ref.current ? getComputedStyle(ref.current) : null, duration = Number(tokens?.getPropertyValue("--du-feedback-ms")) || 460, travel = tokens?.getPropertyValue("--du-feedback-travel").trim() || "90%";
+    const animation = ref.current?.animate?.(expressive ? [{ opacity: 0, transform: "translateY(" + travel + ")" }, { opacity: 1, transform: "translateY(-8%)", offset: 0.75 }, { opacity: 1, transform: "translateY(0)" }] : [{ opacity: 0.65, transform: "translateY(2px)" }, { opacity: 1, transform: "none" }], { duration: expressive ? duration : 180, easing: "cubic-bezier(.2,.8,.2,1)" });
+    return () => animation?.cancel();
+  }, [value, preview, expressive]);
+  return h3("strong", { ref }, children);
+}
+var MOTION_CSS = `
+.dgui-control>.dgui-control-label{flex:1 1 170px;display:flex;align-items:flex-start;gap:7px;line-height:1.6;font-size:inherit;color:var(--du-ink)}.dgui-control>.dgui-control-label .dgui-icon{width:15px;height:15px;margin-top:3px;color:var(--du-accent)}
+.dgui-segmented{display:grid;grid-template-columns:repeat(var(--segment-count),minmax(0,1fr));position:relative;isolation:isolate;flex:1 1 240px;min-width:0;background:var(--du-soft);border:1px solid var(--du-line);padding:4px;border-radius:16px;gap:0}
+.dgui-segment-indicator{position:absolute;z-index:-1;left:4px;top:4px;bottom:4px;width:calc((100% - 8px)/var(--segment-count));transform:translateX(calc(var(--segment-index)*100%));background:var(--du-bg);border:1px solid var(--du-line);border-radius:12px;box-shadow:0 2px 7px #18253712;transition:transform 220ms cubic-bezier(.2,.8,.2,1)}
+.dgui-segmented button{border:0;background:transparent;color:var(--du-muted);padding:9px 10px;min-width:0;border-radius:12px;font:inherit;line-height:1.4;cursor:pointer;overflow-wrap:anywhere;transition:color 160ms ease}
+.dgui-segmented button[aria-checked=true]{color:var(--du-accent);font-weight:700}.dgui-segmented button:disabled{cursor:default;opacity:.6}.dgui-segmented button:focus-visible{outline:2px solid var(--du-accent);outline-offset:-2px}
+.dgui-root .dgui-button,.dgui-root .motion-copy-button{transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease,transform 160ms ease}.dgui-root .dgui-button:active:not(:disabled),.motion-copy-button:active:not(:disabled){transform:scale(.98)}
+.dgui-toggle{transition:background-color 180ms ease,border-color 180ms ease}.dgui-toggle:before{transition:transform 180ms ease}
+.dgui-root:not([data-preview]) .dgui-chart rect{transition:y 220ms ease-out,height 220ms ease-out}.dgui-root:not([data-preview]) progress::-webkit-progress-value{transition:width 220ms ease-out}
+.dgui-control input[type=range]{appearance:none;-webkit-appearance:none;border:0!important;padding:0!important;background:transparent!important;outline-offset:5px}
+.dgui-control input[type=range]::-webkit-slider-runnable-track{height:7px;border-radius:999px;background:linear-gradient(to right,var(--du-accent) 0 var(--du-range,0%),var(--du-line) var(--du-range,0%) 100%)}
+.dgui-control input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:20px;height:20px;margin-top:-6.5px;border:3px solid var(--du-bg);border-radius:50%;background:var(--du-accent);box-shadow:0 1px 5px #18253730}
+.dgui-control input[type=range]::-moz-range-track{height:7px;border-radius:999px;background:var(--du-line)}.dgui-control input[type=range]::-moz-range-progress{height:7px;border-radius:999px;background:var(--du-accent)}.dgui-control input[type=range]::-moz-range-thumb{width:16px;height:16px;border:3px solid var(--du-bg);border-radius:50%;background:var(--du-accent)}
+@media(prefers-reduced-motion:reduce){.dgui-root .dgui-segment-indicator,.dgui-root .dgui-button,.dgui-root .motion-copy-button,.dgui-root .dgui-toggle,.dgui-root .dgui-toggle:before,.dgui-root .dgui-chart rect,.dgui-root progress::-webkit-progress-value{transition:none!important;animation:none!important}}
+.dgui-root[data-preview] .dgui-segment-indicator{transition:none}
+@media(forced-colors:active){.dgui-segment-indicator{background:Highlight}.dgui-segmented button[aria-checked=true]{color:HighlightText}.dgui-control input[type=range]{appearance:auto;-webkit-appearance:auto}}
+`;
 
 // src/view.js
-var import_react15 = __toESM(require("react"), 1);
+var import_react17 = __toESM(require("react"), 1);
 
 // lib/presentation.js
 var UI_ICONS = Object.freeze(["sparkles", "sliders", "layers", "chart", "gauge", "cpu", "database", "info", "check", "warning", "arrow", "target", "external", "file", "globe"]);
@@ -48,15 +220,18 @@ var UI_LAYOUTS = Object.freeze(["dashboard", "workbench", "comparison", "guide",
 var UI_ACCENTS = Object.freeze(["blue", "teal", "violet", "amber", "rose"]);
 var UI_SURFACES = Object.freeze(["outline", "soft", "featured"]);
 
+// lib/mechanism-runtime-bundle.js
+var MECHANISM_RUNTIME = 'var __MotionMechanism=(()=>{var it=Object.defineProperty;var Ot=Object.getOwnPropertyDescriptor;var Et=Object.getOwnPropertyNames;var It=Object.prototype.hasOwnProperty;var zt=(t,a)=>{for(var n in a)it(t,n,{get:a[n],enumerable:!0})},Pt=(t,a,n,o)=>{if(a&&typeof a=="object"||typeof a=="function")for(let e of Et(a))!It.call(t,e)&&e!==n&&it(t,e,{get:()=>a[e],enumerable:!(o=Ot(a,e))||o.enumerable});return t};var _t=t=>Pt(it({},"__esModule",{value:!0}),t);var Tt={};zt(Tt,{createMechanismAPI:()=>Ft});var st=Math.PI/180,Ct=Math.sqrt(1.6);function yt({scale:t,azimuth:a=45,elevation:n=30}){let o=a*st,e=n*st;return{sinA:Math.sin(o),cosA:Math.cos(o),sinE:Math.sin(e),cosE:Math.cos(e),k:t*Ct}}function q([t,a,n],o){let{origin:e}=o,{sinA:i,cosA:r,sinE:p,cosE:d,k:m}=yt(o);return[e[0]+(t*i-a*r)*m,e[1]+((t*r+a*i)*p-n*d)*m]}function tt([t,a,n],o){let{sinA:e,cosA:i,sinE:r,cosE:p}=yt(o);return(t*i+a*e)*p+n*r}function vt({x:t,y:a,w:n,d:o,r:e},i=8){let r=Math.max(0,Math.min(e,n/2,o/2)),p=[[t+n-r,a+r,-90],[t+n-r,a+o-r,0],[t+r,a+o-r,90],[t+r,a+r,180]],d=[];for(let[m,s,c]of p){let u=r>0?i:0;for(let f=0;f<=u;f++){let g=(c+(u?90*f/u:45))*st;d.push([m+r*Math.cos(g),s+r*Math.sin(g)])}}return d}function lt(t,a,n,o=40){return Array.from({length:o},(e,i)=>{let r=i/o*Math.PI*2;return[t+n*Math.cos(r),a+n*Math.sin(r)]})}function ct(t,a,n,{pad:o=24,headroom:e=0,azimuth:i=45,elevation:r=30}={}){let p={origin:[0,0],scale:1,azimuth:i,elevation:r},d=t.map(M=>q(M,p)),m=d.map(([M])=>M),s=d.map(([,M])=>M),c=Math.min(...m),u=Math.max(...m),f=Math.min(...s),g=Math.max(...s),h=Math.min((a-o*2)/(u-c),(n-o*2-e)/(g-f));return{origin:[a/2-(c+u)/2*h,e+(n-e)/2-(f+g)/2*h],scale:h,azimuth:i,elevation:r}}var Nt=Object.freeze({parts:96,teeth:64,faces:8192}),Ht=t=>typeof t=="number"&&Number.isFinite(t),y=t=>{throw Error("Motion mechanism: "+t)},v=(t,a,n=-1e4,o=1e4)=>((!Ht(t)||t<n||t>o)&&y(a+" must be a finite number in "+n+".."+o),t),U=(t,a)=>((!Array.isArray(t)||t.length!==3)&&y(a+" must be [x,y,z]"),t.map((n,o)=>v(n,a+"["+o+"]"))),et=t=>typeof t=="string"&&/^[\\p{L}_][\\p{L}\\p{M}\\p{N}_]{0,63}$/u.test(t)&&!["constructor","prototype","__proto__"].includes(t),kt=["box","cylinder","gear","rod","spring"],I=(t,a)=>t.map((n,o)=>n+a[o]),B=(t,a)=>t.map((n,o)=>n-a[o]),_=(t,a)=>t.map(n=>n*a),dt=(t,a)=>t.reduce((n,o,e)=>n+o*a[e],0),V=(t,a)=>[t[1]*a[2]-t[2]*a[1],t[2]*a[0]-t[0]*a[2],t[0]*a[1]-t[1]*a[0]],J=t=>{let a=Math.hypot(...t);return a<1e-6&&y("zero-length axis"),_(t,1/a)};function Y(t){(!t||typeof t!="object"||Array.isArray(t))&&y("scene must be an object"),(!Array.isArray(t.parts)||!t.parts.length||t.parts.length>Nt.parts)&&y("parts requires 1..96 objects");let a=new Set,n=new Set;for(let[o,e]of t.parts.entries()){let i="parts["+o+"]";(!e||typeof e!="object"||!et(e.id)||a.has(e.id))&&y(i+".id must be a unique identifier"),a.add(e.id),kt.includes(e.type)||y(i+".type must be "+kt.join("/")),e.group!==void 0&&(et(e.group)||y(i+".group must be an identifier"),n.add(e.group));for(let r of["label","description"])e[r]!==void 0&&(typeof e[r]!="string"||e[r].length>1024)&&y(i+"."+r+" must be short text");if(e.cover!==void 0&&typeof e.cover!="boolean"&&y(i+".cover must be boolean"),e.material!==void 0&&!["metal","dark","accent","warm","cool"].includes(e.material)&&y(i+".material must be metal/dark/accent/warm/cool"),e.at!==void 0&&U(e.at,i+".at"),e.explode!==void 0&&U(e.explode,i+".explode"),e.rotation!==void 0&&v(e.rotation,i+".rotation",-1e9,1e9),e.axis!==void 0&&!["x","y","z"].includes(e.axis)&&y(i+".axis must be x/y/z"),e.type==="box"){let r=U(e.size,i+".size");r.some(p=>p<=0||p>2e3)&&y(i+".size must be positive and <=2000"),e.round!==void 0&&v(e.round,i+".round",0,Math.min(r[0],r[1])/2)}if(["cylinder","gear"].includes(e.type)&&(v(e.radius,i+".radius",.1,1e3),v(e.height??8,i+".height",.1,1e3),e.inner!==void 0&&v(e.inner,i+".inner",0,e.radius-.01)),e.type==="gear"){let r=v(e.teeth,i+".teeth",6,64);Number.isInteger(r)||y(i+".teeth must be an integer"),e.module!==void 0&&v(e.module,i+".module",.1,e.radius/3)}if(["rod","spring"].includes(e.type)&&(U(e.from,i+".from"),U(e.to,i+".to"),Math.hypot(...B(e.to,e.from))<.1&&y(i+" endpoints must differ"),v(e.radius??2,i+".radius",.1,200)),e.type==="spring"){let r=v(e.turns??8,i+".turns",2,24);Number.isInteger(r)||y(i+".turns must be integer")}}if(t.groups!==void 0){(!Array.isArray(t.groups)||t.groups.length>12)&&y("groups must be an array of <=12 labels");let o=new Set;for(let e of t.groups)(!e||!et(e.id)||o.has(e.id)||!n.has(e.id)||typeof e.label!="string"||e.label.length>128)&&y("groups must name unique existing part groups"),o.add(e.id)}if(t.bounds!==void 0){(!Array.isArray(t.bounds)||t.bounds.length!==2)&&y("bounds must be [minXYZ,maxXYZ]");let[o,e]=t.bounds.map((i,r)=>U(i,"bounds["+r+"]"));o.some((i,r)=>i>=e[r])&&y("bounds min must be below max on every axis")}if(t.azimuth!==void 0&&v(t.azimuth,"azimuth",10,80),t.elevation!==void 0&&v(t.elevation,"elevation",15,70),t.title!==void 0&&(typeof t.title!="string"||t.title.length>256)&&y("title must be short text"),t.bind!==void 0){(!t.bind||typeof t.bind!="object"||Array.isArray(t.bind))&&y("bind must be an object");for(let[o,e]of Object.entries(t.bind))(!["explode","selected","cutaway"].includes(o)||!et(e))&&y("bind only accepts declared state keys for explode/selected/cutaway")}return t}function Lt(t){return t==="x"?[[0,1,0],[0,0,1],[1,0,0]]:t==="y"?[[0,0,1],[1,0,0],[0,1,0]]:[[1,0,0],[0,1,0],[0,0,1]]}var at=(t,a,n,o)=>I(I(_(t[0],a),_(t[1],n)),_(t[2],o));function Rt(t,a,n,o){let e=t.map(([m,s])=>at(n,m,s,-a/2)),i=t.map(([m,s])=>at(n,m,s,a/2)),r=[],p=o?.map(([m,s])=>at(n,m,s,a/2)),d=o?.map(([m,s])=>at(n,m,s,-a/2));r.push({points:i,holes:p?[p.slice().reverse()]:[],normal:n[2]},{points:e.slice().reverse(),holes:d?[d]:[],normal:_(n[2],-1)});for(let m=0;m<t.length;m++){let s=(m+1)%t.length;Math.hypot(...B(e[s],e[m]))<1e-6||(r.push({points:[e[m],e[s],i[s],i[m]],normal:J(V(B(e[s],e[m]),n[2]))}),o&&r.push({points:[d[s],d[m],p[m],p[s]],normal:J(V(B(d[m],d[s]),n[2]))}))}return r}function ot(t){let a=Lt(t.axis),n,o,e;if(t.type==="box"&&(n=vt({x:-t.size[0]/2,y:-t.size[1]/2,w:t.size[0],d:t.size[1],r:t.round??Math.min(2,t.size[0]/2,t.size[1]/2)},3),o=t.size[2]),t.type==="cylinder"&&(n=lt(0,0,t.radius,24),o=t.height??8),t.type==="gear"){let s=Math.PI*2/t.teeth,c=t.module??t.radius*2/t.teeth;n=[];for(let u=0;u<t.teeth;u++)for(let[f,g]of[[-.5,t.radius-c*.85],[-.32,t.radius-c*.85],[-.17,t.radius+c*.7],[.17,t.radius+c*.7],[.32,t.radius-c*.85]]){let h=(u+f)*s;n.push([Math.cos(h)*g,Math.sin(h)*g])}o=t.height??8}if(t.type==="rod"){let s=J(B(t.to,t.from)),c=J(V(s,Math.abs(s[2])<.9?[0,0,1]:[0,1,0]));a=[c,V(s,c),s],n=lt(0,0,t.radius??2,16),o=Math.hypot(...B(t.to,t.from))}if(t.type==="spring"){let s=J(B(t.to,t.from)),c=J(V(s,Math.abs(s[2])<.9?[0,0,1]:[0,1,0])),u=V(s,c),f=[];for(let g=0;g<=128;g++){let h=g/128,M=h*(t.turns??8)*Math.PI*2,O=Math.min(1,h*12,(1-h)*12);f.push(I(I(t.from,_(B(t.to,t.from),h)),I(_(c,Math.cos(M)*(t.radius??6)*O),_(u,Math.sin(M)*(t.radius??6)*O))))}return{line:f,points:f}}let i=t.rotation??0,r=Math.cos(i),p=Math.sin(i);n=n.map(([s,c])=>[s*r-c*p,s*p+c*r]);let d=t.inner?n.map(([s,c])=>{let u=Math.atan2(c,s);return[Math.cos(u)*t.inner,Math.sin(u)*t.inner]}):void 0;e=Rt(n,o,a,d);let m=t.type==="rod"?_(I(t.from,t.to),.5):t.at??[0,0,0];return e=e.map(s=>({...s,points:s.points.map(c=>I(c,m)),holes:s.holes?.map(c=>c.map(u=>I(u,m)))})),{faces:e,points:e.flatMap(s=>s.points)}}function wt(t){if(t.bounds){let[a,n]=t.bounds;return Array.from({length:8},(o,e)=>[e&1?n[0]:a[0],e&2?n[1]:a[1],e&4?n[2]:a[2]])}return t.parts.flatMap(a=>ot(a).points.flatMap(o=>[o,I(o,a.explode??[0,0,0])]))}function W({driverTeeth:t=16,drivenTeeth:a=32,rpm:n=30,angle:o=0,module:e=2}={}){for(let[i,r]of Object.entries({driverTeeth:t,drivenTeeth:a}))(!Number.isInteger(r)||r<6||r>64)&&y(i+" must be integer 6..64");return v(n,"rpm",-600,600),v(o,"angle",-1e9,1e9),v(e,"module",.1,10),{driverRadius:t*e/2,drivenRadius:a*e/2,centerDistance:(t+a)*e/2,driverAngle:o,drivenAngle:-o*t/a+Math.PI-Math.PI/a,driverRpm:n,drivenRpm:-n*t/a,ratio:a/t}}function X({angle:t=0,radius:a=20,rod:n=70,z:o=20}={}){v(t,"angle",-1e9,1e9),v(a,"radius",.1,200),v(n,"rod",.1,1e3),v(o,"z"),n<=a&&y("connecting rod length must exceed crank radius");let e=[a*Math.cos(t),a*Math.sin(t),o],i=e[0]+Math.sqrt(n*n-e[1]*e[1]);return{crank:e,piston:[i,0,o],position:i,stroke:a*2,angle:t}}function Mt(t,a,n,o=.16){return v(t,"value",-1e9,1e9),v(a,"target",-1e9,1e9),v(n,"delta",0,.1),v(o,"tau",.01,10),t+(a-t)*(1-Math.exp(-n/o))}var $t=Math.PI*2;function nt(t,a){Y(t);let n=a&&!t.bounds?t.parts.filter(o=>!a.cutaway||!o.cover).flatMap(o=>ot(o).points.map(e=>I(e,_(o.explode??[0,0,0],a.explode??0)))):wt(t);return ct(n.length?n:[[0,0,0],[1,1,1]],600,340,{pad:24,azimuth:t.azimuth??45,elevation:t.elevation??30})}var At=t=>t.map(([a,n],o)=>(o?"L":"M")+Math.round(a*10)/10+" "+Math.round(n*10)/10).join("")+"Z";function mt(t,a,{explode:n=0,selected:o="all",cutaway:e=!1,pose:i={}}={},r=new Map){if(typeof n!="number"||!Number.isFinite(n)||n<0||n>1)throw Error("Motion mechanism: explode must be 0..1");if(typeof o!="string"||typeof e!="boolean")throw Error("Motion mechanism: selected must be text and cutaway boolean");if(!i||typeof i!="object"||Array.isArray(i))throw Error("Motion mechanism: pose must be an object");for(let c of Object.keys(i))if(!t.parts.some(u=>u.id===c))throw Error("Motion mechanism: unknown pose part "+c);let p=(a.azimuth??45)*$t/360,d=(a.elevation??30)*$t/360,m=[Math.cos(p)*Math.cos(d),Math.sin(p)*Math.cos(d),Math.sin(d)],s=[];for(let c of t.parts){if(e&&c.cover)continue;let u=i[c.id]??{};for(let $ of Object.keys(u))if(!["at","rotation","from","to"].includes($))throw Error("Motion mechanism: unsupported pose field "+$);let f={...c,...u},g=JSON.stringify(f),h=r.get(c.id);h?.key!==g&&(Y({parts:[f]}),h={key:g,...ot(f)},r.set(c.id,h));let M=_(f.explode??[0,0,0],n),O=Math.min(...h.points.map($=>$[2]))+M[2],N=o==="all"||o===c.id||o===c.group;if(h.line){let $=h.line.map(P=>I(P,M));s.push({floor:O,key:f.id+"_line",part:f.id,group:f.group,d:$.map((P,A)=>(A?"L":"M")+q(P,a).join(" ")).join(""),depth:tt($[Math.floor($.length/2)],a),line:!0,tone:1,material:f.material??"metal",active:N});continue}for(let[$,P]of h.faces.entries()){if(dt(P.normal,m)<=1e-4)continue;let w=P.points.map(S=>I(S,M)),T=P.holes?.map(S=>S.map(H=>I(H,M))),D=_(w.reduce((S,H)=>I(S,H),[0,0,0]),1/w.length),G=dt(P.normal,[-.25,-.4,.88]);s.push({floor:O,key:f.id+"_"+$,part:f.id,group:f.group,d:At(w.map(S=>q(S,a)))+(T??[]).map(S=>At(S.map(H=>q(H,a)))).join(""),depth:tt(D,a),line:!1,tone:G>.5?0:G>.1?1:G>-.4?2:3,material:f.material??"metal",active:N})}}if(s.length>8192)throw Error("Motion mechanism: face budget exceeded");return s.sort((c,u)=>c.floor-u.floor||c.depth-u.depth||c.key.localeCompare(u.key))}var z=(t,a,n,o,e,i={})=>({id:t,type:"box",label:a,at:n,size:o,group:e,...i}),F=(t,a,n,o,e,i,r={})=>({id:t,type:"cylinder",label:a,at:n,radius:o,height:e,group:i,...r});function ut(t,a,n,o,e=3,i=18){return[[-1,-1],[-1,1],[1,-1],[1,1]].map(([r,p],d)=>F(o+"_bolt_"+d,"\\u56FA\\u5B9A\\u87BA\\u6813",[t+r*i,a+p*i,n],e,3,o,{material:"dark",explode:[0,0,26]}))}function ft(){return{title:"\\u5206\\u5C42\\u7ED3\\u6784 \\xB7 \\u793A\\u610F\\u88C5\\u914D",groups:[{id:"base",label:"\\u5E95\\u5EA7",description:"\\u652F\\u6491\\u6574\\u4F53\\uFF0C\\u5E76\\u63D0\\u4F9B\\u5B89\\u88C5\\u4F4D\\u7F6E\\u3002"},{id:"board",label:"\\u529F\\u80FD\\u677F",description:"\\u8FDE\\u63A5\\u8F93\\u5165\\u4E0E\\u5904\\u7406\\u6A21\\u5757\\uFF1B\\u793A\\u610F\\u7ED3\\u6784\\uFF0C\\u4E0D\\u5BF9\\u5E94\\u7279\\u5B9A\\u4EA7\\u54C1\\u3002"},{id:"sink",label:"\\u6563\\u70ED\\u5C42",description:"\\u5C06\\u70ED\\u91CF\\u4F20\\u5230\\u66F4\\u5927\\u7684\\u8868\\u9762\\u79EF\\u3002"},{id:"cover",label:"\\u5916\\u58F3",description:"\\u4FDD\\u62A4\\u5185\\u90E8\\uFF1B\\u5256\\u5F00\\u9009\\u9879\\u901A\\u8FC7\\u9690\\u85CF\\u5916\\u58F3\\u5C55\\u793A\\u7ED3\\u6784\\u3002"}],parts:[z("base","\\u5B89\\u88C5\\u5E95\\u5EA7",[0,0,0],[120,85,10],"base",{round:6,material:"metal"}),...[-1,1].flatMap((t,a)=>[-1,1].map((n,o)=>F("foot_"+a+o,"\\u9632\\u6ED1\\u811A",[t*46,n*30,-8],6,7,"base",{material:"dark"}))),z("board","\\u529F\\u80FD\\u677F",[0,0,15],[96,62,4],"board",{round:3,material:"cool",explode:[0,0,35]}),z("chip","\\u5904\\u7406\\u6A21\\u5757",[-16,0,22],[25,24,10],"board",{round:2,material:"dark",explode:[0,0,35]}),z("connector","\\u8FDE\\u63A5\\u7AEF\\u53E3",[32,0,24],[16,36,14],"board",{round:2,material:"warm",explode:[0,0,35]}),...ut(0,0,20,"board",2,24),z("spreader","\\u5BFC\\u70ED\\u5E95\\u677F",[-16,0,32],[44,42,5],"sink",{round:2,material:"metal",explode:[-10,0,65]}),...Array.from({length:7},(t,a)=>z("fin_"+a,"\\u6563\\u70ED\\u9CCD\\u7247",[-34+a*6,0,44],[2.4,40,20],"sink",{round:1,material:"metal",explode:[-10,0,65]})),z("top","\\u9876\\u76D6",[0,0,61],[124,89,5],"cover",{round:6,cover:!0,material:"metal",explode:[12,0,85]}),z("side","\\u4FA7\\u677F",[0,-44,32],[124,4,58],"cover",{round:2,cover:!0,material:"metal",explode:[12,-22,50]})]}}function pt({driverTeeth:t=16,drivenTeeth:a=32,module:n=1.5}={}){let o=W({driverTeeth:t,drivenTeeth:a,module:n}),e=o.centerDistance;return{title:"\\u9F7F\\u8F6E\\u4F20\\u52A8 \\xB7 \\u7B80\\u5316\\u76F4\\u9F7F\\u8F6E\\u793A\\u610F",azimuth:70,elevation:55,groups:[{id:"frame",label:"\\u652F\\u67B6",description:"\\u56FA\\u5B9A\\u8F74\\u5FC3\\u4F4D\\u7F6E\\uFF1B\\u4E24\\u8F74\\u4E2D\\u5FC3\\u8DDD\\u7531\\u9F7F\\u6570\\u4E0E\\u6A21\\u6570\\u5171\\u540C\\u786E\\u5B9A\\u3002"},{id:"driver",label:"\\u4E3B\\u52A8\\u8F6E",description:"\\u8F93\\u5165\\u8F6C\\u901F\\uFF0C\\u7531\\u9F7F\\u6570\\u51B3\\u5B9A\\u8282\\u5706\\u534A\\u5F84\\u3002"},{id:"driven",label:"\\u4ECE\\u52A8\\u8F6E",description:"\\u5916\\u556E\\u5408\\u8F6C\\u5411\\u76F8\\u53CD\\uFF0C\\u8F6C\\u901F\\u6309\\u9F7F\\u6570\\u6BD4\\u53D8\\u5316\\u3002"},{id:"cover",label:"\\u5916\\u58F3",description:"\\u9690\\u85CF\\u76D6\\u677F\\u4EE5\\u89C2\\u5BDF\\u4F20\\u52A8\\uFF1B\\u4E0D\\u662F\\u52A0\\u5DE5\\u6216\\u53D7\\u529B\\u4EFF\\u771F\\u3002"}],parts:[z("base","\\u5B89\\u88C5\\u5E95\\u5EA7",[30,0,-8],[140,90,10],"frame",{round:6,material:"metal"}),...ut(30,0,0,"frame",3,32),...[0,e].flatMap((i,r)=>[F("bearing_"+r,"\\u8F74\\u627F\\u5EA7",[i,0,4],10,12,"frame",{inner:4,material:"dark"}),F("shaft_"+r,"\\u4F20\\u52A8\\u8F74",[i,0,16],3.8,28,r?"driven":"driver",{material:"metal",explode:[r?24:-24,0,20]}),F("hub_"+r,"\\u8F6E\\u6BC2",[i,0,27],6,6,r?"driven":"driver",{inner:3.8,material:"warm",explode:[r?24:-24,0,20]})]),{id:"driverGear",type:"gear",label:"\\u4E3B\\u52A8\\u9F7F\\u8F6E",group:"driver",at:[0,0,20],radius:o.driverRadius,teeth:t,module:n,height:7,inner:4,material:"accent",explode:[-24,0,20]},{id:"drivenGear",type:"gear",label:"\\u4ECE\\u52A8\\u9F7F\\u8F6E",group:"driven",at:[e,0,20],radius:o.drivenRadius,teeth:a,module:n,height:7,inner:4,material:"cool",rotation:o.drivenAngle,explode:[24,0,20]},z("cover","\\u9632\\u62A4\\u76D6\\u677F",[30,0,36],[140,90,4],"cover",{round:6,cover:!0,material:"metal",explode:[0,0,62]})]}}function ht({radius:t=20,rod:a=70,angle:n=0}={}){let o=X({radius:t,rod:a,angle:n,z:28});return{title:"\\u66F2\\u67C4\\u8FDE\\u6746 \\xB7 \\u65CB\\u8F6C\\u8F6C\\u4E3A\\u5F80\\u590D",groups:[{id:"frame",label:"\\u652F\\u67B6\\u4E0E\\u5BFC\\u8F68",description:"\\u652F\\u6491\\u8F74\\u5FC3\\uFF0C\\u9650\\u5236\\u6ED1\\u5757\\u6CBF\\u540C\\u4E00\\u65B9\\u5411\\u8FD0\\u52A8\\u3002"},{id:"crank",label:"\\u66F2\\u67C4",description:"\\u66F2\\u67C4\\u7ED5\\u56FA\\u5B9A\\u8F74\\u5FC3\\u65CB\\u8F6C\\u3002"},{id:"rod",label:"\\u8FDE\\u6746",description:"\\u8FDE\\u63A5\\u66F2\\u67C4\\u9500\\u548C\\u6ED1\\u5757\\uFF0C\\u957F\\u5EA6\\u4FDD\\u6301\\u4E0D\\u53D8\\u3002"},{id:"piston",label:"\\u6ED1\\u5757",description:"\\u6CBF\\u5BFC\\u8F68\\u5F80\\u590D\\uFF1B\\u5B8C\\u6574\\u884C\\u7A0B\\u7B49\\u4E8E\\u66F2\\u67C4\\u534A\\u5F84\\u7684\\u4E24\\u500D\\u3002"}],parts:[z("base","\\u5B89\\u88C5\\u5E95\\u5EA7",[35,0,-6],[175,80,10],"frame",{round:6,material:"metal"}),...ut(35,0,1,"frame",3,30),F("bearing","\\u66F2\\u8F74\\u8F74\\u627F",[0,0,7],11,15,"frame",{inner:4,material:"dark"}),F("axle","\\u66F2\\u8F74",[0,0,15],3.8,26,"crank",{material:"metal",explode:[0,-18,18]}),F("flywheel","\\u66F2\\u67C4\\u76D8",[0,0,20],t+6,6,"crank",{inner:4,material:"accent",explode:[0,-18,18]}),z("railA","\\u5BFC\\u8F68",[74,-16,13],[85,5,6],"frame",{round:1,material:"dark"}),z("railB","\\u5BFC\\u8F68",[74,16,13],[85,5,6],"frame",{round:1,material:"dark"}),F("crankPin","\\u66F2\\u67C4\\u9500",o.crank,3,12,"crank",{material:"warm",explode:[0,-18,18]}),{id:"link",type:"rod",label:"\\u8FDE\\u6746",from:o.crank,to:o.piston,radius:2.4,group:"rod",material:"metal",explode:[0,0,45]},z("piston","\\u6ED1\\u5757",[o.position,0,22],[18,24,16],"piston",{round:3,material:"cool",explode:[20,0,18]}),F("pistonPin","\\u6ED1\\u5757\\u9500",o.piston,3,10,"piston",{material:"warm",explode:[20,0,18]})]}}var St=`\n.mui-mechanism{font:15px/1.7 system-ui,sans-serif;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:24px;padding:20px;max-width:100%;box-sizing:border-box}.mui-mechanism *{box-sizing:border-box}.mui-mechanism h2{font-size:22px;line-height:1.35;margin:0 0 8px;font-weight:750}.mui-mechanism p{margin:0;color:var(--canvas-muted)}\n.mui-mechanism-svg{display:block;width:100%;height:auto;max-height:420px;touch-action:pan-y}.mui-mechanism-svg path{stroke:color-mix(in srgb,var(--canvas-ink) 38%,var(--canvas-bg));stroke-width:.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;fill:var(--mech-base,var(--canvas-soft))}.mui-mechanism-svg [data-material=metal]{--mech-base:color-mix(in srgb,var(--canvas-muted) 32%,var(--canvas-bg))}.mui-mechanism-svg [data-material=dark]{--mech-base:color-mix(in srgb,var(--canvas-ink) 78%,var(--canvas-bg))}.mui-mechanism-svg [data-material=accent]{--mech-base:var(--canvas-accent)}.mui-mechanism-svg [data-material=cool]{--mech-base:color-mix(in srgb,#22998a 70%,var(--canvas-bg))}.mui-mechanism-svg [data-material=warm]{--mech-base:color-mix(in srgb,#dd9c42 75%,var(--canvas-bg))}\n.mui-mechanism-svg [data-tone="0"]{fill:color-mix(in srgb,var(--mech-base) 74%,var(--canvas-bg))}.mui-mechanism-svg [data-tone="1"]{fill:var(--mech-base)}.mui-mechanism-svg [data-tone="2"]{fill:color-mix(in srgb,var(--mech-base) 85%,var(--canvas-ink))}.mui-mechanism-svg [data-tone="3"]{fill:color-mix(in srgb,var(--mech-base) 68%,var(--canvas-ink))}.mui-mechanism-svg [data-line]{fill:none;stroke:var(--mech-base);stroke-width:2}.mui-mechanism-svg [data-active=false]{opacity:.2}.mui-mechanism-svg [data-active=true]{opacity:1}\n.mui-mechanism-nav{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px}.mui-mechanism button{font:inherit;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:999px;padding:6px 13px;cursor:pointer;min-height:36px}.mui-mechanism button[aria-pressed=true]{color:var(--canvas-bg);background:var(--canvas-ink);border-color:var(--canvas-ink)}.mui-mechanism button:focus-visible,.mui-mechanism input:focus-visible{outline:2px solid var(--canvas-accent);outline-offset:3px}.mui-mechanism button:disabled{opacity:.5;cursor:default}\n.mui-mechanism-controls{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:12px 14px;border-radius:16px;background:var(--canvas-soft);margin:8px 0}.mui-mechanism-controls label{display:flex;align-items:center;gap:9px;flex:1 1 180px;min-width:0}.mui-mechanism-controls input[type=range]{flex:1;min-width:70px;accent-color:var(--canvas-accent)}.mui-mechanism-controls input[type=checkbox]{accent-color:var(--canvas-accent)}.mui-mechanism-controls output{font-variant-numeric:tabular-nums;min-width:40px;text-align:right;font-weight:650}.mui-mechanism-readout{display:block;padding:10px 0;font-weight:700;font-variant-numeric:tabular-nums;color:var(--canvas-ink)}.mui-mechanism-description{min-height:0;font-size:14px}\n.mui-mechanism[data-style=editorial]{border:0;border-top:1px solid var(--canvas-line);border-radius:0;padding:16px 0}.mui-mechanism[data-style=editorial] h2{font-family:ui-serif,Georgia,serif;font-weight:650}.mui-mechanism[data-style=editorial] .mui-mechanism-controls{border-radius:0;background:transparent;border-block:1px solid var(--canvas-line)}\n.mui-mechanism[data-style=technical]{border-radius:10px}.mui-mechanism[data-style=technical] button,.mui-mechanism[data-style=technical] .mui-mechanism-controls{border-radius:6px}.mui-mechanism[data-style=technical] .mui-mechanism-readout{font-family:ui-monospace,Consolas,monospace}\n.mui-mechanism[data-style=soft]{border:0;background:var(--canvas-soft);border-radius:28px 28px 28px 10px}.mui-mechanism[data-style=soft] .mui-mechanism-controls{background:var(--canvas-bg);border-radius:22px}.mui-mechanism[data-style=expressive] h2{font-size:28px;font-weight:850;border-left:5px solid var(--canvas-accent);padding-left:14px}.mui-mechanism[data-style=expressive]{border:0;border-radius:0}.mui-mechanism[data-style=prismframe]{border:1.5px solid var(--canvas-line);box-shadow:4px 5px 0 color-mix(in srgb,var(--canvas-accent) 14%,var(--canvas-bg))}.mui-mechanism[data-style=aurora]{border-radius:28px;box-shadow:0 16px 30px -25px #30204d66}.mui-mechanism[data-style=aurora] .mui-mechanism-controls{border-radius:24px}\n@media(max-width:500px){.mui-mechanism{padding:14px;border-radius:20px}.mui-mechanism h2{font-size:20px}.mui-mechanism-controls{padding:10px}.mui-mechanism-nav{gap:5px}.mui-mechanism button{padding:6px 10px;font-size:14px}}\n@media(prefers-reduced-motion:reduce){.mui-mechanism *{animation:none!important;transition:none!important}}\n@media(forced-colors:active){.mui-mechanism-svg path{fill:Canvas;stroke:CanvasText}.mui-mechanism button[aria-pressed=true]{background:Highlight;color:HighlightText}}\n`;var xt="http://www.w3.org/2000/svg",C=(t,a,n)=>{let o=document.createElement(t);return a&&(o.className=a),n!==void 0&&(o.textContent=n),o};function Ft(t){function a(o,e){let i=typeof o=="string"?document.querySelector(o):o;if(!i||!i.replaceChildren)throw Error("Motion mechanism: target element not found");Y(e);let r=structuredClone({...e,onSelect:void 0}),p=nt(r),d={explode:0,selected:"all",cutaway:!1,pose:{}},m=!1,s="",c="",u=0,f=new Map,g=new Map,h=new Map,M=[],O=C("section","mui-mechanism"),N=C("h2",null,r.title??"\\u7ED3\\u6784\\u56FE\\u89E3"),$=document.createElementNS(xt,"svg"),P=document.createElementNS(xt,"g"),A=C("div","mui-mechanism-nav"),w=C("div","mui-mechanism-controls"),T=C("p","mui-mechanism-description"),D=C("output","mui-mechanism-readout"),G=C("style");G.textContent=St,N.hidden=r.title==="",O.setAttribute("aria-label",r.title??"\\u7ED3\\u6784\\u56FE\\u89E3"),$.setAttribute("class","mui-mechanism-svg"),$.setAttribute("viewBox","0 0 600 340"),$.setAttribute("role","img"),$.setAttribute("aria-label","\\u53EF\\u62C6\\u89E3\\u7684\\u7ED3\\u6784\\u793A\\u610F\\u56FE\\uFF1B\\u4F7F\\u7528\\u4E0B\\u65B9\\u6309\\u94AE\\u9009\\u62E9\\u90E8\\u4EF6"),$.append(P),O.append(G,N,$,A,w,D,T),i.replaceChildren(O);let S=()=>r.groups?.length?r.groups:r.parts.map(l=>({id:l.id,label:l.label??l.id,description:l.description??""}));function H(l){r.bind?.selected?t.setState({[r.bind.selected]:l}):typeof e.onSelect=="function"?e.onSelect(l):Q({selected:l})}function K(){if(A.replaceChildren(),h.clear(),!r.bind?.selected&&typeof e.onSelect!="function"){A.hidden=!0;return}A.hidden=!1;for(let l of[{id:"all",label:"\\u5168\\u90E8",description:""},...S()]){let b=C("button",null,l.label);b.type="button",b.setAttribute("aria-pressed",String(d.selected===l.id)),b.addEventListener("click",()=>H(l.id)),h.set(l.id,b),A.append(b)}}let x,rt,L;if(r.bind?.explode){let l=C("label",null,"\\u62C6\\u89E3\\u8FDB\\u5EA6");x=C("input"),x.type="range",x.min="0",x.max="1",x.step=".01",x.setAttribute("aria-label","\\u62C6\\u89E3\\u8FDB\\u5EA6"),rt=C("output"),x.addEventListener("input",()=>t.setState({[r.bind.explode]:Number(x.value)})),l.append(x,rt),w.append(l)}if(r.bind?.cutaway&&r.parts.some(l=>l.cover)){let l=C("label",null,"\\u5256\\u5F00\\u5916\\u58F3");L=C("input"),L.type="checkbox",L.setAttribute("aria-label","\\u5256\\u5F00\\u5916\\u58F3"),L.addEventListener("change",()=>t.setState({[r.bind.cutaway]:L.checked})),l.prepend(L),w.append(l)}w.hidden=!w.childNodes.length;function jt(l){let b=JSON.stringify([l.explode,l.cutaway]);b!==s&&(p=nt(r,l),s=b);let E=mt(r,p,l,f),k=new Set;for(let j of E){k.add(j.key);let R=g.get(j.key);R||(R=document.createElementNS(xt,"path"),R.setAttribute("fill-rule","evenodd"),g.set(j.key,R));for(let[gt,bt]of Object.entries({d:j.d,"data-part":j.part,"data-material":j.material,"data-tone":j.tone,"data-active":j.active}))R.getAttribute(gt)!==String(bt)&&R.setAttribute(gt,String(bt));j.line?R.setAttribute("data-line",""):R.removeAttribute("data-line")}for(let[j,R]of g)k.has(j)||(R.remove(),g.delete(j));let Z=E.map(j=>j.key).join("|");if(Z!==c){for(let j of E)P.append(g.get(j.key));c=Z}u++}function Q(l={}){if(m)return;for(let k of Object.keys(l))if(!["explode","selected","cutaway","pose","parts","readout"].includes(k))throw Error("Motion mechanism: unknown update field "+k);if(l.parts){let k={...r,parts:l.parts};Y(k);let Z=nt(k);mt(k,Z,{...d,...l},new Map),r=k,p=Z,f.clear(),c="",s=""}let b={...d,...l};l.pose&&(b.pose=l.pose),jt(b),d=b;for(let[k,Z]of h)Z.setAttribute("aria-pressed",String(b.selected===k));let E=S().find(k=>k.id===b.selected)??r.parts.find(k=>k.id===b.selected);T.textContent=E?.description??(b.selected==="all"?"\\u9009\\u62E9\\u4E00\\u4E2A\\u90E8\\u4EF6\\uFF0C\\u67E5\\u770B\\u5B83\\u7684\\u804C\\u8D23\\uFF1B\\u62C6\\u89E3\\u53EA\\u5C55\\u793A\\u88C5\\u914D\\u5173\\u7CFB\\u3002":""),x&&(x.value=String(b.explode),rt.textContent=Math.round(b.explode*100)+"%"),L&&(L.checked=b.cutaway),l.readout!==void 0&&(D.textContent=String(l.readout))}return $.addEventListener("click",l=>{let b=l.target.closest("[data-part]");if(!b)return;let E=r.parts.find(k=>k.id===b.getAttribute("data-part"));E&&H(r.groups?.length?E.group??E.id:E.id)}),K(),M.push(t.subscribe(l=>{if(m)return;let b={};for(let[E,k]of Object.entries(r.bind??{})){if(!Object.hasOwn(l.state,k))throw Error("Motion mechanism: bind."+E+" names undeclared state "+k);b[E]=l.state[k]}O.dataset.style=l.theme?.visualStyle??"";for(let E of h.values())E.disabled=l.disabled;x&&(x.disabled=l.disabled),L&&(L.disabled=l.disabled),Q(b)})),Object.freeze({update:Q,pose:l=>Q({pose:l}),stats:()=>({frames:u,faces:g.size,parts:r.parts.length}),destroy(){m||(m=!0,M.forEach(l=>l()),g.clear(),f.clear(),i.replaceChildren())}})}function n(o,e,i={}){if(!["assembly","gears","crank"].includes(e))throw Error("Motion mechanism: demo must be assembly/gears/crank");let r=i.bind??{},p=()=>t.snapshot.state,d=(A,w)=>Object.hasOwn(r,A)?p()[r[A]]:w;for(let[A,w]of Object.entries(r))if(!["explode","selected","cutaway","rpm","teeth","running","angle","radius"].includes(A)||typeof w!="string"||!Object.hasOwn(p(),w))throw Error("Motion mechanism: invalid demo binding "+A);let m=d("angle",0)*Math.PI/180,s=m,c="",u=!1,f=Object.fromEntries(Object.entries(r).filter(([A])=>["explode","selected","cutaway"].includes(A)));function g(){return e==="assembly"?ft():e==="gears"?pt({driverTeeth:i.driverTeeth??16,drivenTeeth:d("teeth",32),module:i.module??1.5}):ht({radius:d("radius",20),rod:i.rod??70})}let h=a(o,{...g(),...i.title===void 0?{}:{title:i.title},bind:f}),M=!1;function O(A=0,w=!1,T=!0){if(M)return;let D=d("rpm",30),G=d("running",!1),S=d("angle",0)*Math.PI/180,H=s;S!==m?(H=S,m=S):G&&T&&!w&&(H+=D*Math.PI*2/60*A),s=H;let K=JSON.stringify([e,d("teeth",32),d("radius",20)]);if(K!==c&&(h.update({parts:g().parts}),c=K),e==="gears"){let x=W({driverTeeth:i.driverTeeth??16,drivenTeeth:d("teeth",32),rpm:D,angle:s,module:i.module??1.5});h.update({pose:{driverGear:{rotation:x.driverAngle},drivenGear:{rotation:x.drivenAngle}},readout:"\\u4E3B\\u52A8\\u8F6E "+t.formatNumber(x.driverRpm,0)+" rpm \\xB7 \\u4ECE\\u52A8\\u8F6E "+t.formatNumber(x.drivenRpm,2)+" rpm \\xB7 \\u9F7F\\u6570\\u6BD4 "+t.formatNumber(x.ratio,2)+"\\uFF08\\u8D1F\\u53F7\\u8868\\u793A\\u53CD\\u5411\\uFF09"})}else if(e==="crank"){let x=X({angle:s,radius:d("radius",20),rod:i.rod??70,z:28});h.update({pose:{crankPin:{at:x.crank},link:{from:x.crank,to:x.piston},piston:{at:[x.position,0,22]},pistonPin:{at:x.piston}},readout:"\\u66F2\\u67C4\\u89D2 "+t.formatNumber((s*180/Math.PI%360+360)%360,1)+"\\xB0 \\xB7 \\u6ED1\\u5757\\u4F4D\\u7F6E "+t.formatNumber(x.position,2)+" \\xB7 \\u884C\\u7A0B "+t.formatNumber(x.stroke,1)+"\\uFF08\\u793A\\u610F\\u957F\\u5EA6\\u5355\\u4F4D\\uFF09"})}u=w}let N=null,$=()=>{O(0,u,!0),e!=="assembly"&&(d("running",!1)&&!N?N=t.animate(({delta:A,reducedMotion:w,visible:T})=>{T&&!w?O(A,!1,!0):u!==w&&O(0,w,T)}):!d("running",!1)&&N&&(N(),N=null))},P=t.subscribe($);return O(),Object.freeze({...h,destroy(){M||(M=!0,N?.(),P(),h.destroy())}})}return Object.freeze({mount:a,mountDemo:n,gearPair:W,sliderCrank:X,follow:Mt,scenes:Object.freeze({assembly:ft,gears:pt,crank:ht})})}return _t(Tt);})();\n';
+
 // lib/visual-audit.js
 function measureVisual(root2, nodeId = "") {
   const issues = [], seen = /* @__PURE__ */ new Set(), coverage = { nodeId, elements: 0, truncated: false, contrastChecked: 0, contrastUncovered: 0 };
-  const add = (code, value, el2) => {
-    const id = el2?.closest("[data-ui-node]")?.getAttribute("data-ui-node") ?? nodeId;
-    const k2 = id + ":" + code + ":" + Math.round(value ?? 0);
+  const add2 = (code, value, el2) => {
+    const id2 = el2?.closest("[data-ui-node]")?.getAttribute("data-ui-node") ?? nodeId;
+    const k2 = id2 + ":" + code + ":" + Math.round(value ?? 0);
     if (!seen.has(k2) && issues.length < 40) {
       seen.add(k2);
-      issues.push({ code, nodeId: id, ...value === void 0 ? {} : { value: Number(value.toFixed(2)) } });
+      issues.push({ code, nodeId: id2, ...value === void 0 ? {} : { value: Number(value.toFixed(2)) } });
     }
   };
   const color = (s) => {
@@ -74,7 +249,7 @@ function measureVisual(root2, nodeId = "") {
   };
   const luminance = (c) => c.slice(0, 3).map((v2) => v2 <= 0.04045 ? v2 / 12.92 : ((v2 + 0.055) / 1.055) ** 2.4).reduce((s, v2, i) => s + v2 * [0.2126, 0.7152, 0.0722][i], 0);
   const widthRoot = root2.id === "canvas" ? document.documentElement : root2;
-  if (widthRoot.scrollWidth > widthRoot.clientWidth + 2) add("overflow", widthRoot.scrollWidth - widthRoot.clientWidth);
+  if (widthRoot.scrollWidth > widthRoot.clientWidth + 2) add2("overflow", widthRoot.scrollWidth - widthRoot.clientWidth);
   const walker = document.createTreeWalker(root2, NodeFilter.SHOW_ELEMENT);
   let el;
   while (el = walker.nextNode()) {
@@ -83,17 +258,17 @@ function measureVisual(root2, nodeId = "") {
       break;
     }
     coverage.elements++;
-    if (el.matches("[data-canvas-phase=error]")) add("runtimeError", void 0, el);
-    const css = getComputedStyle(el), box = el.getBoundingClientRect();
-    if (!box.width || !box.height || css.visibility === "hidden" || css.display === "none") continue;
-    const text2 = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    if (el.matches("[data-canvas-phase=error]")) add2("runtimeError", void 0, el);
+    const css = getComputedStyle(el), box2 = el.getBoundingClientRect();
+    if (!box2.width || !box2.height || css.visibility === "hidden" || css.display === "none") continue;
+    const text2 = [...el.childNodes].some((n2) => n2.nodeType === 3 && n2.textContent.trim());
     if (text2) {
       let size = parseFloat(css.fontSize);
       if (el instanceof SVGElement && el.getScreenCTM) {
         const m2 = el.getScreenCTM();
         if (m2) size *= Math.hypot(m2.c, m2.d);
       }
-      if (size < 11.9) add("smallText", size, el);
+      if (size < 11.9) add2("smallText", size, el);
       const fg = color(css.color);
       let ancestor = el, bg = null, depth = 0;
       while (ancestor && depth++ < 64) {
@@ -110,10 +285,10 @@ function measureVisual(root2, nodeId = "") {
       if (!(el instanceof SVGElement) && fg?.[3] === 1 && bg) {
         coverage.contrastChecked++;
         const a = luminance(fg), b2 = luminance(bg), ratio = (Math.max(a, b2) + 0.05) / (Math.min(a, b2) + 0.05);
-        if (ratio < (size >= 24 || size >= 18.66 && parseFloat(css.fontWeight) >= 700 ? 3 : 4.5)) add("contrast", ratio, el);
+        if (ratio < (size >= 24 || size >= 18.66 && parseFloat(css.fontWeight) >= 700 ? 3 : 4.5)) add2("contrast", ratio, el);
       } else coverage.contrastUncovered++;
     }
-    if (el.matches("input:not([type=hidden]),select,textarea,button,[role=button]") && !el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby") && !el.labels?.length && !el.textContent.trim() && !el.getAttribute("title")) add("missingLabel", void 0, el);
+    if (el.matches("input:not([type=hidden]),select,textarea,button,[role=button]") && !el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby") && !el.labels?.length && !el.textContent.trim() && !el.getAttribute("title")) add2("missingLabel", void 0, el);
   }
   Object.defineProperty(issues, "coverage", { value: coverage });
   return issues;
@@ -171,6 +346,7 @@ function sandboxDocument(node, channel, nonce) {
   motion.addEventListener('change',refresh);document.addEventListener('visibilitychange',refresh);
   const formatNumber=${formatNumber.toString()};
   const api={formatNumber,get snapshot(){return structuredClone(snapshot)},subscribe(fn){if(typeof fn!=='function')throw Error('Listener required');listeners.add(fn);fn(api.snapshot);return()=>listeners.delete(fn)},setState(patch){if(!snapshot.disabled)send('patch',patch)},animate(fn){if(typeof fn!=='function')throw Error('Animation callback required');animations.add(fn);refresh();return()=>{animations.delete(fn);if(!animations.size){cancelAnimationFrame(raf);raf=0;last=0}}}};
+  ${node.libraries?.includes("mechanism") ? MECHANISM_RUNTIME.replace(/<\/script/gi, "<\\/script") + ";api.mechanism=__MotionMechanism.createMechanismAPI(api);" : ""}
   Object.defineProperty(window,'DSHUI',{value:Object.freeze(api),writable:false});
   for(const type of ['click','input','change','keydown','pointerdown'])document.addEventListener(type,e=>{if(snapshot.disabled){e.preventDefault();e.stopImmediatePropagation()}},true);
   addEventListener('message',event=>{
@@ -205,14 +381,14 @@ var COMPONENTS = Object.freeze({
   metric: define(["label", "value", "unit", "decimals"], "Number with units, or a literal/bound status string", "tone"),
   input: define(["label", "bind"], "String or numeric state input"),
   slider: define(["label", "bind"], "Numeric state control"),
-  select: define(["label", "bind"], "Selection from declared state options"),
+  select: define(["label", "bind", "variant"], "Selection from declared state options; variant:segmented for 2..8 short options, dropdown otherwise"),
   toggle: define(["label", "bind"], "Boolean state control"),
   button: define(["text", "action", "href", "path", "variant"], "Agent follow-up, web link or host file opener", "icon"),
   link: define(["text", "href", "path", "variant"], "User-clicked webpage or local file button", "icon"),
   divider: define(["label"], "Quiet section divider"),
   table: define(["label", "rows", "columns"], "Supplied or derived values; inline rows or data/derived reference"),
   chart: define(["kind", "rows", "labelKey", "valueKey", "label", "unit", "xScale"], "Bar/line comparison with accessible data"),
-  sandbox: define(["title", "html", "css", "script", "fallback", "height", "stateKeys", "dataKeys", "derivedKeys"], "Freeform isolated HTML/SVG/CSS/JavaScript visualization")
+  sandbox: define(["title", "html", "css", "script", "fallback", "height", "libraries", "stateKeys", "dataKeys", "derivedKeys"], "Freeform isolated HTML/SVG/CSS/JavaScript visualization")
 });
 function componentFields(type) {
   const c = Object.hasOwn(COMPONENTS, type) ? COMPONENTS[type] : void 0;
@@ -226,10 +402,10 @@ var validIdentifier = (value) => typeof value === "string" && pattern.test(value
 
 // lib/author-expression.js
 function compileExpression(source) {
-  const fail2 = () => {
-    throw new Error("DSH UI: invalid formula; use state.x, data.x, derived.x, item.x, numbers, strings, + - * /, comparisons, ?: and min/max/round/abs");
+  const fail3 = () => {
+    throw new Error("DSH UI: invalid formula; use state.x, data.x, derived.x, item.x, numbers, strings, + - * /, comparisons, ?: and min/max/round/ceil/floor/abs");
   };
-  if (typeof source !== "string" || !source.trim() || source.length > 2048) fail2();
+  if (typeof source !== "string" || !source.trim() || source.length > 2048) fail3();
   const tokens = [];
   let offset = 0;
   const token = new RegExp(String.raw`\s*(?:(\d+(?:\.\d*)?|\.\d+)([eE][+-]?\d+)?|("(?:[^"\\]|\\.)*")|(${IDENTIFIER_SOURCE}(?:\.${IDENTIFIER_SOURCE})?)|(===|!==|<=|>=|==|!=|[+*/()?,:<>-]))`, "uy");
@@ -237,18 +413,18 @@ function compileExpression(source) {
     if (!source.slice(offset).trim()) break;
     token.lastIndex = offset;
     const m2 = token.exec(source);
-    if (!m2) fail2();
+    if (!m2) fail3();
     offset = token.lastIndex;
     tokens.push(m2[1] ? { number: Number(m2[1] + (m2[2] ?? "")) } : m2[3] ? { string: JSON.parse(m2[3]) } : m2[4] ?? m2[5]);
-    if (tokens.length > 256) fail2();
+    if (tokens.length > 256) fail3();
   }
   let pos = 0;
   const operators = { "==": ["eq", 1], "===": ["eq", 1], "!=": ["neq", 1], "!==": ["neq", 1], "<": ["lt", 2], "<=": ["lte", 2], ">": ["gt", 2], ">=": ["gte", 2], "+": ["add", 3], "-": ["sub", 3], "*": ["mul", 4], "/": ["div", 4] };
   const take = (t) => {
-    if (tokens[pos++] !== t) fail2();
+    if (tokens[pos++] !== t) fail3();
   };
   function parse(min = 0, depth = 0) {
-    if (depth > 12) fail2();
+    if (depth > 12) fail3();
     const t = tokens[pos++];
     let out;
     if (t && typeof t === "object") out = { const: Object.hasOwn(t, "number") ? t.number : t.string };
@@ -260,17 +436,17 @@ function compileExpression(source) {
       const arg = parse(5, depth + 1);
       out = t === "-" ? { op: "sub", args: [{ const: 0 }, arg] } : arg;
     } else if (typeof t === "string" && t.split(".").length === 2 && ["state", "data", "derived", "item"].includes(t.split(".")[0]) && validIdentifier(t.split(".")[1])) out = { ref: t };
-    else if (["min", "max", "round", "abs"].includes(t)) {
+    else if (["min", "max", "round", "ceil", "floor", "abs"].includes(t)) {
       take("(");
       const args = [parse(0, depth + 1)];
       while (tokens[pos] === ",") {
         pos++;
         args.push(parse(0, depth + 1));
-        if (args.length > 8) fail2();
+        if (args.length > 8) fail3();
       }
       take(")");
       out = { op: t, args };
-    } else fail2();
+    } else fail3();
     while (typeof tokens[pos] === "string" && Object.hasOwn(operators, tokens[pos]) && operators[tokens[pos]][1] >= min) {
       const [op, precedence] = operators[tokens[pos++]];
       out = { op, args: [out, parse(precedence + 1, depth + 1)] };
@@ -284,7 +460,7 @@ function compileExpression(source) {
     return out;
   }
   const result = parse();
-  if (pos !== tokens.length) fail2();
+  if (pos !== tokens.length) fail3();
   return result;
 }
 function expandExpressions(doc) {
@@ -304,6 +480,9 @@ function expandExpressions(doc) {
     for (const node of nodes) {
       if (!node || typeof node !== "object") continue;
       for (const field of ["text", "value", "max", "rows"]) if (Object.hasOwn(node, field)) node[field] = expression2(node[field]);
+      if (["table", "chart"].includes(node.type) && Array.isArray(node.rows)) {
+        for (const row of node.rows) if (row && typeof row === "object" && !Array.isArray(row)) for (const k2 of Object.keys(row)) row[k2] = expression2(row[k2]);
+      }
       walk(node.children);
     }
   };
@@ -334,11 +513,11 @@ var be = ["info", "success", "warning", "danger"];
 var he = ["accent", "success", "warning", "danger"];
 var Ee = ["text", "num", "delta", "bar", "badge", "spark", "ring", "index", "group"];
 var b = (t, i, r = {}, e = {}) => {
-  let s = Object.fromEntries(Object.entries(i).filter(([u]) => u !== "type" && !t.includes(u))), n = e.oneOfRequired ?? [], o = e.conditionalRequired ?? [], a = [...n.map((u) => ({ kind: "one-of-required", fields: u })), ...o];
-  return { required: t, fields: i, optional: s, aliases: r, valueAliases: e.valueAliases ?? {}, oneOfRequired: n, conditionalRequired: o, rules: a, enums: e.enums ?? {}, nested: e.nested ?? {}, ...e.validator === void 0 ? {} : { validator: e.validator } };
+  let s = Object.fromEntries(Object.entries(i).filter(([u]) => u !== "type" && !t.includes(u))), n2 = e.oneOfRequired ?? [], o = e.conditionalRequired ?? [], a = [...n2.map((u) => ({ kind: "one-of-required", fields: u })), ...o];
+  return { required: t, fields: i, optional: s, aliases: r, valueAliases: e.valueAliases ?? {}, oneOfRequired: n2, conditionalRequired: o, rules: a, enums: e.enums ?? {}, nested: e.nested ?? {}, ...e.validator === void 0 ? {} : { validator: e.validator } };
 };
 var G = (t, i, r = {}, e = {}, s = {}) => ({ required: t, fields: i, enums: e, nested: r, aliases: s });
-var h = { type: "string", span: "number", id: "string" };
+var h4 = { type: "string", span: "number", id: "string" };
 var De = G(["label", "value"], { label: "string", value: "number", color: "string" });
 var rn = G(["label", "data"], { label: "string", color: "string", data: "array" }, { data: De });
 var sn = G(["title"], { title: "string", desc: "string" });
@@ -359,7 +538,7 @@ var yn = G(["from", "to"], { from: "string", to: "string", label: "string", kind
 var bn = G(["label"], { label: "string", x: "number", y: "number", w: "number", h: "number" });
 var hn = G([], { paper: "string", "paper-2": "string", ink: "string", muted: "string", soft: "string", rule: "string", accent: "string", "accent-tint": "string", link: "string" });
 var V = b(["items"], { title: "string", gap: "number", panel: "boolean", append: "boolean", items: "nodes" });
-var T = { accordion: b(["items"], { ...h, items: "array" }, {}, { nested: { items: mn } }), audio: b(["src"], { ...h, src: "string", alt: "string", loop: "boolean" }, { url: "src", link: "src" }), avatar: b(["name"], { ...h, name: "string", color: "string" }), badge: b(["label"], { ...h, label: "string", tone: "string", icon: "string" }, { text: "label", value: "label" }, { enums: { tone: ie } }), breadcrumb: b(["items"], { ...h, items: "array" }), button: b(["label"], { ...h, label: "string", tone: "string", full: "boolean", small: "boolean", icon: "string", action: "string" }, {}, { enums: { tone: te } }), callout: b(["content"], { ...h, title: "string", content: "string", tone: "string" }, { kind: "tone", text: "content", body: "content", desc: "content" }, { enums: { tone: se }, valueAliases: { tone: { danger: "error", warn: "warning" } } }), card: b(["items"], { ...h, title: "string", items: "nodes", tone: "string", accent: "string" }, { label: "title", content: "items" }, { enums: { tone: be } }), chart: b([], { ...h, kind: "string", data: "array", series: "array", horizontal: "boolean", stacked: "boolean", filter: "string", palette: "array" }, {}, { oneOfRequired: [["data", "series"]], conditionalRequired: [{ kind: "required-if", when: { field: "kind", equals: "donut" }, required: ["data"] }], nested: { data: De, series: rn }, enums: { kind: U }, validator: { name: "chart-renderability" } }), checkbox: b(["label"], { ...h, label: "string", checked: "boolean", action: "string", group: "string" }), code: b(["code"], { ...h, lang: "string", code: "string", title: "string", wrap: "boolean" }, { content: "code", text: "code" }), col: b(["items"], { ...h, items: "nodes", gap: "number" }), copy: b(["text"], { ...h, label: "string", text: "string" }, { content: "text", code: "text", value: "text" }), diagram: b(["kind", "nodes"], { ...h, kind: "string", variant: "string", title: "string", nodes: "array", edges: "array", zones: "array", theme: "object" }, {}, { nested: { nodes: gn, edges: yn, zones: bn, theme: hn }, enums: { kind: de, variant: fe } }), diff: b(["diffs"], { ...h, diffs: "array" }, { items: "diffs", files: "diffs" }, { nested: { diffs: un } }), divider: b([], h), echart: b([], { ...h, title: "string", height: "number", preset: "string", data: "array", series: "array", links: "array", palette: "array", option: "object" }, {}, { oneOfRequired: [["option", "data", "series", "links"]], enums: { preset: ge } }), "file-tree": b(["items"], { ...h, items: "array" }, { nodes: "items" }, { nested: { items: fn } }), grid: b(["items"], { ...h, cols: "number", items: "nodes" }), image: b(["src"], { ...h, src: "string", alt: "string" }, { url: "src", link: "src" }), input: b([], { ...h, label: "string", placeholder: "string", value: "string", inputType: "string", action: "string", id: "string" }, {}, { enums: { inputType: re } }), json: b(["value"], { ...h, value: "unknown" }), keyvalue: b(["pairs"], { ...h, pairs: "array" }, { items: "pairs", rows: "pairs", entries: "pairs" }, { nested: { pairs: on } }), link: b(["label"], { ...h, label: "string", href: "string" }), list: b(["items"], { ...h, items: "array", filter: "string" }), mermaid: b(["code"], { ...h, code: "string" }), svg: b(["code"], { ...h, code: "string", title: "string", height: "number" }), plot: b(["series"], { ...h, series: "array", xMin: "number", xMax: "number", yMin: "number", yMax: "number", title: "string" }, {}, { nested: { series: dn } }), progress: b(["value"], { ...h, value: "number", label: "string", valueLabel: "string", variant: "string", target: "number" }, {}, { enums: { variant: ye } }), quiz: b(["question", "options"], { ...h, question: "string", options: "array", explanation: "string", id: "string", action: "string" }, { title: "question", text: "question", choices: "options", items: "options" }), radio: b(["options"], { ...h, label: "string", options: "array", selected: "number", action: "string", group: "string", answer: "unknown", explanation: "string" }, { items: "options" }), row: b(["items"], { ...h, items: "nodes", wrap: "boolean", spacer: "boolean" }), scene3d: b(["meshes"], { ...h, title: "string", meshes: "array", ambient: "number", background: "string" }, {}, { nested: { meshes: cn } }), select: b(["options"], { ...h, label: "string", options: "array", action: "string", selected: "number", id: "string" }, { items: "options" }), slider: b([], { ...h, label: "string", min: "number", max: "number", step: "number", value: "number", action: "string", id: "string" }), spacer: b([], h), hero: b(["title"], { ...h, title: "string", subtitle: "string", value: "string", label: "string", delta: "string", spark: "array", tone: "string" }, {}, { enums: { tone: he } }), stat: b(["label", "value"], { ...h, label: "string", value: "string", delta: "string", spark: "array", size: "string" }, {}, { enums: { size: tn } }), steps: b(["steps"], { ...h, steps: "array", current: "number" }, { items: "steps" }, { nested: { steps: sn } }), submit: b(["label"], { ...h, label: "string", action: "string", resetAction: "string", groups: "array" }), switch: b(["label"], { ...h, label: "string", checked: "boolean", action: "string" }), table: b(["columns", "rows"], { ...h, columns: "array", rows: "array", types: "array", total: "boolean", details: "array", filter: "string", filterColumn: "number", sortField: "string", export: "boolean" }, { headers: "columns", data: "rows", items: "rows" }), tabs: b(["tabs"], { ...h, tabs: "array" }, {}, { nested: { tabs: pn } }), text: b(["content"], { ...h, content: "string", size: "string", center: "boolean", copyable: "boolean", title: "string" }, { text: "content" }, { enums: { size: ne } }), textarea: b([], { ...h, label: "string", placeholder: "string", rows: "number", value: "string", action: "string", id: "string" }), timeline: b(["items"], { ...h, items: "array" }, {}, { nested: { items: an } }), video: b(["src"], { ...h, src: "string", alt: "string", poster: "string", loop: "boolean", muted: "boolean", aspectRatio: "string" }, { url: "src", link: "src" }, { enums: { aspectRatio: ae } }) };
+var T = { accordion: b(["items"], { ...h4, items: "array" }, {}, { nested: { items: mn } }), audio: b(["src"], { ...h4, src: "string", alt: "string", loop: "boolean" }, { url: "src", link: "src" }), avatar: b(["name"], { ...h4, name: "string", color: "string" }), badge: b(["label"], { ...h4, label: "string", tone: "string", icon: "string" }, { text: "label", value: "label" }, { enums: { tone: ie } }), breadcrumb: b(["items"], { ...h4, items: "array" }), button: b(["label"], { ...h4, label: "string", tone: "string", full: "boolean", small: "boolean", icon: "string", action: "string" }, {}, { enums: { tone: te } }), callout: b(["content"], { ...h4, title: "string", content: "string", tone: "string" }, { kind: "tone", text: "content", body: "content", desc: "content" }, { enums: { tone: se }, valueAliases: { tone: { danger: "error", warn: "warning" } } }), card: b(["items"], { ...h4, title: "string", items: "nodes", tone: "string", accent: "string" }, { label: "title", content: "items" }, { enums: { tone: be } }), chart: b([], { ...h4, kind: "string", data: "array", series: "array", horizontal: "boolean", stacked: "boolean", filter: "string", palette: "array" }, {}, { oneOfRequired: [["data", "series"]], conditionalRequired: [{ kind: "required-if", when: { field: "kind", equals: "donut" }, required: ["data"] }], nested: { data: De, series: rn }, enums: { kind: U }, validator: { name: "chart-renderability" } }), checkbox: b(["label"], { ...h4, label: "string", checked: "boolean", action: "string", group: "string" }), code: b(["code"], { ...h4, lang: "string", code: "string", title: "string", wrap: "boolean" }, { content: "code", text: "code" }), col: b(["items"], { ...h4, items: "nodes", gap: "number" }), copy: b(["text"], { ...h4, label: "string", text: "string" }, { content: "text", code: "text", value: "text" }), diagram: b(["kind", "nodes"], { ...h4, kind: "string", variant: "string", title: "string", nodes: "array", edges: "array", zones: "array", theme: "object" }, {}, { nested: { nodes: gn, edges: yn, zones: bn, theme: hn }, enums: { kind: de, variant: fe } }), diff: b(["diffs"], { ...h4, diffs: "array" }, { items: "diffs", files: "diffs" }, { nested: { diffs: un } }), divider: b([], h4), echart: b([], { ...h4, title: "string", height: "number", preset: "string", data: "array", series: "array", links: "array", palette: "array", option: "object" }, {}, { oneOfRequired: [["option", "data", "series", "links"]], enums: { preset: ge } }), "file-tree": b(["items"], { ...h4, items: "array" }, { nodes: "items" }, { nested: { items: fn } }), grid: b(["items"], { ...h4, cols: "number", items: "nodes" }), image: b(["src"], { ...h4, src: "string", alt: "string" }, { url: "src", link: "src" }), input: b([], { ...h4, label: "string", placeholder: "string", value: "string", inputType: "string", action: "string", id: "string" }, {}, { enums: { inputType: re } }), json: b(["value"], { ...h4, value: "unknown" }), keyvalue: b(["pairs"], { ...h4, pairs: "array" }, { items: "pairs", rows: "pairs", entries: "pairs" }, { nested: { pairs: on } }), link: b(["label"], { ...h4, label: "string", href: "string" }), list: b(["items"], { ...h4, items: "array", filter: "string" }), mermaid: b(["code"], { ...h4, code: "string" }), svg: b(["code"], { ...h4, code: "string", title: "string", height: "number" }), plot: b(["series"], { ...h4, series: "array", xMin: "number", xMax: "number", yMin: "number", yMax: "number", title: "string" }, {}, { nested: { series: dn } }), progress: b(["value"], { ...h4, value: "number", label: "string", valueLabel: "string", variant: "string", target: "number" }, {}, { enums: { variant: ye } }), quiz: b(["question", "options"], { ...h4, question: "string", options: "array", explanation: "string", id: "string", action: "string" }, { title: "question", text: "question", choices: "options", items: "options" }), radio: b(["options"], { ...h4, label: "string", options: "array", selected: "number", action: "string", group: "string", answer: "unknown", explanation: "string" }, { items: "options" }), row: b(["items"], { ...h4, items: "nodes", wrap: "boolean", spacer: "boolean" }), scene3d: b(["meshes"], { ...h4, title: "string", meshes: "array", ambient: "number", background: "string" }, {}, { nested: { meshes: cn } }), select: b(["options"], { ...h4, label: "string", options: "array", action: "string", selected: "number", id: "string" }, { items: "options" }), slider: b([], { ...h4, label: "string", min: "number", max: "number", step: "number", value: "number", action: "string", id: "string" }), spacer: b([], h4), hero: b(["title"], { ...h4, title: "string", subtitle: "string", value: "string", label: "string", delta: "string", spark: "array", tone: "string" }, {}, { enums: { tone: he } }), stat: b(["label", "value"], { ...h4, label: "string", value: "string", delta: "string", spark: "array", size: "string" }, {}, { enums: { size: tn } }), steps: b(["steps"], { ...h4, steps: "array", current: "number" }, { items: "steps" }, { nested: { steps: sn } }), submit: b(["label"], { ...h4, label: "string", action: "string", resetAction: "string", groups: "array" }), switch: b(["label"], { ...h4, label: "string", checked: "boolean", action: "string" }), table: b(["columns", "rows"], { ...h4, columns: "array", rows: "array", types: "array", total: "boolean", details: "array", filter: "string", filterColumn: "number", sortField: "string", export: "boolean" }, { headers: "columns", data: "rows", items: "rows" }), tabs: b(["tabs"], { ...h4, tabs: "array" }, {}, { nested: { tabs: pn } }), text: b(["content"], { ...h4, content: "string", size: "string", center: "boolean", copyable: "boolean", title: "string" }, { text: "content" }, { enums: { size: ne } }), textarea: b([], { ...h4, label: "string", placeholder: "string", rows: "number", value: "string", action: "string", id: "string" }), timeline: b(["items"], { ...h4, items: "array" }, {}, { nested: { items: an } }), video: b(["src"], { ...h4, src: "string", alt: "string", poster: "string", loop: "boolean", muted: "boolean", aspectRatio: "string" }, { url: "src", link: "src" }, { enums: { aspectRatio: ae } }) };
 var q = new Set(Object.keys(T));
 function N(t) {
   if (typeof t != "object" || t === null) return false;
@@ -380,19 +559,19 @@ function Me(t) {
 }
 var m = { maxDepth: 8, maxNodes: 200, maxString: 2e3, maxCode: 12e3, maxMermaid: 8e3, maxGridCols: 12, maxTabs: 12, maxAccordionItems: 24, maxListItems: 50, maxOptions: 50, maxTableRows: 50, maxTableCols: 12, maxChartPoints: 60, maxPlotSeries: 8, maxPlotParams: 6, maxMeshes: 5, maxQuizOptions: 8, maxSteps: 24, maxTimelineItems: 24, maxBreadcrumbItems: 12, maxKeyValuePairs: 24, maxTreeDepth: 6, maxDiagramNodes: 9, maxDiagramEdges: 12, maxDiagramZones: 3, maxDiagramFocal: 2, maxDiagramLabel: 14, maxEChartOptionDepth: 10, maxEChartArrayLen: 500, maxEChartOptionNodes: 2e3 };
 function ke(t) {
-  let i = t.columns, r = Array.isArray(i) && i.length > 0, e = r && Array.isArray(i) && typeof i[0] == "object" && i[0] !== null ? i.map($n) : i, s = kn(e), n = t.rows !== void 0 ? t.rows : t.data;
-  if (Array.isArray(n) && n.length > 0 && typeof n[0] == "object" && n[0] !== null && !Array.isArray(n[0])) {
-    let u = Array.isArray(t.columns) && t.columns.length > 0 && typeof t.columns[0] == "object" && t.columns[0] !== null ? t.columns.map(Sn).filter((d) => d !== void 0) : Object.keys(n[0]);
-    n = n.map((d) => u.map((c) => wn(d[c])));
+  let i = t.columns, r = Array.isArray(i) && i.length > 0, e = r && Array.isArray(i) && typeof i[0] == "object" && i[0] !== null ? i.map($n) : i, s = kn(e), n2 = t.rows !== void 0 ? t.rows : t.data;
+  if (Array.isArray(n2) && n2.length > 0 && typeof n2[0] == "object" && n2[0] !== null && !Array.isArray(n2[0])) {
+    let u = Array.isArray(t.columns) && t.columns.length > 0 && typeof t.columns[0] == "object" && t.columns[0] !== null ? t.columns.map(Sn).filter((d) => d !== void 0) : Object.keys(n2[0]);
+    n2 = n2.map((d) => u.map((c) => wn(d[c])));
   }
   let o = null;
-  if (!r && Array.isArray(n) && n.length > 0 && Array.isArray(n[0])) {
-    let u = xe(n), d = u.length === 0 ? null : An(u);
+  if (!r && Array.isArray(n2) && n2.length > 0 && Array.isArray(n2[0])) {
+    let u = xe(n2), d = u.length === 0 ? null : An(u);
     d !== null && xe(d.rows).length === d.rows.length && (o = d, s = d.columns.map((c) => c.slice(0, 128)));
   }
   if (s.length === 0 && !Array.isArray(t.columns)) return null;
-  let a = xe(o === null ? n : o.rows);
-  return Array.isArray(n) ? { columns: s.slice(0, m.maxTableCols), rows: a } : null;
+  let a = xe(o === null ? n2 : o.rows);
+  return Array.isArray(n2) ? { columns: s.slice(0, m.maxTableCols), rows: a } : null;
 }
 function I(t) {
   return ke(t)?.rows ?? [];
@@ -469,10 +648,10 @@ function Tn(t, i, r) {
   if (t.length === 0) return null;
   let e = [];
   for (let s = 0; s < t.length; s++) {
-    let n = t[s], o = O(n);
+    let n2 = t[s], o = O(n2);
     if (o === void 0) return null;
-    if (Ae(n)) {
-      e.push(r(n, `${i}.items[${s}]`));
+    if (Ae(n2)) {
+      e.push(r(n2, `${i}.items[${s}]`));
       continue;
     }
     if (typeof o.label != "string" && typeof o.value != "string") return null;
@@ -485,25 +664,25 @@ function Tn(t, i, r) {
 function Cn(t, i, r, e) {
   let s = T[r];
   if (s === void 0) return t;
-  let n = { ...t };
+  let n2 = { ...t };
   for (let [o, a] of Object.entries(s.aliases)) {
-    if (!(o in n)) continue;
-    let u = `${i}.${o}`, d = a in n;
-    d || (n[a] = n[o]), delete n[o], e.push({ kind: "alias", path: u, message: d ? `${u} is ignored because canonical field '${a}' is present` : `${u} normalized/adopted as '${a}'`, type: r, field: o, canonical: a });
+    if (!(o in n2)) continue;
+    let u = `${i}.${o}`, d = a in n2;
+    d || (n2[a] = n2[o]), delete n2[o], e.push({ kind: "alias", path: u, message: d ? `${u} is ignored because canonical field '${a}' is present` : `${u} normalized/adopted as '${a}'`, type: r, field: o, canonical: a });
   }
   for (let [o, a] of Object.entries(s.valueAliases)) {
-    let u = n[o];
+    let u = n2[o];
     if (typeof u != "string") continue;
     let d = a[u];
-    d === void 0 || d === u || (n[o] = d, e.push({ kind: "alias", path: `${i}.${o}`, message: `${i}.${o} '${u}' normalized to '${d}'`, type: r, field: o, canonical: d }));
+    d === void 0 || d === u || (n2[o] = d, e.push({ kind: "alias", path: `${i}.${o}`, message: `${i}.${o} '${u}' normalized to '${d}'`, type: r, field: o, canonical: d }));
   }
-  return n;
+  return n2;
 }
 function Se(t, i, r, e, s) {
   if (Array.isArray(t)) return t.map((a, u) => Se(a, i, `${r}[${u}]`, e, s));
-  let n = O(t);
-  if (n === void 0) return t;
-  let o = { ...n };
+  let n2 = O(t);
+  if (n2 === void 0) return t;
+  let o = { ...n2 };
   for (let [a, u] of Object.entries(i.aliases)) !(a in o) || u in o || (o[u] = o[a], delete o[a], s.push({ kind: "alias", path: `${r}.${a}`, message: `${r}.${a} normalized/adopted as '${u}'`, type: e, field: a, canonical: u }));
   for (let [a, u] of Object.entries(i.nested)) o[a] !== void 0 && (o[a] = Se(o[a], u, `${r}.${a}`, e, s));
   return o;
@@ -519,15 +698,15 @@ function $e(t, i, r) {
   if (!Ae(t)) return t;
   let e = t.type, s = T[e];
   if (s === void 0) return t;
-  let n = Cn(t, i, e, r);
-  for (let [u, d] of Object.entries(s.nested)) n[u] !== void 0 && (n[u] = Se(n[u], d, `${i}.${u}`, e, r));
+  let n2 = Cn(t, i, e, r);
+  for (let [u, d] of Object.entries(s.nested)) n2[u] !== void 0 && (n2[u] = Se(n2[u], d, `${i}.${u}`, e, r));
   let o = (u, d) => $e(u, d, r), a = (u, d) => Array.isArray(u) ? u.map((c, f) => o(c, `${d}[${f}]`)) : u;
-  if (e === "file-tree" && n.items !== void 0 && (n.items = we(n.items)), e === "stat" && Array.isArray(n.items) && n.label === void 0 && n.value === void 0) {
-    let u = Tn(n.items, i, o);
-    if (u !== null) return r.push({ kind: "alias", path: `${i}.items`, message: `${i}.items normalized into a row of 'stat' nodes`, type: e, field: "items", canonical: "row" }), { type: "row", items: u, ...n.span !== void 0 ? { span: n.span } : {} };
+  if (e === "file-tree" && n2.items !== void 0 && (n2.items = we(n2.items)), e === "stat" && Array.isArray(n2.items) && n2.label === void 0 && n2.value === void 0) {
+    let u = Tn(n2.items, i, o);
+    if (u !== null) return r.push({ kind: "alias", path: `${i}.items`, message: `${i}.items normalized into a row of 'stat' nodes`, type: e, field: "items", canonical: "row" }), { type: "row", items: u, ...n2.span !== void 0 ? { span: n2.span } : {} };
   }
-  if (e === "row" || e === "col" || e === "grid" || e === "card" || e === "file-tree" || e === "timeline" || e === "breadcrumb") e !== "file-tree" && e !== "timeline" && e !== "breadcrumb" && (n.items = a(n.items, `${i}.items`));
-  else if (e === "list" && Array.isArray(n.items)) n.items = n.items.map((u, d) => {
+  if (e === "row" || e === "col" || e === "grid" || e === "card" || e === "file-tree" || e === "timeline" || e === "breadcrumb") e !== "file-tree" && e !== "timeline" && e !== "breadcrumb" && (n2.items = a(n2.items, `${i}.items`));
+  else if (e === "list" && Array.isArray(n2.items)) n2.items = n2.items.map((u, d) => {
     if (Ae(u)) return o(u, `${i}.items[${d}]`);
     if (Array.isArray(u) && u.length === 1 && typeof u[0] == "string") return u[0];
     let c = O(u);
@@ -540,11 +719,11 @@ function $e(t, i, r) {
     }
     return !("title" in f) && typeof f.desc == "string" && (f.title = f.desc, delete f.desc, r.push({ kind: "alias", path: `${g}.desc`, type: e, field: "desc", canonical: "title", message: `${g}.desc normalized/adopted as 'title'` })), f;
   });
-  else if (e === "keyvalue" && Array.isArray(n.pairs)) n.pairs.length > 0 && n.pairs.every((u) => Array.isArray(u)) && (n.pairs = n.pairs.map((u) => {
+  else if (e === "keyvalue" && Array.isArray(n2.pairs)) n2.pairs.length > 0 && n2.pairs.every((u) => Array.isArray(u)) && (n2.pairs = n2.pairs.map((u) => {
     let d = u;
     return { key: d[0], value: d.length > 1 ? d[1] : "" };
   }));
-  else if (e === "tabs" && Array.isArray(n.tabs)) n.tabs = n.tabs.map((u, d) => {
+  else if (e === "tabs" && Array.isArray(n2.tabs)) n2.tabs = n2.tabs.map((u, d) => {
     let c = O(u);
     if (c === void 0) return u;
     let f = { ...c };
@@ -554,15 +733,15 @@ function $e(t, i, r) {
     }
     return f.items = Array.isArray(f.items) ? f.items.map((g, x) => o(g, `${i}.tabs[${d}].items[${x}]`)) : f.items === void 0 ? [] : [o(f.items, `${i}.tabs[${d}].items[0]`)], f;
   });
-  else if (e === "accordion" && Array.isArray(n.items)) n.items = n.items.map((u, d) => {
+  else if (e === "accordion" && Array.isArray(n2.items)) n2.items = n2.items.map((u, d) => {
     let c = O(u);
     return c === void 0 ? u : { ...c, items: Array.isArray(c.items) ? c.items.map((f, g) => o(f, `${i}.items[${d}].items[${g}]`)) : c.items };
   });
-  else if (e === "table" && Array.isArray(n.details)) {
-    let u = { columns: n.columns, rows: n.rows, types: n.types };
-    n.details = n.details.map((d, c) => !Array.isArray(d) || !C(u, c) ? d : d.map((f, g) => o(f, `${i}.details[${c}][${g}]`)));
+  else if (e === "table" && Array.isArray(n2.details)) {
+    let u = { columns: n2.columns, rows: n2.rows, types: n2.types };
+    n2.details = n2.details.map((d, c) => !Array.isArray(d) || !C(u, c) ? d : d.map((f, g) => o(f, `${i}.details[${c}][${g}]`)));
   }
-  return n;
+  return n2;
 }
 function Ie(t) {
   let i = [];
@@ -575,7 +754,7 @@ function Ie(t) {
   let r = O(t);
   if (r === void 0) return { value: t, warnings: i };
   let e = { ...r };
-  return N(e) ? { value: $e(e, "spec", i), warnings: i } : (Array.isArray(e.items) && (e.items = e.items.map((s, n) => $e(s, `items[${n}]`, i))), { value: e, warnings: i });
+  return N(e) ? { value: $e(e, "spec", i), warnings: i } : (Array.isArray(e.items) && (e.items = e.items.map((s, n2) => $e(s, `items[${n2}]`, i))), { value: e, warnings: i });
 }
 function F(t) {
   return typeof t == "object" && t !== null && !Array.isArray(t) ? t : void 0;
@@ -589,21 +768,21 @@ function Ge(t, i, r) {
   let e = t.type, s = T[e];
   if (s === void 0) return;
   r(t, i, s);
-  let n = (o, a) => Ge(o, a, r);
-  if ((e === "row" || e === "col" || e === "grid" || e === "card") && Array.isArray(t.items)) t.items.forEach((o, a) => n(o, `${i}.items[${a}]`));
-  else if (e === "list" && Array.isArray(t.items)) t.items.forEach((o, a) => n(o, `${i}.items[${a}]`));
+  let n2 = (o, a) => Ge(o, a, r);
+  if ((e === "row" || e === "col" || e === "grid" || e === "card") && Array.isArray(t.items)) t.items.forEach((o, a) => n2(o, `${i}.items[${a}]`));
+  else if (e === "list" && Array.isArray(t.items)) t.items.forEach((o, a) => n2(o, `${i}.items[${a}]`));
   else if (e === "tabs" && Array.isArray(t.tabs)) t.tabs.forEach((o, a) => {
     let u = F(o);
-    u !== void 0 && (Array.isArray(u.items) ? u.items.forEach((d, c) => n(d, `${i}.tabs[${a}].items[${c}]`)) : n(u.items, `${i}.tabs[${a}].items`));
+    u !== void 0 && (Array.isArray(u.items) ? u.items.forEach((d, c) => n2(d, `${i}.tabs[${a}].items[${c}]`)) : n2(u.items, `${i}.tabs[${a}].items`));
   });
   else if (e === "accordion" && Array.isArray(t.items)) t.items.forEach((o, a) => {
     let u = F(o);
-    u?.items !== void 0 && Array.isArray(u.items) && u.items.forEach((d, c) => n(d, `${i}.items[${a}].items[${c}]`));
+    u?.items !== void 0 && Array.isArray(u.items) && u.items.forEach((d, c) => n2(d, `${i}.items[${a}].items[${c}]`));
   });
   else if (e === "table" && Array.isArray(t.details)) {
     let o = { columns: t.columns, rows: t.rows, types: t.types };
     t.details.forEach((a, u) => {
-      Array.isArray(a) && C(o, u) && a.forEach((d, c) => n(d, `${i}.details[${u}][${c}]`));
+      Array.isArray(a) && C(o, u) && a.forEach((d, c) => n2(d, `${i}.details[${u}][${c}]`));
     });
   }
 }
@@ -611,68 +790,68 @@ function B(t, i, r, e) {
   t.push({ kind: "unknown-field", path: `${i}.${r}`, message: `${i}.${r}: unknown field for '${e}'`, type: e, field: r });
 }
 function Y(t, i, r, e, s) {
-  let n = F(t);
-  if (n !== void 0) {
-    for (let o of Object.keys(n)) o in r.fields || B(s, i, o, e);
+  let n2 = F(t);
+  if (n2 !== void 0) {
+    for (let o of Object.keys(n2)) o in r.fields || B(s, i, o, e);
     for (let [o, a] of Object.entries(r.nested)) {
-      let u = n[o];
+      let u = n2[o];
       Array.isArray(u) ? u.forEach((d, c) => Y(d, `${i}.${o}[${c}]`, a, e, s)) : u !== void 0 && Y(u, `${i}.${o}`, a, e, s);
     }
   }
 }
 function Nn(t, i, r, e) {
-  for (let [s, n] of Object.entries(r.nested)) {
+  for (let [s, n2] of Object.entries(r.nested)) {
     let o = t[s];
-    Array.isArray(o) ? o.forEach((a, u) => Y(a, `${i}.${s}[${u}]`, n, t.type, e)) : o !== void 0 && Y(o, `${i}.${s}`, n, t.type, e);
+    Array.isArray(o) ? o.forEach((a, u) => Y(a, `${i}.${s}[${u}]`, n2, t.type, e)) : o !== void 0 && Y(o, `${i}.${s}`, n2, t.type, e);
   }
 }
 function Pe(t) {
   let i = [], r = F(t);
   if (r === void 0) return i;
-  let e = (s, n, o) => {
-    for (let a of Object.keys(s)) a === "type" || a in o.fields || B(i, n, a, s.type);
-    Nn(s, n, o, i), s.type === "list" && Array.isArray(s.items) && s.items.forEach((a, u) => {
+  let e = (s, n2, o) => {
+    for (let a of Object.keys(s)) a === "type" || a in o.fields || B(i, n2, a, s.type);
+    Nn(s, n2, o, i), s.type === "list" && Array.isArray(s.items) && s.items.forEach((a, u) => {
       if (_e(a)) return;
       let d = F(a);
       if (d !== void 0) for (let c of Object.keys(d)) {
         if (c === "title" || c === "desc") continue;
-        let f = `${n}.items[${u}]`;
+        let f = `${n2}.items[${u}]`;
         i.push({ kind: "unknown-field", path: `${f}.${c}`, message: `${f}.${c}: list items render 'title' and 'desc' only \u2014 '${c}' is dropped`, type: "list", field: c });
       }
     });
   };
   if (Array.isArray(r.items) && !N(r)) {
     for (let s of Object.keys(r)) s in V.fields || B(i, "spec", s, "spec");
-    r.items.forEach((s, n) => Ge(s, `items[${n}]`, e));
+    r.items.forEach((s, n2) => Ge(s, `items[${n2}]`, e));
   } else if (typeof r.type == "string") Ge(r, "spec", e);
   else for (let s of Object.keys(r)) s in V.fields || B(i, "spec", s, "spec");
   return i;
 }
 function ve(t, i) {
-  let r = (s, n, o) => {
-    o > m.maxDepth || s.forEach((a, u) => e(a, `${n}[${u}]`, o));
-  }, e = (s, n, o) => {
-    if (!(o > m.maxDepth) && (i(s, n), !(o >= m.maxDepth))) switch (s.type) {
+  let r = (s, n2, o) => {
+    o > m.maxDepth || s.forEach((a, u) => e(a, `${n2}[${u}]`, o));
+  }, e = (s, n2, o) => {
+    if (!(o > m.maxDepth) && (i(s, n2), !(o >= m.maxDepth))) switch (s.type) {
       case "row":
       case "col":
       case "grid":
       case "card":
-        r(s.items, `${n}.items`, o + 1);
+        r(s.items, `${n2}.items`, o + 1);
         break;
       case "tabs":
-        s.tabs.forEach((a, u) => r(a.items, `${n}.tabs[${u}].items`, o + 1));
+        s.tabs.forEach((a, u) => r(a.items, `${n2}.tabs[${u}].items`, o + 1));
         break;
       case "accordion":
-        s.items.forEach((a, u) => r(a.items, `${n}.items[${u}].items`, o + 1));
+        s.items.forEach((a, u) => r(a.items, `${n2}.items[${u}].items`, o + 1));
         break;
       case "list":
         s.items.forEach((a, u) => {
-          a !== null && typeof a == "object" && "type" in a && e(a, `${n}.items[${u}]`, o + 1);
+          a !== null && typeof a == "object" && "type" in a && e(a, `${n2}.items[${u}]`, o + 1);
         });
         break;
       case "table":
         s.details?.slice(0, I(s).length).forEach((a, u) => {
-          a !== null && C(s, u) && r(a, `${n}.details[${u}]`, o + 1);
+          a !== null && C(s, u) && r(a, `${n2}.details[${u}]`, o + 1);
         });
         break;
     }
@@ -681,27 +860,27 @@ function ve(t, i) {
 }
 function Re(t) {
   let i = /* @__PURE__ */ new Map(), r = /* @__PURE__ */ new Map(), e = [], s = [];
-  ve(t, (n, o) => {
-    if (n.type === "submit") {
-      n.groups !== void 0 && s.push({ groups: n.groups, path: o });
+  ve(t, (n2, o) => {
+    if (n2.type === "submit") {
+      n2.groups !== void 0 && s.push({ groups: n2.groups, path: o });
       return;
     }
     let a, u;
-    switch (n.type) {
+    switch (n2.type) {
       case "radio":
-        if (n.group === void 0) return;
-        a = { kind: "radio", key: n.group, label: n.label ?? n.group, options: n.options.slice(0, m.maxOptions), ...n.answer === void 0 ? {} : { answer: n.answer }, ...n.explanation === void 0 ? {} : { explanation: n.explanation } }, u = `${o}.group`;
+        if (n2.group === void 0) return;
+        a = { kind: "radio", key: n2.group, label: n2.label ?? n2.group, options: n2.options.slice(0, m.maxOptions), ...n2.answer === void 0 ? {} : { answer: n2.answer }, ...n2.explanation === void 0 ? {} : { explanation: n2.explanation } }, u = `${o}.group`;
         break;
       case "checkbox":
-        if (n.group === void 0) return;
-        a = { kind: "checkbox", key: n.group }, u = `${o}.group`;
+        if (n2.group === void 0) return;
+        a = { kind: "checkbox", key: n2.group }, u = `${o}.group`;
         break;
       case "input":
       case "textarea":
       case "select":
       case "slider":
-        if (n.id === void 0) return;
-        a = { kind: "field", key: n.id, fieldType: n.type, secret: n.type === "input" && n.inputType === "password" }, u = `${o}.id`;
+        if (n2.id === void 0) return;
+        a = { kind: "field", key: n2.id, fieldType: n2.type, secret: n2.type === "input" && n2.inputType === "password" }, u = `${o}.id`;
         break;
       default:
         return;
@@ -714,9 +893,9 @@ function Re(t) {
     }
     i.set(a.key, a), r.set(a.key, u);
   });
-  for (let { groups: n, path: o } of s) {
+  for (let { groups: n2, path: o } of s) {
     let a = /* @__PURE__ */ new Set();
-    n.forEach((u, d) => {
+    n2.forEach((u, d) => {
       let c = `${o}.groups[${d}]`;
       a.has(u) && e.push(`${c}: duplicate submission member '${u}'`), a.add(u);
       let f = i.get(u);
@@ -779,8 +958,8 @@ function On(t) {
   if (i < 0) return { path: e };
   let s = /^L([1-9]\d*)(?:-L([1-9]\d*))?$/.exec(t.slice(i + 1));
   if (s === null) return;
-  let n = Number(s[1]), o = s[2] === void 0 ? n : Number(s[2]);
-  if (!(!Number.isSafeInteger(n) || !Number.isSafeInteger(o) || o < n)) return { path: e, line: n };
+  let n2 = Number(s[1]), o = s[2] === void 0 ? n2 : Number(s[2]);
+  if (!(!Number.isSafeInteger(n2) || !Number.isSafeInteger(o) || o < n2)) return { path: e, line: n2 };
 }
 function ze(t) {
   let i = qe(t);
@@ -832,8 +1011,8 @@ function v(t, i, r) {
   return t.some((e) => e.startsWith(`${i}.${r} `) || e.includes(`'${r}'`) || e.includes(`requires ${r}`));
 }
 function Ke(t, i, r, e, s = []) {
-  for (let [n, o] of Object.entries(r.fields)) s.includes(n) || t[n] === void 0 || !H(t[n], o) && !v(e, i, n) && e.push(`${i}.${n} must be ${j(o)}`);
-  for (let [n, o] of Object.entries(r.enums)) s.includes(n) || t[n] === void 0 || !H(t[n], "string") || !o.includes(t[n]) && !v(e, i, n) && e.push(`${i}.${n} must be one of ${o.join(", ")}`);
+  for (let [n2, o] of Object.entries(r.fields)) s.includes(n2) || t[n2] === void 0 || !H(t[n2], o) && !v(e, i, n2) && e.push(`${i}.${n2} must be ${j(o)}`);
+  for (let [n2, o] of Object.entries(r.enums)) s.includes(n2) || t[n2] === void 0 || !H(t[n2], "string") || !o.includes(t[n2]) && !v(e, i, n2) && e.push(`${i}.${n2} must be one of ${o.join(", ")}`);
 }
 function W(t, i, r, e) {
   let s = y(t);
@@ -841,21 +1020,21 @@ function W(t, i, r, e) {
     e.push(`${i} must be an object`);
     return;
   }
-  for (let n of r.required) {
-    let o = r.fields[n];
-    s[n] === void 0 ? v(e, i, n) || e.push(`${i}: requires ${n}${o === void 0 ? "" : ` (${j(o)})`}`) : o !== void 0 && !H(s[n], o) && (v(e, i, n) || e.push(`${i}.${n} must be ${j(o)}`));
+  for (let n2 of r.required) {
+    let o = r.fields[n2];
+    s[n2] === void 0 ? v(e, i, n2) || e.push(`${i}: requires ${n2}${o === void 0 ? "" : ` (${j(o)})`}`) : o !== void 0 && !H(s[n2], o) && (v(e, i, n2) || e.push(`${i}.${n2} must be ${j(o)}`));
   }
-  for (let [n, o] of Object.entries(r.fields)) s[n] !== void 0 && !H(s[n], o) && (v(e, i, n) || e.push(`${i}.${n} must be ${j(o)}`));
-  for (let [n, o] of Object.entries(r.enums)) s[n] !== void 0 && typeof s[n] == "string" && !o.includes(s[n]) && (v(e, i, n) || e.push(`${i}.${n} must be one of ${o.join(", ")}`));
-  for (let [n, o] of Object.entries(r.nested)) {
-    let a = s[n];
-    a !== void 0 && (Array.isArray(a) ? a.forEach((u, d) => W(u, `${i}.${n}[${d}]`, o, e)) : W(a, `${i}.${n}`, o, e));
+  for (let [n2, o] of Object.entries(r.fields)) s[n2] !== void 0 && !H(s[n2], o) && (v(e, i, n2) || e.push(`${i}.${n2} must be ${j(o)}`));
+  for (let [n2, o] of Object.entries(r.enums)) s[n2] !== void 0 && typeof s[n2] == "string" && !o.includes(s[n2]) && (v(e, i, n2) || e.push(`${i}.${n2} must be one of ${o.join(", ")}`));
+  for (let [n2, o] of Object.entries(r.nested)) {
+    let a = s[n2];
+    a !== void 0 && (Array.isArray(a) ? a.forEach((u, d) => W(u, `${i}.${n2}[${d}]`, o, e)) : W(a, `${i}.${n2}`, o, e));
   }
 }
 function Mn(t, i, r, e) {
-  for (let [s, n] of Object.entries(r.nested)) {
+  for (let [s, n2] of Object.entries(r.nested)) {
     let o = t[s];
-    o !== void 0 && (Array.isArray(o) ? o.forEach((a, u) => W(a, `${i}.${s}[${u}]`, n, e)) : W(o, `${i}.${s}`, n, e));
+    o !== void 0 && (Array.isArray(o) ? o.forEach((a, u) => W(a, `${i}.${s}[${u}]`, n2, e)) : W(o, `${i}.${s}`, n2, e));
   }
 }
 function He(t) {
@@ -863,18 +1042,18 @@ function He(t) {
   return !Array.isArray(i) || i.length === 0 ? false : Array.isArray(i[0]);
 }
 function In(t, i, r, e) {
-  let s = String(t.type), n = (a) => v(e, i, a), o = s === "table" && He(t) ? "columns" : null;
+  let s = String(t.type), n2 = (a) => v(e, i, a), o = s === "table" && He(t) ? "columns" : null;
   for (let a of r.required) {
     let u = r.fields[a];
     if (u === void 0 || t[a] === void 0) {
-      a !== o && !n(a) && e.push(`${i}: type '${s}' requires ${a}${u === void 0 ? "" : ` (${j(u)})`}`);
+      a !== o && !n2(a) && e.push(`${i}: type '${s}' requires ${a}${u === void 0 ? "" : ` (${j(u)})`}`);
       continue;
     }
-    !H(t[a], u) && !n(a) && e.push(`${i}.${a} must be ${j(u)}`);
+    !H(t[a], u) && !n2(a) && e.push(`${i}.${a} must be ${j(u)}`);
   }
   Ke(t, i, r, e, ["type"]);
   for (let a of r.oneOfRequired) !a.some((u) => t[u] !== void 0) && !e.some((u) => u.includes(`requires ${a.join(" or ")}`)) && e.push(`${i}: type '${s}' requires one of ${a.join(" or ")}`);
-  for (let a of r.conditionalRequired) if (t[a.when.field] === a.when.equals) for (let u of a.required) t[u] === void 0 && !n(u) && e.push(`${i}: type '${s}' requires ${u}${a.message === void 0 ? "" : ` (${a.message})`}`);
+  for (let a of r.conditionalRequired) if (t[a.when.field] === a.when.equals) for (let u of a.required) t[u] === void 0 && !n2(u) && e.push(`${i}: type '${s}' requires ${u}${a.message === void 0 ? "" : ` (${a.message})`}`);
   Mn(t, i, r, e);
 }
 function _(t, i, r) {
@@ -883,8 +1062,8 @@ function _(t, i, r) {
   for (let s of t) {
     if (i.remaining <= 0) break;
     i.remaining -= 1;
-    let n = Je(s, i, r);
-    n !== null && e.push(n);
+    let n2 = Je(s, i, r);
+    n2 !== null && e.push(n2);
   }
   return e;
 }
@@ -910,8 +1089,8 @@ function je(t) {
 function Je(t, i, r) {
   let e = _n(t, i, r);
   if (e === null) return null;
-  let s = D(y(t)?.span, 2, 12), n = p(y(t)?.id, 64);
-  return { ...e, ...l("span", s), ...l("id", n) };
+  let s = D(y(t)?.span, 2, 12), n2 = p(y(t)?.id, 64);
+  return { ...e, ...l("span", s), ...l("id", n2) };
 }
 function _n(t, i, r) {
   if (r > m.maxDepth) return null;
@@ -921,8 +1100,8 @@ function _n(t, i, r) {
   if (typeof s != "string") return null;
   switch (s) {
     case "text": {
-      let n = p(e.content, m.maxString) ?? p(e.text, m.maxString);
-      return n === void 0 ? null : { type: "text", content: n, ...l("copyable", e.copyable === true ? true : void 0), ...l("title", p(e.title, m.maxString)), ...l("size", w(e.size, ne)), ...l("center", e.center === true ? true : void 0) };
+      let n2 = p(e.content, m.maxString) ?? p(e.text, m.maxString);
+      return n2 === void 0 ? null : { type: "text", content: n2, ...l("copyable", e.copyable === true ? true : void 0), ...l("title", p(e.title, m.maxString)), ...l("size", w(e.size, ne)), ...l("center", e.center === true ? true : void 0) };
     }
     case "row":
       return { type: "row", items: _(e.items, i, r + 1), ...l("wrap", e.wrap === true ? true : void 0), ...l("spacer", e.spacer === true ? true : void 0) };
@@ -933,69 +1112,69 @@ function _n(t, i, r) {
     case "card":
       return { type: "card", items: _(e.items, i, r + 1), ...l("title", p(e.title, m.maxString)), ...l("tone", w(e.tone, be)), ...l("accent", E(e.accent)) };
     case "button": {
-      let n = p(e.label, m.maxString);
-      return n === void 0 ? null : { type: "button", label: n, ...l("tone", w(e.tone, te)), ...l("full", e.full === true ? true : void 0), ...l("small", e.small === true ? true : void 0), ...l("icon", p(e.icon, 64)), ...l("action", p(e.action, 200)) };
+      let n2 = p(e.label, m.maxString);
+      return n2 === void 0 ? null : { type: "button", label: n2, ...l("tone", w(e.tone, te)), ...l("full", e.full === true ? true : void 0), ...l("small", e.small === true ? true : void 0), ...l("icon", p(e.icon, 64)), ...l("action", p(e.action, 200)) };
     }
     case "input":
       return { type: "input", ...l("label", p(e.label, m.maxString)), ...l("placeholder", p(e.placeholder, m.maxString)), ...l("value", p(e.value, m.maxString)), ...l("inputType", w(e.inputType, re)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };
     case "select": {
-      let n = Q(e.options, m.maxOptions, m.maxString);
-      return n === void 0 ? null : { type: "select", options: n, ...l("label", p(e.label, m.maxString)), ...l("action", p(e.action, 200)), ...l("selected", D(e.selected, 0, n.length - 1)), ...l("id", p(e.id, 200)) };
+      let n2 = Q(e.options, m.maxOptions, m.maxString);
+      return n2 === void 0 ? null : { type: "select", options: n2, ...l("label", p(e.label, m.maxString)), ...l("action", p(e.action, 200)), ...l("selected", D(e.selected, 0, n2.length - 1)), ...l("id", p(e.id, 200)) };
     }
     case "checkbox": {
-      let n = p(e.label, m.maxString);
-      return n === void 0 ? null : { type: "checkbox", label: n, ...l("checked", e.checked === true ? true : void 0), ...l("action", p(e.action, 200)), ...l("group", p(e.group, 200)) };
+      let n2 = p(e.label, m.maxString);
+      return n2 === void 0 ? null : { type: "checkbox", label: n2, ...l("checked", e.checked === true ? true : void 0), ...l("action", p(e.action, 200)), ...l("group", p(e.group, 200)) };
     }
     case "link": {
-      let n = p(e.label, m.maxString);
-      if (n === void 0) return null;
+      let n2 = p(e.label, m.maxString);
+      if (n2 === void 0) return null;
       let o = ze(e.href), a = o.type === "external" ? o.href : o.type === "file" ? String(e.href).trim() : void 0;
-      return { type: "link", label: n, ...l("href", a) };
+      return { type: "link", label: n2, ...l("href", a) };
     }
     case "image": {
-      let n = K(e.src);
-      return n === void 0 ? null : { type: "image", src: n, ...l("alt", p(e.alt, m.maxString)) };
+      let n2 = K(e.src);
+      return n2 === void 0 ? null : { type: "image", src: n2, ...l("alt", p(e.alt, m.maxString)) };
     }
     case "audio": {
-      let n = K(e.src);
-      return n === void 0 ? null : { type: "audio", src: n, ...l("alt", p(e.alt, m.maxString)), ...l("loop", e.loop === true ? true : void 0) };
+      let n2 = K(e.src);
+      return n2 === void 0 ? null : { type: "audio", src: n2, ...l("alt", p(e.alt, m.maxString)), ...l("loop", e.loop === true ? true : void 0) };
     }
     case "video": {
-      let n = K(e.src);
-      return n === void 0 ? null : { type: "video", src: n, ...l("alt", p(e.alt, m.maxString)), ...l("poster", K(e.poster)), ...l("loop", e.loop === true ? true : void 0), ...l("muted", e.muted === true ? true : void 0), ...l("aspectRatio", w(e.aspectRatio, ae)) };
+      let n2 = K(e.src);
+      return n2 === void 0 ? null : { type: "video", src: n2, ...l("alt", p(e.alt, m.maxString)), ...l("poster", K(e.poster)), ...l("loop", e.loop === true ? true : void 0), ...l("muted", e.muted === true ? true : void 0), ...l("aspectRatio", w(e.aspectRatio, ae)) };
     }
     case "badge": {
-      let n = p(e.label, m.maxString) ?? p(e.text, m.maxString) ?? p(e.value, m.maxString);
-      return n === void 0 ? null : { type: "badge", label: n, ...l("tone", w(e.tone, ie)), ...l("icon", p(e.icon, 64)) };
+      let n2 = p(e.label, m.maxString) ?? p(e.text, m.maxString) ?? p(e.value, m.maxString);
+      return n2 === void 0 ? null : { type: "badge", label: n2, ...l("tone", w(e.tone, ie)), ...l("icon", p(e.icon, 64)) };
     }
     case "hero": {
-      let n = p(e.title, m.maxString);
-      return n === void 0 ? null : { type: "hero", title: n, ...l("subtitle", p(e.subtitle, m.maxString)), ...l("value", p(e.value, 128)), ...l("label", p(e.label, m.maxString)), ...l("delta", p(e.delta, 64)), ...l("spark", je(e.spark)), ...l("tone", w(e.tone, he)) };
+      let n2 = p(e.title, m.maxString);
+      return n2 === void 0 ? null : { type: "hero", title: n2, ...l("subtitle", p(e.subtitle, m.maxString)), ...l("value", p(e.value, 128)), ...l("label", p(e.label, m.maxString)), ...l("delta", p(e.delta, 64)), ...l("spark", je(e.spark)), ...l("tone", w(e.tone, he)) };
     }
     case "stat": {
-      let n = p(e.label, m.maxString), o = p(e.value, 128);
-      return n === void 0 || o === void 0 ? null : { type: "stat", label: n, value: o, ...l("delta", p(e.delta, 64)), ...l("spark", je(e.spark)), ...l("size", e.size === "hero" ? "hero" : void 0) };
+      let n2 = p(e.label, m.maxString), o = p(e.value, 128);
+      return n2 === void 0 || o === void 0 ? null : { type: "stat", label: n2, value: o, ...l("delta", p(e.delta, 64)), ...l("spark", je(e.spark)), ...l("size", e.size === "hero" ? "hero" : void 0) };
     }
     case "progress": {
-      let n = k(e.value, 0, 100);
-      return n === void 0 ? null : { type: "progress", value: n, ...l("label", p(e.label, m.maxString)), ...l("valueLabel", p(e.valueLabel, 64)), ...l("variant", w(e.variant, ye)), ...l("target", k(e.target, 0, 100)) };
+      let n2 = k(e.value, 0, 100);
+      return n2 === void 0 ? null : { type: "progress", value: n2, ...l("label", p(e.label, m.maxString)), ...l("valueLabel", p(e.valueLabel, 64)), ...l("variant", w(e.variant, ye)), ...l("target", k(e.target, 0, 100)) };
     }
     case "divider":
       return { type: "divider" };
     case "spacer":
       return { type: "spacer" };
     case "avatar": {
-      let n = p(e.name, 64);
-      return n === void 0 ? null : { type: "avatar", name: n, ...l("color", E(e.color)) };
+      let n2 = p(e.name, 64);
+      return n2 === void 0 ? null : { type: "avatar", name: n2, ...l("color", E(e.color)) };
     }
     case "list": {
-      let n = Pn(e.items, m.maxListItems, i, r + 1);
-      return n === void 0 ? null : { type: "list", items: n, ...l("filter", p(e.filter, 64)) };
+      let n2 = Pn(e.items, m.maxListItems, i, r + 1);
+      return n2 === void 0 ? null : { type: "list", items: n2, ...l("filter", p(e.filter, 64)) };
     }
     case "table": {
-      let n = ke(e);
-      if (n === null) return null;
-      let { columns: o, rows: a } = n, u = Array.isArray(e.types) ? e.types : void 0, d = u === void 0 ? void 0 : o.map((g, x) => {
+      let n2 = ke(e);
+      if (n2 === null) return null;
+      let { columns: o, rows: a } = n2, u = Array.isArray(e.types) ? e.types : void 0, d = u === void 0 ? void 0 : o.map((g, x) => {
         let $ = u[x];
         return typeof $ == "string" && Ee.includes($) ? $ : "text";
       }), c = Array.isArray(e.details) ? e.details : void 0, f = c === void 0 ? void 0 : a.map((g, x) => {
@@ -1006,101 +1185,101 @@ function _n(t, i, r) {
       return { type: "table", columns: o, rows: a, ...l("types", d), ...l("total", e.total === true ? true : void 0), ...l("export", e.export === true ? true : void 0), ...l("filter", p(e.filter, 64)), ...l("filterColumn", D(e.filterColumn, 0, m.maxTableCols - 1)), ...l("sortField", p(e.sortField, 64)), ...l("details", f !== void 0 && f.some((g) => g !== null) ? f : void 0) };
     }
     case "chart": {
-      let n = Te(e.data, m.maxChartPoints), o = Array.isArray(e.series) ? Le(e.series, m.maxPlotSeries, m.maxChartPoints) : void 0;
-      return n === void 0 && o === void 0 ? null : { type: "chart", data: n ?? [], ...l("kind", w(e.kind, U)), ...l("series", o), ...l("horizontal", e.horizontal === true ? true : void 0), ...l("stacked", e.stacked === true ? true : void 0), ...l("filter", p(e.filter, 64)), ...l("palette", Fe(e.palette)) };
+      let n2 = Te(e.data, m.maxChartPoints), o = Array.isArray(e.series) ? Le(e.series, m.maxPlotSeries, m.maxChartPoints) : void 0;
+      return n2 === void 0 && o === void 0 ? null : { type: "chart", data: n2 ?? [], ...l("kind", w(e.kind, U)), ...l("series", o), ...l("horizontal", e.horizontal === true ? true : void 0), ...l("stacked", e.stacked === true ? true : void 0), ...l("filter", p(e.filter, 64)), ...l("palette", Fe(e.palette)) };
     }
     case "tabs": {
-      let n = vn(e.tabs, i, r);
-      return n === void 0 ? null : { type: "tabs", tabs: n };
+      let n2 = vn(e.tabs, i, r);
+      return n2 === void 0 ? null : { type: "tabs", tabs: n2 };
     }
     case "plot": {
-      let n = qn(e.series, m.maxPlotSeries);
-      return n === void 0 ? null : { type: "plot", series: n, ...l("xMin", k(e.xMin, -1e6, 1e6)), ...l("xMax", k(e.xMax, -1e6, 1e6)), ...l("yMin", k(e.yMin, -1e9, 1e9)), ...l("yMax", k(e.yMax, -1e9, 1e9)), ...l("title", p(e.title, m.maxString)) };
+      let n2 = qn(e.series, m.maxPlotSeries);
+      return n2 === void 0 ? null : { type: "plot", series: n2, ...l("xMin", k(e.xMin, -1e6, 1e6)), ...l("xMax", k(e.xMax, -1e6, 1e6)), ...l("yMin", k(e.yMin, -1e9, 1e9)), ...l("yMax", k(e.yMax, -1e9, 1e9)), ...l("title", p(e.title, m.maxString)) };
     }
     case "callout": {
-      let n = p(e.content, m.maxString);
-      return n === void 0 ? null : { type: "callout", content: n, ...l("tone", w(e.tone, se)), ...l("title", p(e.title, m.maxString)) };
+      let n2 = p(e.content, m.maxString);
+      return n2 === void 0 ? null : { type: "callout", content: n2, ...l("tone", w(e.tone, se)), ...l("title", p(e.title, m.maxString)) };
     }
     case "steps": {
-      let n = zn(e.steps);
-      return n === void 0 ? null : { type: "steps", steps: n, ...l("current", D(e.current, 0, n.length)) };
+      let n2 = zn(e.steps);
+      return n2 === void 0 ? null : { type: "steps", steps: n2, ...l("current", D(e.current, 0, n2.length)) };
     }
     case "keyvalue": {
-      let n = Fn(e.pairs, m.maxKeyValuePairs);
-      return n === void 0 ? null : { type: "keyvalue", pairs: n };
+      let n2 = Fn(e.pairs, m.maxKeyValuePairs);
+      return n2 === void 0 ? null : { type: "keyvalue", pairs: n2 };
     }
     case "diff": {
-      let n = jn(e.diffs);
-      return n === void 0 ? null : { type: "diff", diffs: n };
+      let n2 = jn(e.diffs);
+      return n2 === void 0 ? null : { type: "diff", diffs: n2 };
     }
     case "json":
       return "value" in e ? { type: "json", value: e.value } : null;
     case "code": {
-      let n = p(e.code, m.maxCode);
-      return n === void 0 ? null : { type: "code", code: n, ...l("lang", p(e.lang, 64)), ...l("title", p(e.title, m.maxString)), ...l("wrap", e.wrap === true ? true : void 0) };
+      let n2 = p(e.code, m.maxCode);
+      return n2 === void 0 ? null : { type: "code", code: n2, ...l("lang", p(e.lang, 64)), ...l("title", p(e.title, m.maxString)), ...l("wrap", e.wrap === true ? true : void 0) };
     }
     case "radio": {
-      let n = Q(e.options, m.maxOptions, m.maxString);
-      return n === void 0 ? null : { type: "radio", options: n, ...l("label", p(e.label, m.maxString)), ...l("selected", D(e.selected, 0, n.length - 1)), ...l("action", p(e.action, 200)), ...l("group", p(e.group, 200)), ...l("answer", typeof e.answer == "number" && Number.isFinite(e.answer) && e.answer >= 0 && e.answer < n.length ? Math.trunc(e.answer) : typeof e.answer == "string" ? e.answer.slice(0, 512) : void 0), ...l("explanation", p(e.explanation, m.maxString)) };
+      let n2 = Q(e.options, m.maxOptions, m.maxString);
+      return n2 === void 0 ? null : { type: "radio", options: n2, ...l("label", p(e.label, m.maxString)), ...l("selected", D(e.selected, 0, n2.length - 1)), ...l("action", p(e.action, 200)), ...l("group", p(e.group, 200)), ...l("answer", typeof e.answer == "number" && Number.isFinite(e.answer) && e.answer >= 0 && e.answer < n2.length ? Math.trunc(e.answer) : typeof e.answer == "string" ? e.answer.slice(0, 512) : void 0), ...l("explanation", p(e.explanation, m.maxString)) };
     }
     case "submit": {
-      let n = p(e.label, m.maxString), o = p(e.action, 200);
-      return n === void 0 ? null : { type: "submit", label: n, ...l("action", o), ...l("resetAction", p(e.resetAction, 200)), ...l("groups", Q(e.groups, m.maxOptions, 200)) };
+      let n2 = p(e.label, m.maxString), o = p(e.action, 200);
+      return n2 === void 0 ? null : { type: "submit", label: n2, ...l("action", o), ...l("resetAction", p(e.resetAction, 200)), ...l("groups", Q(e.groups, m.maxOptions, 200)) };
     }
     case "switch": {
-      let n = p(e.label, m.maxString);
-      return n === void 0 ? null : { type: "switch", label: n, ...l("checked", e.checked === true ? true : void 0), ...l("action", p(e.action, 200)) };
+      let n2 = p(e.label, m.maxString);
+      return n2 === void 0 ? null : { type: "switch", label: n2, ...l("checked", e.checked === true ? true : void 0), ...l("action", p(e.action, 200)) };
     }
     case "slider": {
-      let n = k(e.min, -1e9, 1e9) ?? 0, o = k(e.max, -1e9, 1e9) ?? 100, a = Math.min(n, o), u = Math.max(n, o), d = k(e.step, 1e-9, Math.max(u - a, 1e-9)), c = k(e.value, a, u) ?? a;
+      let n2 = k(e.min, -1e9, 1e9) ?? 0, o = k(e.max, -1e9, 1e9) ?? 100, a = Math.min(n2, o), u = Math.max(n2, o), d = k(e.step, 1e-9, Math.max(u - a, 1e-9)), c = k(e.value, a, u) ?? a;
       return { type: "slider", min: a, max: u, ...l("step", d), value: c, ...l("label", p(e.label, m.maxString)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };
     }
     case "textarea":
       return { type: "textarea", ...l("label", p(e.label, m.maxString)), ...l("placeholder", p(e.placeholder, m.maxString)), ...l("rows", D(e.rows, 1, 30)), ...l("value", p(e.value, m.maxString)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };
     case "accordion": {
-      let n = Ln(e.items, i, r);
-      return n === void 0 ? null : { type: "accordion", items: n };
+      let n2 = Ln(e.items, i, r);
+      return n2 === void 0 ? null : { type: "accordion", items: n2 };
     }
     case "copy": {
-      let n = p(e.text, m.maxCode);
-      return n === void 0 ? null : { type: "copy", text: n, ...l("label", p(e.label, 128)) };
+      let n2 = p(e.text, m.maxCode);
+      return n2 === void 0 ? null : { type: "copy", text: n2, ...l("label", p(e.label, 128)) };
     }
     case "svg": {
-      let n = p(e.code, m.maxCode);
-      return n === void 0 ? null : { type: "svg", code: n, ...l("title", p(e.title, m.maxString)), ...l("height", D(e.height, 100, 800)) };
+      let n2 = p(e.code, m.maxCode);
+      return n2 === void 0 ? null : { type: "svg", code: n2, ...l("title", p(e.title, m.maxString)), ...l("height", D(e.height, 100, 800)) };
     }
     case "mermaid": {
-      let n = p(e.code, m.maxMermaid);
-      return n === void 0 ? null : { type: "mermaid", code: n };
+      let n2 = p(e.code, m.maxMermaid);
+      return n2 === void 0 ? null : { type: "mermaid", code: n2 };
     }
     case "scene3d": {
-      let n = Vn(e.meshes);
-      return n === void 0 ? null : { type: "scene3d", meshes: n, ...l("title", p(e.title, m.maxString)), ...l("ambient", k(e.ambient, 0, 2)), ...l("background", E(e.background)) };
+      let n2 = Vn(e.meshes);
+      return n2 === void 0 ? null : { type: "scene3d", meshes: n2, ...l("title", p(e.title, m.maxString)), ...l("ambient", k(e.ambient, 0, 2)), ...l("background", E(e.background)) };
     }
     case "diagram":
       return Bn(e);
     case "timeline": {
-      let n = Yn(e.items, m.maxTimelineItems);
-      return n === void 0 ? null : { type: "timeline", items: n };
+      let n2 = Yn(e.items, m.maxTimelineItems);
+      return n2 === void 0 ? null : { type: "timeline", items: n2 };
     }
     case "file-tree": {
-      let n = Qn(e.items, m.maxListItems);
-      return n === void 0 ? null : { type: "file-tree", items: n };
+      let n2 = Qn(e.items, m.maxListItems);
+      return n2 === void 0 ? null : { type: "file-tree", items: n2 };
     }
     case "breadcrumb": {
-      let n = Q(e.items, m.maxBreadcrumbItems, m.maxString);
-      return n === void 0 ? null : { type: "breadcrumb", items: n };
+      let n2 = Q(e.items, m.maxBreadcrumbItems, m.maxString);
+      return n2 === void 0 ? null : { type: "breadcrumb", items: n2 };
     }
     case "quiz": {
-      let n = p(e.question, m.maxString), o = Zn(e.options, e.answer);
-      return n === void 0 || o === void 0 ? null : { type: "quiz", question: n, options: o, ...l("explanation", p(e.explanation, m.maxString)), ...l("id", p(e.id, 200)), ...l("action", p(e.action, 200)) };
+      let n2 = p(e.question, m.maxString), o = Zn(e.options, e.answer);
+      return n2 === void 0 || o === void 0 ? null : { type: "quiz", question: n2, options: o, ...l("explanation", p(e.explanation, m.maxString)), ...l("id", p(e.id, 200)), ...l("action", p(e.action, 200)) };
     }
     case "echart": {
-      let n = e.data !== void 0 ? Te(e.data, m.maxChartPoints) : void 0, o = e.series !== void 0 && Array.isArray(e.series) ? Le(e.series, m.maxPlotSeries, m.maxChartPoints) : void 0, a = Array.isArray(e.links) ? e.links.slice(0, m.maxChartPoints).flatMap((c) => {
+      let n2 = e.data !== void 0 ? Te(e.data, m.maxChartPoints) : void 0, o = e.series !== void 0 && Array.isArray(e.series) ? Le(e.series, m.maxPlotSeries, m.maxChartPoints) : void 0, a = Array.isArray(e.links) ? e.links.slice(0, m.maxChartPoints).flatMap((c) => {
         let f = y(c), g = f === void 0 ? void 0 : p(f.from, 64), x = f === void 0 ? void 0 : p(f.to, 64);
         return g === void 0 || x === void 0 ? [] : [{ from: g, to: x, ...l("value", k(f.value, 0, 1e9)) }];
       }) : void 0, u = e.option !== void 0 ? Ce(e.option, 0, { count: m.maxEChartOptionNodes }) : void 0, d = u === void 0 || typeof u != "object" || u === null || Array.isArray(u) ? void 0 : u;
-      return d === void 0 && n === void 0 && o === void 0 && (a === void 0 || a.length === 0) ? null : { type: "echart", ...l("title", p(e.title, m.maxString)), ...l("height", D(e.height, 100, 800)), ...l("preset", w(e.preset, ge)), ...l("data", n), ...l("series", o), ...l("links", a !== void 0 && a.length > 0 ? a : void 0), ...l("palette", Fe(e.palette)), ...l("option", d) };
+      return d === void 0 && n2 === void 0 && o === void 0 && (a === void 0 || a.length === 0) ? null : { type: "echart", ...l("title", p(e.title, m.maxString)), ...l("height", D(e.height, 100, 800)), ...l("preset", w(e.preset, ge)), ...l("data", n2), ...l("series", o), ...l("links", a !== void 0 && a.length > 0 ? a : void 0), ...l("palette", Fe(e.palette)), ...l("option", d) };
     }
     default:
       return t;
@@ -1113,7 +1292,7 @@ function Q(t, i, r) {
     if (e.length >= i) break;
     if (typeof s == "string") e.push(s.slice(0, r));
     else if (s !== null && typeof s == "object") {
-      let n = s, o = typeof n.label == "string" ? n.label : typeof n.value == "string" ? n.value : typeof n.title == "string" ? n.title : JSON.stringify(s);
+      let n2 = s, o = typeof n2.label == "string" ? n2.label : typeof n2.value == "string" ? n2.value : typeof n2.title == "string" ? n2.title : JSON.stringify(s);
       e.push(o.slice(0, r));
     }
   }
@@ -1122,13 +1301,13 @@ function Q(t, i, r) {
 function Pn(t, i, r, e) {
   if (!Array.isArray(t)) return;
   let s = [];
-  for (let n of t) {
+  for (let n2 of t) {
     if (s.length >= i) break;
-    if (typeof n == "string") {
-      s.push(n.slice(0, m.maxString));
+    if (typeof n2 == "string") {
+      s.push(n2.slice(0, m.maxString));
       continue;
     }
-    let o = y(n);
+    let o = y(n2);
     if (o !== void 0 && typeof o.type == "string") {
       if (r.remaining <= 0) break;
       r.remaining -= 1;
@@ -1146,8 +1325,8 @@ function Te(t, i) {
   let r = [];
   for (let e of t) {
     if (r.length >= i) break;
-    let s = y(e), n = s === void 0 ? void 0 : p(s.label, 128), o = s === void 0 ? void 0 : k(s.value, -1e12, 1e12);
-    n === void 0 || o === void 0 || r.push({ label: n, value: o, ...l("color", s === void 0 ? void 0 : E(s.color)) });
+    let s = y(e), n2 = s === void 0 ? void 0 : p(s.label, 128), o = s === void 0 ? void 0 : k(s.value, -1e12, 1e12);
+    n2 === void 0 || o === void 0 || r.push({ label: n2, value: o, ...l("color", s === void 0 ? void 0 : E(s.color)) });
   }
   return r;
 }
@@ -1156,8 +1335,8 @@ function Le(t, i, r) {
   let e = [];
   for (let s of t) {
     if (e.length >= i) break;
-    let n = y(s), o = n === void 0 ? void 0 : p(n.label, 128), a = n === void 0 ? void 0 : Te(n.data, r);
-    o === void 0 || a === void 0 || e.push({ label: o, data: a, ...l("color", n === void 0 ? void 0 : E(n.color)) });
+    let n2 = y(s), o = n2 === void 0 ? void 0 : p(n2.label, 128), a = n2 === void 0 ? void 0 : Te(n2.data, r);
+    o === void 0 || a === void 0 || e.push({ label: o, data: a, ...l("color", n2 === void 0 ? void 0 : E(n2.color)) });
   }
   return e;
 }
@@ -1166,9 +1345,9 @@ function vn(t, i, r) {
   let e = [];
   for (let s of t) {
     if (e.length >= m.maxTabs) break;
-    let n = y(s), o = n === void 0 ? void 0 : p(n.label, 128);
-    if (o === void 0 || n === void 0) continue;
-    let a = n.items !== void 0 ? n.items : n.content !== void 0 ? Array.isArray(n.content) ? n.content : [n.content] : void 0;
+    let n2 = y(s), o = n2 === void 0 ? void 0 : p(n2.label, 128);
+    if (o === void 0 || n2 === void 0) continue;
+    let a = n2.items !== void 0 ? n2.items : n2.content !== void 0 ? Array.isArray(n2.content) ? n2.content : [n2.content] : void 0;
     e.push({ label: o, items: _(a, i, r + 1) });
   }
   return e;
@@ -1178,15 +1357,15 @@ function qn(t, i) {
   let r = [];
   for (let e of t) {
     if (r.length >= i) break;
-    let s = y(e), n = s === void 0 ? void 0 : p(s.expr, 512);
-    if (n === void 0 || s === void 0) continue;
+    let s = y(e), n2 = s === void 0 ? void 0 : p(s.expr, 512);
+    if (n2 === void 0 || s === void 0) continue;
     let o = [];
     if (Array.isArray(s.params)) for (let a of s.params) {
       if (o.length >= m.maxPlotParams) break;
       let u = y(a), d = u === void 0 ? void 0 : p(u.name, 64), c = u === void 0 ? void 0 : k(u.value, -1e9, 1e9);
       d === void 0 || c === void 0 || o.push({ name: d, value: c, ...l("min", u === void 0 ? void 0 : k(u.min, -1e9, 1e9)), ...l("max", u === void 0 ? void 0 : k(u.max, -1e9, 1e9)), ...l("step", u === void 0 ? void 0 : k(u.step, 1e-9, 1e9)), ...l("animateTo", u === void 0 ? void 0 : k(u.animateTo, -1e9, 1e9)), ...l("durationMs", u === void 0 ? void 0 : k(u.durationMs, 1, 12e4)), ...l("loop", u === void 0 ? void 0 : u.loop === true ? true : void 0) });
     }
-    r.push({ expr: n, ...l("label", p(s.label, 128)), ...l("color", E(s.color)), ...l("kind", w(s.kind, oe)), ...l("params", o.length > 0 ? o : void 0) });
+    r.push({ expr: n2, ...l("label", p(s.label, 128)), ...l("color", E(s.color)), ...l("kind", w(s.kind, oe)), ...l("params", o.length > 0 ? o : void 0) });
   }
   return r;
 }
@@ -1205,8 +1384,8 @@ function Fn(t, i) {
   let r = [];
   for (let e of t) {
     if (r.length >= i) break;
-    let s = y(e), n = s === void 0 ? void 0 : p(s.key, 256), o = s === void 0 ? void 0 : p(s.value, m.maxString);
-    n === void 0 || o === void 0 || r.push({ key: n, value: o });
+    let s = y(e), n2 = s === void 0 ? void 0 : p(s.key, 256), o = s === void 0 ? void 0 : p(s.value, m.maxString);
+    n2 === void 0 || o === void 0 || r.push({ key: n2, value: o });
   }
   return r;
 }
@@ -1215,10 +1394,10 @@ function jn(t) {
   let i = [];
   for (let r of t) {
     if (i.length >= 24) break;
-    let e = y(r), s = e === void 0 ? void 0 : p(e.path, 1024), n = e === void 0 ? void 0 : p(e.newText, 2e4);
-    if (s === void 0 || n === void 0) continue;
+    let e = y(r), s = e === void 0 ? void 0 : p(e.path, 1024), n2 = e === void 0 ? void 0 : p(e.newText, 2e4);
+    if (s === void 0 || n2 === void 0) continue;
     let o = e === void 0 ? void 0 : e.oldText;
-    i.push({ path: s, newText: n, oldText: o === null || typeof o != "string" ? null : o.slice(0, 2e4) });
+    i.push({ path: s, newText: n2, oldText: o === null || typeof o != "string" ? null : o.slice(0, 2e4) });
   }
   return i;
 }
@@ -1227,8 +1406,8 @@ function Ln(t, i, r) {
   let e = [];
   for (let s of t) {
     if (e.length >= m.maxAccordionItems) break;
-    let n = y(s), o = n === void 0 ? void 0 : p(n.title, 256);
-    o === void 0 || n === void 0 || e.push({ title: o, items: _(n.items, i, r + 1) });
+    let n2 = y(s), o = n2 === void 0 ? void 0 : p(n2.title, 256);
+    o === void 0 || n2 === void 0 || e.push({ title: o, items: _(n2.items, i, r + 1) });
   }
   return e;
 }
@@ -1239,8 +1418,8 @@ function Vn(t) {
     if (i.length >= m.maxMeshes) break;
     let e = y(r), s = e === void 0 ? void 0 : w(e.shape, ue);
     if (s === void 0) continue;
-    let n = e === void 0 ? void 0 : k(e.scale, -1e6, 1e6) ?? Z(e.scale), o = e === void 0 ? void 0 : k(e.size, -1e6, 1e6) ?? Z(e.size);
-    i.push({ shape: s, ...l("color", e === void 0 ? void 0 : E(e.color)), ...l("position", e === void 0 ? void 0 : Z(e.position)), ...l("rotation", e === void 0 ? void 0 : Z(e.rotation)), ...l("scale", n), ...l("size", o) });
+    let n2 = e === void 0 ? void 0 : k(e.scale, -1e6, 1e6) ?? Z(e.scale), o = e === void 0 ? void 0 : k(e.size, -1e6, 1e6) ?? Z(e.size);
+    i.push({ shape: s, ...l("color", e === void 0 ? void 0 : E(e.color)), ...l("position", e === void 0 ? void 0 : Z(e.position)), ...l("rotation", e === void 0 ? void 0 : Z(e.rotation)), ...l("scale", n2), ...l("size", o) });
   }
   return i;
 }
@@ -1259,11 +1438,11 @@ function Kn(t) {
     if (i.length >= m.maxDiagramNodes) break;
     let s = y(e);
     if (s === void 0) continue;
-    let n = p(s.id, 128), o = p(s.label, m.maxString);
-    if (n === void 0 || o === void 0 || r.has(n)) continue;
-    r.add(n);
+    let n2 = p(s.id, 128), o = p(s.label, m.maxString);
+    if (n2 === void 0 || o === void 0 || r.has(n2)) continue;
+    r.add(n2);
     let a = w(s.type, ce), u = s.x === void 0 ? void 0 : P(k(s.x, -1e6, 1e6) ?? 0, 0, 1e6), d = s.y === void 0 ? void 0 : P(k(s.y, -1e6, 1e6) ?? 0, 0, 1e6), c = s.w === void 0 ? void 0 : P(k(s.w, -1e6, 1e6) ?? 96, 40, 2e3), f = s.h === void 0 ? void 0 : P(k(s.h, -1e6, 1e6) ?? 48, 24, 1200);
-    i.push({ id: n, label: o, ...l("sub", p(s.sub, 256)), ...l("type", a), ...l("x", u), ...l("y", d), ...l("w", c), ...l("h", f), ...l("tag", p(s.tag, 32)) });
+    i.push({ id: n2, label: o, ...l("sub", p(s.sub, 256)), ...l("type", a), ...l("x", u), ...l("y", d), ...l("w", c), ...l("h", f), ...l("tag", p(s.tag, 32)) });
   }
   return i;
 }
@@ -1275,8 +1454,8 @@ function Hn(t) {
     if (i.length >= m.maxDiagramEdges) break;
     let e = y(r);
     if (e === void 0) continue;
-    let s = p(e.from, 128), n = p(e.to, 128);
-    s === void 0 || n === void 0 || i.push({ from: s, to: n, ...l("label", p(e.label, m.maxDiagramLabel)), ...l("kind", w(e.kind, pe)), ...l("route", w(e.route, me)) });
+    let s = p(e.from, 128), n2 = p(e.to, 128);
+    s === void 0 || n2 === void 0 || i.push({ from: s, to: n2, ...l("label", p(e.label, m.maxDiagramLabel)), ...l("kind", w(e.kind, pe)), ...l("route", w(e.route, me)) });
   }
   return i;
 }
@@ -1312,16 +1491,16 @@ function Bn(t) {
   if (e === void 0) return null;
   let s = Hn(i.edges);
   if (s === void 0) return null;
-  let n = Un(i.zones);
-  return n === void 0 ? null : { type: "diagram", kind: r, nodes: e, edges: s, ...l("zones", n.length > 0 ? n : void 0), ...l("variant", w(i.variant, fe)), ...l("title", p(i.title, 256)), ...l("theme", Jn(i.theme)) };
+  let n2 = Un(i.zones);
+  return n2 === void 0 ? null : { type: "diagram", kind: r, nodes: e, edges: s, ...l("zones", n2.length > 0 ? n2 : void 0), ...l("variant", w(i.variant, fe)), ...l("title", p(i.title, 256)), ...l("theme", Jn(i.theme)) };
 }
 function Yn(t, i) {
   if (!Array.isArray(t)) return;
   let r = [];
   for (let e of t) {
     if (r.length >= i) break;
-    let s = y(e), n = s === void 0 ? void 0 : p(s.title, 256);
-    n !== void 0 && r.push({ title: n, ...l("desc", s === void 0 ? void 0 : p(s.desc, m.maxString)), ...l("time", s === void 0 ? void 0 : p(s.time, 128)) });
+    let s = y(e), n2 = s === void 0 ? void 0 : p(s.title, 256);
+    n2 !== void 0 && r.push({ title: n2, ...l("desc", s === void 0 ? void 0 : p(s.desc, m.maxString)), ...l("time", s === void 0 ? void 0 : p(s.time, 128)) });
   }
   return r;
 }
@@ -1333,10 +1512,10 @@ function Ue(t, i, r) {
   let e = [];
   for (let s of t) {
     if (e.length >= i) break;
-    let n = y(s), o = n === void 0 ? void 0 : p(n.name, 256);
+    let n2 = y(s), o = n2 === void 0 ? void 0 : p(n2.name, 256);
     if (o === void 0) continue;
-    let a = n !== void 0 && r > 0 && Array.isArray(n.children) ? Ue(n.children, i, r - 1) : void 0;
-    e.push({ name: o, ...l("type", n === void 0 ? void 0 : w(n.type, le)), ...l("children", a) });
+    let a = n2 !== void 0 && r > 0 && Array.isArray(n2.children) ? Ue(n2.children, i, r - 1) : void 0;
+    e.push({ name: o, ...l("type", n2 === void 0 ? void 0 : w(n2.type, le)), ...l("children", a) });
   }
   return e;
 }
@@ -1345,26 +1524,26 @@ function Zn(t, i) {
   let r = [];
   for (let s of t) {
     if (r.length >= m.maxQuizOptions) break;
-    let n = y(s), o = typeof s == "string" ? p(s, 512) : n === void 0 ? void 0 : p(n.label, 512);
-    o !== void 0 && r.push({ label: o, ...l("correct", n === void 0 ? void 0 : n.correct === true ? true : void 0), ...l("feedback", n === void 0 ? void 0 : p(n.feedback, m.maxString)) });
+    let n2 = y(s), o = typeof s == "string" ? p(s, 512) : n2 === void 0 ? void 0 : p(n2.label, 512);
+    o !== void 0 && r.push({ label: o, ...l("correct", n2 === void 0 ? void 0 : n2.correct === true ? true : void 0), ...l("feedback", n2 === void 0 ? void 0 : p(n2.feedback, m.maxString)) });
   }
   if (r.length === 0) return;
   if (r.some((s) => s.correct === true)) return r;
   let e = typeof i == "number" && Number.isFinite(i) ? Math.trunc(i) : typeof i == "string" ? r.findIndex((s) => s.label === i.slice(0, 512)) : -1;
-  return e < 0 || e >= r.length ? r : r.map((s, n) => n === e ? { ...s, correct: true } : s);
+  return e < 0 || e >= r.length ? r : r.map((s, n2) => n2 === e ? { ...s, correct: true } : s);
 }
 var Wn = /<(?:script|img|svg|iframe|video|audio|object|embed|source)\b|on[a-z]+\s*=|javascript:/i;
 function Ce(t, i, r) {
   if (r.count <= 0 || (r.count -= 1, i > m.maxEChartOptionDepth)) return;
   if (typeof t == "string") {
-    let n = t.slice(0, m.maxString);
-    return n.toLowerCase().includes("url(") || Wn.test(n) ? void 0 : n;
+    let n2 = t.slice(0, m.maxString);
+    return n2.toLowerCase().includes("url(") || Wn.test(n2) ? void 0 : n2;
   }
   if (typeof t == "number" && Number.isFinite(t) || typeof t == "boolean") return t;
   if (t === null) return null;
   if (Array.isArray(t)) {
-    let n = Math.min(t.length, m.maxEChartArrayLen), o = [];
-    for (let a = 0; a < n; a++) {
+    let n2 = Math.min(t.length, m.maxEChartArrayLen), o = [];
+    for (let a = 0; a < n2; a++) {
       let u = Ce(t[a], i + 1, r);
       u !== void 0 && o.push(u);
     }
@@ -1373,9 +1552,9 @@ function Ce(t, i, r) {
   let e = y(t);
   if (e === void 0) return;
   let s = {};
-  for (let [n, o] of Object.entries(e)) {
+  for (let [n2, o] of Object.entries(e)) {
     let a = Ce(o, i + 1, r);
-    a !== void 0 && (n === "tooltip" && typeof a == "object" && a !== null && !Array.isArray(a) && (a.renderMode = "richText"), s[n] = a);
+    a !== void 0 && (n2 === "tooltip" && typeof a == "object" && a !== null && !Array.isArray(a) && (a.renderMode = "richText"), s[n2] = a);
   }
   return Object.keys(s).length > 0 || Object.keys(e).length === 0 ? s : void 0;
 }
@@ -1391,8 +1570,8 @@ function Be(t) {
   return { ...l("title", p(i.title, m.maxString)), ...l("gap", k(i.gap, 0, 96)), ...l("panel", i.panel === true ? true : void 0), ...l("append", i.append === true ? true : void 0), items: _(i.items, r, 0) };
 }
 function Xn(t, i = Number.POSITIVE_INFINITY) {
-  let r = 0, e = (n) => {
-    if (Array.isArray(n)) for (let o of n) {
+  let r = 0, e = (n2) => {
+    if (Array.isArray(n2)) for (let o of n2) {
       if (r >= i) return;
       r += 1;
       let a = y(o);
@@ -1434,7 +1613,7 @@ function nt(t, i, r) {
     let c = y(d);
     return c !== void 0 && typeof c.type == "string" && et.has(c.type);
   };
-  function n(d, c) {
+  function n2(d, c) {
     if (Array.isArray(d)) {
       for (let f = 0; f < d.length; f++) if (o(d[f], `${c}[${f}]`), e >= i) return;
     }
@@ -1445,11 +1624,11 @@ function nt(t, i, r) {
     if (f !== void 0) {
       if (e += 1, r(f, c), f.type === "tabs" && Array.isArray(f.tabs)) for (let g = 0; g < f.tabs.length; g++) a(f.tabs[g], `${c}.tabs[${g}]`);
       else if (f.type === "accordion" && Array.isArray(f.items)) for (let g = 0; g < f.items.length; g++) a(f.items[g], `${c}.items[${g}]`);
-      else if ((f.type === "row" || f.type === "col" || f.type === "grid" || f.type === "card") && Array.isArray(f.items)) n(f.items, `${c}.items`);
+      else if ((f.type === "row" || f.type === "col" || f.type === "grid" || f.type === "card") && Array.isArray(f.items)) n2(f.items, `${c}.items`);
       else if (f.type === "list" && Array.isArray(f.items)) for (let g = 0; g < f.items.length; g++) o(f.items[g], `${c}.items[${g}]`);
       else if (f.type === "table" && Array.isArray(f.details)) {
         let g = I(f).length;
-        for (let x = 0; x < Math.min(f.details.length, g); x++) Array.isArray(f.details[x]) && C(f, x) && n(f.details[x], `${c}.details[${x}]`);
+        for (let x = 0; x < Math.min(f.details.length, g); x++) Array.isArray(f.details[x]) && C(f, x) && n2(f.details[x], `${c}.details[${x}]`);
       }
     }
   }
@@ -1457,10 +1636,10 @@ function nt(t, i, r) {
     let f = y(d);
     if (f === void 0) return;
     let g = f.items !== void 0 ? f.items : f.content;
-    Array.isArray(g) ? n(g, `${c}.items`) : o(g, `${c}.items`);
+    Array.isArray(g) ? n2(g, `${c}.items`) : o(g, `${c}.items`);
   }
   let u = y(t);
-  return u === void 0 || (N(u) && s(t) ? o(t, "spec") : n(u.items, "items")), e;
+  return u === void 0 || (N(u) && s(t) ? o(t, "spec") : n2(u.items, "items")), e;
 }
 function Ye(t, i = Number.POSITIVE_INFINITY) {
   return nt(t, i, () => {
@@ -1478,7 +1657,7 @@ function Qe(t) {
   }
   if (!Array.isArray(r.items)) return { ok: false, errors: ["spec.items must be an array"] };
   Ke(r, "spec", V, i, ["items"]);
-  let e = 0, s = false, n = (a, u, d) => {
+  let e = 0, s = false, n2 = (a, u, d) => {
     if (!s) {
       if (!Array.isArray(a)) {
         i.push(`${d} must be an array`);
@@ -1491,17 +1670,17 @@ function Qe(t) {
         }
         e += 1;
         let f = `${d}[${c}]`;
-        Xe(a[c], u, f, i, n);
+        Xe(a[c], u, f, i, n2);
       }
     }
   };
-  n(r.items, 0, "items"), i.length === 0 && i.push(...Re(r).diagnostics);
+  n2(r.items, 0, "items"), i.length === 0 && i.push(...Re(r).diagnostics);
   let o = [...new Set(i)];
   return { ok: o.length === 0, errors: o };
 }
 function Ze(t) {
-  let i = Ie(t), r = Be(i.value), e = Qe(i.value), s = Ye(i.value, m.maxNodes + 1), n = r === null ? 0 : tt(r), o = r === null ? 0 : Xn(r), a = e.errors.filter((u) => !u.includes(": unknown type "));
-  return r !== null && a.length === 0 && a.push(...Re(r).diagnostics), s > n && a.push(`repair dropped ${s - n} declared native node(s): declared ${s}, rendered ${n}`), { value: i.value, normalized: i.value, repaired: r, spec: r, errors: [...new Set(a)], warnings: [...i.warnings, ...Pe(i.value)], declaredCount: s, renderedCount: o, declaredNativeCount: s, renderedNativeCount: n, renderedTotalCount: o };
+  let i = Ie(t), r = Be(i.value), e = Qe(i.value), s = Ye(i.value, m.maxNodes + 1), n2 = r === null ? 0 : tt(r), o = r === null ? 0 : Xn(r), a = e.errors.filter((u) => !u.includes(": unknown type "));
+  return r !== null && a.length === 0 && a.push(...Re(r).diagnostics), s > n2 && a.push(`repair dropped ${s - n2} declared native node(s): declared ${s}, rendered ${n2}`), { value: i.value, normalized: i.value, repaired: r, spec: r, errors: [...new Set(a)], warnings: [...i.warnings, ...Pe(i.value)], declaredCount: s, renderedCount: o, declaredNativeCount: s, renderedNativeCount: n2, renderedTotalCount: o };
 }
 function it(t) {
   return t.errors.length > 0 && t.errors.every((i) => i.startsWith("spec exceeds ") || i.startsWith("repair dropped ")) && t.renderedNativeCount === m.maxNodes && t.declaredNativeCount === m.maxNodes + 1;
@@ -1519,9 +1698,9 @@ function Ve(t, i) {
   if (r.length === 0 || r[r.length - 1][1] === "tabs") return;
   let e = t;
   for (let s = 0; s < r.length; s++) {
-    let n = r[s], o = n[1] === void 0 ? e : y(e)?.[n[1]], a = Number(n[2] ?? n[3]);
+    let n2 = r[s], o = n2[1] === void 0 ? e : y(e)?.[n2[1]], a = Number(n2[2] ?? n2[3]);
     if (!Array.isArray(o) || a >= o.length) return;
-    if (s === r.length - 1) return { array: o, index: a, preserveIndex: n[1] === "details" };
+    if (s === r.length - 1) return { array: o, index: a, preserveIndex: n2[1] === "details" };
     if (e = o[a], e === void 0) return;
   }
 }
@@ -1546,13 +1725,13 @@ function at(t) {
   if (r.size === 0 && e.size === 0) return null;
   let s = ot(N(i) ? z(i) : i);
   if (s === null) return null;
-  let n = [...r].map((d) => Ve(s, d)).filter((d) => d !== void 0), o = [...e].map((d) => Ve(s, d)).filter((d) => d !== void 0);
+  let n2 = [...r].map((d) => Ve(s, d)).filter((d) => d !== void 0), o = [...e].map((d) => Ve(s, d)).filter((d) => d !== void 0);
   for (let { array: d, index: c } of o) {
     let f = y(d[c]);
     f?.type === "table" && Array.isArray(f.details) && (f.details.length = Math.min(f.details.length, I(f).length));
   }
   let a = /* @__PURE__ */ new Map();
-  for (let { array: d, index: c, preserveIndex: f } of n) {
+  for (let { array: d, index: c, preserveIndex: f } of n2) {
     if (f) {
       d[c] = null;
       continue;
@@ -1569,22 +1748,22 @@ function at(t) {
 }
 function We(t, i, r) {
   if (Array.isArray(t)) for (let e = 0; e < t.length; e++) {
-    let s = y(t[e]), n = `${i}[${e}]`;
+    let s = y(t[e]), n2 = `${i}[${e}]`;
     if (s === void 0) {
-      r.push(`${n} must be an object`);
+      r.push(`${n2} must be an object`);
       continue;
     }
-    typeof s.label != "string" && r.push(`${n}.label must be a string`), (typeof s.value != "number" || !Number.isFinite(s.value)) && r.push(`${n}.value must be a finite number`), s.color !== void 0 && typeof s.color != "string" && r.push(`${n}.color must be a string`);
+    typeof s.label != "string" && r.push(`${n2}.label must be a string`), (typeof s.value != "number" || !Number.isFinite(s.value)) && r.push(`${n2}.value must be a finite number`), s.color !== void 0 && typeof s.color != "string" && r.push(`${n2}.color must be a string`);
   }
 }
 function ut(t, i, r) {
   if (Array.isArray(t)) for (let e = 0; e < t.length; e++) {
-    let s = y(t[e]), n = `${i}[${e}]`;
+    let s = y(t[e]), n2 = `${i}[${e}]`;
     if (s === void 0) {
-      r.push(`${n} must be an object`);
+      r.push(`${n2} must be an object`);
       continue;
     }
-    typeof s.label != "string" && r.push(`${n}.label must be a string`), s.color !== void 0 && typeof s.color != "string" && r.push(`${n}.color must be a string`), Array.isArray(s.data) || r.push(`${n}.data must be an array`), We(s.data, `${n}.data`, r);
+    typeof s.label != "string" && r.push(`${n2}.label must be a string`), s.color !== void 0 && typeof s.color != "string" && r.push(`${n2}.color must be a string`), Array.isArray(s.data) || r.push(`${n2}.data must be an array`), We(s.data, `${n2}.data`, r);
   }
 }
 function lt(t, i, r) {
@@ -1592,9 +1771,9 @@ function lt(t, i, r) {
   let e = t.kind === void 0 ? "bars" : t.kind, s = Array.isArray(t.series) ? t.series : void 0;
   if (Array.isArray(t.data) && t.data.length === 0 && (s === void 0 || s.length === 0) && r.push(`${i}.data must not be empty`), s !== void 0) {
     s.length === 0 && r.push(`${i}.series must not be empty`), e === "donut" && r.push(`${i}.series is only supported for bars and line`);
-    for (let n = 0; n < s.length; n++) {
-      let o = y(s[n]);
-      o !== void 0 && Array.isArray(o.data) && o.data.length === 0 && r.push(`${i}.series[${n}].data must not be empty`);
+    for (let n2 = 0; n2 < s.length; n2++) {
+      let o = y(s[n2]);
+      o !== void 0 && Array.isArray(o.data) && o.data.length === 0 && r.push(`${i}.series[${n2}].data must not be empty`);
     }
   }
   e === "donut" && t.data === void 0 && r.push(`${i}.data is required for donut`), e === "line" && t.data === void 0 && (s === void 0 || s.length === 0) && r.push(`${i}.data is required for line (or provide series)`), We(t.data, `${i}.data`, r), ut(t.series, `${i}.series`, r);
@@ -1607,9 +1786,9 @@ function dt(t, i, r) {
         r.push(`${i}[${e}] must be an array or object`);
         continue;
       }
-      for (let n = 0; n < s.length; n++) {
-        let o = s[n];
-        typeof o != "string" && (typeof o != "number" || !Number.isFinite(o)) && r.push(`${i}[${e}][${n}] must be a string or finite number`);
+      for (let n2 = 0; n2 < s.length; n2++) {
+        let o = s[n2];
+        typeof o != "string" && (typeof o != "number" || !Number.isFinite(o)) && r.push(`${i}[${e}][${n2}] must be a string or finite number`);
       }
     }
   }
@@ -1619,41 +1798,41 @@ function Xe(t, i, r, e, s) {
     e.push(`${r}: exceeds max depth ${m.maxDepth}`);
     return;
   }
-  let n = y(t);
-  if (n === void 0) {
+  let n2 = y(t);
+  if (n2 === void 0) {
     e.push(`${r}: must be an object`);
     return;
   }
-  let o = n.type;
+  let o = n2.type;
   if (typeof o != "string") {
     e.push(`${r}: missing string 'type'`);
     return;
   }
   let a = (c) => {
-    n[c] !== void 0 && typeof n[c] != "string" && e.push(`${r}: '${c}' must be a string`);
+    n2[c] !== void 0 && typeof n2[c] != "string" && e.push(`${r}: '${c}' must be a string`);
   }, u = (c) => {
-    n[c] !== void 0 && (typeof n[c] != "number" || !Number.isFinite(n[c])) && e.push(`${r}: '${c}' must be a finite number`);
+    n2[c] !== void 0 && (typeof n2[c] != "number" || !Number.isFinite(n2[c])) && e.push(`${r}: '${c}' must be a finite number`);
   };
   switch (o) {
     case "text":
-      typeof n.content != "string" && typeof n.text != "string" && e.push(`${r}: type 'text' requires content or text (string)`), a("content"), a("text");
+      typeof n2.content != "string" && typeof n2.text != "string" && e.push(`${r}: type 'text' requires content or text (string)`), a("content"), a("text");
       break;
     case "row":
     case "col":
     case "card":
     case "grid":
-      Array.isArray(n.items) || e.push(`${r}: type '${o}' requires items (array)`), s(n.items, i + 1, `${r}.items`), o === "grid" && u("cols");
+      Array.isArray(n2.items) || e.push(`${r}: type '${o}' requires items (array)`), s(n2.items, i + 1, `${r}.items`), o === "grid" && u("cols");
       break;
     case "button":
     case "checkbox":
     case "link":
     case "switch":
-      typeof n.label != "string" && e.push(`${r}: type '${o}' requires label (string)`), a("label");
+      typeof n2.label != "string" && e.push(`${r}: type '${o}' requires label (string)`), a("label");
       break;
     case "image":
     case "audio":
     case "video":
-      typeof n.src != "string" && e.push(`${r}: type '${o}' requires src (string)`), a("src"), a("alt"), o === "video" && a("poster");
+      typeof n2.src != "string" && e.push(`${r}: type '${o}' requires src (string)`), a("src"), a("alt"), o === "video" && a("poster");
       break;
     case "slider":
       a("label"), u("min"), u("max"), u("step"), u("value");
@@ -1664,38 +1843,38 @@ function Xe(t, i, r, e, s) {
       break;
     case "select":
     case "radio":
-      Array.isArray(n.options) || e.push(`${r}: type '${o}' requires options (array)`);
+      Array.isArray(n2.options) || e.push(`${r}: type '${o}' requires options (array)`);
       break;
     case "submit":
-      typeof n.label != "string" && e.push(`${r}: type 'submit' requires label (string)`);
+      typeof n2.label != "string" && e.push(`${r}: type 'submit' requires label (string)`);
       break;
     case "badge":
-      typeof n.label != "string" && typeof n.text != "string" && typeof n.value != "string" && e.push(`${r}: type 'badge' requires label, text, or value (string)`), a("label"), a("text"), a("value");
+      typeof n2.label != "string" && typeof n2.text != "string" && typeof n2.value != "string" && e.push(`${r}: type 'badge' requires label, text, or value (string)`), a("label"), a("text"), a("value");
       break;
     case "hero":
-      typeof n.title != "string" && e.push(`${r}: type 'hero' requires title (string)`), a("subtitle");
+      typeof n2.title != "string" && e.push(`${r}: type 'hero' requires title (string)`), a("subtitle");
       break;
     case "stat":
-      typeof n.label != "string" && e.push(`${r}: type 'stat' requires label (string)`), typeof n.value != "string" && e.push(`${r}: type 'stat' requires value (string)`), a("delta");
+      typeof n2.label != "string" && e.push(`${r}: type 'stat' requires label (string)`), typeof n2.value != "string" && e.push(`${r}: type 'stat' requires value (string)`), a("delta");
       break;
     case "progress":
-      (typeof n.value != "number" || !Number.isFinite(n.value) || n.value < 0 || n.value > 100) && e.push(`${r}: type 'progress' requires value (number 0..100)`), u("value");
+      (typeof n2.value != "number" || !Number.isFinite(n2.value) || n2.value < 0 || n2.value > 100) && e.push(`${r}: type 'progress' requires value (number 0..100)`), u("value");
       break;
     case "avatar":
-      typeof n.name != "string" && e.push(`${r}: type 'avatar' requires name (string)`);
+      typeof n2.name != "string" && e.push(`${r}: type 'avatar' requires name (string)`);
       break;
     case "list":
-      if (Array.isArray(n.items) || e.push(`${r}: type 'list' requires items (array)`), Array.isArray(n.items)) for (let c = 0; c < n.items.length; c++) {
-        let f = y(n.items[c]);
+      if (Array.isArray(n2.items) || e.push(`${r}: type 'list' requires items (array)`), Array.isArray(n2.items)) for (let c = 0; c < n2.items.length; c++) {
+        let f = y(n2.items[c]);
         f !== void 0 && typeof f.type == "string" && Xe(f, i + 1, `${r}.items[${c}]`, e, s);
       }
       break;
     case "table":
-      if (!Array.isArray(n.columns) && !He(n) && e.push(`${r}: type 'table' requires columns (array)`), Array.isArray(n.rows) || e.push(`${r}: type 'table' requires rows (array)`), n.types !== void 0 && !Array.isArray(n.types) && e.push(`${r}.types must be an array of column cell types`), n.details !== void 0 && !Array.isArray(n.details) && e.push(`${r}.details must be an array aligned with rows`), Array.isArray(n.details)) {
-        let c = { columns: n.columns, rows: n.rows, types: n.types }, f = I(c).length;
-        n.details.length > f && e.push(`${r}.details must not contain more entries than rows`);
-        for (let g = 0; g < Math.min(n.details.length, f); g++) {
-          let x = n.details[g];
+      if (!Array.isArray(n2.columns) && !He(n2) && e.push(`${r}: type 'table' requires columns (array)`), Array.isArray(n2.rows) || e.push(`${r}: type 'table' requires rows (array)`), n2.types !== void 0 && !Array.isArray(n2.types) && e.push(`${r}.types must be an array of column cell types`), n2.details !== void 0 && !Array.isArray(n2.details) && e.push(`${r}.details must be an array aligned with rows`), Array.isArray(n2.details)) {
+        let c = { columns: n2.columns, rows: n2.rows, types: n2.types }, f = I(c).length;
+        n2.details.length > f && e.push(`${r}.details must not contain more entries than rows`);
+        for (let g = 0; g < Math.min(n2.details.length, f); g++) {
+          let x = n2.details[g];
           if (!(x === null || !C(c, g))) {
             if (!Array.isArray(x)) {
               e.push(`${r}.details[${g}] must be an array or null`);
@@ -1705,14 +1884,14 @@ function Xe(t, i, r, e, s) {
           }
         }
       }
-      dt(n.rows, `${r}.rows`, e);
+      dt(n2.rows, `${r}.rows`, e);
       break;
     case "chart":
-      lt(n, r, e);
+      lt(n2, r, e);
       break;
     case "tabs": {
-      if (Array.isArray(n.tabs) || e.push(`${r}: type 'tabs' requires tabs (array)`), Array.isArray(n.tabs)) for (let c = 0; c < n.tabs.length; c++) {
-        let f = y(n.tabs[c]);
+      if (Array.isArray(n2.tabs) || e.push(`${r}: type 'tabs' requires tabs (array)`), Array.isArray(n2.tabs)) for (let c = 0; c < n2.tabs.length; c++) {
+        let f = y(n2.tabs[c]);
         if (f === void 0) {
           e.push(`${r}.tabs[${c}] must be an object`);
           continue;
@@ -1722,29 +1901,29 @@ function Xe(t, i, r, e, s) {
       break;
     }
     case "plot":
-      Array.isArray(n.series) || e.push(`${r}: type 'plot' requires series (array)`);
+      Array.isArray(n2.series) || e.push(`${r}: type 'plot' requires series (array)`);
       break;
     case "callout":
-      typeof n.content != "string" && e.push(`${r}: type 'callout' requires content (string)`);
+      typeof n2.content != "string" && e.push(`${r}: type 'callout' requires content (string)`);
       break;
     case "steps":
-      Array.isArray(n.steps) || e.push(`${r}: type 'steps' requires steps (array)`);
+      Array.isArray(n2.steps) || e.push(`${r}: type 'steps' requires steps (array)`);
       break;
     case "keyvalue":
-      Array.isArray(n.pairs) || e.push(`${r}: type 'keyvalue' requires pairs (array)`);
+      Array.isArray(n2.pairs) || e.push(`${r}: type 'keyvalue' requires pairs (array)`);
       break;
     case "diff":
-      Array.isArray(n.diffs) || e.push(`${r}: type 'diff' requires diffs (array)`);
+      Array.isArray(n2.diffs) || e.push(`${r}: type 'diff' requires diffs (array)`);
       break;
     case "json":
-      "value" in n || e.push(`${r}: type 'json' requires value`);
+      "value" in n2 || e.push(`${r}: type 'json' requires value`);
       break;
     case "code":
-      typeof n.code != "string" && e.push(`${r}: type 'code' requires code (string)`);
+      typeof n2.code != "string" && e.push(`${r}: type 'code' requires code (string)`);
       break;
     case "accordion":
-      if (Array.isArray(n.items) || e.push(`${r}: type 'accordion' requires items (array)`), Array.isArray(n.items)) for (let c = 0; c < n.items.length; c++) {
-        let f = y(n.items[c]);
+      if (Array.isArray(n2.items) || e.push(`${r}: type 'accordion' requires items (array)`), Array.isArray(n2.items)) for (let c = 0; c < n2.items.length; c++) {
+        let f = y(n2.items[c]);
         if (f === void 0) {
           e.push(`${r}.items[${c}] must be an object`);
           continue;
@@ -1753,51 +1932,51 @@ function Xe(t, i, r, e, s) {
       }
       break;
     case "copy":
-      typeof n.text != "string" && e.push(`${r}: type 'copy' requires text (string)`);
+      typeof n2.text != "string" && e.push(`${r}: type 'copy' requires text (string)`);
       break;
     case "svg":
-      typeof n.code != "string" && e.push(`${r}: type 'svg' requires code (string)`), u("height");
+      typeof n2.code != "string" && e.push(`${r}: type 'svg' requires code (string)`), u("height");
       break;
     case "mermaid":
-      typeof n.code != "string" && e.push(`${r}: type 'mermaid' requires code (string)`);
+      typeof n2.code != "string" && e.push(`${r}: type 'mermaid' requires code (string)`);
       break;
     case "scene3d":
-      Array.isArray(n.meshes) || e.push(`${r}: type 'scene3d' requires meshes (array)`);
+      Array.isArray(n2.meshes) || e.push(`${r}: type 'scene3d' requires meshes (array)`);
       break;
     case "timeline":
-      Array.isArray(n.items) || e.push(`${r}: type 'timeline' requires items (array)`);
+      Array.isArray(n2.items) || e.push(`${r}: type 'timeline' requires items (array)`);
       break;
     case "file-tree":
-      Array.isArray(n.items) || e.push(`${r}: type 'file-tree' requires items (array)`);
+      Array.isArray(n2.items) || e.push(`${r}: type 'file-tree' requires items (array)`);
       break;
     case "breadcrumb":
-      Array.isArray(n.items) || e.push(`${r}: type 'breadcrumb' requires items (array)`);
+      Array.isArray(n2.items) || e.push(`${r}: type 'breadcrumb' requires items (array)`);
       break;
     case "quiz":
-      typeof n.question != "string" && e.push(`${r}: type 'quiz' requires question (string)`), Array.isArray(n.options) || e.push(`${r}: type 'quiz' requires options (array)`);
+      typeof n2.question != "string" && e.push(`${r}: type 'quiz' requires question (string)`), Array.isArray(n2.options) || e.push(`${r}: type 'quiz' requires options (array)`);
       break;
     case "diagram":
-      typeof n.kind != "string" && e.push(`${r}: type 'diagram' requires kind (string)`), Array.isArray(n.nodes) || e.push(`${r}: type 'diagram' requires nodes (array)`), n.edges !== void 0 && !Array.isArray(n.edges) && e.push(`${r}: type 'diagram' requires edges (array) when present`);
+      typeof n2.kind != "string" && e.push(`${r}: type 'diagram' requires kind (string)`), Array.isArray(n2.nodes) || e.push(`${r}: type 'diagram' requires nodes (array)`), n2.edges !== void 0 && !Array.isArray(n2.edges) && e.push(`${r}: type 'diagram' requires edges (array) when present`);
       break;
     case "echart":
-      n.option === void 0 && n.data === void 0 && n.series === void 0 && (!Array.isArray(n.links) || n.links.length === 0) && e.push(`${r}: type 'echart' requires option, data, series, or links`), u("height");
+      n2.option === void 0 && n2.data === void 0 && n2.series === void 0 && (!Array.isArray(n2.links) || n2.links.length === 0) && e.push(`${r}: type 'echart' requires option, data, series, or links`), u("height");
       break;
     default:
       e.push(`${r}: unknown type '${o}' (custom renderer?)`);
   }
   let d = T[o];
-  d !== void 0 && In(n, r, d, e);
+  d !== void 0 && In(n2, r, d, e);
 }
 var ct = 32;
 var en = ct;
 function ft(t) {
   let i = [], r = [], e = (u) => {
     r.length >= en && r.shift(), r.push(u);
-  }, s = false, n = false, o = 0;
+  }, s = false, n2 = false, o = 0;
   for (; o < t.length; o++) {
     let u = t[o];
     if (s) {
-      n ? n = false : u === "\\" ? n = true : u === '"' && (s = false);
+      n2 ? n2 = false : u === "\\" ? n2 = true : u === '"' && (s = false);
       continue;
     }
     if (u === '"') {
@@ -1839,8 +2018,8 @@ function pt(t) {
   if (r !== null) return r;
   let { candidates: e } = ft(i);
   for (let s of e) {
-    let n = nn(i.slice(0, s.end) + s.closingSuffix, false);
-    if (n !== null) return n;
+    let n2 = nn(i.slice(0, s.end) + s.closingSuffix, false);
+    if (n2 !== null) return n2;
   }
   return null;
 }
@@ -1858,10 +2037,10 @@ function L(t) {
 ` || t === "\r";
 }
 function yt(t, i, r, e, s) {
-  let n = Math.min(t.length, i + gt), o = i + 1, a = () => {
-    for (; o < n && L(t[o]); ) o++;
+  let n2 = Math.min(t.length, i + gt), o = i + 1, a = () => {
+    for (; o < n2 && L(t[o]); ) o++;
   };
-  if (a(), o >= n) return true;
+  if (a(), o >= n2) return true;
   if (r) return t[o] === ":";
   let u = e.length - 1;
   if (t[o] === ":") return false;
@@ -1870,38 +2049,38 @@ function yt(t, i, r, e, s) {
     if (c === void 0) return false;
     if (t[o] === c.closer) u--;
     else if (!s) return false;
-    if (o++, a(), o >= n) return true;
+    if (o++, a(), o >= n2) return true;
     if (u < 0) return s;
   }
   if (t[o] !== ",") return false;
   let d = e[u];
   if (d === void 0) return false;
-  if (o++, a(), o >= n || t[o] === d.closer) return true;
+  if (o++, a(), o >= n2 || t[o] === d.closer) return true;
   if (d.closer === "]") return /["[{tfn\-0-9]/.test(t[o]);
   if (t[o] !== '"') return false;
-  for (o++; o < n; ) {
+  for (o++; o < n2; ) {
     if (t[o] === "\\") {
       o += 2;
       continue;
     }
-    if (t[o] === '"') return o++, a(), o >= n || t[o] === ":";
+    if (t[o] === '"') return o++, a(), o >= n2 || t[o] === ":";
     if (t[o].charCodeAt(0) < 32) return false;
     o++;
   }
   return true;
 }
 function bt(t, i, r) {
-  let e = "", s = [], n = false, o = false, a = false, u = false, d = 0, c = 0, f = 0, g = false, x = [], $ = () => {
+  let e = "", s = [], n2 = false, o = false, a = false, u = false, d = 0, c = 0, f = 0, g = false, x = [], $ = () => {
     let R = s[s.length - 1];
     R !== void 0 && (R.expecting = "comma");
   };
   for (let R = 0; R < t.length; R++) {
     let A = t[R];
     if (u) {
-      n && A === '"' && (a = true), e += A, u = false;
+      n2 && A === '"' && (a = true), e += A, u = false;
       continue;
     }
-    if (n) {
+    if (n2) {
       if (A === "\\") {
         e += A, u = true;
         continue;
@@ -1914,14 +2093,14 @@ function bt(t, i, r) {
       for (; S < t.length && L(t[S]); ) S++;
       let M = !o && (!a && ",}]:".includes(t[S] ?? "\0") || s[s.length - 1]?.closer === "]" && t[S] === ",");
       if (!r.has(R) && (M || yt(t, R, o, s, i))) {
-        n = false, e += A;
+        n2 = false, e += A;
         let ee = s[s.length - 1];
         o ? ee !== void 0 && (ee.expecting = "colon") : ($(), ee !== void 0 && a && (x.length === X && x.shift(), x.push(R)));
       } else e += '\\"', a = true, d++;
       continue;
     }
     if (A === '"') {
-      o = s[s.length - 1]?.expecting === "key", a = false, n = true, e += A;
+      o = s[s.length - 1]?.expecting === "key", a = false, n2 = true, e += A;
       continue;
     }
     if (A === "{" || A === "[") {
@@ -1953,14 +2132,14 @@ function bt(t, i, r) {
     }
     e += A;
   }
-  let J = n;
-  if (i) for (n && (e += '"', d++); s.length > 0; ) e += s.pop().closer, d++;
+  let J = n2;
+  if (i) for (n2 && (e += '"', d++); s.length > 0; ) e += s.pop().closer, d++;
   return { text: e, repairs: d, rootEnd: c, rawRootEnd: f, choices: x, unfinishedString: J, invalidValue: g };
 }
 function ht(t) {
   let i = [], r = false, e = false, s = false;
-  for (let n = 0; n < t.length; n++) {
-    let o = t[n];
+  for (let n2 = 0; n2 < t.length; n2++) {
+    let o = t[n2];
     if (e) {
       e = false;
       continue;
@@ -1982,7 +2161,7 @@ function ht(t) {
     else if (o === "}" || o === "]") {
       if (i.pop() !== o) return null;
       if (i.length === 0) {
-        let a = t.slice(0, n + 1).trimEnd();
+        let a = t.slice(0, n2 + 1).trimEnd();
         try {
           return JSON.parse(a), a;
         } catch {
@@ -1997,7 +2176,7 @@ function xt(t, i) {
   let r = ht(t);
   if (r !== null) return i ? { text: r, repairs: 1 } : null;
   let e = [[]], s = null;
-  for (let n = 0; n < X && e.length > 0; n++) {
+  for (let n2 = 0; n2 < X && e.length > 0; n2++) {
     let o = e.pop(), a = bt(t, i, new Set(o));
     if (a.repairs > 0 && !(o.length > 0 && a.unfinishedString)) try {
       return JSON.parse(a.text), { text: a.text, repairs: a.repairs };
@@ -2074,10 +2253,10 @@ function validateVisual(value) {
   const processed = Ze(normalizeVisual(value, T)), spec = Ne(processed) ? processed.spec : at(processed);
   if (!spec || !processed.renderedNativeCount) throw Error("DSH UI: visual spec: " + (processed.errors.slice(0, 4).join("; ") || "requires registered components"));
   const critical = /* @__PURE__ */ new Set(["quiz", "radio", "submit", "input", "textarea", "select", "slider", "checkbox", "switch"]);
-  const inventory = (items, path = "items", result = []) => {
-    for (const [n, v2] of (Array.isArray(items) ? items : []).entries()) {
+  const inventory = (items, path2 = "items", result = []) => {
+    for (const [n2, v2] of (Array.isArray(items) ? items : []).entries()) {
       if (!v2 || typeof v2 !== "object") continue;
-      const at2 = path + "[" + n + "]";
+      const at2 = path2 + "[" + n2 + "]";
       if (critical.has(v2.type)) result.push({ type: v2.type, id: v2.id ?? v2.group ?? v2.question ?? v2.label, path: at2 });
       if (["row", "col", "grid", "card"].includes(v2.type)) inventory(v2.items, at2 + ".items", result);
       if (v2.type === "tabs") for (const [i, t] of (v2.tabs ?? []).entries()) inventory(t.items, at2 + ".tabs[" + i + "].items", result);
@@ -2087,7 +2266,7 @@ function validateVisual(value) {
   };
   const source = normalizeVisual(value, T), before = inventory(source.items), after = inventory(spec.items);
   const available = [...after], missing = before.filter((v2) => {
-    const i = available.findIndex((n) => n.type === v2.type && n.id === v2.id);
+    const i = available.findIndex((n2) => n2.type === v2.type && n2.id === v2.id);
     if (i < 0) return true;
     available.splice(i, 1);
     return false;
@@ -2095,17 +2274,17 @@ function validateVisual(value) {
   if (missing.length) throw Error("DSH UI: critical component was rejected at " + missing.map((v2) => v2.path + " (" + v2.type + ")").join(", ") + ". " + processed.errors.slice(0, 4).join("; "));
   const stableIds = /* @__PURE__ */ new Set();
   function walk(items) {
-    for (const n of items) {
-      if (n.id !== void 0) {
-        if (stableIds.has(n.id)) throw Error("DSH UI: duplicate extended component id " + n.id);
-        stableIds.add(n.id);
+    for (const n2 of items) {
+      if (n2.id !== void 0) {
+        if (stableIds.has(n2.id)) throw Error("DSH UI: duplicate extended component id " + n2.id);
+        stableIds.add(n2.id);
       }
-      if (!VISUAL_TYPES.includes(n.type)) throw Error("DSH UI: unsupported visual component " + n.type);
-      if (n.type === "input" && n.inputType === "password") throw Error("DSH UI: do not collect passwords or secrets in a UI");
-      if (n.type !== "file-tree" && Array.isArray(n.items)) walk(n.items.filter((x) => x && typeof x === "object" && "type" in x));
-      for (const t of n.tabs ?? []) walk(t.items ?? []);
-      if (n.type === "table") {
-        for (const d of n.details ?? []) if (d) walk(d);
+      if (!VISUAL_TYPES.includes(n2.type)) throw Error("DSH UI: unsupported visual component " + n2.type);
+      if (n2.type === "input" && n2.inputType === "password") throw Error("DSH UI: do not collect passwords or secrets in a UI");
+      if (n2.type !== "file-tree" && Array.isArray(n2.items)) walk(n2.items.filter((x) => x && typeof x === "object" && "type" in x));
+      for (const t of n2.tabs ?? []) walk(t.items ?? []);
+      if (n2.type === "table") {
+        for (const d of n2.details ?? []) if (d) walk(d);
       }
     }
   }
@@ -2138,11 +2317,11 @@ var array = (v2) => {
   for (let i = 0; i < 8 && singleItem(candidate); i++) candidate = candidate.item;
   return Array.isArray(candidate) ? candidate : v2;
 };
-var numericOps = /* @__PURE__ */ new Set(["add", "sub", "mul", "div", "min", "max", "round", "abs", "lt", "lte", "gt", "gte"]);
+var numericOps = /* @__PURE__ */ new Set(["add", "sub", "mul", "div", "min", "max", "round", "ceil", "floor", "abs", "lt", "lte", "gt", "gte"]);
 function number(v2) {
   if (typeof v2 !== "string" || !/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:e[+-]?\d+)?$/i.test(v2.trim())) return v2;
-  const n = Number(v2);
-  return Number.isFinite(n) && (!Number.isInteger(n) || Number.isSafeInteger(n)) ? n : v2;
+  const n2 = Number(v2);
+  return Number.isFinite(n2) && (!Number.isInteger(n2) || Number.isSafeInteger(n2)) ? n2 : v2;
 }
 var boolean = (v2) => v2 === "true" ? true : v2 === "false" ? false : v2;
 function expression(e, numeric = false, logical = false) {
@@ -2205,15 +2384,18 @@ function normalizeAuthoring(doc) {
         const columns = array(node.columns), rows = array(node.rows), types = array(node.types);
         const allowed = ["id", "type", "label", "columns", "rows", "types"];
         if (Object.keys(node).every((k2) => allowed.includes(k2)) && Array.isArray(columns) && columns.length && columns.every((c) => object(c) && typeof c.key === "string" && typeof c.label === "string" && Object.keys(c).every((k2) => ["key", "label", "unit"].includes(k2))) && new Set(columns.map((c) => c.key)).size === columns.length && Array.isArray(rows) && rows.every(object) && Array.isArray(types) && types.length === columns.length && types.every((t) => ["text", "num", "delta", "bar", "badge"].includes(t))) {
-          const spec = { ...node.label ? { title: node.label } : {}, items: [{ type: "table", columns: columns.map((c) => c.label + (c.unit ? ` (${c.unit})` : "")), rows: rows.map((row) => columns.map((c) => row[c.key] ?? null)), types }] }, id = node.id;
+          const spec = { ...node.label ? { title: node.label } : {}, items: [{ type: "table", columns: columns.map((c) => c.label + (c.unit ? ` (${c.unit})` : "")), rows: rows.map((row) => columns.map((c) => row[c.key] ?? null)), types }] }, id2 = node.id;
           for (const k2 of Object.keys(node)) delete node[k2];
-          Object.assign(node, { ...id !== void 0 ? { id } : {}, type: "visual", spec });
+          Object.assign(node, { ...id2 !== void 0 ? { id: id2 } : {}, type: "visual", spec });
         }
       }
       if (typeof node.id === "string" && VISUAL_TYPES.includes(node.type) && !own(COMPONENTS, node.type)) {
-        const spec = { items: [{ ...node }] }, id = node.id;
+        const spec = { items: [{ ...node }] }, id2 = node.id;
         for (const k2 of Object.keys(node)) delete node[k2];
-        Object.assign(node, { id, type: "visual", spec });
+        Object.assign(node, { id: id2, type: "visual", spec });
+      }
+      if (node.type === "table" && Array.isArray(node.columns) && node.columns.length && node.columns.every((c) => object(c) && typeof c.key === "string") && new Set(node.columns.map((c) => c.key)).size === node.columns.length && Array.isArray(node.rows) && node.rows.every((row) => Array.isArray(row) && row.length === node.columns.length)) {
+        node.rows = node.rows.map((row) => Object.fromEntries(node.columns.map((c, i) => [c.key, row[i]])));
       }
       if (node.type === "table" && Array.isArray(node.columns) && node.columns.length && Array.isArray(node.rows) && node.rows.every(Array.isArray) && node.columns.every((c) => object(c) && Number.isInteger(c.key) && c.key >= 0) && new Set(node.columns.map((c) => c.key)).size === node.columns.length) {
         const columns = node.columns.map((c) => ({ ...c, key: "col_" + c.key }));
@@ -2229,7 +2411,7 @@ function normalizeAuthoring(doc) {
         if (!own(node, "title")) node.title = doc.title;
         if (!own(node, "fallback")) node.fallback = doc.fallback;
       }
-      for (const field of ["children", "items", "columns", "stateKeys", "dataKeys", "derivedKeys"]) if (own(node, field)) node[field] = array(node[field]);
+      for (const field of ["children", "items", "columns", "libraries", "stateKeys", "dataKeys", "derivedKeys"]) if (own(node, field)) node[field] = array(node[field]);
       if (["table", "chart"].includes(node.type) && own(node, "rows")) node.rows = array(node.rows);
       for (const field of ["decimals", "height"]) if (own(node, field)) node[field] = number(node[field]);
       if (["row", "column"].includes(node.type)) {
@@ -2263,14 +2445,14 @@ var TYPE_FIELDS = Object.freeze(["size", "weight", "color", "align", "lineHeight
 var TEXT_SIZES = Object.freeze({ sm: 14, md: 16, lg: 20, xl: 26, hero: 36 });
 var TEXT_COLORS = Object.freeze({ default: "var(--du-ink)", muted: "var(--du-muted)", accent: "var(--du-accent)", success: "var(--du-green)", warning: "var(--du-amber)", danger: "var(--du-red)", violet: "var(--du-violet)" });
 function validateTypography(value, at2 = "text") {
-  const fail2 = (message) => {
+  const fail3 = (message) => {
     throw Error(`DSH UI: ${at2}.${message}`);
   };
-  if (value.size !== void 0 && !(typeof value.size === "number" && Number.isFinite(value.size) && value.size >= 12 && value.size <= 48) && !Object.hasOwn(TEXT_SIZES, value.size)) fail2("size must be 12..48 px or sm/md/lg/xl/hero");
-  if (value.weight !== void 0 && ![400, 500, 600, 700, 800].includes(value.weight)) fail2("weight must be 400/500/600/700/800");
-  if (value.color !== void 0 && (typeof value.color !== "string" || !Object.hasOwn(TEXT_COLORS, value.color) && !/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.color))) fail2("color must be default/muted/accent/success/warning/danger/violet or #RGB/#RRGGBB");
-  if (value.align !== void 0 && !["left", "center", "right"].includes(value.align)) fail2("align must be left/center/right");
-  if (value.lineHeight !== void 0 && !(typeof value.lineHeight === "number" && value.lineHeight >= 1.2 && value.lineHeight <= 2.4)) fail2("lineHeight must be 1.2..2.4");
+  if (value.size !== void 0 && !(typeof value.size === "number" && Number.isFinite(value.size) && value.size >= 12 && value.size <= 48) && !Object.hasOwn(TEXT_SIZES, value.size)) fail3("size must be 12..48 px or sm/md/lg/xl/hero");
+  if (value.weight !== void 0 && ![400, 500, 600, 700, 800].includes(value.weight)) fail3("weight must be 400/500/600/700/800");
+  if (value.color !== void 0 && (typeof value.color !== "string" || !Object.hasOwn(TEXT_COLORS, value.color) && !/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.color))) fail3("color must be default/muted/accent/success/warning/danger/violet or #RGB/#RRGGBB");
+  if (value.align !== void 0 && !["left", "center", "right"].includes(value.align)) fail3("align must be left/center/right");
+  if (value.lineHeight !== void 0 && !(typeof value.lineHeight === "number" && value.lineHeight >= 1.2 && value.lineHeight <= 2.4)) fail3("lineHeight must be 1.2..2.4");
 }
 function typographyStyle(value) {
   return { fontSize: value.size === void 0 ? void 0 : TEXT_SIZES[value.size] ?? value.size, fontWeight: value.weight, color: value.color === void 0 ? void 0 : TEXT_COLORS[value.color] ?? value.color, textAlign: value.align, lineHeight: value.lineHeight };
@@ -2278,23 +2460,23 @@ function typographyStyle(value) {
 
 // lib/links.js
 function validateLink(node) {
-  const fail2 = (message) => {
+  const fail3 = (message) => {
     throw Error("DSH UI: " + message);
   };
-  if ([node.href, node.path, node.action].filter((v2) => v2 !== void 0).length !== 1) fail2(`node.${node.id}: choose exactly one href (http/https), path (file), or action (Agent follow-up)`);
-  if (node.variant !== void 0 && !["primary", "secondary", "text"].includes(node.variant)) fail2("link/button variant must be primary/secondary/text");
+  if ([node.href, node.path, node.action].filter((v2) => v2 !== void 0).length !== 1) fail3(`node.${node.id}: choose exactly one href (http/https), path (file), or action (Agent follow-up)`);
+  if (node.variant !== void 0 && !["primary", "secondary", "text"].includes(node.variant)) fail3("link/button variant must be primary/secondary/text");
   if (node.href !== void 0) {
-    if (typeof node.href !== "string" || node.href.length > 8192 || /[\u0000-\u0020\u007f]/.test(node.href) || !/^https?:\/\//i.test(node.href)) fail2("href must be an absolute http/https URL; encode spaces");
+    if (typeof node.href !== "string" || node.href.length > 8192 || /[\u0000-\u0020\u007f]/.test(node.href) || !/^https?:\/\//i.test(node.href)) fail3("href must be an absolute http/https URL; encode spaces");
     let url;
     try {
       url = new URL(node.href);
     } catch {
-      fail2("invalid href URL");
+      fail3("invalid href URL");
     }
-    if (!url.hostname || url.username || url.password) fail2("href must have a host and must not contain credentials");
+    if (!url.hostname || url.username || url.password) fail3("href must have a host and must not contain credentials");
   }
   if (node.path !== void 0) {
-    if (typeof node.path !== "string" || !node.path.trim() || node.path.length > 8192 || /[\u0000-\u001f\u007f]/.test(node.path) || /^\s*(?:[a-z][a-z\d+.-]*:|[\\/]{2})/i.test(node.path) && !/^\s*[a-z]:[\\/]/i.test(node.path)) fail2("path must be a local file path, not a URL, network path or command");
+    if (typeof node.path !== "string" || !node.path.trim() || node.path.length > 8192 || /[\u0000-\u001f\u007f]/.test(node.path) || /^\s*(?:[a-z][a-z\d+.-]*:|[\\/]{2})/i.test(node.path) && !/^\s*[a-z]:[\\/]/i.test(node.path)) fail3("path must be a local file path, not a URL, network path or command");
   }
 }
 
@@ -2362,7 +2544,7 @@ function validateState(doc, state) {
   }
   return result;
 }
-var ARITY = { add: [1, 8], sub: [2, 2], mul: [1, 8], div: [2, 2], min: [1, 8], max: [1, 8], round: [1, 1], abs: [1, 1], eq: [2, 2], neq: [2, 2], lt: [2, 2], lte: [2, 2], gt: [2, 2], gte: [2, 2], if: [3, 3] };
+var ARITY = { add: [1, 8], sub: [2, 2], mul: [1, 8], div: [2, 2], min: [1, 8], max: [1, 8], round: [1, 1], ceil: [1, 1], floor: [1, 1], abs: [1, 1], eq: [2, 2], neq: [2, 2], lt: [2, 2], lte: [2, 2], gt: [2, 2], gte: [2, 2], if: [3, 3] };
 function reference(doc, ref) {
   if (typeof ref !== "string" || !["state", "data", "derived"].includes(ref.split(".")[0]) || ref.split(".").length !== 2 || !validIdentifier(ref.split(".")[1])) fail(`invalid reference ${JSON.stringify(ref)}; use state.key, data.key or derived.key with a letter/underscore identifier`);
   const [group, k2] = ref.split(".");
@@ -2440,6 +2622,12 @@ function evaluate(doc, state) {
       case "round":
         out = Math.round(a[0]);
         break;
+      case "ceil":
+        out = Math.ceil(a[0]);
+        break;
+      case "floor":
+        out = Math.floor(a[0]);
+        break;
       case "abs":
         out = Math.abs(a[0]);
         break;
@@ -2459,7 +2647,13 @@ function evaluate(doc, state) {
   };
   for (const k2 of Object.keys(doc.derived)) resolve(`derived.${k2}`);
   if (new TextEncoder().encode(JSON.stringify(derived)).length > LIMITS.bytes) fail("derived output exceeds 128 KiB");
+  const resolveCell = (cell) => {
+    const out = expression2(cell);
+    if (!scalar(out)) fail("inline row formula cells must resolve to a string, boolean or finite number");
+    return out;
+  };
   const result = { derived, resolveValue: (value) => {
+    if (Array.isArray(value)) return value.map((row) => object2(row) ? Object.fromEntries(Object.entries(row).map(([k2, cell]) => [k2, object2(cell) && ["const", "ref", "op"].some((field) => own2(cell, field)) ? resolveCell(cell) : cell])) : row);
     if (!object2(value)) return value;
     return expression2(value);
   } };
@@ -2468,19 +2662,25 @@ function evaluate(doc, state) {
 }
 function checkViewValues(doc, evaluated) {
   function walk(list) {
-    for (const n of list) {
-      if (n.type === "table" || n.type === "chart") {
-        const rows = evaluated.resolveValue(n.rows);
+    for (const n2 of list) {
+      if (n2.type === "table" || n2.type === "chart") {
+        const rows = evaluated.resolveValue(n2.rows);
         if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object2)) fail("table/chart rows must reference an array of objects");
-        if (n.type === "chart" && rows.some((r) => !own2(r, n.labelKey) || !scalar(r[n.labelKey]) || !own2(r, n.valueKey) || !finite(r[n.valueKey]))) fail("chart requires labels and finite numeric values");
-        if (n.type === "chart" && n.xScale === "linear" && rows.some((r) => !finite(r[n.labelKey]))) fail("linear chart requires numeric x values");
+        if (n2.type === "chart") {
+          const index = rows.findIndex((r) => !own2(r, n2.labelKey) || !scalar(r[n2.labelKey]) || !own2(r, n2.valueKey) || !finite(r[n2.valueKey]));
+          if (index >= 0) {
+            const row = rows[index], missing = [n2.labelKey, n2.valueKey].filter((k2) => !own2(row, k2));
+            fail("chart requires labels and finite numeric values. node." + n2.id + ".rows[" + index + "]: " + (missing.length ? "missing field(s) " + missing.join(", ") : n2.valueKey + " must resolve to a finite number") + ". Available keys: " + Object.keys(row).slice(0, 16).join(", ") + ". For live values use inline rows:[{" + n2.labelKey + ':"\u9879\u76EE",' + n2.valueKey + ':{ref:"derived.amount"}}]; static data labels alone contain no amounts. Keep all nodes/state/derived when correcting the document');
+          }
+        }
+        if (n2.type === "chart" && n2.xScale === "linear" && rows.some((r) => !finite(r[n2.labelKey]))) fail("linear chart requires numeric x values");
       }
-      if (n.type === "metric" && !scalar(evaluated.resolveValue(n.value))) fail(`node.${n.id}.value must resolve to a number, string or boolean; use table for rows or a canvas for structured data`);
-      if (n.type === "progress") {
-        const v2 = evaluated.resolveValue(n.value), max = evaluated.resolveValue(n.max);
+      if (n2.type === "metric" && !scalar(evaluated.resolveValue(n2.value))) fail(`node.${n2.id}.value must resolve to a number, string or boolean; use table for rows or a canvas for structured data`);
+      if (n2.type === "progress") {
+        const v2 = evaluated.resolveValue(n2.value), max = evaluated.resolveValue(n2.max);
         if (!finite(v2) || !finite(max) || max <= 0 || v2 < 0 || v2 > max) fail("progress requires 0 <= value <= positive max");
       }
-      if (n.children) walk(n.children);
+      if (n2.children) walk(n2.children);
     }
   }
   walk(doc.nodes);
@@ -2499,7 +2699,7 @@ function validateDocument(input) {
     for (const [k2, allowed] of Object.entries({ layout: UI_LAYOUTS, accent: UI_ACCENTS, density: ["comfortable", "compact"] }))
       if (doc.presentation[k2] !== void 0 && !allowed.includes(doc.presentation[k2])) fail(`unknown presentation ${k2}`);
   }
-  if (doc.version !== 1) fail("unsupported protocol version");
+  if (doc.version !== 1) fail(own2(doc, "version") ? "document.version must be 1" : "document.version is missing. render_ui creates a complete document, not a partial patch: send {version:1,title,fallback,nodes:[...]} for shared controls/formulas, or {title,items:[...]} for extended visuals. Include all content, not only data/derived");
   text(doc.title, "title");
   text(doc.fallback, "fallback");
   if (!doc.title.trim() || !doc.fallback.trim()) fail("title and fallback cannot be empty");
@@ -2522,10 +2722,16 @@ function validateDocument(input) {
   }
   const defaults = validateState(doc, initialState(doc));
   let expressions = 0;
+  const expressionShapes = /* @__PURE__ */ new Set();
   for (const [k2, spec] of Object.entries(doc.state))
     for (const option of spec.options ?? []) validateState(doc, { ...defaults, [k2]: option });
   function validateExpression(e, depth = 0, itemRows, at2 = "expression") {
-    if (++expressions > LIMITS.expressions || depth > LIMITS.depth) fail("expression limit exceeded");
+    if (depth > LIMITS.depth) fail(at2 + ": expression nesting exceeds " + LIMITS.depth);
+    const shape = JSON.stringify(e);
+    if (!expressionShapes.has(shape)) {
+      expressionShapes.add(shape);
+      if (++expressions > LIMITS.expressions) fail(at2 + ": expression limit exceeded (128 distinct expressions). Reuse derived references instead of expanding long formulas; keep the complete document when retrying");
+    }
     if (!object2(e)) fail(`${at2}: expression must be an object`);
     if (own2(e, "map")) {
       if (depth !== 0) fail("map is only allowed at the root of a derived value");
@@ -2589,69 +2795,71 @@ function validateDocument(input) {
       validateExpression(v2);
     } else if (!scalar(v2)) fail(`invalid value at ${at2}`);
   };
-  function nodes(list, depth = 0, path = "nodes") {
-    if (!Array.isArray(list) || depth > LIMITS.depth) fail("invalid node children or depth");
-    for (const [index, n] of list.entries()) {
-      const at2 = `${path}[${index}]`;
+  function nodes(list, depth = 0, path2 = "nodes") {
+    if (!Array.isArray(list)) fail(path2 === "nodes" ? 'document.nodes is missing or is not an array. State/derived define values but do not create visible UI. Include nodes:[{id:"heading",type:"heading",text:"..."},...] and actual controls in the SAME complete document; do not resend state/data/derived alone. Declared state keys: ' + Object.keys(doc.state).join(", ") : path2 + " must be an array of child nodes; use children:[{id,type,...}]");
+    if (depth > LIMITS.depth) fail(path2 + " exceeds maximum node depth " + LIMITS.depth);
+    for (const [index, n2] of list.entries()) {
+      const at2 = `${path2}[${index}]`;
       if (++count > LIMITS.nodes) fail("too many nodes");
-      if (!object2(n)) fail(`${at2} must be a node object`);
-      if (!own2(n, "id")) fail(`${at2}.id is missing (type=${JSON.stringify(n.type)}). Every node, including sandbox, needs its own id; add e.g. id:"canvas". JSON field order does not matter`);
-      if (!validIdentifier(n.id)) fail(`${at2}.id is invalid: ${JSON.stringify(n.id)}. Use 1..64 letters/numbers/underscores starting with a letter/underscore`);
-      if (ids.has(n.id)) fail(`${at2}.id duplicates ${JSON.stringify(n.id)} first declared at ${ids.get(n.id)}. Give each node a unique id; state keys and node ids are separate namespaces`);
-      ids.set(n.id, `${at2}.id`);
-      if (!Object.hasOwn(COMPONENTS, n.type)) fail("unsupported component " + n.type);
-      if (["table", "chart"].includes(n.type) && typeof n.rows === "string" && /^(data|derived)\./.test(n.rows)) n.rows = { ref: n.rows };
-      switch (n.type) {
+      if (!object2(n2)) fail(`${at2} must be a node object`);
+      if (!own2(n2, "id")) fail(`${at2}.id is missing (type=${JSON.stringify(n2.type)}). Every node, including sandbox, needs its own id; add e.g. id:"canvas". JSON field order does not matter`);
+      if (!validIdentifier(n2.id)) fail(`${at2}.id is invalid: ${JSON.stringify(n2.id)}. Use 1..64 letters/numbers/underscores starting with a letter/underscore`);
+      if (ids.has(n2.id)) fail(`${at2}.id duplicates ${JSON.stringify(n2.id)} first declared at ${ids.get(n2.id)}. Give each node a unique id; state keys and node ids are separate namespaces`);
+      ids.set(n2.id, `${at2}.id`);
+      if (!Object.hasOwn(COMPONENTS, n2.type)) fail("unsupported component " + n2.type);
+      if (["table", "chart"].includes(n2.type) && typeof n2.rows === "string" && /^(data|derived)\./.test(n2.rows)) n2.rows = { ref: n2.rows };
+      switch (n2.type) {
         case "visual": {
-          const previous = Array.isArray(n.warnings) ? n.warnings.filter((x) => typeof x === "string").map((x) => x.slice(0, 512)).slice(0, 12) : [];
-          const checked = validateVisual(n.spec);
-          n.spec = checked.spec;
-          n.warnings = [.../* @__PURE__ */ new Set([...previous, ...checked.warnings])].slice(0, 12);
+          const previous = Array.isArray(n2.warnings) ? n2.warnings.filter((x) => typeof x === "string").map((x) => x.slice(0, 512)).slice(0, 12) : [];
+          const checked = validateVisual(n2.spec);
+          n2.spec = checked.spec;
+          n2.warnings = [.../* @__PURE__ */ new Set([...previous, ...checked.warnings])].slice(0, 12);
           count += checked.count;
           if (count > LIMITS.nodes) fail("too many nodes, including visual components");
-          if (!validIdentifier(n.stateKey) || doc.state[n.stateKey]?.type !== "json") fail("visual requires its own json stateKey");
+          if (!validIdentifier(n2.stateKey) || doc.state[n2.stateKey]?.type !== "json") fail("visual requires its own json stateKey");
           break;
         }
         case "sandbox": {
-          text(n.title, `${at2}.title (canvas title)`);
-          text(n.fallback, `${at2}.fallback (canvas fallback)`);
-          if (!n.title.trim()) fail(`${at2}.title must not be empty`);
-          if (!n.fallback.trim()) fail(`${at2}.fallback must not be empty`);
-          if (typeof n.html !== "string" || !n.html.trim()) fail(`${at2}.html must be a non-empty HTML string; script/css/fallback belong beside html on the sandbox node, not inside it`);
-          for (const field of ["html", "css", "script"]) if (n[field] !== void 0 && (typeof n[field] !== "string" || n[field].length > SANDBOX_LIMITS.source)) fail("canvas source exceeds 48 Ki characters");
-          if (n.height !== void 0 && (!Number.isInteger(n.height) || n.height < 160 || n.height > SANDBOX_LIMITS.height)) fail("canvas height must be 160..1000");
-          for (const [field, group] of [["stateKeys", "state"], ["dataKeys", "data"], ["derivedKeys", "derived"]]) if (n[field] !== void 0 && (!Array.isArray(n[field]) || n[field].length > 64 || new Set(n[field]).size !== n[field].length || n[field].some((k2) => !own2(doc[group], k2)))) fail("invalid canvas " + field);
+          text(n2.title, `${at2}.title (canvas title)`);
+          text(n2.fallback, `${at2}.fallback (canvas fallback)`);
+          if (!n2.title.trim()) fail(`${at2}.title must not be empty`);
+          if (!n2.fallback.trim()) fail(`${at2}.fallback must not be empty`);
+          if (typeof n2.html !== "string" || !n2.html.trim()) fail(`${at2}.html must be a non-empty HTML string; script/css/fallback belong beside html on the sandbox node, not inside it`);
+          for (const field of ["html", "css", "script"]) if (n2[field] !== void 0 && (typeof n2[field] !== "string" || n2[field].length > SANDBOX_LIMITS.source)) fail("canvas source exceeds 48 Ki characters");
+          if (n2.libraries !== void 0 && (!Array.isArray(n2.libraries) || n2.libraries.length > 1 || n2.libraries.some((v2) => v2 !== "mechanism"))) fail('canvas libraries supports only ["mechanism"] or []');
+          if (n2.height !== void 0 && (!Number.isInteger(n2.height) || n2.height < 160 || n2.height > SANDBOX_LIMITS.height)) fail("canvas height must be 160..1000");
+          for (const [field, group] of [["stateKeys", "state"], ["dataKeys", "data"], ["derivedKeys", "derived"]]) if (n2[field] !== void 0 && (!Array.isArray(n2[field]) || n2[field].length > 64 || new Set(n2[field]).size !== n2[field].length || n2[field].some((k2) => !own2(doc[group], k2)))) fail("invalid canvas " + field);
           break;
         }
         case "row":
         case "column":
-          if (n.gap !== void 0 && !(typeof n.gap === "number" && Number.isFinite(n.gap) && n.gap >= 0 && n.gap <= 40)) fail("gap must be 0..40 pixels");
-          if (n.columns !== void 0 && (!Number.isInteger(n.columns) || n.columns < 1 || n.columns > 4)) fail("columns must be 1..4");
+          if (n2.gap !== void 0 && !(typeof n2.gap === "number" && Number.isFinite(n2.gap) && n2.gap >= 0 && n2.gap <= 40)) fail("gap must be 0..40 pixels");
+          if (n2.columns !== void 0 && (!Number.isInteger(n2.columns) || n2.columns < 1 || n2.columns > 4)) fail("columns must be 1..4");
           break;
         case "card":
-          if (n.title !== void 0) text(n.title, "card title");
-          if (n.surface !== void 0 && !UI_SURFACES.includes(n.surface)) fail("unknown card surface");
+          if (n2.title !== void 0) text(n2.title, "card title");
+          if (n2.surface !== void 0 && !UI_SURFACES.includes(n2.surface)) fail("unknown card surface");
           break;
         case "details":
-          text(n.title, "details title");
-          if (n.open === "true" || n.open === "false") n.open = n.open === "true";
-          if (n.open !== void 0 && typeof n.open !== "boolean") fail(`node.${n.id}.open must be boolean true or false`);
+          text(n2.title, "details title");
+          if (n2.open === "true" || n2.open === "false") n2.open = n2.open === "true";
+          if (n2.open !== void 0 && typeof n2.open !== "boolean") fail(`node.${n2.id}.open must be boolean true or false`);
           break;
         case "badge":
-          value(n.text, "badge text");
+          value(n2.text, "badge text");
           break;
         case "progress":
-          text(n.label, "progress label");
-          value(n.value, "progress value");
-          value(n.max, "progress max");
-          if (n.unit !== void 0) text(n.unit, "progress unit");
+          text(n2.label, "progress label");
+          value(n2.value, "progress value");
+          value(n2.max, "progress max");
+          if (n2.unit !== void 0) text(n2.unit, "progress unit");
           break;
         case "steps": {
-          if (n.title !== void 0) text(n.title, "steps title");
-          const at3 = `node.${n.id}.items`;
-          if (!Array.isArray(n.items)) fail(`${at3} must be an array of 1..12 step objects, received ${n.items === null ? "null" : typeof n.items}. Use items:[{"title":"First step","description":"One sentence"}], not items:{item:[...]}. status is optional for a static guide`);
-          if (!n.items.length || n.items.length > 12) fail(`${at3} requires 1..12 items; received ${n.items.length}. Split a longer guide into separate steps nodes`);
-          for (const [i, item] of n.items.entries()) {
+          if (n2.title !== void 0) text(n2.title, "steps title");
+          const at3 = `node.${n2.id}.items`;
+          if (!Array.isArray(n2.items)) fail(`${at3} must be an array of 1..12 step objects, received ${n2.items === null ? "null" : typeof n2.items}. Use items:[{"title":"First step","description":"One sentence"}], not items:{item:[...]}. status is optional for a static guide`);
+          if (!n2.items.length || n2.items.length > 12) fail(`${at3} requires 1..12 items; received ${n2.items.length}. Split a longer guide into separate steps nodes`);
+          for (const [i, item] of n2.items.entries()) {
             const stepAt = `${at3}[${i}]`;
             fields(item, ["title", "description", "status"], stepAt);
             text(item.title, `${stepAt}.title`);
@@ -2663,62 +2871,63 @@ function validateDocument(input) {
         case "heading":
         case "text":
         case "callout":
-          if (n.type === "text") {
-            if (n.title !== void 0) text(n.title, "text block title");
-            if (n.copyable !== void 0 && typeof n.copyable !== "boolean") fail("copyable must be boolean");
+          if (n2.type === "text") {
+            if (n2.title !== void 0) text(n2.title, "text block title");
+            if (n2.copyable !== void 0 && typeof n2.copyable !== "boolean") fail("copyable must be boolean");
           }
-          validateTypography(n, `node.${n.id}`);
-          if (n.spans !== void 0) {
-            if (n.text !== void 0) fail(`node.${n.id}: use text or spans, not both`);
-            if (!Array.isArray(n.spans) || !n.spans.length || n.spans.length > 80) fail("spans must contain 1..80 text fragments");
-            for (const [i, span] of n.spans.entries()) {
-              fields(span, ["text", ...TYPE_FIELDS], `node.${n.id}.spans[${i}]`);
+          validateTypography(n2, `node.${n2.id}`);
+          if (n2.spans !== void 0) {
+            if (n2.text !== void 0) fail(`node.${n2.id}: use text or spans, not both`);
+            if (!Array.isArray(n2.spans) || !n2.spans.length || n2.spans.length > 80) fail("spans must contain 1..80 text fragments");
+            for (const [i, span] of n2.spans.entries()) {
+              fields(span, ["text", ...TYPE_FIELDS], `node.${n2.id}.spans[${i}]`);
               text(span.text, "span text");
-              validateTypography(span, `node.${n.id}.spans[${i}]`);
+              validateTypography(span, `node.${n2.id}.spans[${i}]`);
             }
-          } else value(n.text, "text");
+          } else value(n2.text, "text");
           break;
         case "metric":
-          text(n.label, "metric label");
-          value(n.value, "metric value");
-          if (n.unit !== void 0) text(n.unit, "unit");
-          if (n.decimals !== void 0 && (!Number.isInteger(n.decimals) || n.decimals < 0 || n.decimals > 6)) fail("invalid decimals");
+          text(n2.label, "metric label");
+          value(n2.value, "metric value");
+          if (n2.unit !== void 0) text(n2.unit, "unit");
+          if (n2.decimals !== void 0 && (!Number.isInteger(n2.decimals) || n2.decimals < 0 || n2.decimals > 6)) fail("invalid decimals");
           break;
         case "input":
         case "slider":
         case "select":
         case "toggle": {
-          text(n.label, "control label");
-          if (typeof n.bind !== "string" || !n.bind.startsWith("state.")) fail("controls must bind state");
-          const [, k2] = reference(doc, n.bind), spec = doc.state[k2];
-          if (n.type === "slider" && spec.type !== "number") fail("slider requires numeric state");
-          if (n.type === "toggle" && spec.type !== "boolean") fail("toggle requires boolean state");
-          if (["input", "select"].includes(n.type) && spec.type === "json") fail(`node.${n.id}: structured state requires a sandbox with DSHUI.setState; use separate boolean states and toggle nodes for a native checklist`);
-          if (n.type === "input" && spec.type === "boolean") fail("use toggle for boolean state");
-          if (n.type === "select" && !spec.options) fail("select requires options");
+          text(n2.label, "control label");
+          if (typeof n2.bind !== "string" || !n2.bind.startsWith("state.")) fail("controls must bind state");
+          const [, k2] = reference(doc, n2.bind), spec = doc.state[k2];
+          if (n2.type === "slider" && spec.type !== "number") fail("slider requires numeric state");
+          if (n2.type === "toggle" && spec.type !== "boolean") fail("toggle requires boolean state");
+          if (["input", "select"].includes(n2.type) && spec.type === "json") fail(`node.${n2.id}: structured state requires a sandbox with DSHUI.setState; use separate boolean states and toggle nodes for a native checklist`);
+          if (n2.type === "input" && spec.type === "boolean") fail("use toggle for boolean state");
+          if (n2.type === "select" && !spec.options) fail("select requires options");
+          if (n2.type === "select" && n2.variant !== void 0 && !["dropdown", "segmented"].includes(n2.variant)) fail(`node.${n2.id}.variant must be dropdown or segmented`);
           break;
         }
         case "code":
-          if (typeof n.code !== "string" || n.code.length > SANDBOX_LIMITS.source) fail("code must be a string of at most 48 Ki characters");
-          if (n.lang !== void 0) text(n.lang, "code language");
-          if (n.title !== void 0) text(n.title, "code title");
-          if (n.wrap !== void 0 && typeof n.wrap !== "boolean") fail("code wrap must be boolean");
+          if (typeof n2.code !== "string" || n2.code.length > SANDBOX_LIMITS.source) fail("code must be a string of at most 48 Ki characters");
+          if (n2.lang !== void 0) text(n2.lang, "code language");
+          if (n2.title !== void 0) text(n2.title, "code title");
+          if (n2.wrap !== void 0 && typeof n2.wrap !== "boolean") fail("code wrap must be boolean");
           break;
         case "button":
         case "link":
-          text(n.text, "button text");
-          validateLink(n);
-          if (n.action !== void 0 && !own2(doc.actions, n.action)) fail("unknown action");
+          text(n2.text, "button text");
+          validateLink(n2);
+          if (n2.action !== void 0 && !own2(doc.actions, n2.action)) fail("unknown action");
           break;
         case "divider":
-          if (n.label !== void 0) text(n.label, "divider label");
+          if (n2.label !== void 0) text(n2.label, "divider label");
           break;
         case "table": {
-          if (n.label !== void 0) text(n.label, "table label");
-          if (!Array.isArray(n.rows)) value(n.rows, "table rows");
-          if (!Array.isArray(n.columns) || !n.columns.length || n.columns.length > 16) fail("invalid table columns");
+          if (n2.label !== void 0) text(n2.label, "table label");
+          if (!Array.isArray(n2.rows)) value(n2.rows, "table rows");
+          if (!Array.isArray(n2.columns) || !n2.columns.length || n2.columns.length > 16) fail("invalid table columns");
           const cols = /* @__PURE__ */ new Set();
-          for (const c of n.columns) {
+          for (const c of n2.columns) {
             fields(c, ["key", "label", "unit"], "column");
             if (!validIdentifier(c.key) || cols.has(c.key)) fail("invalid or duplicate column key");
             cols.add(c.key);
@@ -2728,23 +2937,28 @@ function validateDocument(input) {
           break;
         }
         case "chart":
-          if (!Array.isArray(n.rows)) value(n.rows, "chart rows");
-          if (!["bar", "line"].includes(n.kind) || !validIdentifier(n.labelKey) || !validIdentifier(n.valueKey)) fail("invalid chart");
-          text(n.label, "chart label");
-          if (n.unit !== void 0) text(n.unit, "chart unit");
-          if (n.xScale !== void 0 && (!["category", "linear"].includes(n.xScale) || n.xScale === "linear" && n.kind !== "line")) fail("invalid xScale");
+          if (!Array.isArray(n2.rows)) value(n2.rows, "chart rows");
+          if (!["bar", "line"].includes(n2.kind) || !validIdentifier(n2.labelKey) || !validIdentifier(n2.valueKey)) fail("invalid chart");
+          text(n2.label, "chart label");
+          if (n2.unit !== void 0) text(n2.unit, "chart unit");
+          if (n2.xScale !== void 0 && (!["category", "linear"].includes(n2.xScale) || n2.xScale === "linear" && n2.kind !== "line")) fail("invalid xScale");
           break;
         default:
-          fail(`unsupported component ${n.type}`);
+          fail(`unsupported component ${n2.type}`);
       }
-      if (["heading", "text", "callout", "card", "metric", "button", "link", "badge", "progress", "details"].includes(n.type)) {
-        if (n.icon !== void 0 && !UI_ICONS.includes(n.icon)) fail("unknown UI icon");
-        if (!["button", "link"].includes(n.type)) {
-          if (n.tone !== void 0 && !UI_TONES.includes(n.tone)) fail("unknown UI tone");
+      if (["heading", "text", "callout", "card", "metric", "button", "link", "badge", "progress", "details"].includes(n2.type)) {
+        if (n2.icon !== void 0 && !UI_ICONS.includes(n2.icon)) fail("unknown UI icon");
+        if (!["button", "link"].includes(n2.type)) {
+          if (n2.tone !== void 0 && !UI_TONES.includes(n2.tone)) fail("unknown UI tone");
         }
       }
-      fields(n, componentFields(n.type), `node.${n.id}`);
-      if (["row", "column", "card", "details"].includes(n.type)) nodes(n.children, depth + 1, `${at2}.children`);
+      if (["table", "chart"].includes(n2.type) && Array.isArray(n2.rows)) {
+        for (const [i, row] of n2.rows.entries()) if (object2(row)) {
+          for (const [k2, cell] of Object.entries(row)) if (object2(cell) && ["const", "ref", "op"].some((field) => own2(cell, field))) value(cell, at2 + ".rows[" + i + "]." + k2);
+        }
+      }
+      fields(n2, componentFields(n2.type), `node.${n2.id}`);
+      if (["row", "column", "card", "details"].includes(n2.type)) nodes(n2.children, depth + 1, `${at2}.children`);
     }
   }
   nodes(doc.nodes);
@@ -2769,31 +2983,31 @@ function fallbackText(doc) {
   if (Object.keys(visibleDefaults).length) lines.push("\u521D\u59CB\u53C2\u6570\uFF1A" + JSON.stringify(visibleDefaults));
   const describe = (v2) => v2 === null || v2 === void 0 ? "\u2014" : typeof v2 === "object" ? JSON.stringify(v2) : String(v2);
   function walk(nodes) {
-    for (const n of nodes) {
-      if (n.type === "code") lines.push(n.title ?? n.lang ?? "\u4EE3\u7801", n.code);
-      if (["heading", "text", "callout", "badge"].includes(n.type)) lines.push(n.spans ? n.spans.map((s) => s.text).join("") : describe(resolveValue(n.text)));
-      if (n.type === "link" || n.type === "button" && (n.href || n.path)) lines.push(`${n.text}: ${n.href ?? n.path}`);
-      if (n.type === "sandbox") lines.push(n.title, n.fallback);
-      if ((n.type === "card" || n.type === "details") && n.title) lines.push(n.title);
-      if (n.type === "progress") lines.push(`${n.label}: ${resolveValue(n.value)} / ${resolveValue(n.max)} ${n.unit ?? ""}`);
-      if (n.type === "steps") {
-        if (n.title) lines.push(n.title);
-        for (const [i, item] of n.items.entries()) lines.push(`${item.status ? `[${item.status}]` : `${i + 1}.`} ${item.title}${item.description ? ": " + item.description : ""}`);
+    for (const n2 of nodes) {
+      if (n2.type === "code") lines.push(n2.title ?? n2.lang ?? "\u4EE3\u7801", n2.code);
+      if (["heading", "text", "callout", "badge"].includes(n2.type)) lines.push(n2.spans ? n2.spans.map((s) => s.text).join("") : describe(resolveValue(n2.text)));
+      if (n2.type === "link" || n2.type === "button" && (n2.href || n2.path)) lines.push(`${n2.text}: ${n2.href ?? n2.path}`);
+      if (n2.type === "sandbox") lines.push(n2.title, n2.fallback);
+      if ((n2.type === "card" || n2.type === "details") && n2.title) lines.push(n2.title);
+      if (n2.type === "progress") lines.push(`${n2.label}: ${resolveValue(n2.value)} / ${resolveValue(n2.max)} ${n2.unit ?? ""}`);
+      if (n2.type === "steps") {
+        if (n2.title) lines.push(n2.title);
+        for (const [i, item] of n2.items.entries()) lines.push(`${item.status ? `[${item.status}]` : `${i + 1}.`} ${item.title}${item.description ? ": " + item.description : ""}`);
       }
-      if (n.type === "metric") {
-        const v2 = resolveValue(n.value);
-        lines.push(`${n.label}: ${typeof v2 === "number" ? formatNumber(v2, n.decimals ?? 2) : String(v2)} ${n.unit ?? ""}`);
+      if (n2.type === "metric") {
+        const v2 = resolveValue(n2.value);
+        lines.push(`${n2.label}: ${typeof v2 === "number" ? formatNumber(v2, n2.decimals ?? 2) : String(v2)} ${n2.unit ?? ""}`);
       }
-      if (n.type === "table") {
-        if (n.label) lines.push(n.label);
-        lines.push(n.columns.map((c) => c.label + (c.unit ? ` (${c.unit})` : "")).join(" | "));
-        for (const row of resolveValue(n.rows)) lines.push(n.columns.map((c) => Object.hasOwn(row, c.key) ? String(row[c.key]) : "\u2014").join(" | "));
+      if (n2.type === "table") {
+        if (n2.label) lines.push(n2.label);
+        lines.push(n2.columns.map((c) => c.label + (c.unit ? ` (${c.unit})` : "")).join(" | "));
+        for (const row of resolveValue(n2.rows)) lines.push(n2.columns.map((c) => Object.hasOwn(row, c.key) ? String(row[c.key]) : "\u2014").join(" | "));
       }
-      if (n.type === "chart") {
-        lines.push(n.label + (n.unit ? ` (${n.unit})` : ""));
-        for (const r of resolveValue(n.rows)) lines.push(`${r[n.labelKey]}: ${r[n.valueKey]}`);
+      if (n2.type === "chart") {
+        lines.push(n2.label + (n2.unit ? ` (${n2.unit})` : ""));
+        for (const r of resolveValue(n2.rows)) lines.push(`${r[n2.labelKey]}: ${r[n2.valueKey]}`);
       }
-      if (n.children) walk(n.children);
+      if (n2.children) walk(n2.children);
     }
   }
   walk(doc.nodes);
@@ -2802,43 +3016,14 @@ function fallbackText(doc) {
   return result;
 }
 
-// src/icons.js
-var import_react = __toESM(require("react"), 1);
-var h2 = import_react.default.createElement;
-var paths = {
-  copy: ["M9 8h11v13H9z", "M15 8V3H4v13h5"],
-  external: ["M14 4h6v6M20 4l-9 9", "M10 4H4v16h16v-6"],
-  file: ["M14 3H5v18h14V8l-5-5Z", "M14 3v5h5M8 13h8M8 17h5"],
-  globe: ["M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z", "M3 12h18M12 3c-5 5-5 13 0 18 5-5 5-13 0-18Z"],
-  sparkles: ["m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3Z", "M20 2v4M18 4h4"],
-  sliders: ["M4 7h6m4 0h6M4 17h10m4 0h2", "M10 4v6m4 4v6"],
-  layers: ["m12 3 9 5-9 5-9-5 9-5Z", "m3 12 9 5 9-5M3 16l9 5 9-5"],
-  chart: ["M4 3v17h17M8 15v-4m5 4V7m5 8v-6"],
-  gauge: ["M5 18a9 9 0 1 1 14 0", "m12 13 4-5M8 18h8"],
-  cpu: ["M8 3v3m4-3v3m4-3v3M8 18v3m4-3v3m4-3v3M3 8h3m-3 4h3m-3 4h3m12-8h3m-3 4h3m-3 4h3", "M6 6h12v12H6zM9 9h6v6H9z"],
-  database: ["M4 6c0-4 16-4 16 0s-16 4-16 0Z", "M4 6v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0"],
-  info: ["M12 11v6M12 7h.01", "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"],
-  check: ["m5 12 4 4L19 6"],
-  warning: ["m12 3 10 18H2L12 3Z", "M12 9v5m0 3h.01"],
-  arrow: ["M4 12h16m-6-6 6 6-6 6"],
-  target: ["M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z", "M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0ZM12 11v2"]
-};
-function Icon({ name = "info", className = "" }) {
-  return h2(
-    "svg",
-    { className: `dgui-icon ${className}`, width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.65, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true, focusable: false },
-    (paths[name] ?? paths.info).map((d, i) => h2("path", { key: i, d }))
-  );
-}
-
 // src/saved-state.js
-var import_react2 = require("react");
+var import_react4 = require("react");
 
 // src/state-channel.js
 var listeners = /* @__PURE__ */ new Map();
-var key = (id, sessionId) => id + "\0" + sessionId;
-function subscribeState(id, sessionId, fn2) {
-  const k2 = key(id, sessionId), set = listeners.get(k2) ?? /* @__PURE__ */ new Set();
+var key = (id2, sessionId) => id2 + "\0" + sessionId;
+function subscribeState(id2, sessionId, fn2) {
+  const k2 = key(id2, sessionId), set = listeners.get(k2) ?? /* @__PURE__ */ new Set();
   listeners.set(k2, set);
   set.add(fn2);
   return () => {
@@ -2846,8 +3031,8 @@ function subscribeState(id, sessionId, fn2) {
     if (!set.size) listeners.delete(k2);
   };
 }
-function broadcastState(id, sessionId, saved, origin) {
-  for (const fn2 of listeners.get(key(id, sessionId)) ?? []) if (fn2 !== origin) fn2(saved);
+function broadcastState(id2, sessionId, saved, origin) {
+  for (const fn2 of listeners.get(key(id2, sessionId)) ?? []) if (fn2 !== origin) fn2(saved);
 }
 
 // src/saved-state.js
@@ -2865,14 +3050,14 @@ async function request(url, options) {
 function useSavedState(record, sessionId, preview = false) {
   const doc = record.document;
   const schemaKey = JSON.stringify(doc.state);
-  const [state, setState] = (0, import_react2.useState)(() => initialState(doc));
-  const [ready, setReady] = (0, import_react2.useState)(false), [status, setStatus] = (0, import_react2.useState)("\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026");
-  const [issue, setIssue] = (0, import_react2.useState)(null), [epoch, setEpoch] = (0, import_react2.useState)(0), [tick, wake] = (0, import_react2.useState)(0);
-  const refs = (0, import_react2.useRef)({ revision: 0, saved: "", saving: false, blocked: true, alive: true, generation: 0, loading: false });
-  const liveState = (0, import_react2.useRef)(state);
+  const [state, setState] = (0, import_react4.useState)(() => initialState(doc));
+  const [ready, setReady] = (0, import_react4.useState)(false), [status, setStatus] = (0, import_react4.useState)("\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026");
+  const [issue, setIssue] = (0, import_react4.useState)(null), [epoch, setEpoch] = (0, import_react4.useState)(0), [tick, wake] = (0, import_react4.useState)(0);
+  const refs = (0, import_react4.useRef)({ revision: 0, saved: "", saving: false, blocked: true, alive: true, generation: 0, loading: false });
+  const liveState = (0, import_react4.useRef)(state);
   liveState.current = state;
-  const receive = (0, import_react2.useRef)(null);
-  (0, import_react2.useEffect)(() => {
+  const receive = (0, import_react4.useRef)(null);
+  (0, import_react4.useEffect)(() => {
     if (preview) return;
     const adopt = (saved) => {
       const r = refs.current;
@@ -2919,12 +3104,12 @@ function useSavedState(record, sessionId, preview = false) {
       r.blocked = false;
       if (!keepLocal) {
         setState(saved.state);
-        setEpoch((n) => n + 1);
+        setEpoch((n2) => n2 + 1);
       }
       setIssue(null);
       setStatus(keepLocal ? "\u5DF2\u8BFB\u53D6\u6700\u65B0\u7248\u672C\uFF0C\u51C6\u5907\u4FDD\u5B58\u672C\u9875\u53C2\u6570\u2026" : saved.revision ? "\u5DF2\u6062\u590D\u4FDD\u5B58\u7684\u53C2\u6570" : "\u4F7F\u7528\u521D\u59CB\u53C2\u6570");
       setReady(true);
-      wake((n) => n + 1);
+      wake((n2) => n2 + 1);
     } catch (e) {
       if (!r.alive || generation !== r.generation) return;
       setIssue({ kind: keepLocal ? "conflict" : "load", message: e.message });
@@ -2933,7 +3118,7 @@ function useSavedState(record, sessionId, preview = false) {
       if (generation === r.generation) r.loading = false;
     }
   }
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     if (preview) return;
     const r = refs.current;
     r.alive = true;
@@ -2945,7 +3130,7 @@ function useSavedState(record, sessionId, preview = false) {
       r.loading = false;
     };
   }, [record.documentId, sessionId, schemaKey, preview]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     const r = refs.current, signature = JSON.stringify(state);
     if (!ready || r.blocked || r.saving) return;
     if (signature === r.saved) {
@@ -2975,7 +3160,7 @@ function useSavedState(record, sessionId, preview = false) {
         }
       } finally {
         r.saving = false;
-        if (r.alive) wake((n) => n + 1);
+        if (r.alive) wake((n2) => n2 + 1);
       }
     }, 350);
     return () => clearTimeout(timer);
@@ -2991,7 +3176,7 @@ function useSavedState(record, sessionId, preview = false) {
     r.blocked = false;
     setIssue(null);
     setStatus("\u53C2\u6570\u5DF2\u4FEE\u6539\uFF0C\u7B49\u5F85\u4FDD\u5B58\u2026");
-    wake((n) => n + 1);
+    wake((n2) => n2 + 1);
   }
   return { state: preview ? initialState(doc) : state, setState, ready: !preview && ready, status: preview ? "\u751F\u6210\u9884\u89C8 \xB7 \u5B8C\u6210\u6821\u9A8C\u540E\u53EF\u64CD\u4F5C" : status, issue, epoch, retry, useRemote: () => load(), keepLocal: () => load(true) };
 }
@@ -3049,9 +3234,9 @@ function textDocument({ title = "\u5185\u5BB9", preset = "reading", accent, bloc
   let count = 0;
   const guard = (list, depth = 1) => {
     if (depth > LIMITS.depth) throw Error("DSH UI: blocks exceed node depth limit");
-    for (const n of list) {
+    for (const n2 of list) {
       if (++count > LIMITS.nodes) throw Error("DSH UI: too many blocks");
-      if (n && typeof n === "object" && Array.isArray(n.children)) guard(n.children, depth + 1);
+      if (n2 && typeof n2 === "object" && Array.isArray(n2.children)) guard(n2.children, depth + 1);
     }
   };
   guard(blocks);
@@ -3060,14 +3245,14 @@ function textDocument({ title = "\u5185\u5BB9", preset = "reading", accent, bloc
   guard(blocks);
   let serial = 0;
   const used = /* @__PURE__ */ new Set();
-  const collect = (list) => list.forEach((n) => {
-    if (n && typeof n === "object") {
-      if (n.id !== void 0) used.add(n.id);
-      if (Array.isArray(n.children)) collect(n.children);
+  const collect = (list) => list.forEach((n2) => {
+    if (n2 && typeof n2 === "object") {
+      if (n2.id !== void 0) used.add(n2.id);
+      if (Array.isArray(n2.children)) collect(n2.children);
     }
   });
   collect(blocks);
-  const copy = (list) => list.map((block) => {
+  const copy2 = (list) => list.map((block) => {
     const node = typeof block === "string" ? { type: "text", text: block } : structuredClone(block);
     if (!node || typeof node !== "object" || Array.isArray(node)) throw Error("DSH UI: each block must be text or a node object");
     if (node.id === void 0) {
@@ -3078,11 +3263,11 @@ function textDocument({ title = "\u5185\u5BB9", preset = "reading", accent, bloc
     }
     if (node.children !== void 0) {
       if (!Array.isArray(node.children)) throw Error("DSH UI: children must be an array");
-      node.children = copy(node.children);
+      node.children = copy2(node.children);
     }
     return node;
   });
-  const nodes = copy(blocks);
+  const nodes = copy2(blocks);
   const doc = validateDocument({ version: 1, title, fallback: title, presentation: { preset, ...accent ? { accent } : {} }, nodes });
   doc.fallback = fallbackText({ ...doc, title: "", fallback: "" }).trim().slice(0, 8192) || title;
   return doc;
@@ -3193,9 +3378,9 @@ function previewDocument(raw) {
     }
     if (!nodes || !Array.isArray(nodes.value) || !nodes.value.length) return null;
     doc.nodes = nodes.value;
-    for (let n = doc.nodes.length; n > 0; n--) {
+    for (let n2 = doc.nodes.length; n2 > 0; n2--) {
       try {
-        return validateDocument({ ...doc, nodes: doc.nodes.slice(0, n) });
+        return validateDocument({ ...doc, nodes: doc.nodes.slice(0, n2) });
       } catch {
       }
     }
@@ -3214,9 +3399,9 @@ function previewCanvas(raw) {
 function previewText(raw) {
   const root2 = parseToolArguments(raw), blocks = root2?.members?.get("blocks");
   if (!Array.isArray(blocks?.value) || !blocks.value.length) return null;
-  for (let n = blocks.value.length; n > 0; n--) {
+  for (let n2 = blocks.value.length; n2 > 0; n2--) {
     try {
-      return textDocument({ ...root2.value, blocks: blocks.value.slice(0, n) });
+      return textDocument({ ...root2.value, blocks: blocks.value.slice(0, n2) });
     } catch {
     }
   }
@@ -3224,7 +3409,7 @@ function previewText(raw) {
 }
 
 // src/canvas-preview.js
-var import_react3 = __toESM(require("react"), 1);
+var import_react5 = __toESM(require("react"), 1);
 
 // lib/canvas-preview.js
 function updatePreview(html) {
@@ -3271,49 +3456,49 @@ function previewFrameDocument(channel, nonce) {
 }
 
 // src/canvas-preview.js
-var h3 = import_react3.default.createElement;
+var h5 = import_react5.default.createElement;
 function CanvasPreview({ node }) {
-  const [height, setHeight] = (0, import_react3.useState)(node.height ?? 420);
-  const frame = (0, import_react3.useRef)(null), latest = (0, import_react3.useRef)(node);
+  const [height, setHeight] = (0, import_react5.useState)(node.height ?? 420);
+  const frame2 = (0, import_react5.useRef)(null), latest = (0, import_react5.useRef)(node);
   latest.current = node;
-  const config = (0, import_react3.useMemo)(() => {
+  const config = (0, import_react5.useMemo)(() => {
     const token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b2) => b2.toString(16).padStart(2, "0")).join("");
     return { channel: token(), nonce: token() };
   }, []);
-  const srcDoc = (0, import_react3.useMemo)(() => previewFrameDocument(config.channel, config.nonce), [config]);
+  const srcDoc = (0, import_react5.useMemo)(() => previewFrameDocument(config.channel, config.nonce), [config]);
   const publish2 = () => {
-    const el = frame.current;
+    const el = frame2.current;
     if (!el) return;
     const css = getComputedStyle(el.closest(".dgui-root") ?? el.parentElement);
     const theme = Object.fromEntries(["bg", "soft", "ink", "muted", "line", "accent"].map((k2) => [k2, css.getPropertyValue("--du-" + k2).trim()]));
     theme.scheme = document.body.hasAttribute("data-ds-dark-theme") || el.closest("[data-preview-theme=dark]") ? "dark" : "light";
     el.contentWindow?.postMessage({ channel: config.channel, html: latest.current.html, css: latest.current.css ?? "", theme }, "*");
   };
-  (0, import_react3.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     const timer = setTimeout(publish2, 120);
     return () => clearTimeout(timer);
   }, [node]);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     const observer = new MutationObserver(publish2);
     observer.observe(document.body, { attributes: true });
     return () => observer.disconnect();
   }, []);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     const receive = (event) => {
       const m2 = event.data;
-      if (event.source === frame.current?.contentWindow && m2?.channel === config.channel && Number.isFinite(m2.previewHeight) && m2.previewHeight >= 0) setHeight(Math.max(32, Math.min(1e3, Math.ceil(m2.previewHeight))));
+      if (event.source === frame2.current?.contentWindow && m2?.channel === config.channel && Number.isFinite(m2.previewHeight) && m2.previewHeight >= 0) setHeight(Math.max(32, Math.min(1e3, Math.ceil(m2.previewHeight))));
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
   }, [config]);
-  return h3("section", { className: "dgui-canvas", "data-canvas-phase": "preview", "aria-label": node.title }, h3("p", { className: "dgui-copy", role: "status" }, "\u751F\u6210\u9884\u89C8 \xB7 \u56DE\u590D\u5B8C\u6210\u540E\u542F\u7528\u4EA4\u4E92"), h3("iframe", { ref: frame, title: node.title + "\uFF08\u9759\u6001\u9884\u89C8\uFF09", sandbox: "allow-scripts", referrerPolicy: "no-referrer", srcDoc, onLoad: publish2, style: { display: "block", width: "100%", height, border: 0, pointerEvents: "none" } }));
+  return h5("section", { className: "dgui-canvas", "data-canvas-phase": "preview", "aria-label": node.title }, h5("p", { className: "dgui-copy", role: "status" }, "\u751F\u6210\u9884\u89C8 \xB7 \u56DE\u590D\u5B8C\u6210\u540E\u542F\u7528\u4EA4\u4E92"), h5("iframe", { ref: frame2, title: node.title + "\uFF08\u9759\u6001\u9884\u89C8\uFF09", sandbox: "allow-scripts", referrerPolicy: "no-referrer", srcDoc, onLoad: publish2, style: { display: "block", width: "100%", height, border: 0, pointerEvents: "none" } }));
 }
 
 // src/sandbox.js
-var import_react6 = __toESM(require("react"), 1);
+var import_react8 = __toESM(require("react"), 1);
 
 // lib/export-runtime-bundle.js
-var EXPORT_RUNTIME = '(() => {\n  // lib/presentation.js\n  var UI_ICONS = Object.freeze(["sparkles", "sliders", "layers", "chart", "gauge", "cpu", "database", "info", "check", "warning", "arrow", "target", "external", "file", "globe"]);\n  var UI_TONES = Object.freeze(["neutral", "accent", "success", "warning", "danger"]);\n  var UI_LAYOUTS = Object.freeze(["dashboard", "workbench", "comparison", "guide", "status", "report"]);\n  var UI_ACCENTS = Object.freeze(["blue", "teal", "violet", "amber", "rose"]);\n  var UI_SURFACES = Object.freeze(["outline", "soft", "featured"]);\n\n  // lib/visual-audit.js\n  function measureVisual(root, nodeId = "") {\n    const issues = [], seen = /* @__PURE__ */ new Set(), coverage = { nodeId, elements: 0, truncated: false, contrastChecked: 0, contrastUncovered: 0 };\n    const add = (code, value, el2) => {\n      const id = el2?.closest("[data-ui-node]")?.getAttribute("data-ui-node") ?? nodeId;\n      const k2 = id + ":" + code + ":" + Math.round(value ?? 0);\n      if (!seen.has(k2) && issues.length < 40) {\n        seen.add(k2);\n        issues.push({ code, nodeId: id, ...value === void 0 ? {} : { value: Number(value.toFixed(2)) } });\n      }\n    };\n    const color = (s) => {\n      let m2 = s.match(/^rgba?\\(([^)]+)\\)/);\n      if (m2) {\n        const a = m2[1].split(/[\\s,\\/]+/).map(Number);\n        return [a[0] / 255, a[1] / 255, a[2] / 255, a[3] ?? 1];\n      }\n      m2 = s.match(/^color\\(srgb ([^)]+)\\)/);\n      if (m2) {\n        const a = m2[1].split(/[\\s\\/]+/).map(Number);\n        return [a[0], a[1], a[2], a[3] ?? 1];\n      }\n      return null;\n    };\n    const luminance = (c) => c.slice(0, 3).map((v2) => v2 <= 0.04045 ? v2 / 12.92 : ((v2 + 0.055) / 1.055) ** 2.4).reduce((s, v2, i) => s + v2 * [0.2126, 0.7152, 0.0722][i], 0);\n    const widthRoot = root.id === "canvas" ? document.documentElement : root;\n    if (widthRoot.scrollWidth > widthRoot.clientWidth + 2) add("overflow", widthRoot.scrollWidth - widthRoot.clientWidth);\n    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);\n    let el;\n    while (el = walker.nextNode()) {\n      if (coverage.elements >= 2e3) {\n        coverage.truncated = true;\n        break;\n      }\n      coverage.elements++;\n      if (el.matches("[data-canvas-phase=error]")) add("runtimeError", void 0, el);\n      const css = getComputedStyle(el), box = el.getBoundingClientRect();\n      if (!box.width || !box.height || css.visibility === "hidden" || css.display === "none") continue;\n      const text2 = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());\n      if (text2) {\n        let size = parseFloat(css.fontSize);\n        if (el instanceof SVGElement && el.getScreenCTM) {\n          const m2 = el.getScreenCTM();\n          if (m2) size *= Math.hypot(m2.c, m2.d);\n        }\n        if (size < 11.9) add("smallText", size, el);\n        const fg = color(css.color);\n        let ancestor = el, bg = null, depth = 0;\n        while (ancestor && depth++ < 64) {\n          const style = getComputedStyle(ancestor);\n          if (style.backgroundImage !== "none") break;\n          const c = color(style.backgroundColor);\n          if (c?.[3] === 1) {\n            bg = c;\n            break;\n          }\n          if (c?.[3] > 0) break;\n          ancestor = ancestor.parentElement;\n        }\n        if (!(el instanceof SVGElement) && fg?.[3] === 1 && bg) {\n          coverage.contrastChecked++;\n          const a = luminance(fg), b2 = luminance(bg), ratio = (Math.max(a, b2) + 0.05) / (Math.min(a, b2) + 0.05);\n          if (ratio < (size >= 24 || size >= 18.66 && parseFloat(css.fontWeight) >= 700 ? 3 : 4.5)) add("contrast", ratio, el);\n        } else coverage.contrastUncovered++;\n      }\n      if (el.matches("input:not([type=hidden]),select,textarea,button,[role=button]") && !el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby") && !el.labels?.length && !el.textContent.trim() && !el.getAttribute("title")) add("missingLabel", void 0, el);\n    }\n    Object.defineProperty(issues, "coverage", { value: coverage });\n    return issues;\n  }\n\n  // lib/format-number.js\n  function formatNumber(value, decimals = 2) {\n    if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("DSH UI: formatNumber requires a finite number");\n    if (!Number.isInteger(decimals) || decimals < 0 || decimals > 6) throw new Error("DSH UI: formatNumber decimals must be an integer from 0 to 6");\n    return value.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });\n  }\n\n  // lib/canvas-system.js\n  var CANVAS_SYSTEM_CSS = `\n:root{--canvas-radius:16px;--canvas-gap:16px;--canvas-positive:#167456;--canvas-negative:#b13b3b;--canvas-warning:#875b15}\n:root[data-canvas-scheme=dark]{--canvas-positive:#78d9b4;--canvas-negative:#ffaaaa;--canvas-warning:#edc87e}\n#canvas{display:flow-root}html,body{margin:0;min-width:0;background:var(--canvas-bg,#fff);color:var(--canvas-ink,#182537);font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}*{box-sizing:border-box}svg{max-width:100%;height:auto}button,input,select,textarea{font:inherit;color:inherit}button,input,select,textarea{border:1px solid var(--canvas-line,#ced4df);border-radius:8px;background:var(--canvas-bg,#fff);padding:8px 12px;max-width:100%}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}input[type=range]{padding:0;accent-color:var(--canvas-accent,#3e60d3)}input[type=checkbox],input[type=radio]{accent-color:var(--canvas-accent,#3e60d3)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--canvas-accent,#3e60d3);outline-offset:3px}\n.ui-stack{display:grid;gap:var(--canvas-gap)}.ui-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--canvas-gap)}.ui-surface{padding:20px;border:1px solid var(--canvas-line,#ced4df);border-radius:var(--canvas-radius);background:var(--canvas-soft,#f3f5f8)}.ui-title{margin:0;font-size:clamp(20px,3vw,28px);line-height:1.3;letter-spacing:-.02em}.ui-caption{color:var(--canvas-muted,#526176);margin:8px 0;font-size:14px}.ui-value{font-size:clamp(24px,4vw,36px);font-variant-numeric:tabular-nums;line-height:1.2}.ui-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.ui-field{display:grid;gap:6px;min-width:0}.ui-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px}.ui-status{min-height:1.6em}.ui-error{color:var(--canvas-negative)}.ui-primary{background:var(--canvas-accent,#3e60d3);color:var(--canvas-accent-ink,#fff);border-color:transparent}\nsvg .ui-node{fill:var(--canvas-soft,#f3f5f8);stroke:var(--canvas-line,#ced4df);stroke-width:1}svg .ui-edge{fill:none;stroke:var(--canvas-muted,#526176);stroke-width:1.5}svg .ui-label{fill:var(--canvas-ink,#182537);font:500 14px system-ui,sans-serif}svg .ui-note{fill:var(--canvas-muted,#526176);font:400 13px system-ui,sans-serif}svg .ui-leader{fill:none;stroke:var(--canvas-muted,#526176);stroke-dasharray:3 4}svg .ui-accent{fill:color-mix(in srgb,var(--canvas-accent,#3e60d3) 12%,var(--canvas-bg,#fff));stroke:var(--canvas-accent,#3e60d3)}\n.ui-flow{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 8px;flex-wrap:wrap}.ui-step{display:grid;gap:6px;min-width:130px;max-width:240px;padding:16px 20px;border:1px solid var(--canvas-line);border-radius:6px;background:var(--canvas-bg)}.ui-step strong{font-size:16px;font-weight:600}.ui-step span{font-size:14px;color:var(--canvas-muted)}.ui-arrow{color:var(--canvas-muted);font-size:22px}.ui-callout{border-inline-start:3px solid var(--canvas-accent);padding:8px 16px;color:var(--canvas-ink)}\n.ui-surface,.ui-step{border-radius:var(--canvas-radius);background:var(--canvas-bg,#fff)}button,input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{border-radius:12px}button{border-radius:999px}.ui-primary{background:var(--canvas-ink,#182537);color:var(--canvas-bg,#fff)}.ui-callout{border-radius:0 12px 12px 0;background:color-mix(in srgb,var(--canvas-accent,#3e60d3) 5%,var(--canvas-bg,#fff))}\n@media(max-width:480px){.ui-flow{flex-direction:column;padding:16px 8px;gap:12px}.ui-step{width:100%;max-width:none}.ui-arrow{transform:rotate(90deg)}}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}`;\n\n  // lib/sandbox.js\n  var SANDBOX_LIMITS = Object.freeze({ source: 49152, height: 1e3, message: 16384, rate: 30 });\n  function canvasSnapshot(node2, state2, data, derived, disabled, theme) {\n    const pick = (keys, values) => Object.fromEntries((keys ?? []).map((k2) => [k2, values[k2]]));\n    return { state: pick(node2.stateKeys, state2), data: pick(node2.dataKeys, data), derived: pick(node2.derivedKeys, derived), disabled, theme };\n  }\n  function canvasPatch(message, node2) {\n    if (!message || typeof message !== "object" || Array.isArray(message)) throw new Error("Invalid canvas patch");\n    const keys = Object.keys(message);\n    if (!keys.length || keys.length > 64 || keys.some((k2) => !(node2.stateKeys ?? []).includes(k2))) throw new Error("Canvas state key is not declared");\n    if (JSON.stringify(message).length > SANDBOX_LIMITS.message) throw new Error("Canvas patch is too large");\n    return message;\n  }\n  function sandboxDocument(node2, channel2, nonce2) {\n    const json = (value) => JSON.stringify(value).replace(/</g, "\\\\u003c").replace(/\\u2028/g, "\\\\u2028").replace(/\\u2029/g, "\\\\u2029");\n    return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'nonce-${nonce2}\'; style-src \'unsafe-inline\'; img-src data:; font-src \'none\'; connect-src \'none\'; media-src \'none\'; object-src \'none\'; frame-src \'none\'; worker-src \'none\'; base-uri \'none\'; form-action \'none\'"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${CANVAS_SYSTEM_CSS}</style></head><body><main id="canvas"></main><script nonce="${nonce2}">(()=>{\n  const channel=${json(channel2)}, source=${json({ html: node2.html, css: node2.css ?? "", script: node2.script ?? "" })};\n  let snapshot={state:{},data:{},derived:{},disabled:true,theme:{}}, started=false;\n  const listeners=new Set(), send=(type,payload)=>parent.postMessage({dshCanvas:1,channel,type,payload},\'*\');\n  const report=e=>send(\'error\',String(e?.message??e).slice(0,1000));\n  const audit=${measureVisual.toString()};let auditTimer;const scheduleAudit=()=>{clearTimeout(auditTimer);auditTimer=setTimeout(()=>{const issues=audit(document.getElementById(\'canvas\'),${json(node2.id ?? "")});send(\'audit\',{issues,coverage:issues.coverage})},400)};\n  addEventListener(\'resize\',scheduleAudit);\n  addEventListener(\'error\',e=>report(e.error??e.message));addEventListener(\'unhandledrejection\',e=>report(e.reason));\n  const animations=new Set(), motion=matchMedia(\'(prefers-reduced-motion: reduce)\');\n  let raf=0,last=0,time=0;\n  const visible=()=>snapshot.visible!==false&&!document.hidden;\n  const canAnimate=()=>visible()&&!snapshot.disabled&&!motion.matches;\n  const draw=delta=>{for(const fn of animations)try{fn({time,delta,reducedMotion:motion.matches,visible:visible()})}catch(e){animations.delete(fn);report(e)}};\n  const tick=t=>{raf=0;if(!canAnimate()||!animations.size){last=0;draw(0);return}const delta=last?Math.min(.05,(t-last)/1000):0;last=t;time+=delta;draw(delta);if(animations.size)raf=requestAnimationFrame(tick)};\n  const refresh=()=>{draw(0);if(canAnimate()&&animations.size){if(!raf){last=0;raf=requestAnimationFrame(tick)}}else{cancelAnimationFrame(raf);raf=0;last=0}};\n  motion.addEventListener(\'change\',refresh);document.addEventListener(\'visibilitychange\',refresh);\n  const formatNumber=${formatNumber.toString()};\n  const api={formatNumber,get snapshot(){return structuredClone(snapshot)},subscribe(fn){if(typeof fn!==\'function\')throw Error(\'Listener required\');listeners.add(fn);fn(api.snapshot);return()=>listeners.delete(fn)},setState(patch){if(!snapshot.disabled)send(\'patch\',patch)},animate(fn){if(typeof fn!==\'function\')throw Error(\'Animation callback required\');animations.add(fn);refresh();return()=>{animations.delete(fn);if(!animations.size){cancelAnimationFrame(raf);raf=0;last=0}}}};\n  Object.defineProperty(window,\'DSHUI\',{value:Object.freeze(api),writable:false});\n  for(const type of [\'click\',\'input\',\'change\',\'keydown\',\'pointerdown\'])document.addEventListener(type,e=>{if(snapshot.disabled){e.preventDefault();e.stopImmediatePropagation()}},true);\n  addEventListener(\'message\',event=>{\n    const m=event.data;if(event.source!==parent||m?.dshCanvas!==1||m.channel!==channel||m.type!==\'snapshot\')return;\n    snapshot=m.payload;for(const [k,v] of Object.entries(snapshot.theme??{}))document.documentElement.style.setProperty(\'--canvas-\'+k,v);\n    document.documentElement.style.colorScheme=snapshot.theme?.scheme??\'light\';document.documentElement.dataset.canvasScheme=snapshot.theme?.scheme??\'light\';\n    const wasStarted=started;\n    if(!started){started=true;document.getElementById(\'canvas\').innerHTML=source.html;const style=document.createElement(\'style\');style.textContent=source.css;document.head.append(style);const script=document.createElement(\'script\');script.nonce=${json(nonce2)};script.textContent=source.script;document.body.append(script)}\n    if(wasStarted)for(const fn of listeners)try{fn(api.snapshot)}catch(e){report(e)}\n    refresh();if(!wasStarted)send(\'mounted\');scheduleAudit();\n  });\n  let resizePending=false;new ResizeObserver(()=>{if(!started||resizePending)return;resizePending=true;requestAnimationFrame(()=>{resizePending=false;send(\'height\',Math.ceil(document.getElementById(\'canvas\').getBoundingClientRect().height))})}).observe(document.getElementById(\'canvas\'));\n  send(\'ready\');\n})();<\\/script></body></html>`;\n  }\n\n  // lib/components.js\n  var define = (fields2, purpose, presentation = "") => Object.freeze({ fields: Object.freeze(fields2), purpose, presentation });\n  var COMPONENTS = Object.freeze({\n    visual: define(["spec", "stateKey", "warnings"], "Extended native charts, tables, plots, quiz, forms, diagrams, media and 3D"),\n    heading: define(["text", "spans", "size", "weight", "color", "align", "lineHeight"], "Section heading", "tone"),\n    text: define(["text", "spans", "size", "weight", "color", "align", "lineHeight", "copyable", "title"], "Readable explanation; copyable:true adds a reusable text panel", "tone"),\n    code: define(["code", "lang", "title", "wrap"], "Literal copyable code; displayed only, never executed"),\n    callout: define(["text", "spans", "size", "weight", "color", "align", "lineHeight"], "A short emphasized paragraph", "tone"),\n    row: define(["children", "columns", "gap"], "Wrapping parallel content"),\n    column: define(["children", "gap"], "Ordered vertical content"),\n    card: define(["title", "children", "surface"], "Meaningful grouped section", "tone"),\n    details: define(["title", "children", "open"], "Collapsible supporting content", "tone"),\n    badge: define(["text"], "Short explicit status label", "tone"),\n    progress: define(["label", "value", "max", "unit"], "Declared numeric progress snapshot", "tone"),\n    steps: define(["title", "items"], "Ordered declared steps with an optional heading"),\n    metric: define(["label", "value", "unit", "decimals"], "Number with units, or a literal/bound status string", "tone"),\n    input: define(["label", "bind"], "String or numeric state input"),\n    slider: define(["label", "bind"], "Numeric state control"),\n    select: define(["label", "bind"], "Selection from declared state options"),\n    toggle: define(["label", "bind"], "Boolean state control"),\n    button: define(["text", "action", "href", "path", "variant"], "Agent follow-up, web link or host file opener", "icon"),\n    link: define(["text", "href", "path", "variant"], "User-clicked webpage or local file button", "icon"),\n    divider: define(["label"], "Quiet section divider"),\n    table: define(["label", "rows", "columns"], "Supplied or derived values; inline rows or data/derived reference"),\n    chart: define(["kind", "rows", "labelKey", "valueKey", "label", "unit", "xScale"], "Bar/line comparison with accessible data"),\n    sandbox: define(["title", "html", "css", "script", "fallback", "height", "stateKeys", "dataKeys", "derivedKeys"], "Freeform isolated HTML/SVG/CSS/JavaScript visualization")\n  });\n  function componentFields(type) {\n    const c = Object.hasOwn(COMPONENTS, type) ? COMPONENTS[type] : void 0;\n    return c && ["id", "type", ...c.fields, ...c.presentation ? ["icon"] : [], ...c.presentation === "tone" ? ["tone"] : []];\n  }\n\n  // lib/identifiers.js\n  var IDENTIFIER_SOURCE = "[\\\\p{L}_][\\\\p{L}\\\\p{M}\\\\p{N}_]{0,63}";\n  var pattern = new RegExp(`^${IDENTIFIER_SOURCE}$`, "u");\n  var validIdentifier = (value) => typeof value === "string" && pattern.test(value) && !["constructor", "prototype", "__proto__"].includes(value);\n\n  // lib/author-expression.js\n  function compileExpression(source) {\n    const fail2 = () => {\n      throw new Error("DSH UI: invalid formula; use state.x, data.x, derived.x, item.x, numbers, strings, + - * /, comparisons, ?: and min/max/round/abs");\n    };\n    if (typeof source !== "string" || !source.trim() || source.length > 2048) fail2();\n    const tokens = [];\n    let offset = 0;\n    const token2 = new RegExp(String.raw`\\s*(?:(\\d+(?:\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?|("(?:[^"\\\\]|\\\\.)*")|(${IDENTIFIER_SOURCE}(?:\\.${IDENTIFIER_SOURCE})?)|(===|!==|<=|>=|==|!=|[+*/()?,:<>-]))`, "uy");\n    while (offset < source.length) {\n      if (!source.slice(offset).trim()) break;\n      token2.lastIndex = offset;\n      const m2 = token2.exec(source);\n      if (!m2) fail2();\n      offset = token2.lastIndex;\n      tokens.push(m2[1] ? { number: Number(m2[1] + (m2[2] ?? "")) } : m2[3] ? { string: JSON.parse(m2[3]) } : m2[4] ?? m2[5]);\n      if (tokens.length > 256) fail2();\n    }\n    let pos = 0;\n    const operators = { "==": ["eq", 1], "===": ["eq", 1], "!=": ["neq", 1], "!==": ["neq", 1], "<": ["lt", 2], "<=": ["lte", 2], ">": ["gt", 2], ">=": ["gte", 2], "+": ["add", 3], "-": ["sub", 3], "*": ["mul", 4], "/": ["div", 4] };\n    const take = (t) => {\n      if (tokens[pos++] !== t) fail2();\n    };\n    function parse(min = 0, depth = 0) {\n      if (depth > 12) fail2();\n      const t = tokens[pos++];\n      let out;\n      if (t && typeof t === "object") out = { const: Object.hasOwn(t, "number") ? t.number : t.string };\n      else if (t === "true" || t === "false") out = { const: t === "true" };\n      else if (t === "(") {\n        out = parse(0, depth + 1);\n        take(")");\n      } else if (t === "-" || t === "+") {\n        const arg = parse(5, depth + 1);\n        out = t === "-" ? { op: "sub", args: [{ const: 0 }, arg] } : arg;\n      } else if (typeof t === "string" && t.split(".").length === 2 && ["state", "data", "derived", "item"].includes(t.split(".")[0]) && validIdentifier(t.split(".")[1])) out = { ref: t };\n      else if (["min", "max", "round", "abs"].includes(t)) {\n        take("(");\n        const args = [parse(0, depth + 1)];\n        while (tokens[pos] === ",") {\n          pos++;\n          args.push(parse(0, depth + 1));\n          if (args.length > 8) fail2();\n        }\n        take(")");\n        out = { op: t, args };\n      } else fail2();\n      while (typeof tokens[pos] === "string" && Object.hasOwn(operators, tokens[pos]) && operators[tokens[pos]][1] >= min) {\n        const [op, precedence] = operators[tokens[pos++]];\n        out = { op, args: [out, parse(precedence + 1, depth + 1)] };\n      }\n      if (min === 0 && tokens[pos] === "?") {\n        pos++;\n        const yes = parse(0, depth + 1);\n        take(":");\n        out = { op: "if", args: [out, yes, parse(0, depth + 1)] };\n      }\n      return out;\n    }\n    const result = parse();\n    if (pos !== tokens.length) fail2();\n    return result;\n  }\n  function expandExpressions(doc2) {\n    const expression2 = (e) => {\n      if (!e || typeof e !== "object" || Array.isArray(e)) return e;\n      if (Object.hasOwn(e, "expr")) {\n        if (Object.keys(e).length !== 1) throw new Error("DSH UI: expr must be the only formula field");\n        return compileExpression(e.expr);\n      }\n      if (Array.isArray(e.args)) e.args = e.args.map(expression2);\n      if (e.map?.fields) for (const k2 of Object.keys(e.map.fields)) e.map.fields[k2] = expression2(e.map.fields[k2]);\n      return e;\n    };\n    if (doc2.derived && typeof doc2.derived === "object") for (const k2 of Object.keys(doc2.derived)) doc2.derived[k2] = expression2(doc2.derived[k2]);\n    const walk = (nodes) => {\n      if (!Array.isArray(nodes)) return;\n      for (const node2 of nodes) {\n        if (!node2 || typeof node2 !== "object") continue;\n        for (const field of ["text", "value", "max", "rows"]) if (Object.hasOwn(node2, field)) node2[field] = expression2(node2[field]);\n        walk(node2.children);\n      }\n    };\n    walk(doc2.nodes);\n    return doc2;\n  }\n\n  // lib/visual-guard.js\n  var ne = ["h1", "h2", "h3", "body", "muted", "caption"];\n  var te = ["primary", "danger", "success", "ghost"];\n  var ie = ["success", "warn", "danger", "accent"];\n  var re = ["text", "email", "password", "color"];\n  var se = ["info", "success", "warning", "error"];\n  var U = ["bars", "line", "donut"];\n  var oe = ["line", "area", "scatter"];\n  var ae = ["16:9", "4:3", "1:1", "9:16"];\n  var ue = ["box", "sphere", "cone", "cylinder", "torus"];\n  var le = ["file", "dir"];\n  var de = ["architecture", "it-state", "flowchart", "sequence", "state", "er", "timeline", "swimlane", "quadrant", "radar", "loop", "nested", "tree", "org-chart", "layers", "venn", "pyramid", "bar", "line", "gantt", "scatter", "high-level", "process", "medallion", "data-flow", "dp-integration", "dp-security-matrix"];\n  var ce = ["focal", "backend", "store", "external", "input", "optional", "security"];\n  var fe = ["light", "dark", "editorial"];\n  var pe = ["solid", "dashed", "accent", "link"];\n  var me = ["auto", "orthogonal", "straight"];\n  var ge = ["bar", "line", "area", "pie", "scatter", "radar", "gauge", "funnel", "treemap", "sankey", "graph", "heatmap", "bigline", "wordCloud"];\n  var tn = ["hero"];\n  var ye = ["bar", "ring"];\n  var be = ["info", "success", "warning", "danger"];\n  var he = ["accent", "success", "warning", "danger"];\n  var Ee = ["text", "num", "delta", "bar", "badge", "spark", "ring", "index", "group"];\n  var b = (t, i, r = {}, e = {}) => {\n    let s = Object.fromEntries(Object.entries(i).filter(([u]) => u !== "type" && !t.includes(u))), n = e.oneOfRequired ?? [], o = e.conditionalRequired ?? [], a = [...n.map((u) => ({ kind: "one-of-required", fields: u })), ...o];\n    return { required: t, fields: i, optional: s, aliases: r, valueAliases: e.valueAliases ?? {}, oneOfRequired: n, conditionalRequired: o, rules: a, enums: e.enums ?? {}, nested: e.nested ?? {}, ...e.validator === void 0 ? {} : { validator: e.validator } };\n  };\n  var G = (t, i, r = {}, e = {}, s = {}) => ({ required: t, fields: i, enums: e, nested: r, aliases: s });\n  var h = { type: "string", span: "number", id: "string" };\n  var De = G(["label", "value"], { label: "string", value: "number", color: "string" });\n  var rn = G(["label", "data"], { label: "string", color: "string", data: "array" }, { data: De });\n  var sn = G(["title"], { title: "string", desc: "string" });\n  var on = G(["key", "value"], { key: "string", value: "string" }, {}, {}, { label: "key" });\n  var an = G(["title"], { title: "string", desc: "string", time: "string" });\n  var un = G(["path", "newText"], { path: "string", oldText: "string-or-null", newText: "string" });\n  var ln = G(["name", "value"], { name: "string", value: "number", min: "number", max: "number", step: "number", animateTo: "number", durationMs: "number", loop: "boolean" });\n  var dn = G(["expr"], { expr: "string", label: "string", color: "string", kind: "string", params: "array" }, { params: ln }, { kind: oe });\n  var cn = G(["shape"], { shape: "string", color: "string", position: "array", rotation: "array", scale: "unknown", size: "unknown" }, {}, { shape: ue });\n  function Oe(t) {\n    return G(["name"], { name: "string", type: "string", children: "array" }, t > 0 ? { children: Oe(t - 1) } : {}, { type: le }, { label: "name" });\n  }\n  var fn = Oe(6);\n  var pn = G(["label", "items"], { label: "string", items: "nodes", content: "nodes" });\n  var mn = G(["title", "items"], { title: "string", items: "nodes" });\n  var gn = G(["id", "label"], { id: "string", label: "string", sub: "string", type: "string", x: "number", y: "number", w: "number", h: "number", tag: "string" }, {}, { type: ce });\n  var yn = G(["from", "to"], { from: "string", to: "string", label: "string", kind: "string", route: "string" }, {}, { kind: pe, route: me });\n  var bn = G(["label"], { label: "string", x: "number", y: "number", w: "number", h: "number" });\n  var hn = G([], { paper: "string", "paper-2": "string", ink: "string", muted: "string", soft: "string", rule: "string", accent: "string", "accent-tint": "string", link: "string" });\n  var V = b(["items"], { title: "string", gap: "number", panel: "boolean", append: "boolean", items: "nodes" });\n  var T = { accordion: b(["items"], { ...h, items: "array" }, {}, { nested: { items: mn } }), audio: b(["src"], { ...h, src: "string", alt: "string", loop: "boolean" }, { url: "src", link: "src" }), avatar: b(["name"], { ...h, name: "string", color: "string" }), badge: b(["label"], { ...h, label: "string", tone: "string", icon: "string" }, { text: "label", value: "label" }, { enums: { tone: ie } }), breadcrumb: b(["items"], { ...h, items: "array" }), button: b(["label"], { ...h, label: "string", tone: "string", full: "boolean", small: "boolean", icon: "string", action: "string" }, {}, { enums: { tone: te } }), callout: b(["content"], { ...h, title: "string", content: "string", tone: "string" }, { kind: "tone", text: "content", body: "content", desc: "content" }, { enums: { tone: se }, valueAliases: { tone: { danger: "error", warn: "warning" } } }), card: b(["items"], { ...h, title: "string", items: "nodes", tone: "string", accent: "string" }, { label: "title", content: "items" }, { enums: { tone: be } }), chart: b([], { ...h, kind: "string", data: "array", series: "array", horizontal: "boolean", stacked: "boolean", filter: "string", palette: "array" }, {}, { oneOfRequired: [["data", "series"]], conditionalRequired: [{ kind: "required-if", when: { field: "kind", equals: "donut" }, required: ["data"] }], nested: { data: De, series: rn }, enums: { kind: U }, validator: { name: "chart-renderability" } }), checkbox: b(["label"], { ...h, label: "string", checked: "boolean", action: "string", group: "string" }), code: b(["code"], { ...h, lang: "string", code: "string", title: "string", wrap: "boolean" }, { content: "code", text: "code" }), col: b(["items"], { ...h, items: "nodes", gap: "number" }), copy: b(["text"], { ...h, label: "string", text: "string" }, { content: "text", code: "text", value: "text" }), diagram: b(["kind", "nodes"], { ...h, kind: "string", variant: "string", title: "string", nodes: "array", edges: "array", zones: "array", theme: "object" }, {}, { nested: { nodes: gn, edges: yn, zones: bn, theme: hn }, enums: { kind: de, variant: fe } }), diff: b(["diffs"], { ...h, diffs: "array" }, { items: "diffs", files: "diffs" }, { nested: { diffs: un } }), divider: b([], h), echart: b([], { ...h, title: "string", height: "number", preset: "string", data: "array", series: "array", links: "array", palette: "array", option: "object" }, {}, { oneOfRequired: [["option", "data", "series", "links"]], enums: { preset: ge } }), "file-tree": b(["items"], { ...h, items: "array" }, { nodes: "items" }, { nested: { items: fn } }), grid: b(["items"], { ...h, cols: "number", items: "nodes" }), image: b(["src"], { ...h, src: "string", alt: "string" }, { url: "src", link: "src" }), input: b([], { ...h, label: "string", placeholder: "string", value: "string", inputType: "string", action: "string", id: "string" }, {}, { enums: { inputType: re } }), json: b(["value"], { ...h, value: "unknown" }), keyvalue: b(["pairs"], { ...h, pairs: "array" }, { items: "pairs", rows: "pairs", entries: "pairs" }, { nested: { pairs: on } }), link: b(["label"], { ...h, label: "string", href: "string" }), list: b(["items"], { ...h, items: "array", filter: "string" }), mermaid: b(["code"], { ...h, code: "string" }), svg: b(["code"], { ...h, code: "string", title: "string", height: "number" }), plot: b(["series"], { ...h, series: "array", xMin: "number", xMax: "number", yMin: "number", yMax: "number", title: "string" }, {}, { nested: { series: dn } }), progress: b(["value"], { ...h, value: "number", label: "string", valueLabel: "string", variant: "string", target: "number" }, {}, { enums: { variant: ye } }), quiz: b(["question", "options"], { ...h, question: "string", options: "array", explanation: "string", id: "string", action: "string" }, { title: "question", text: "question", choices: "options", items: "options" }), radio: b(["options"], { ...h, label: "string", options: "array", selected: "number", action: "string", group: "string", answer: "unknown", explanation: "string" }, { items: "options" }), row: b(["items"], { ...h, items: "nodes", wrap: "boolean", spacer: "boolean" }), scene3d: b(["meshes"], { ...h, title: "string", meshes: "array", ambient: "number", background: "string" }, {}, { nested: { meshes: cn } }), select: b(["options"], { ...h, label: "string", options: "array", action: "string", selected: "number", id: "string" }, { items: "options" }), slider: b([], { ...h, label: "string", min: "number", max: "number", step: "number", value: "number", action: "string", id: "string" }), spacer: b([], h), hero: b(["title"], { ...h, title: "string", subtitle: "string", value: "string", label: "string", delta: "string", spark: "array", tone: "string" }, {}, { enums: { tone: he } }), stat: b(["label", "value"], { ...h, label: "string", value: "string", delta: "string", spark: "array", size: "string" }, {}, { enums: { size: tn } }), steps: b(["steps"], { ...h, steps: "array", current: "number" }, { items: "steps" }, { nested: { steps: sn } }), submit: b(["label"], { ...h, label: "string", action: "string", resetAction: "string", groups: "array" }), switch: b(["label"], { ...h, label: "string", checked: "boolean", action: "string" }), table: b(["columns", "rows"], { ...h, columns: "array", rows: "array", types: "array", total: "boolean", details: "array", filter: "string", filterColumn: "number", sortField: "string", export: "boolean" }, { headers: "columns", data: "rows", items: "rows" }), tabs: b(["tabs"], { ...h, tabs: "array" }, {}, { nested: { tabs: pn } }), text: b(["content"], { ...h, content: "string", size: "string", center: "boolean", copyable: "boolean", title: "string" }, { text: "content" }, { enums: { size: ne } }), textarea: b([], { ...h, label: "string", placeholder: "string", rows: "number", value: "string", action: "string", id: "string" }), timeline: b(["items"], { ...h, items: "array" }, {}, { nested: { items: an } }), video: b(["src"], { ...h, src: "string", alt: "string", poster: "string", loop: "boolean", muted: "boolean", aspectRatio: "string" }, { url: "src", link: "src" }, { enums: { aspectRatio: ae } }) };\n  var q = new Set(Object.keys(T));\n  function N(t) {\n    if (typeof t != "object" || t === null) return false;\n    let i = t;\n    return typeof i.type != "string" || i.type === "" ? false : Array.isArray(i.items) ? q.has(i.type) : true;\n  }\n  function z(t) {\n    if (typeof t != "object" || t === null) return null;\n    let i = t;\n    if (typeof i.type != "string" || i.type === "") return null;\n    let r = q.has(i.type) ? T[i.type] : void 0, e = typeof i.title == "string" && r !== void 0 && !("title" in r.fields) ? i.title : void 0, s = { ...t };\n    return e !== void 0 && delete s.title, { items: [s], ...e !== void 0 ? { title: e } : {}, ...i.panel === true ? { panel: true } : {}, ...i.append === true ? { append: true } : {} };\n  }\n  var m = { maxDepth: 8, maxNodes: 200, maxString: 2e3, maxCode: 12e3, maxMermaid: 8e3, maxGridCols: 12, maxTabs: 12, maxAccordionItems: 24, maxListItems: 50, maxOptions: 50, maxTableRows: 50, maxTableCols: 12, maxChartPoints: 60, maxPlotSeries: 8, maxPlotParams: 6, maxMeshes: 5, maxQuizOptions: 8, maxSteps: 24, maxTimelineItems: 24, maxBreadcrumbItems: 12, maxKeyValuePairs: 24, maxTreeDepth: 6, maxDiagramNodes: 9, maxDiagramEdges: 12, maxDiagramZones: 3, maxDiagramFocal: 2, maxDiagramLabel: 14, maxEChartOptionDepth: 10, maxEChartArrayLen: 500, maxEChartOptionNodes: 2e3 };\n  function ke(t) {\n    let i = t.columns, r = Array.isArray(i) && i.length > 0, e = r && Array.isArray(i) && typeof i[0] == "object" && i[0] !== null ? i.map($n) : i, s = kn(e), n = t.rows !== void 0 ? t.rows : t.data;\n    if (Array.isArray(n) && n.length > 0 && typeof n[0] == "object" && n[0] !== null && !Array.isArray(n[0])) {\n      let u = Array.isArray(t.columns) && t.columns.length > 0 && typeof t.columns[0] == "object" && t.columns[0] !== null ? t.columns.map(Sn).filter((d) => d !== void 0) : Object.keys(n[0]);\n      n = n.map((d) => u.map((c) => wn(d[c])));\n    }\n    let o = null;\n    if (!r && Array.isArray(n) && n.length > 0 && Array.isArray(n[0])) {\n      let u = xe(n), d = u.length === 0 ? null : An(u);\n      d !== null && xe(d.rows).length === d.rows.length && (o = d, s = d.columns.map((c) => c.slice(0, 128)));\n    }\n    if (s.length === 0 && !Array.isArray(t.columns)) return null;\n    let a = xe(o === null ? n : o.rows);\n    return Array.isArray(n) ? { columns: s.slice(0, m.maxTableCols), rows: a } : null;\n  }\n  function I(t) {\n    return ke(t)?.rows ?? [];\n  }\n  function xn(t, i) {\n    return !Array.isArray(t) || !Array.isArray(i) || i[0] !== "group" ? false : String(t[0] ?? "").trim() !== "" && t.slice(1).every((r) => String(r ?? "").trim() === "");\n  }\n  function C(t, i) {\n    let r = I(t);\n    return i >= 0 && i < r.length && !xn(r[i], t.types);\n  }\n  function kn(t) {\n    if (!Array.isArray(t)) return [];\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxTableCols) break;\n      if (typeof r == "string") i.push(r.slice(0, 128));\n      else if (r !== null && typeof r == "object") {\n        let e = r, s = typeof e.label == "string" ? e.label : typeof e.value == "string" ? e.value : typeof e.title == "string" ? e.title : JSON.stringify(r);\n        i.push(s.slice(0, 128));\n      }\n    }\n    return i;\n  }\n  function xe(t) {\n    if (!Array.isArray(t)) return [];\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxTableRows) break;\n      if (!Array.isArray(r)) continue;\n      let e = [];\n      for (let s of r) {\n        if (e.length >= m.maxTableCols) break;\n        typeof s == "string" ? e.push(s.slice(0, 256)) : typeof s == "number" && Number.isFinite(s) && e.push(s);\n      }\n      e.length > 0 && i.push(e);\n    }\n    return i;\n  }\n  function An(t) {\n    let i = t[0];\n    if (i === void 0 || i.length === 0) return null;\n    let r = t.slice(1);\n    if (r.length === 0) {\n      let e = i.map((s) => String(s).trim());\n      return e.every((s) => s !== "") ? { columns: e, rows: [] } : null;\n    }\n    return r.every((e) => e.length === i.length) ? { columns: i.map((e) => String(e).trim()), rows: r } : { columns: Array.from({ length: i.length }, (e, s) => `\\u5217${s + 1}`), rows: t };\n  }\n  function Sn(t) {\n    if (t === null || typeof t != "object" || Array.isArray(t)) return;\n    let i = t;\n    for (let r of ["key", "dataIndex", "title", "label"]) if (typeof i[r] == "string" && i[r] !== "") return i[r];\n  }\n  function wn(t) {\n    return typeof t == "string" || typeof t == "number" && Number.isFinite(t) ? t : t == null ? "" : JSON.stringify(t);\n  }\n  function $n(t) {\n    if (t === null || typeof t != "object" || Array.isArray(t)) return String(t);\n    let i = t;\n    for (let r of ["title", "label", "key", "dataIndex"]) if (typeof i[r] == "string" && i[r] !== "") return i[r];\n    return JSON.stringify(t);\n  }\n  function O(t) {\n    return typeof t == "object" && t !== null && !Array.isArray(t) ? t : void 0;\n  }\n  function Ae(t) {\n    let i = O(t);\n    return i !== void 0 && typeof i.type == "string";\n  }\n  var Gn = ["label", "value", "delta", "spark", "size"];\n  var Rn = { label: "title", name: "title", description: "desc", content: "desc", text: "desc", body: "desc", detail: "desc" };\n  function Tn(t, i, r) {\n    if (t.length === 0) return null;\n    let e = [];\n    for (let s = 0; s < t.length; s++) {\n      let n = t[s], o = O(n);\n      if (o === void 0) return null;\n      if (Ae(n)) {\n        e.push(r(n, `${i}.items[${s}]`));\n        continue;\n      }\n      if (typeof o.label != "string" && typeof o.value != "string") return null;\n      let a = { type: "stat" };\n      for (let u of Gn) o[u] !== void 0 && (a[u] = o[u]);\n      e.push(a);\n    }\n    return e;\n  }\n  function Cn(t, i, r, e) {\n    let s = T[r];\n    if (s === void 0) return t;\n    let n = { ...t };\n    for (let [o, a] of Object.entries(s.aliases)) {\n      if (!(o in n)) continue;\n      let u = `${i}.${o}`, d = a in n;\n      d || (n[a] = n[o]), delete n[o], e.push({ kind: "alias", path: u, message: d ? `${u} is ignored because canonical field \'${a}\' is present` : `${u} normalized/adopted as \'${a}\'`, type: r, field: o, canonical: a });\n    }\n    for (let [o, a] of Object.entries(s.valueAliases)) {\n      let u = n[o];\n      if (typeof u != "string") continue;\n      let d = a[u];\n      d === void 0 || d === u || (n[o] = d, e.push({ kind: "alias", path: `${i}.${o}`, message: `${i}.${o} \'${u}\' normalized to \'${d}\'`, type: r, field: o, canonical: d }));\n    }\n    return n;\n  }\n  function Se(t, i, r, e, s) {\n    if (Array.isArray(t)) return t.map((a, u) => Se(a, i, `${r}[${u}]`, e, s));\n    let n = O(t);\n    if (n === void 0) return t;\n    let o = { ...n };\n    for (let [a, u] of Object.entries(i.aliases)) !(a in o) || u in o || (o[u] = o[a], delete o[a], s.push({ kind: "alias", path: `${r}.${a}`, message: `${r}.${a} normalized/adopted as \'${u}\'`, type: e, field: a, canonical: u }));\n    for (let [a, u] of Object.entries(i.nested)) o[a] !== void 0 && (o[a] = Se(o[a], u, `${r}.${a}`, e, s));\n    return o;\n  }\n  function we(t) {\n    if (Array.isArray(t)) return t.map(we);\n    let i = O(t);\n    if (i === void 0) return t;\n    let r = { ...i };\n    return r.type === void 0 && Array.isArray(r.children) && (r.type = "dir"), r.children !== void 0 && (r.children = we(r.children)), r;\n  }\n  function $e(t, i, r) {\n    if (!Ae(t)) return t;\n    let e = t.type, s = T[e];\n    if (s === void 0) return t;\n    let n = Cn(t, i, e, r);\n    for (let [u, d] of Object.entries(s.nested)) n[u] !== void 0 && (n[u] = Se(n[u], d, `${i}.${u}`, e, r));\n    let o = (u, d) => $e(u, d, r), a = (u, d) => Array.isArray(u) ? u.map((c, f) => o(c, `${d}[${f}]`)) : u;\n    if (e === "file-tree" && n.items !== void 0 && (n.items = we(n.items)), e === "stat" && Array.isArray(n.items) && n.label === void 0 && n.value === void 0) {\n      let u = Tn(n.items, i, o);\n      if (u !== null) return r.push({ kind: "alias", path: `${i}.items`, message: `${i}.items normalized into a row of \'stat\' nodes`, type: e, field: "items", canonical: "row" }), { type: "row", items: u, ...n.span !== void 0 ? { span: n.span } : {} };\n    }\n    if (e === "row" || e === "col" || e === "grid" || e === "card" || e === "file-tree" || e === "timeline" || e === "breadcrumb") e !== "file-tree" && e !== "timeline" && e !== "breadcrumb" && (n.items = a(n.items, `${i}.items`));\n    else if (e === "list" && Array.isArray(n.items)) n.items = n.items.map((u, d) => {\n      if (Ae(u)) return o(u, `${i}.items[${d}]`);\n      if (Array.isArray(u) && u.length === 1 && typeof u[0] == "string") return u[0];\n      let c = O(u);\n      if (c === void 0) return u;\n      let f = { ...c }, g = `${i}.items[${d}]`;\n      for (let [x, $] of Object.entries(Rn)) {\n        if (!(x in f)) continue;\n        let J = $ in f;\n        J || (f[$] = f[x]), delete f[x], r.push({ kind: "alias", path: `${g}.${x}`, type: e, field: x, canonical: $, message: J ? `${g}.${x} is ignored because canonical field \'${$}\' is present` : `${g}.${x} normalized/adopted as \'${$}\'` });\n      }\n      return !("title" in f) && typeof f.desc == "string" && (f.title = f.desc, delete f.desc, r.push({ kind: "alias", path: `${g}.desc`, type: e, field: "desc", canonical: "title", message: `${g}.desc normalized/adopted as \'title\'` })), f;\n    });\n    else if (e === "keyvalue" && Array.isArray(n.pairs)) n.pairs.length > 0 && n.pairs.every((u) => Array.isArray(u)) && (n.pairs = n.pairs.map((u) => {\n      let d = u;\n      return { key: d[0], value: d.length > 1 ? d[1] : "" };\n    }));\n    else if (e === "tabs" && Array.isArray(n.tabs)) n.tabs = n.tabs.map((u, d) => {\n      let c = O(u);\n      if (c === void 0) return u;\n      let f = { ...c };\n      if ("content" in f) {\n        let g = `${i}.tabs[${d}].content`, x = "items" in f;\n        x || (f.items = f.content), delete f.content, r.push({ kind: "alias", path: g, message: x ? `${g} is ignored because canonical field \'items\' is present` : `${g} normalized/adopted as \'items\'`, type: e, field: "content", canonical: "items" });\n      }\n      return f.items = Array.isArray(f.items) ? f.items.map((g, x) => o(g, `${i}.tabs[${d}].items[${x}]`)) : f.items === void 0 ? [] : [o(f.items, `${i}.tabs[${d}].items[0]`)], f;\n    });\n    else if (e === "accordion" && Array.isArray(n.items)) n.items = n.items.map((u, d) => {\n      let c = O(u);\n      return c === void 0 ? u : { ...c, items: Array.isArray(c.items) ? c.items.map((f, g) => o(f, `${i}.items[${d}].items[${g}]`)) : c.items };\n    });\n    else if (e === "table" && Array.isArray(n.details)) {\n      let u = { columns: n.columns, rows: n.rows, types: n.types };\n      n.details = n.details.map((d, c) => !Array.isArray(d) || !C(u, c) ? d : d.map((f, g) => o(f, `${i}.details[${c}][${g}]`)));\n    }\n    return n;\n  }\n  function Ie(t) {\n    let i = [];\n    if (typeof t == "string") try {\n      let s = JSON.parse(t);\n      (O(s) !== void 0 || Array.isArray(s)) && (t = s, i.push({ kind: "alias", path: "spec", message: "double-encoded JSON string unwrapped into a spec value" }));\n    } catch {\n    }\n    Array.isArray(t) && t.length > 0 && (t = { items: t }, i.push({ kind: "alias", path: "items", message: "root array normalized into an items envelope" }));\n    let r = O(t);\n    if (r === void 0) return { value: t, warnings: i };\n    let e = { ...r };\n    return N(e) ? { value: $e(e, "spec", i), warnings: i } : (Array.isArray(e.items) && (e.items = e.items.map((s, n) => $e(s, `items[${n}]`, i))), { value: e, warnings: i });\n  }\n  function F(t) {\n    return typeof t == "object" && t !== null && !Array.isArray(t) ? t : void 0;\n  }\n  function _e(t) {\n    let i = F(t);\n    return i !== void 0 && typeof i.type == "string";\n  }\n  function Ge(t, i, r) {\n    if (!_e(t)) return;\n    let e = t.type, s = T[e];\n    if (s === void 0) return;\n    r(t, i, s);\n    let n = (o, a) => Ge(o, a, r);\n    if ((e === "row" || e === "col" || e === "grid" || e === "card") && Array.isArray(t.items)) t.items.forEach((o, a) => n(o, `${i}.items[${a}]`));\n    else if (e === "list" && Array.isArray(t.items)) t.items.forEach((o, a) => n(o, `${i}.items[${a}]`));\n    else if (e === "tabs" && Array.isArray(t.tabs)) t.tabs.forEach((o, a) => {\n      let u = F(o);\n      u !== void 0 && (Array.isArray(u.items) ? u.items.forEach((d, c) => n(d, `${i}.tabs[${a}].items[${c}]`)) : n(u.items, `${i}.tabs[${a}].items`));\n    });\n    else if (e === "accordion" && Array.isArray(t.items)) t.items.forEach((o, a) => {\n      let u = F(o);\n      u?.items !== void 0 && Array.isArray(u.items) && u.items.forEach((d, c) => n(d, `${i}.items[${a}].items[${c}]`));\n    });\n    else if (e === "table" && Array.isArray(t.details)) {\n      let o = { columns: t.columns, rows: t.rows, types: t.types };\n      t.details.forEach((a, u) => {\n        Array.isArray(a) && C(o, u) && a.forEach((d, c) => n(d, `${i}.details[${u}][${c}]`));\n      });\n    }\n  }\n  function B(t, i, r, e) {\n    t.push({ kind: "unknown-field", path: `${i}.${r}`, message: `${i}.${r}: unknown field for \'${e}\'`, type: e, field: r });\n  }\n  function Y(t, i, r, e, s) {\n    let n = F(t);\n    if (n !== void 0) {\n      for (let o of Object.keys(n)) o in r.fields || B(s, i, o, e);\n      for (let [o, a] of Object.entries(r.nested)) {\n        let u = n[o];\n        Array.isArray(u) ? u.forEach((d, c) => Y(d, `${i}.${o}[${c}]`, a, e, s)) : u !== void 0 && Y(u, `${i}.${o}`, a, e, s);\n      }\n    }\n  }\n  function Nn(t, i, r, e) {\n    for (let [s, n] of Object.entries(r.nested)) {\n      let o = t[s];\n      Array.isArray(o) ? o.forEach((a, u) => Y(a, `${i}.${s}[${u}]`, n, t.type, e)) : o !== void 0 && Y(o, `${i}.${s}`, n, t.type, e);\n    }\n  }\n  function Pe(t) {\n    let i = [], r = F(t);\n    if (r === void 0) return i;\n    let e = (s, n, o) => {\n      for (let a of Object.keys(s)) a === "type" || a in o.fields || B(i, n, a, s.type);\n      Nn(s, n, o, i), s.type === "list" && Array.isArray(s.items) && s.items.forEach((a, u) => {\n        if (_e(a)) return;\n        let d = F(a);\n        if (d !== void 0) for (let c of Object.keys(d)) {\n          if (c === "title" || c === "desc") continue;\n          let f = `${n}.items[${u}]`;\n          i.push({ kind: "unknown-field", path: `${f}.${c}`, message: `${f}.${c}: list items render \'title\' and \'desc\' only \\u2014 \'${c}\' is dropped`, type: "list", field: c });\n        }\n      });\n    };\n    if (Array.isArray(r.items) && !N(r)) {\n      for (let s of Object.keys(r)) s in V.fields || B(i, "spec", s, "spec");\n      r.items.forEach((s, n) => Ge(s, `items[${n}]`, e));\n    } else if (typeof r.type == "string") Ge(r, "spec", e);\n    else for (let s of Object.keys(r)) s in V.fields || B(i, "spec", s, "spec");\n    return i;\n  }\n  function ve(t, i) {\n    let r = (s, n, o) => {\n      o > m.maxDepth || s.forEach((a, u) => e(a, `${n}[${u}]`, o));\n    }, e = (s, n, o) => {\n      if (!(o > m.maxDepth) && (i(s, n), !(o >= m.maxDepth))) switch (s.type) {\n        case "row":\n        case "col":\n        case "grid":\n        case "card":\n          r(s.items, `${n}.items`, o + 1);\n          break;\n        case "tabs":\n          s.tabs.forEach((a, u) => r(a.items, `${n}.tabs[${u}].items`, o + 1));\n          break;\n        case "accordion":\n          s.items.forEach((a, u) => r(a.items, `${n}.items[${u}].items`, o + 1));\n          break;\n        case "list":\n          s.items.forEach((a, u) => {\n            a !== null && typeof a == "object" && "type" in a && e(a, `${n}.items[${u}]`, o + 1);\n          });\n          break;\n        case "table":\n          s.details?.slice(0, I(s).length).forEach((a, u) => {\n            a !== null && C(s, u) && r(a, `${n}.details[${u}]`, o + 1);\n          });\n          break;\n      }\n    };\n    r(t.items, "items", 0);\n  }\n  function Re(t) {\n    let i = /* @__PURE__ */ new Map(), r = /* @__PURE__ */ new Map(), e = [], s = [];\n    ve(t, (n, o) => {\n      if (n.type === "submit") {\n        n.groups !== void 0 && s.push({ groups: n.groups, path: o });\n        return;\n      }\n      let a, u;\n      switch (n.type) {\n        case "radio":\n          if (n.group === void 0) return;\n          a = { kind: "radio", key: n.group, label: n.label ?? n.group, options: n.options.slice(0, m.maxOptions), ...n.answer === void 0 ? {} : { answer: n.answer }, ...n.explanation === void 0 ? {} : { explanation: n.explanation } }, u = `${o}.group`;\n          break;\n        case "checkbox":\n          if (n.group === void 0) return;\n          a = { kind: "checkbox", key: n.group }, u = `${o}.group`;\n          break;\n        case "input":\n        case "textarea":\n        case "select":\n        case "slider":\n          if (n.id === void 0) return;\n          a = { kind: "field", key: n.id, fieldType: n.type, secret: n.type === "input" && n.inputType === "password" }, u = `${o}.id`;\n          break;\n        default:\n          return;\n      }\n      if (a === void 0) return;\n      let d = i.get(a.key);\n      if (d !== void 0) {\n        (d.kind !== "checkbox" || a.kind !== "checkbox") && e.push(`${u} conflicts with ${r.get(a.key)}: submission key \'${a.key}\' is already used`);\n        return;\n      }\n      i.set(a.key, a), r.set(a.key, u);\n    });\n    for (let { groups: n, path: o } of s) {\n      let a = /* @__PURE__ */ new Set();\n      n.forEach((u, d) => {\n        let c = `${o}.groups[${d}]`;\n        a.has(u) && e.push(`${c}: duplicate submission member \'${u}\'`), a.add(u);\n        let f = i.get(u);\n        f === void 0 ? e.push(`${c}: submit.groups references unknown submission member \'${u}\'`) : f.kind === "field" && f.secret && e.push(`${c}: submit.groups cannot require secret field \'${u}\'`);\n      });\n    }\n    return { registry: { members: i }, diagnostics: e };\n  }\n  function En(t, i) {\n    return typeof t == "string" && i.includes(t);\n  }\n  function p(t, i) {\n    return typeof t == "string" ? t.slice(0, i) : void 0;\n  }\n  var Dn = /^(?:#[\\da-fA-F]{3,8}|rgba?\\([^)]{0,64}\\)|hsla?\\([^)]{0,64}\\)|var\\(--dsw-[\\w-]+(?:,\\s*#[0-9a-fA-F]{3,8})?\\))$/;\n  function E(t) {\n    if (typeof t != "string") return;\n    let i = t.trim();\n    return i.length <= 64 && Dn.test(i) ? i : void 0;\n  }\n  function qe(t) {\n    if (typeof t != "string") return;\n    let i = t.trim();\n    if (!(i.length > 2048)) return /^https?:\\/\\//i.test(i) || /^mailto:[^@\\s]+@[^@\\s]+$/i.test(i) ? i : void 0;\n  }\n  function K(t) {\n    if (typeof t != "string") return;\n    let i = t.trim();\n    if (!(i === "" || i.length > 2048)) {\n      if (/^https?:\\/\\//i.test(i)) return i;\n      if (!(/^[a-z][a-z0-9+.-]*:/i.test(i) || /^[/\\\\]{2}/.test(i))) return i;\n    }\n  }\n  function k(t, i, r) {\n    return typeof t == "number" && Number.isFinite(t) ? Math.min(r, Math.max(i, t)) : void 0;\n  }\n  function D(t, i, r) {\n    return typeof t == "number" && Number.isFinite(t) ? Math.min(r, Math.max(i, Math.trunc(t))) : void 0;\n  }\n  function w(t, i) {\n    return En(t, i) ? t : void 0;\n  }\n  function y(t) {\n    return typeof t == "object" && t !== null && !Array.isArray(t) ? t : void 0;\n  }\n  function l(t, i) {\n    return i === void 0 ? {} : { [t]: i };\n  }\n  function On(t) {\n    if (t.length > 2048) return;\n    let i = t.indexOf("#"), r = i < 0 ? t : t.slice(0, i);\n    if (r.includes("?")) return;\n    let e;\n    try {\n      e = decodeURIComponent(r);\n    } catch {\n      return;\n    }\n    if (e === "" || /[\\u0000-\\u001f\\u007f]/.test(e) || /^[\\\\/]{2}/.test(e) || /^[a-z][a-z\\d+.-]*:/i.test(e) && !/^[a-z]:[\\\\/]/i.test(e)) return;\n    if (i < 0) return { path: e };\n    let s = /^L([1-9]\\d*)(?:-L([1-9]\\d*))?$/.exec(t.slice(i + 1));\n    if (s === null) return;\n    let n = Number(s[1]), o = s[2] === void 0 ? n : Number(s[2]);\n    if (!(!Number.isSafeInteger(n) || !Number.isSafeInteger(o) || o < n)) return { path: e, line: n };\n  }\n  function ze(t) {\n    let i = qe(t);\n    if (i !== void 0) return { type: "external", href: i };\n    if (typeof t != "string") return { type: "invalid" };\n    let r = On(t.trim());\n    return r === void 0 ? { type: "invalid" } : { type: "file", file: r };\n  }\n  function H(t, i) {\n    switch (i) {\n      case "string":\n        return typeof t == "string";\n      case "string-or-null":\n        return t === null || typeof t == "string";\n      case "number":\n        return typeof t == "number" && Number.isFinite(t);\n      case "boolean":\n        return typeof t == "boolean";\n      case "nodes":\n        return Array.isArray(t);\n      case "array":\n        return Array.isArray(t);\n      case "object":\n        return y(t) !== void 0;\n      case "unknown":\n        return true;\n    }\n  }\n  function j(t) {\n    switch (t) {\n      case "string-or-null":\n        return "a string or null";\n      case "number":\n        return "a finite number";\n      case "boolean":\n        return "a boolean";\n      case "nodes":\n      case "array":\n        return "an array";\n      case "object":\n        return "an object";\n      case "unknown":\n        return "a value";\n      default:\n        return "a string";\n    }\n  }\n  function v(t, i, r) {\n    return t.some((e) => e.startsWith(`${i}.${r} `) || e.includes(`\'${r}\'`) || e.includes(`requires ${r}`));\n  }\n  function Ke(t, i, r, e, s = []) {\n    for (let [n, o] of Object.entries(r.fields)) s.includes(n) || t[n] === void 0 || !H(t[n], o) && !v(e, i, n) && e.push(`${i}.${n} must be ${j(o)}`);\n    for (let [n, o] of Object.entries(r.enums)) s.includes(n) || t[n] === void 0 || !H(t[n], "string") || !o.includes(t[n]) && !v(e, i, n) && e.push(`${i}.${n} must be one of ${o.join(", ")}`);\n  }\n  function W(t, i, r, e) {\n    let s = y(t);\n    if (s === void 0) {\n      e.push(`${i} must be an object`);\n      return;\n    }\n    for (let n of r.required) {\n      let o = r.fields[n];\n      s[n] === void 0 ? v(e, i, n) || e.push(`${i}: requires ${n}${o === void 0 ? "" : ` (${j(o)})`}`) : o !== void 0 && !H(s[n], o) && (v(e, i, n) || e.push(`${i}.${n} must be ${j(o)}`));\n    }\n    for (let [n, o] of Object.entries(r.fields)) s[n] !== void 0 && !H(s[n], o) && (v(e, i, n) || e.push(`${i}.${n} must be ${j(o)}`));\n    for (let [n, o] of Object.entries(r.enums)) s[n] !== void 0 && typeof s[n] == "string" && !o.includes(s[n]) && (v(e, i, n) || e.push(`${i}.${n} must be one of ${o.join(", ")}`));\n    for (let [n, o] of Object.entries(r.nested)) {\n      let a = s[n];\n      a !== void 0 && (Array.isArray(a) ? a.forEach((u, d) => W(u, `${i}.${n}[${d}]`, o, e)) : W(a, `${i}.${n}`, o, e));\n    }\n  }\n  function Mn(t, i, r, e) {\n    for (let [s, n] of Object.entries(r.nested)) {\n      let o = t[s];\n      o !== void 0 && (Array.isArray(o) ? o.forEach((a, u) => W(a, `${i}.${s}[${u}]`, n, e)) : W(o, `${i}.${s}`, n, e));\n    }\n  }\n  function He(t) {\n    let i = t.rows !== void 0 ? t.rows : t.data;\n    return !Array.isArray(i) || i.length === 0 ? false : Array.isArray(i[0]);\n  }\n  function In(t, i, r, e) {\n    let s = String(t.type), n = (a) => v(e, i, a), o = s === "table" && He(t) ? "columns" : null;\n    for (let a of r.required) {\n      let u = r.fields[a];\n      if (u === void 0 || t[a] === void 0) {\n        a !== o && !n(a) && e.push(`${i}: type \'${s}\' requires ${a}${u === void 0 ? "" : ` (${j(u)})`}`);\n        continue;\n      }\n      !H(t[a], u) && !n(a) && e.push(`${i}.${a} must be ${j(u)}`);\n    }\n    Ke(t, i, r, e, ["type"]);\n    for (let a of r.oneOfRequired) !a.some((u) => t[u] !== void 0) && !e.some((u) => u.includes(`requires ${a.join(" or ")}`)) && e.push(`${i}: type \'${s}\' requires one of ${a.join(" or ")}`);\n    for (let a of r.conditionalRequired) if (t[a.when.field] === a.when.equals) for (let u of a.required) t[u] === void 0 && !n(u) && e.push(`${i}: type \'${s}\' requires ${u}${a.message === void 0 ? "" : ` (${a.message})`}`);\n    Mn(t, i, r, e);\n  }\n  function _(t, i, r) {\n    if (!Array.isArray(t)) return [];\n    let e = [];\n    for (let s of t) {\n      if (i.remaining <= 0) break;\n      i.remaining -= 1;\n      let n = Je(s, i, r);\n      n !== null && e.push(n);\n    }\n    return e;\n  }\n  function Fe(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t.slice(0, 12)) {\n      let e = E(r);\n      e !== void 0 && i.push(e);\n    }\n    return i.length > 0 ? i : void 0;\n  }\n  function je(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t.slice(0, 60)) {\n      let e = typeof r == "number" ? r : Number(r);\n      if (!Number.isFinite(e)) return;\n      i.push(e);\n    }\n    return i.length >= 2 ? i : void 0;\n  }\n  function Je(t, i, r) {\n    let e = _n(t, i, r);\n    if (e === null) return null;\n    let s = D(y(t)?.span, 2, 12), n = p(y(t)?.id, 64);\n    return { ...e, ...l("span", s), ...l("id", n) };\n  }\n  function _n(t, i, r) {\n    if (r > m.maxDepth) return null;\n    let e = y(t);\n    if (e === void 0) return null;\n    let s = e.type;\n    if (typeof s != "string") return null;\n    switch (s) {\n      case "text": {\n        let n = p(e.content, m.maxString) ?? p(e.text, m.maxString);\n        return n === void 0 ? null : { type: "text", content: n, ...l("copyable", e.copyable === true ? true : void 0), ...l("title", p(e.title, m.maxString)), ...l("size", w(e.size, ne)), ...l("center", e.center === true ? true : void 0) };\n      }\n      case "row":\n        return { type: "row", items: _(e.items, i, r + 1), ...l("wrap", e.wrap === true ? true : void 0), ...l("spacer", e.spacer === true ? true : void 0) };\n      case "col":\n        return { type: "col", items: _(e.items, i, r + 1), ...l("gap", k(e.gap, 0, 96)) };\n      case "grid":\n        return { type: "grid", cols: D(e.cols, 1, m.maxGridCols) ?? 1, items: _(e.items, i, r + 1) };\n      case "card":\n        return { type: "card", items: _(e.items, i, r + 1), ...l("title", p(e.title, m.maxString)), ...l("tone", w(e.tone, be)), ...l("accent", E(e.accent)) };\n      case "button": {\n        let n = p(e.label, m.maxString);\n        return n === void 0 ? null : { type: "button", label: n, ...l("tone", w(e.tone, te)), ...l("full", e.full === true ? true : void 0), ...l("small", e.small === true ? true : void 0), ...l("icon", p(e.icon, 64)), ...l("action", p(e.action, 200)) };\n      }\n      case "input":\n        return { type: "input", ...l("label", p(e.label, m.maxString)), ...l("placeholder", p(e.placeholder, m.maxString)), ...l("value", p(e.value, m.maxString)), ...l("inputType", w(e.inputType, re)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };\n      case "select": {\n        let n = Q(e.options, m.maxOptions, m.maxString);\n        return n === void 0 ? null : { type: "select", options: n, ...l("label", p(e.label, m.maxString)), ...l("action", p(e.action, 200)), ...l("selected", D(e.selected, 0, n.length - 1)), ...l("id", p(e.id, 200)) };\n      }\n      case "checkbox": {\n        let n = p(e.label, m.maxString);\n        return n === void 0 ? null : { type: "checkbox", label: n, ...l("checked", e.checked === true ? true : void 0), ...l("action", p(e.action, 200)), ...l("group", p(e.group, 200)) };\n      }\n      case "link": {\n        let n = p(e.label, m.maxString);\n        if (n === void 0) return null;\n        let o = ze(e.href), a = o.type === "external" ? o.href : o.type === "file" ? String(e.href).trim() : void 0;\n        return { type: "link", label: n, ...l("href", a) };\n      }\n      case "image": {\n        let n = K(e.src);\n        return n === void 0 ? null : { type: "image", src: n, ...l("alt", p(e.alt, m.maxString)) };\n      }\n      case "audio": {\n        let n = K(e.src);\n        return n === void 0 ? null : { type: "audio", src: n, ...l("alt", p(e.alt, m.maxString)), ...l("loop", e.loop === true ? true : void 0) };\n      }\n      case "video": {\n        let n = K(e.src);\n        return n === void 0 ? null : { type: "video", src: n, ...l("alt", p(e.alt, m.maxString)), ...l("poster", K(e.poster)), ...l("loop", e.loop === true ? true : void 0), ...l("muted", e.muted === true ? true : void 0), ...l("aspectRatio", w(e.aspectRatio, ae)) };\n      }\n      case "badge": {\n        let n = p(e.label, m.maxString) ?? p(e.text, m.maxString) ?? p(e.value, m.maxString);\n        return n === void 0 ? null : { type: "badge", label: n, ...l("tone", w(e.tone, ie)), ...l("icon", p(e.icon, 64)) };\n      }\n      case "hero": {\n        let n = p(e.title, m.maxString);\n        return n === void 0 ? null : { type: "hero", title: n, ...l("subtitle", p(e.subtitle, m.maxString)), ...l("value", p(e.value, 128)), ...l("label", p(e.label, m.maxString)), ...l("delta", p(e.delta, 64)), ...l("spark", je(e.spark)), ...l("tone", w(e.tone, he)) };\n      }\n      case "stat": {\n        let n = p(e.label, m.maxString), o = p(e.value, 128);\n        return n === void 0 || o === void 0 ? null : { type: "stat", label: n, value: o, ...l("delta", p(e.delta, 64)), ...l("spark", je(e.spark)), ...l("size", e.size === "hero" ? "hero" : void 0) };\n      }\n      case "progress": {\n        let n = k(e.value, 0, 100);\n        return n === void 0 ? null : { type: "progress", value: n, ...l("label", p(e.label, m.maxString)), ...l("valueLabel", p(e.valueLabel, 64)), ...l("variant", w(e.variant, ye)), ...l("target", k(e.target, 0, 100)) };\n      }\n      case "divider":\n        return { type: "divider" };\n      case "spacer":\n        return { type: "spacer" };\n      case "avatar": {\n        let n = p(e.name, 64);\n        return n === void 0 ? null : { type: "avatar", name: n, ...l("color", E(e.color)) };\n      }\n      case "list": {\n        let n = Pn(e.items, m.maxListItems, i, r + 1);\n        return n === void 0 ? null : { type: "list", items: n, ...l("filter", p(e.filter, 64)) };\n      }\n      case "table": {\n        let n = ke(e);\n        if (n === null) return null;\n        let { columns: o, rows: a } = n, u = Array.isArray(e.types) ? e.types : void 0, d = u === void 0 ? void 0 : o.map((g, x) => {\n          let $ = u[x];\n          return typeof $ == "string" && Ee.includes($) ? $ : "text";\n        }), c = Array.isArray(e.details) ? e.details : void 0, f = c === void 0 ? void 0 : a.map((g, x) => {\n          if (!C({ columns: o, rows: a, types: d }, x)) return null;\n          let $ = _(c[x], i, r + 1);\n          return $.length === 0 ? null : $;\n        });\n        return { type: "table", columns: o, rows: a, ...l("types", d), ...l("total", e.total === true ? true : void 0), ...l("export", e.export === true ? true : void 0), ...l("filter", p(e.filter, 64)), ...l("filterColumn", D(e.filterColumn, 0, m.maxTableCols - 1)), ...l("sortField", p(e.sortField, 64)), ...l("details", f !== void 0 && f.some((g) => g !== null) ? f : void 0) };\n      }\n      case "chart": {\n        let n = Te(e.data, m.maxChartPoints), o = Array.isArray(e.series) ? Le(e.series, m.maxPlotSeries, m.maxChartPoints) : void 0;\n        return n === void 0 && o === void 0 ? null : { type: "chart", data: n ?? [], ...l("kind", w(e.kind, U)), ...l("series", o), ...l("horizontal", e.horizontal === true ? true : void 0), ...l("stacked", e.stacked === true ? true : void 0), ...l("filter", p(e.filter, 64)), ...l("palette", Fe(e.palette)) };\n      }\n      case "tabs": {\n        let n = vn(e.tabs, i, r);\n        return n === void 0 ? null : { type: "tabs", tabs: n };\n      }\n      case "plot": {\n        let n = qn(e.series, m.maxPlotSeries);\n        return n === void 0 ? null : { type: "plot", series: n, ...l("xMin", k(e.xMin, -1e6, 1e6)), ...l("xMax", k(e.xMax, -1e6, 1e6)), ...l("yMin", k(e.yMin, -1e9, 1e9)), ...l("yMax", k(e.yMax, -1e9, 1e9)), ...l("title", p(e.title, m.maxString)) };\n      }\n      case "callout": {\n        let n = p(e.content, m.maxString);\n        return n === void 0 ? null : { type: "callout", content: n, ...l("tone", w(e.tone, se)), ...l("title", p(e.title, m.maxString)) };\n      }\n      case "steps": {\n        let n = zn(e.steps);\n        return n === void 0 ? null : { type: "steps", steps: n, ...l("current", D(e.current, 0, n.length)) };\n      }\n      case "keyvalue": {\n        let n = Fn(e.pairs, m.maxKeyValuePairs);\n        return n === void 0 ? null : { type: "keyvalue", pairs: n };\n      }\n      case "diff": {\n        let n = jn(e.diffs);\n        return n === void 0 ? null : { type: "diff", diffs: n };\n      }\n      case "json":\n        return "value" in e ? { type: "json", value: e.value } : null;\n      case "code": {\n        let n = p(e.code, m.maxCode);\n        return n === void 0 ? null : { type: "code", code: n, ...l("lang", p(e.lang, 64)), ...l("title", p(e.title, m.maxString)), ...l("wrap", e.wrap === true ? true : void 0) };\n      }\n      case "radio": {\n        let n = Q(e.options, m.maxOptions, m.maxString);\n        return n === void 0 ? null : { type: "radio", options: n, ...l("label", p(e.label, m.maxString)), ...l("selected", D(e.selected, 0, n.length - 1)), ...l("action", p(e.action, 200)), ...l("group", p(e.group, 200)), ...l("answer", typeof e.answer == "number" && Number.isFinite(e.answer) && e.answer >= 0 && e.answer < n.length ? Math.trunc(e.answer) : typeof e.answer == "string" ? e.answer.slice(0, 512) : void 0), ...l("explanation", p(e.explanation, m.maxString)) };\n      }\n      case "submit": {\n        let n = p(e.label, m.maxString), o = p(e.action, 200);\n        return n === void 0 ? null : { type: "submit", label: n, ...l("action", o), ...l("resetAction", p(e.resetAction, 200)), ...l("groups", Q(e.groups, m.maxOptions, 200)) };\n      }\n      case "switch": {\n        let n = p(e.label, m.maxString);\n        return n === void 0 ? null : { type: "switch", label: n, ...l("checked", e.checked === true ? true : void 0), ...l("action", p(e.action, 200)) };\n      }\n      case "slider": {\n        let n = k(e.min, -1e9, 1e9) ?? 0, o = k(e.max, -1e9, 1e9) ?? 100, a = Math.min(n, o), u = Math.max(n, o), d = k(e.step, 1e-9, Math.max(u - a, 1e-9)), c = k(e.value, a, u) ?? a;\n        return { type: "slider", min: a, max: u, ...l("step", d), value: c, ...l("label", p(e.label, m.maxString)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };\n      }\n      case "textarea":\n        return { type: "textarea", ...l("label", p(e.label, m.maxString)), ...l("placeholder", p(e.placeholder, m.maxString)), ...l("rows", D(e.rows, 1, 30)), ...l("value", p(e.value, m.maxString)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };\n      case "accordion": {\n        let n = Ln(e.items, i, r);\n        return n === void 0 ? null : { type: "accordion", items: n };\n      }\n      case "copy": {\n        let n = p(e.text, m.maxCode);\n        return n === void 0 ? null : { type: "copy", text: n, ...l("label", p(e.label, 128)) };\n      }\n      case "svg": {\n        let n = p(e.code, m.maxCode);\n        return n === void 0 ? null : { type: "svg", code: n, ...l("title", p(e.title, m.maxString)), ...l("height", D(e.height, 100, 800)) };\n      }\n      case "mermaid": {\n        let n = p(e.code, m.maxMermaid);\n        return n === void 0 ? null : { type: "mermaid", code: n };\n      }\n      case "scene3d": {\n        let n = Vn(e.meshes);\n        return n === void 0 ? null : { type: "scene3d", meshes: n, ...l("title", p(e.title, m.maxString)), ...l("ambient", k(e.ambient, 0, 2)), ...l("background", E(e.background)) };\n      }\n      case "diagram":\n        return Bn(e);\n      case "timeline": {\n        let n = Yn(e.items, m.maxTimelineItems);\n        return n === void 0 ? null : { type: "timeline", items: n };\n      }\n      case "file-tree": {\n        let n = Qn(e.items, m.maxListItems);\n        return n === void 0 ? null : { type: "file-tree", items: n };\n      }\n      case "breadcrumb": {\n        let n = Q(e.items, m.maxBreadcrumbItems, m.maxString);\n        return n === void 0 ? null : { type: "breadcrumb", items: n };\n      }\n      case "quiz": {\n        let n = p(e.question, m.maxString), o = Zn(e.options, e.answer);\n        return n === void 0 || o === void 0 ? null : { type: "quiz", question: n, options: o, ...l("explanation", p(e.explanation, m.maxString)), ...l("id", p(e.id, 200)), ...l("action", p(e.action, 200)) };\n      }\n      case "echart": {\n        let n = e.data !== void 0 ? Te(e.data, m.maxChartPoints) : void 0, o = e.series !== void 0 && Array.isArray(e.series) ? Le(e.series, m.maxPlotSeries, m.maxChartPoints) : void 0, a = Array.isArray(e.links) ? e.links.slice(0, m.maxChartPoints).flatMap((c) => {\n          let f = y(c), g = f === void 0 ? void 0 : p(f.from, 64), x = f === void 0 ? void 0 : p(f.to, 64);\n          return g === void 0 || x === void 0 ? [] : [{ from: g, to: x, ...l("value", k(f.value, 0, 1e9)) }];\n        }) : void 0, u = e.option !== void 0 ? Ce(e.option, 0, { count: m.maxEChartOptionNodes }) : void 0, d = u === void 0 || typeof u != "object" || u === null || Array.isArray(u) ? void 0 : u;\n        return d === void 0 && n === void 0 && o === void 0 && (a === void 0 || a.length === 0) ? null : { type: "echart", ...l("title", p(e.title, m.maxString)), ...l("height", D(e.height, 100, 800)), ...l("preset", w(e.preset, ge)), ...l("data", n), ...l("series", o), ...l("links", a !== void 0 && a.length > 0 ? a : void 0), ...l("palette", Fe(e.palette)), ...l("option", d) };\n      }\n      default:\n        return t;\n    }\n  }\n  function Q(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= i) break;\n      if (typeof s == "string") e.push(s.slice(0, r));\n      else if (s !== null && typeof s == "object") {\n        let n = s, o = typeof n.label == "string" ? n.label : typeof n.value == "string" ? n.value : typeof n.title == "string" ? n.title : JSON.stringify(s);\n        e.push(o.slice(0, r));\n      }\n    }\n    return e;\n  }\n  function Pn(t, i, r, e) {\n    if (!Array.isArray(t)) return;\n    let s = [];\n    for (let n of t) {\n      if (s.length >= i) break;\n      if (typeof n == "string") {\n        s.push(n.slice(0, m.maxString));\n        continue;\n      }\n      let o = y(n);\n      if (o !== void 0 && typeof o.type == "string") {\n        if (r.remaining <= 0) break;\n        r.remaining -= 1;\n        let u = Je(o, r, e);\n        u !== null && s.push(u);\n        continue;\n      }\n      let a = o === void 0 ? void 0 : p(o.title, m.maxString);\n      a !== void 0 && s.push({ title: a, ...l("desc", p(o?.desc, m.maxString)) });\n    }\n    return s;\n  }\n  function Te(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let e of t) {\n      if (r.length >= i) break;\n      let s = y(e), n = s === void 0 ? void 0 : p(s.label, 128), o = s === void 0 ? void 0 : k(s.value, -1e12, 1e12);\n      n === void 0 || o === void 0 || r.push({ label: n, value: o, ...l("color", s === void 0 ? void 0 : E(s.color)) });\n    }\n    return r;\n  }\n  function Le(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= i) break;\n      let n = y(s), o = n === void 0 ? void 0 : p(n.label, 128), a = n === void 0 ? void 0 : Te(n.data, r);\n      o === void 0 || a === void 0 || e.push({ label: o, data: a, ...l("color", n === void 0 ? void 0 : E(n.color)) });\n    }\n    return e;\n  }\n  function vn(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= m.maxTabs) break;\n      let n = y(s), o = n === void 0 ? void 0 : p(n.label, 128);\n      if (o === void 0 || n === void 0) continue;\n      let a = n.items !== void 0 ? n.items : n.content !== void 0 ? Array.isArray(n.content) ? n.content : [n.content] : void 0;\n      e.push({ label: o, items: _(a, i, r + 1) });\n    }\n    return e;\n  }\n  function qn(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let e of t) {\n      if (r.length >= i) break;\n      let s = y(e), n = s === void 0 ? void 0 : p(s.expr, 512);\n      if (n === void 0 || s === void 0) continue;\n      let o = [];\n      if (Array.isArray(s.params)) for (let a of s.params) {\n        if (o.length >= m.maxPlotParams) break;\n        let u = y(a), d = u === void 0 ? void 0 : p(u.name, 64), c = u === void 0 ? void 0 : k(u.value, -1e9, 1e9);\n        d === void 0 || c === void 0 || o.push({ name: d, value: c, ...l("min", u === void 0 ? void 0 : k(u.min, -1e9, 1e9)), ...l("max", u === void 0 ? void 0 : k(u.max, -1e9, 1e9)), ...l("step", u === void 0 ? void 0 : k(u.step, 1e-9, 1e9)), ...l("animateTo", u === void 0 ? void 0 : k(u.animateTo, -1e9, 1e9)), ...l("durationMs", u === void 0 ? void 0 : k(u.durationMs, 1, 12e4)), ...l("loop", u === void 0 ? void 0 : u.loop === true ? true : void 0) });\n      }\n      r.push({ expr: n, ...l("label", p(s.label, 128)), ...l("color", E(s.color)), ...l("kind", w(s.kind, oe)), ...l("params", o.length > 0 ? o : void 0) });\n    }\n    return r;\n  }\n  function zn(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxSteps) break;\n      let e = y(r), s = e === void 0 ? void 0 : p(e.title, 256);\n      s !== void 0 && i.push({ title: s, ...l("desc", e === void 0 ? void 0 : p(e.desc, m.maxString)) });\n    }\n    return i;\n  }\n  function Fn(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let e of t) {\n      if (r.length >= i) break;\n      let s = y(e), n = s === void 0 ? void 0 : p(s.key, 256), o = s === void 0 ? void 0 : p(s.value, m.maxString);\n      n === void 0 || o === void 0 || r.push({ key: n, value: o });\n    }\n    return r;\n  }\n  function jn(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= 24) break;\n      let e = y(r), s = e === void 0 ? void 0 : p(e.path, 1024), n = e === void 0 ? void 0 : p(e.newText, 2e4);\n      if (s === void 0 || n === void 0) continue;\n      let o = e === void 0 ? void 0 : e.oldText;\n      i.push({ path: s, newText: n, oldText: o === null || typeof o != "string" ? null : o.slice(0, 2e4) });\n    }\n    return i;\n  }\n  function Ln(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= m.maxAccordionItems) break;\n      let n = y(s), o = n === void 0 ? void 0 : p(n.title, 256);\n      o === void 0 || n === void 0 || e.push({ title: o, items: _(n.items, i, r + 1) });\n    }\n    return e;\n  }\n  function Vn(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxMeshes) break;\n      let e = y(r), s = e === void 0 ? void 0 : w(e.shape, ue);\n      if (s === void 0) continue;\n      let n = e === void 0 ? void 0 : k(e.scale, -1e6, 1e6) ?? Z(e.scale), o = e === void 0 ? void 0 : k(e.size, -1e6, 1e6) ?? Z(e.size);\n      i.push({ shape: s, ...l("color", e === void 0 ? void 0 : E(e.color)), ...l("position", e === void 0 ? void 0 : Z(e.position)), ...l("rotation", e === void 0 ? void 0 : Z(e.rotation)), ...l("scale", n), ...l("size", o) });\n    }\n    return i;\n  }\n  function Z(t) {\n    if (!Array.isArray(t) || t.length !== 3) return;\n    let [i, r, e] = t;\n    if (!(typeof i != "number" || !Number.isFinite(i) || typeof r != "number" || !Number.isFinite(r) || typeof e != "number" || !Number.isFinite(e))) return [Math.min(1e6, Math.max(-1e6, i)), Math.min(1e6, Math.max(-1e6, r)), Math.min(1e6, Math.max(-1e6, e))];\n  }\n  function P(t, i, r) {\n    return Math.min(r, Math.max(i, Math.round(t / 4) * 4));\n  }\n  function Kn(t) {\n    if (!Array.isArray(t)) return;\n    let i = [], r = /* @__PURE__ */ new Set();\n    for (let e of t) {\n      if (i.length >= m.maxDiagramNodes) break;\n      let s = y(e);\n      if (s === void 0) continue;\n      let n = p(s.id, 128), o = p(s.label, m.maxString);\n      if (n === void 0 || o === void 0 || r.has(n)) continue;\n      r.add(n);\n      let a = w(s.type, ce), u = s.x === void 0 ? void 0 : P(k(s.x, -1e6, 1e6) ?? 0, 0, 1e6), d = s.y === void 0 ? void 0 : P(k(s.y, -1e6, 1e6) ?? 0, 0, 1e6), c = s.w === void 0 ? void 0 : P(k(s.w, -1e6, 1e6) ?? 96, 40, 2e3), f = s.h === void 0 ? void 0 : P(k(s.h, -1e6, 1e6) ?? 48, 24, 1200);\n      i.push({ id: n, label: o, ...l("sub", p(s.sub, 256)), ...l("type", a), ...l("x", u), ...l("y", d), ...l("w", c), ...l("h", f), ...l("tag", p(s.tag, 32)) });\n    }\n    return i;\n  }\n  function Hn(t) {\n    if (t === void 0) return [];\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxDiagramEdges) break;\n      let e = y(r);\n      if (e === void 0) continue;\n      let s = p(e.from, 128), n = p(e.to, 128);\n      s === void 0 || n === void 0 || i.push({ from: s, to: n, ...l("label", p(e.label, m.maxDiagramLabel)), ...l("kind", w(e.kind, pe)), ...l("route", w(e.route, me)) });\n    }\n    return i;\n  }\n  function Jn(t) {\n    let i = y(t);\n    if (i === void 0) return;\n    let r = {};\n    for (let e of ["paper", "paper-2", "ink", "muted", "soft", "rule", "accent", "accent-tint", "link"]) {\n      let s = E(i[e]);\n      s !== void 0 && (r[e] = s);\n    }\n    return Object.keys(r).length === 0 ? void 0 : r;\n  }\n  function Un(t) {\n    if (t === void 0) return [];\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxDiagramZones) break;\n      let e = y(r);\n      if (e === void 0) continue;\n      let s = p(e.label, 64);\n      s !== void 0 && i.push({ label: s, ...l("x", e.x === void 0 ? void 0 : P(k(e.x, -1e6, 1e6) ?? 0, 0, 1e6)), ...l("y", e.y === void 0 ? void 0 : P(k(e.y, -1e6, 1e6) ?? 0, 0, 1e6)), ...l("w", e.w === void 0 ? void 0 : P(k(e.w, -1e6, 1e6) ?? 100, 40, 2e3)), ...l("h", e.h === void 0 ? void 0 : P(k(e.h, -1e6, 1e6) ?? 100, 40, 1200)) });\n    }\n    return i;\n  }\n  function Bn(t) {\n    let i = y(t);\n    if (i === void 0) return null;\n    let r = w(i.kind, de);\n    if (r === void 0) return null;\n    let e = Kn(i.nodes);\n    if (e === void 0) return null;\n    let s = Hn(i.edges);\n    if (s === void 0) return null;\n    let n = Un(i.zones);\n    return n === void 0 ? null : { type: "diagram", kind: r, nodes: e, edges: s, ...l("zones", n.length > 0 ? n : void 0), ...l("variant", w(i.variant, fe)), ...l("title", p(i.title, 256)), ...l("theme", Jn(i.theme)) };\n  }\n  function Yn(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let e of t) {\n      if (r.length >= i) break;\n      let s = y(e), n = s === void 0 ? void 0 : p(s.title, 256);\n      n !== void 0 && r.push({ title: n, ...l("desc", s === void 0 ? void 0 : p(s.desc, m.maxString)), ...l("time", s === void 0 ? void 0 : p(s.time, 128)) });\n    }\n    return r;\n  }\n  function Qn(t, i) {\n    return Ue(t, i, m.maxTreeDepth);\n  }\n  function Ue(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= i) break;\n      let n = y(s), o = n === void 0 ? void 0 : p(n.name, 256);\n      if (o === void 0) continue;\n      let a = n !== void 0 && r > 0 && Array.isArray(n.children) ? Ue(n.children, i, r - 1) : void 0;\n      e.push({ name: o, ...l("type", n === void 0 ? void 0 : w(n.type, le)), ...l("children", a) });\n    }\n    return e;\n  }\n  function Zn(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let s of t) {\n      if (r.length >= m.maxQuizOptions) break;\n      let n = y(s), o = typeof s == "string" ? p(s, 512) : n === void 0 ? void 0 : p(n.label, 512);\n      o !== void 0 && r.push({ label: o, ...l("correct", n === void 0 ? void 0 : n.correct === true ? true : void 0), ...l("feedback", n === void 0 ? void 0 : p(n.feedback, m.maxString)) });\n    }\n    if (r.length === 0) return;\n    if (r.some((s) => s.correct === true)) return r;\n    let e = typeof i == "number" && Number.isFinite(i) ? Math.trunc(i) : typeof i == "string" ? r.findIndex((s) => s.label === i.slice(0, 512)) : -1;\n    return e < 0 || e >= r.length ? r : r.map((s, n) => n === e ? { ...s, correct: true } : s);\n  }\n  var Wn = /<(?:script|img|svg|iframe|video|audio|object|embed|source)\\b|on[a-z]+\\s*=|javascript:/i;\n  function Ce(t, i, r) {\n    if (r.count <= 0 || (r.count -= 1, i > m.maxEChartOptionDepth)) return;\n    if (typeof t == "string") {\n      let n = t.slice(0, m.maxString);\n      return n.toLowerCase().includes("url(") || Wn.test(n) ? void 0 : n;\n    }\n    if (typeof t == "number" && Number.isFinite(t) || typeof t == "boolean") return t;\n    if (t === null) return null;\n    if (Array.isArray(t)) {\n      let n = Math.min(t.length, m.maxEChartArrayLen), o = [];\n      for (let a = 0; a < n; a++) {\n        let u = Ce(t[a], i + 1, r);\n        u !== void 0 && o.push(u);\n      }\n      return o.length > 0 || t.length === 0 ? o : void 0;\n    }\n    let e = y(t);\n    if (e === void 0) return;\n    let s = {};\n    for (let [n, o] of Object.entries(e)) {\n      let a = Ce(o, i + 1, r);\n      a !== void 0 && (n === "tooltip" && typeof a == "object" && a !== null && !Array.isArray(a) && (a.renderMode = "richText"), s[n] = a);\n    }\n    return Object.keys(s).length > 0 || Object.keys(e).length === 0 ? s : void 0;\n  }\n  function Be(t) {\n    let i = y(t);\n    if (i === void 0) return null;\n    if (N(t)) {\n      let e = z(t);\n      return e === null ? null : Be(e);\n    }\n    if (!Array.isArray(i.items)) return null;\n    let r = { remaining: m.maxNodes };\n    return { ...l("title", p(i.title, m.maxString)), ...l("gap", k(i.gap, 0, 96)), ...l("panel", i.panel === true ? true : void 0), ...l("append", i.append === true ? true : void 0), items: _(i.items, r, 0) };\n  }\n  function Xn(t, i = Number.POSITIVE_INFINITY) {\n    let r = 0, e = (n) => {\n      if (Array.isArray(n)) for (let o of n) {\n        if (r >= i) return;\n        r += 1;\n        let a = y(o);\n        if (a !== void 0) {\n          if (a.type === "tabs" && Array.isArray(a.tabs)) for (let u of a.tabs) {\n            if (r >= i) return;\n            let d = y(u);\n            d !== void 0 && e(d.items);\n          }\n          else if (a.type === "accordion" && Array.isArray(a.items)) for (let u of a.items) {\n            if (r >= i) return;\n            let d = y(u);\n            d !== void 0 && e(d.items);\n          }\n          else if ((a.type === "row" || a.type === "col" || a.type === "grid" || a.type === "card") && Array.isArray(a.items)) e(a.items);\n          else if (a.type !== "file-tree") {\n            if (a.type === "list" && Array.isArray(a.items)) for (let u of a.items) {\n              if (r >= i) return;\n              let d = y(u);\n              d !== void 0 && typeof d.type == "string" && e([d]);\n            }\n            else if (a.type === "table" && Array.isArray(a.details)) {\n              let u = I(a).length;\n              for (let d = 0; d < Math.min(a.details.length, u); d++) {\n                if (r >= i) return;\n                let c = a.details[d];\n                Array.isArray(c) && C(a, d) && e(c);\n              }\n            }\n          }\n        }\n      }\n    }, s = y(t);\n    return e(s === void 0 ? [] : s.items), r;\n  }\n  var et = q;\n  function nt(t, i, r) {\n    let e = 0, s = (d) => {\n      let c = y(d);\n      return c !== void 0 && typeof c.type == "string" && et.has(c.type);\n    };\n    function n(d, c) {\n      if (Array.isArray(d)) {\n        for (let f = 0; f < d.length; f++) if (o(d[f], `${c}[${f}]`), e >= i) return;\n      }\n    }\n    function o(d, c) {\n      if (e >= i || !s(d)) return;\n      let f = y(d);\n      if (f !== void 0) {\n        if (e += 1, r(f, c), f.type === "tabs" && Array.isArray(f.tabs)) for (let g = 0; g < f.tabs.length; g++) a(f.tabs[g], `${c}.tabs[${g}]`);\n        else if (f.type === "accordion" && Array.isArray(f.items)) for (let g = 0; g < f.items.length; g++) a(f.items[g], `${c}.items[${g}]`);\n        else if ((f.type === "row" || f.type === "col" || f.type === "grid" || f.type === "card") && Array.isArray(f.items)) n(f.items, `${c}.items`);\n        else if (f.type === "list" && Array.isArray(f.items)) for (let g = 0; g < f.items.length; g++) o(f.items[g], `${c}.items[${g}]`);\n        else if (f.type === "table" && Array.isArray(f.details)) {\n          let g = I(f).length;\n          for (let x = 0; x < Math.min(f.details.length, g); x++) Array.isArray(f.details[x]) && C(f, x) && n(f.details[x], `${c}.details[${x}]`);\n        }\n      }\n    }\n    function a(d, c) {\n      let f = y(d);\n      if (f === void 0) return;\n      let g = f.items !== void 0 ? f.items : f.content;\n      Array.isArray(g) ? n(g, `${c}.items`) : o(g, `${c}.items`);\n    }\n    let u = y(t);\n    return u === void 0 || (N(u) && s(t) ? o(t, "spec") : n(u.items, "items")), e;\n  }\n  function Ye(t, i = Number.POSITIVE_INFINITY) {\n    return nt(t, i, () => {\n    });\n  }\n  function tt(t, i = Number.POSITIVE_INFINITY) {\n    return Ye(t, i);\n  }\n  function Qe(t) {\n    let i = [], r = y(t);\n    if (r === void 0) return { ok: false, errors: ["spec root must be an object"] };\n    if (N(t)) {\n      let a = z(t);\n      return a !== null ? Qe(a) : { ok: false, errors: ["spec.items must be an array"] };\n    }\n    if (!Array.isArray(r.items)) return { ok: false, errors: ["spec.items must be an array"] };\n    Ke(r, "spec", V, i, ["items"]);\n    let e = 0, s = false, n = (a, u, d) => {\n      if (!s) {\n        if (!Array.isArray(a)) {\n          i.push(`${d} must be an array`);\n          return;\n        }\n        for (let c = 0; c < a.length; c++) {\n          if (s || e >= m.maxNodes) {\n            s || (i.push(`spec exceeds ${m.maxNodes} nodes; tail elided`), s = true);\n            return;\n          }\n          e += 1;\n          let f = `${d}[${c}]`;\n          Xe(a[c], u, f, i, n);\n        }\n      }\n    };\n    n(r.items, 0, "items"), i.length === 0 && i.push(...Re(r).diagnostics);\n    let o = [...new Set(i)];\n    return { ok: o.length === 0, errors: o };\n  }\n  function Ze(t) {\n    let i = Ie(t), r = Be(i.value), e = Qe(i.value), s = Ye(i.value, m.maxNodes + 1), n = r === null ? 0 : tt(r), o = r === null ? 0 : Xn(r), a = e.errors.filter((u) => !u.includes(": unknown type "));\n    return r !== null && a.length === 0 && a.push(...Re(r).diagnostics), s > n && a.push(`repair dropped ${s - n} declared native node(s): declared ${s}, rendered ${n}`), { value: i.value, normalized: i.value, repaired: r, spec: r, errors: [...new Set(a)], warnings: [...i.warnings, ...Pe(i.value)], declaredCount: s, renderedCount: o, declaredNativeCount: s, renderedNativeCount: n, renderedTotalCount: o };\n  }\n  function it(t) {\n    return t.errors.length > 0 && t.errors.every((i) => i.startsWith("spec exceeds ") || i.startsWith("repair dropped ")) && t.renderedNativeCount === m.maxNodes && t.declaredNativeCount === m.maxNodes + 1;\n  }\n  function Ne(t) {\n    return t.spec !== null && (t.errors.length === 0 || it(t));\n  }\n  var rt = /^(items\\[\\d+\\](?:\\.(?:items\\[\\d+\\]|tabs\\[\\d+\\]\\.items\\[\\d+\\]|details\\[\\d+\\](?:\\[\\d+\\])?))*)/;\n  function st(t) {\n    let i = rt.exec(t);\n    return i === null ? null : i[1] ?? null;\n  }\n  function Ve(t, i) {\n    let r = [...i.matchAll(/(?:^|\\.)(items|tabs|details)\\[(\\d+)\\]|\\[(\\d+)\\]/g)];\n    if (r.length === 0 || r[r.length - 1][1] === "tabs") return;\n    let e = t;\n    for (let s = 0; s < r.length; s++) {\n      let n = r[s], o = n[1] === void 0 ? e : y(e)?.[n[1]], a = Number(n[2] ?? n[3]);\n      if (!Array.isArray(o) || a >= o.length) return;\n      if (s === r.length - 1) return { array: o, index: a, preserveIndex: n[1] === "details" };\n      if (e = o[a], e === void 0) return;\n    }\n  }\n  function ot(t) {\n    try {\n      return y(JSON.parse(JSON.stringify(t))) ?? null;\n    } catch {\n      return null;\n    }\n  }\n  function at(t) {\n    if (Ne(t)) return t.spec;\n    if (t.spec === null) return null;\n    let i = y(t.value);\n    if (i === void 0) return null;\n    let r = /* @__PURE__ */ new Set(), e = /* @__PURE__ */ new Set();\n    for (let d of t.errors) {\n      if (d.startsWith("spec exceeds ")) continue;\n      let c = st(d);\n      c !== null && (d === `${c}.details must not contain more entries than rows` ? e.add(c) : r.add(c));\n    }\n    if (r.size === 0 && e.size === 0) return null;\n    let s = ot(N(i) ? z(i) : i);\n    if (s === null) return null;\n    let n = [...r].map((d) => Ve(s, d)).filter((d) => d !== void 0), o = [...e].map((d) => Ve(s, d)).filter((d) => d !== void 0);\n    for (let { array: d, index: c } of o) {\n      let f = y(d[c]);\n      f?.type === "table" && Array.isArray(f.details) && (f.details.length = Math.min(f.details.length, I(f).length));\n    }\n    let a = /* @__PURE__ */ new Map();\n    for (let { array: d, index: c, preserveIndex: f } of n) {\n      if (f) {\n        d[c] = null;\n        continue;\n      }\n      let g = a.get(d);\n      g === void 0 ? a.set(d, [c]) : g.push(c);\n    }\n    for (let [d, c] of a) {\n      c.sort((f, g) => g - f);\n      for (let f of c) d.splice(f, 1);\n    }\n    let u = Ze(s);\n    return !Ne(u) || u.renderedNativeCount === 0 ? null : u.spec;\n  }\n  function We(t, i, r) {\n    if (Array.isArray(t)) for (let e = 0; e < t.length; e++) {\n      let s = y(t[e]), n = `${i}[${e}]`;\n      if (s === void 0) {\n        r.push(`${n} must be an object`);\n        continue;\n      }\n      typeof s.label != "string" && r.push(`${n}.label must be a string`), (typeof s.value != "number" || !Number.isFinite(s.value)) && r.push(`${n}.value must be a finite number`), s.color !== void 0 && typeof s.color != "string" && r.push(`${n}.color must be a string`);\n    }\n  }\n  function ut(t, i, r) {\n    if (Array.isArray(t)) for (let e = 0; e < t.length; e++) {\n      let s = y(t[e]), n = `${i}[${e}]`;\n      if (s === void 0) {\n        r.push(`${n} must be an object`);\n        continue;\n      }\n      typeof s.label != "string" && r.push(`${n}.label must be a string`), s.color !== void 0 && typeof s.color != "string" && r.push(`${n}.color must be a string`), Array.isArray(s.data) || r.push(`${n}.data must be an array`), We(s.data, `${n}.data`, r);\n    }\n  }\n  function lt(t, i, r) {\n    !Array.isArray(t.data) && !Array.isArray(t.series) && r.push(`${i}: type \'chart\' requires data or series (array)`), t.variant !== void 0 && r.push(`${i}.variant is unsupported; use kind`), t.data !== void 0 && !Array.isArray(t.data) && r.push(`${i}.data must be an array`), t.series !== void 0 && !Array.isArray(t.series) && r.push(`${i}.series must be an array`), t.kind !== void 0 && (typeof t.kind != "string" || !U.includes(t.kind)) && r.push(`${i}.kind must be bars, line, or donut`);\n    let e = t.kind === void 0 ? "bars" : t.kind, s = Array.isArray(t.series) ? t.series : void 0;\n    if (Array.isArray(t.data) && t.data.length === 0 && (s === void 0 || s.length === 0) && r.push(`${i}.data must not be empty`), s !== void 0) {\n      s.length === 0 && r.push(`${i}.series must not be empty`), e === "donut" && r.push(`${i}.series is only supported for bars and line`);\n      for (let n = 0; n < s.length; n++) {\n        let o = y(s[n]);\n        o !== void 0 && Array.isArray(o.data) && o.data.length === 0 && r.push(`${i}.series[${n}].data must not be empty`);\n      }\n    }\n    e === "donut" && t.data === void 0 && r.push(`${i}.data is required for donut`), e === "line" && t.data === void 0 && (s === void 0 || s.length === 0) && r.push(`${i}.data is required for line (or provide series)`), We(t.data, `${i}.data`, r), ut(t.series, `${i}.series`, r);\n  }\n  function dt(t, i, r) {\n    if (Array.isArray(t)) for (let e = 0; e < t.length; e++) {\n      let s = t[e];\n      if (y(s) === void 0) {\n        if (!Array.isArray(s)) {\n          r.push(`${i}[${e}] must be an array or object`);\n          continue;\n        }\n        for (let n = 0; n < s.length; n++) {\n          let o = s[n];\n          typeof o != "string" && (typeof o != "number" || !Number.isFinite(o)) && r.push(`${i}[${e}][${n}] must be a string or finite number`);\n        }\n      }\n    }\n  }\n  function Xe(t, i, r, e, s) {\n    if (i > m.maxDepth) {\n      e.push(`${r}: exceeds max depth ${m.maxDepth}`);\n      return;\n    }\n    let n = y(t);\n    if (n === void 0) {\n      e.push(`${r}: must be an object`);\n      return;\n    }\n    let o = n.type;\n    if (typeof o != "string") {\n      e.push(`${r}: missing string \'type\'`);\n      return;\n    }\n    let a = (c) => {\n      n[c] !== void 0 && typeof n[c] != "string" && e.push(`${r}: \'${c}\' must be a string`);\n    }, u = (c) => {\n      n[c] !== void 0 && (typeof n[c] != "number" || !Number.isFinite(n[c])) && e.push(`${r}: \'${c}\' must be a finite number`);\n    };\n    switch (o) {\n      case "text":\n        typeof n.content != "string" && typeof n.text != "string" && e.push(`${r}: type \'text\' requires content or text (string)`), a("content"), a("text");\n        break;\n      case "row":\n      case "col":\n      case "card":\n      case "grid":\n        Array.isArray(n.items) || e.push(`${r}: type \'${o}\' requires items (array)`), s(n.items, i + 1, `${r}.items`), o === "grid" && u("cols");\n        break;\n      case "button":\n      case "checkbox":\n      case "link":\n      case "switch":\n        typeof n.label != "string" && e.push(`${r}: type \'${o}\' requires label (string)`), a("label");\n        break;\n      case "image":\n      case "audio":\n      case "video":\n        typeof n.src != "string" && e.push(`${r}: type \'${o}\' requires src (string)`), a("src"), a("alt"), o === "video" && a("poster");\n        break;\n      case "slider":\n        a("label"), u("min"), u("max"), u("step"), u("value");\n        break;\n      case "input":\n      case "textarea":\n        a("label"), a("placeholder"), a("value");\n        break;\n      case "select":\n      case "radio":\n        Array.isArray(n.options) || e.push(`${r}: type \'${o}\' requires options (array)`);\n        break;\n      case "submit":\n        typeof n.label != "string" && e.push(`${r}: type \'submit\' requires label (string)`);\n        break;\n      case "badge":\n        typeof n.label != "string" && typeof n.text != "string" && typeof n.value != "string" && e.push(`${r}: type \'badge\' requires label, text, or value (string)`), a("label"), a("text"), a("value");\n        break;\n      case "hero":\n        typeof n.title != "string" && e.push(`${r}: type \'hero\' requires title (string)`), a("subtitle");\n        break;\n      case "stat":\n        typeof n.label != "string" && e.push(`${r}: type \'stat\' requires label (string)`), typeof n.value != "string" && e.push(`${r}: type \'stat\' requires value (string)`), a("delta");\n        break;\n      case "progress":\n        (typeof n.value != "number" || !Number.isFinite(n.value) || n.value < 0 || n.value > 100) && e.push(`${r}: type \'progress\' requires value (number 0..100)`), u("value");\n        break;\n      case "avatar":\n        typeof n.name != "string" && e.push(`${r}: type \'avatar\' requires name (string)`);\n        break;\n      case "list":\n        if (Array.isArray(n.items) || e.push(`${r}: type \'list\' requires items (array)`), Array.isArray(n.items)) for (let c = 0; c < n.items.length; c++) {\n          let f = y(n.items[c]);\n          f !== void 0 && typeof f.type == "string" && Xe(f, i + 1, `${r}.items[${c}]`, e, s);\n        }\n        break;\n      case "table":\n        if (!Array.isArray(n.columns) && !He(n) && e.push(`${r}: type \'table\' requires columns (array)`), Array.isArray(n.rows) || e.push(`${r}: type \'table\' requires rows (array)`), n.types !== void 0 && !Array.isArray(n.types) && e.push(`${r}.types must be an array of column cell types`), n.details !== void 0 && !Array.isArray(n.details) && e.push(`${r}.details must be an array aligned with rows`), Array.isArray(n.details)) {\n          let c = { columns: n.columns, rows: n.rows, types: n.types }, f = I(c).length;\n          n.details.length > f && e.push(`${r}.details must not contain more entries than rows`);\n          for (let g = 0; g < Math.min(n.details.length, f); g++) {\n            let x = n.details[g];\n            if (!(x === null || !C(c, g))) {\n              if (!Array.isArray(x)) {\n                e.push(`${r}.details[${g}] must be an array or null`);\n                continue;\n              }\n              s(x, i + 1, `${r}.details[${g}]`);\n            }\n          }\n        }\n        dt(n.rows, `${r}.rows`, e);\n        break;\n      case "chart":\n        lt(n, r, e);\n        break;\n      case "tabs": {\n        if (Array.isArray(n.tabs) || e.push(`${r}: type \'tabs\' requires tabs (array)`), Array.isArray(n.tabs)) for (let c = 0; c < n.tabs.length; c++) {\n          let f = y(n.tabs[c]);\n          if (f === void 0) {\n            e.push(`${r}.tabs[${c}] must be an object`);\n            continue;\n          }\n          typeof f.label != "string" && e.push(`${r}.tabs[${c}].label must be a string`), s(f.items, i + 1, `${r}.tabs[${c}].items`);\n        }\n        break;\n      }\n      case "plot":\n        Array.isArray(n.series) || e.push(`${r}: type \'plot\' requires series (array)`);\n        break;\n      case "callout":\n        typeof n.content != "string" && e.push(`${r}: type \'callout\' requires content (string)`);\n        break;\n      case "steps":\n        Array.isArray(n.steps) || e.push(`${r}: type \'steps\' requires steps (array)`);\n        break;\n      case "keyvalue":\n        Array.isArray(n.pairs) || e.push(`${r}: type \'keyvalue\' requires pairs (array)`);\n        break;\n      case "diff":\n        Array.isArray(n.diffs) || e.push(`${r}: type \'diff\' requires diffs (array)`);\n        break;\n      case "json":\n        "value" in n || e.push(`${r}: type \'json\' requires value`);\n        break;\n      case "code":\n        typeof n.code != "string" && e.push(`${r}: type \'code\' requires code (string)`);\n        break;\n      case "accordion":\n        if (Array.isArray(n.items) || e.push(`${r}: type \'accordion\' requires items (array)`), Array.isArray(n.items)) for (let c = 0; c < n.items.length; c++) {\n          let f = y(n.items[c]);\n          if (f === void 0) {\n            e.push(`${r}.items[${c}] must be an object`);\n            continue;\n          }\n          typeof f.title != "string" && e.push(`${r}.items[${c}].title must be a string`), s(f.items, i + 1, `${r}.items[${c}].items`);\n        }\n        break;\n      case "copy":\n        typeof n.text != "string" && e.push(`${r}: type \'copy\' requires text (string)`);\n        break;\n      case "svg":\n        typeof n.code != "string" && e.push(`${r}: type \'svg\' requires code (string)`), u("height");\n        break;\n      case "mermaid":\n        typeof n.code != "string" && e.push(`${r}: type \'mermaid\' requires code (string)`);\n        break;\n      case "scene3d":\n        Array.isArray(n.meshes) || e.push(`${r}: type \'scene3d\' requires meshes (array)`);\n        break;\n      case "timeline":\n        Array.isArray(n.items) || e.push(`${r}: type \'timeline\' requires items (array)`);\n        break;\n      case "file-tree":\n        Array.isArray(n.items) || e.push(`${r}: type \'file-tree\' requires items (array)`);\n        break;\n      case "breadcrumb":\n        Array.isArray(n.items) || e.push(`${r}: type \'breadcrumb\' requires items (array)`);\n        break;\n      case "quiz":\n        typeof n.question != "string" && e.push(`${r}: type \'quiz\' requires question (string)`), Array.isArray(n.options) || e.push(`${r}: type \'quiz\' requires options (array)`);\n        break;\n      case "diagram":\n        typeof n.kind != "string" && e.push(`${r}: type \'diagram\' requires kind (string)`), Array.isArray(n.nodes) || e.push(`${r}: type \'diagram\' requires nodes (array)`), n.edges !== void 0 && !Array.isArray(n.edges) && e.push(`${r}: type \'diagram\' requires edges (array) when present`);\n        break;\n      case "echart":\n        n.option === void 0 && n.data === void 0 && n.series === void 0 && (!Array.isArray(n.links) || n.links.length === 0) && e.push(`${r}: type \'echart\' requires option, data, series, or links`), u("height");\n        break;\n      default:\n        e.push(`${r}: unknown type \'${o}\' (custom renderer?)`);\n    }\n    let d = T[o];\n    d !== void 0 && In(n, r, d, e);\n  }\n\n  // lib/normalize-visual.js\n  function normalizeVisual(value, schemas) {\n    const unwrap = (v2) => v2 && typeof v2 === "object" && !Array.isArray(v2) && Object.keys(v2).length === 1 && Array.isArray(v2.item) ? v2.item : v2;\n    const scalar2 = (v2, kind) => kind === "number" && typeof v2 === "string" && v2.trim() !== "" && Number.isFinite(Number(v2)) ? Number(v2) : kind === "boolean" && (v2 === "true" || v2 === "false") ? v2 === "true" : v2;\n    function record(input, schema, depth = 0) {\n      if (!input || typeof input !== "object" || Array.isArray(input) || depth > 32) return input;\n      const out2 = { ...input };\n      for (const [key, v2] of Object.entries(input)) {\n        const target = schema.aliases?.[key] ?? key, kind = schema.fields?.[target];\n        if (kind === "array" || kind === "nodes") {\n          let array2 = unwrap(v2);\n          if (Array.isArray(array2)) array2 = array2.map((x) => kind === "nodes" ? node2(x, depth + 1) : schema.nested?.[target] ? record(x, schema.nested[target], depth + 1) : x);\n          out2[key] = array2;\n        } else out2[key] = scalar2(v2, kind);\n      }\n      return out2;\n    }\n    function node2(v2, depth) {\n      if (!v2 || typeof v2 !== "object" || Array.isArray(v2)) return v2;\n      if (v2.type === "heading") {\n        v2 = { ...v2, type: "text", content: v2.content ?? v2.text ?? v2.title, size: v2.size ?? "h3" };\n        delete v2.text;\n        delete v2.title;\n      }\n      if (["card", "row", "col", "grid"].includes(v2.type) && v2.items === void 0 && Array.isArray(unwrap(v2.children))) {\n        v2 = { ...v2, items: unwrap(v2.children) };\n        delete v2.children;\n      }\n      const out2 = record(v2, schemas[v2.type] ?? {}, depth);\n      if (v2.type === "quiz" && Array.isArray(out2.options)) out2.options = out2.options.map((x) => record(x, { fields: { correct: "boolean" } }));\n      if (v2.type === "table") {\n        for (const key of ["rows", "data", "items", "details"]) if (Array.isArray(out2[key])) out2[key] = out2[key].map((row) => {\n          row = unwrap(row);\n          return key === "details" && Array.isArray(row) ? row.map((x) => node2(x, depth + 1)) : row;\n        });\n      }\n      if (v2.type === "echart") {\n        for (const key of ["data", "series", "links"]) if (Array.isArray(out2[key])) out2[key] = out2[key].map((x) => record(x, { fields: { value: "number", data: "array" }, nested: { data: { fields: { value: "number" } } } }));\n      }\n      return out2;\n    }\n    if (Array.isArray(value)) return { items: value.map((x) => node2(x, 0)) };\n    if (!value || typeof value !== "object") return value;\n    const out = { ...value }, items = unwrap(value.items);\n    if (Array.isArray(items)) out.items = items.map((x) => node2(x, 0));\n    return out;\n  }\n\n  // lib/visual.js\n  var VISUAL_TYPES = Object.freeze([...q]);\n  function validateVisual(value) {\n    const encoded = JSON.stringify(value);\n    if (!encoded || new TextEncoder().encode(encoded).length > 131072) throw Error("DSH UI: visual spec exceeds 128 KiB");\n    const processed = Ze(normalizeVisual(value, T)), spec = Ne(processed) ? processed.spec : at(processed);\n    if (!spec || !processed.renderedNativeCount) throw Error("DSH UI: visual spec: " + (processed.errors.slice(0, 4).join("; ") || "requires registered components"));\n    const critical = /* @__PURE__ */ new Set(["quiz", "radio", "submit", "input", "textarea", "select", "slider", "checkbox", "switch"]);\n    const inventory = (items, path = "items", result = []) => {\n      for (const [n, v2] of (Array.isArray(items) ? items : []).entries()) {\n        if (!v2 || typeof v2 !== "object") continue;\n        const at2 = path + "[" + n + "]";\n        if (critical.has(v2.type)) result.push({ type: v2.type, id: v2.id ?? v2.group ?? v2.question ?? v2.label, path: at2 });\n        if (["row", "col", "grid", "card"].includes(v2.type)) inventory(v2.items, at2 + ".items", result);\n        if (v2.type === "tabs") for (const [i, t] of (v2.tabs ?? []).entries()) inventory(t.items, at2 + ".tabs[" + i + "].items", result);\n        if (v2.type === "accordion") for (const [i, t] of (v2.items ?? []).entries()) inventory(t.items, at2 + ".items[" + i + "].items", result);\n      }\n      return result;\n    };\n    const source = normalizeVisual(value, T), before = inventory(source.items), after = inventory(spec.items);\n    const available = [...after], missing = before.filter((v2) => {\n      const i = available.findIndex((n) => n.type === v2.type && n.id === v2.id);\n      if (i < 0) return true;\n      available.splice(i, 1);\n      return false;\n    });\n    if (missing.length) throw Error("DSH UI: critical component was rejected at " + missing.map((v2) => v2.path + " (" + v2.type + ")").join(", ") + ". " + processed.errors.slice(0, 4).join("; "));\n    const stableIds = /* @__PURE__ */ new Set();\n    function walk(items) {\n      for (const n of items) {\n        if (n.id !== void 0) {\n          if (stableIds.has(n.id)) throw Error("DSH UI: duplicate extended component id " + n.id);\n          stableIds.add(n.id);\n        }\n        if (!VISUAL_TYPES.includes(n.type)) throw Error("DSH UI: unsupported visual component " + n.type);\n        if (n.type === "input" && n.inputType === "password") throw Error("DSH UI: do not collect passwords or secrets in a UI");\n        if (n.type !== "file-tree" && Array.isArray(n.items)) walk(n.items.filter((x) => x && typeof x === "object" && "type" in x));\n        for (const t of n.tabs ?? []) walk(t.items ?? []);\n        if (n.type === "table") {\n          for (const d of n.details ?? []) if (d) walk(d);\n        }\n      }\n    }\n    walk(spec.items);\n    delete spec.panel;\n    delete spec.append;\n    return { spec, warnings: processed.errors.slice(0, 12), count: processed.renderedNativeCount };\n  }\n  function visualDocument(value) {\n    if (Array.isArray(value)) value = { items: value };\n    const { spec, warnings } = validateVisual(value), title = spec.title || "\\u53EF\\u89C6\\u5316";\n    const texts = [];\n    function gather(v2) {\n      if (!v2 || typeof v2 !== "object") return;\n      for (const [k2, x] of Object.entries(v2)) {\n        if (["title", "content", "label", "question", "explanation", "alt"].includes(k2) && typeof x === "string") texts.push(x);\n        else if (x && typeof x === "object") Array.isArray(x) ? x.forEach(gather) : gather(x);\n      }\n    }\n    gather(spec);\n    return { version: 1, title, fallback: texts.join("\\n").slice(0, 8192) || title, nodes: [{ id: "visual", type: "visual", spec, warnings }] };\n  }\n\n  // lib/normalize-authoring.js\n  var object = (v2) => v2 !== null && typeof v2 === "object" && !Array.isArray(v2);\n  var own = (v2, k2) => Object.hasOwn(v2, k2);\n  var singleItem = (v2) => object(v2) && Object.keys(v2).length === 1 && own(v2, "item");\n  var array = (v2) => {\n    let candidate = v2;\n    for (let i = 0; i < 8 && singleItem(candidate); i++) candidate = candidate.item;\n    return Array.isArray(candidate) ? candidate : v2;\n  };\n  var numericOps = /* @__PURE__ */ new Set(["add", "sub", "mul", "div", "min", "max", "round", "abs", "lt", "lte", "gt", "gte"]);\n  function number(v2) {\n    if (typeof v2 !== "string" || !/^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:e[+-]?\\d+)?$/i.test(v2.trim())) return v2;\n    const n = Number(v2);\n    return Number.isFinite(n) && (!Number.isInteger(n) || Number.isSafeInteger(n)) ? n : v2;\n  }\n  var boolean = (v2) => v2 === "true" ? true : v2 === "false" ? false : v2;\n  function expression(e, numeric = false, logical = false) {\n    if (!object(e)) return e;\n    if (own(e, "const")) {\n      if (numeric) e.const = number(e.const);\n      if (logical) e.const = boolean(e.const);\n    }\n    if (own(e, "args")) e.args = array(e.args);\n    if (Array.isArray(e.args)) e.args.forEach((arg, i) => expression(arg, numericOps.has(e.op) || e.op === "if" && i > 0 && numeric, e.op === "if" && i === 0));\n    if (object(e.map?.fields)) Object.values(e.map.fields).forEach((e2) => expression(e2));\n    return e;\n  }\n  function normalizeAuthoring(doc2) {\n    if (Array.isArray(doc2)) doc2 = visualDocument(doc2);\n    if (object(doc2) && !own(doc2, "nodes") && (own(doc2, "items") || typeof doc2.type === "string")) doc2 = visualDocument(doc2);\n    if (!object(doc2)) return doc2;\n    if (own(doc2, "version")) doc2.version = number(doc2.version);\n    if (object(doc2.state)) for (const k2 of Object.keys(doc2.state)) {\n      let s = doc2.state[k2];\n      if (typeof s === "string" && s.trim().startsWith("{")) {\n        try {\n          const parsed = JSON.parse(s);\n          if (object(parsed)) s = parsed;\n        } catch {\n        }\n      }\n      if (singleItem(s) && object(s.item)) s = s.item;\n      doc2.state[k2] = s;\n      if (!object(s)) continue;\n      if (own(s, "options")) s.options = array(s.options);\n      if (s.type === "number") {\n        for (const field of ["default", "min", "max", "step"]) if (own(s, field)) s[field] = number(s[field]);\n        if (Array.isArray(s.options)) s.options = s.options.map(number);\n      } else if (s.type === "boolean") {\n        if (own(s, "default")) s.default = boolean(s.default);\n        if (Array.isArray(s.options)) s.options = s.options.map(boolean);\n      }\n    }\n    if (object(doc2.derived)) Object.values(doc2.derived).forEach((e) => expression(e));\n    if (object(doc2.actions)) {\n      for (const action of Object.values(doc2.actions)) if (object(action) && own(action, "stateKeys")) action.stateKeys = array(action.stateKeys);\n    }\n    function nodes(list) {\n      list = array(list);\n      if (!Array.isArray(list)) return list;\n      for (const node2 of list) {\n        if (!object(node2)) continue;\n        if (["text", "heading", "callout"].includes(node2.type) && own(node2, "content")) {\n          if (!own(node2, "text")) {\n            node2.text = node2.content;\n            delete node2.content;\n          } else if (node2.text === node2.content) delete node2.content;\n        }\n        if (["text", "heading", "callout"].includes(node2.type) && typeof node2.text === "string") {\n          const spans = array(node2.spans);\n          if (Array.isArray(spans) && spans.every((s) => object(s) && typeof s.text === "string") && spans.map((s) => s.text).join("") === node2.text) delete node2.text;\n        }\n        if (node2.type === "table" && own(node2, "types")) {\n          const columns = array(node2.columns), rows = array(node2.rows), types = array(node2.types);\n          const allowed = ["id", "type", "label", "columns", "rows", "types"];\n          if (Object.keys(node2).every((k2) => allowed.includes(k2)) && Array.isArray(columns) && columns.length && columns.every((c) => object(c) && typeof c.key === "string" && typeof c.label === "string" && Object.keys(c).every((k2) => ["key", "label", "unit"].includes(k2))) && new Set(columns.map((c) => c.key)).size === columns.length && Array.isArray(rows) && rows.every(object) && Array.isArray(types) && types.length === columns.length && types.every((t) => ["text", "num", "delta", "bar", "badge"].includes(t))) {\n            const spec = { ...node2.label ? { title: node2.label } : {}, items: [{ type: "table", columns: columns.map((c) => c.label + (c.unit ? ` (${c.unit})` : "")), rows: rows.map((row) => columns.map((c) => row[c.key] ?? null)), types }] }, id = node2.id;\n            for (const k2 of Object.keys(node2)) delete node2[k2];\n            Object.assign(node2, { ...id !== void 0 ? { id } : {}, type: "visual", spec });\n          }\n        }\n        if (typeof node2.id === "string" && VISUAL_TYPES.includes(node2.type) && !own(COMPONENTS, node2.type)) {\n          const spec = { items: [{ ...node2 }] }, id = node2.id;\n          for (const k2 of Object.keys(node2)) delete node2[k2];\n          Object.assign(node2, { id, type: "visual", spec });\n        }\n        if (node2.type === "table" && Array.isArray(node2.columns) && node2.columns.length && Array.isArray(node2.rows) && node2.rows.every(Array.isArray) && node2.columns.every((c) => object(c) && Number.isInteger(c.key) && c.key >= 0) && new Set(node2.columns.map((c) => c.key)).size === node2.columns.length) {\n          const columns = node2.columns.map((c) => ({ ...c, key: "col_" + c.key }));\n          node2.rows = node2.rows.map((row) => Object.fromEntries(node2.columns.map((c) => ["col_" + c.key, row[c.key] ?? null])));\n          node2.columns = columns;\n        }\n        if (node2.type === "visual" && typeof node2.id === "string") {\n          node2.stateKey ??= "visual_" + node2.id;\n          doc2.state ??= {};\n          if (!own(doc2.state, node2.stateKey)) doc2.state[node2.stateKey] = { type: "json", default: {} };\n        }\n        if (node2.type === "sandbox") {\n          if (!own(node2, "title")) node2.title = doc2.title;\n          if (!own(node2, "fallback")) node2.fallback = doc2.fallback;\n        }\n        for (const field of ["children", "items", "columns", "stateKeys", "dataKeys", "derivedKeys"]) if (own(node2, field)) node2[field] = array(node2[field]);\n        if (["table", "chart"].includes(node2.type) && own(node2, "rows")) node2.rows = array(node2.rows);\n        for (const field of ["decimals", "height"]) if (own(node2, field)) node2[field] = number(node2[field]);\n        if (["row", "column"].includes(node2.type)) {\n          if (own(node2, "gap")) node2.gap = number(node2.gap);\n          if (node2.type === "row" && own(node2, "columns")) node2.columns = number(node2.columns);\n        }\n        if (["text", "heading", "callout"].includes(node2.type)) {\n          for (const field of ["size", "weight", "lineHeight"]) if (own(node2, field)) node2[field] = number(node2[field]);\n          if (own(node2, "spans")) node2.spans = array(node2.spans);\n          if (Array.isArray(node2.spans)) {\n            for (const span of node2.spans) if (object(span)) {\n              for (const field of ["size", "weight", "lineHeight"]) if (own(span, field)) span[field] = number(span[field]);\n            }\n          }\n        }\n        if (node2.type === "details" && own(node2, "open")) node2.open = boolean(node2.open);\n        if (node2.type === "text" && own(node2, "copyable")) node2.copyable = boolean(node2.copyable);\n        if (node2.type === "code" && own(node2, "wrap")) node2.wrap = boolean(node2.wrap);\n        for (const field of ["text", "value", "max", "rows"]) if (own(node2, field)) expression(node2[field], node2.type === "progress");\n        if (["row", "column", "card", "details"].includes(node2.type) && own(node2, "children")) node2.children = nodes(node2.children);\n      }\n      return list;\n    }\n    if (own(doc2, "nodes")) doc2.nodes = nodes(doc2.nodes);\n    return doc2;\n  }\n\n  // lib/typography.js\n  var TEXT_PRESETS = Object.freeze(["reading", "brief", "comparison", "list", "callout", "scorecard", "flow", "minimal"]);\n  var TYPE_FIELDS = Object.freeze(["size", "weight", "color", "align", "lineHeight"]);\n  var TEXT_SIZES = Object.freeze({ sm: 14, md: 16, lg: 20, xl: 26, hero: 36 });\n  var TEXT_COLORS = Object.freeze({ default: "var(--du-ink)", muted: "var(--du-muted)", accent: "var(--du-accent)", success: "var(--du-green)", warning: "var(--du-amber)", danger: "var(--du-red)", violet: "var(--du-violet)" });\n  function validateTypography(value, at2 = "text") {\n    const fail2 = (message) => {\n      throw Error(`DSH UI: ${at2}.${message}`);\n    };\n    if (value.size !== void 0 && !(typeof value.size === "number" && Number.isFinite(value.size) && value.size >= 12 && value.size <= 48) && !Object.hasOwn(TEXT_SIZES, value.size)) fail2("size must be 12..48 px or sm/md/lg/xl/hero");\n    if (value.weight !== void 0 && ![400, 500, 600, 700, 800].includes(value.weight)) fail2("weight must be 400/500/600/700/800");\n    if (value.color !== void 0 && (typeof value.color !== "string" || !Object.hasOwn(TEXT_COLORS, value.color) && !/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.color))) fail2("color must be default/muted/accent/success/warning/danger/violet or #RGB/#RRGGBB");\n    if (value.align !== void 0 && !["left", "center", "right"].includes(value.align)) fail2("align must be left/center/right");\n    if (value.lineHeight !== void 0 && !(typeof value.lineHeight === "number" && value.lineHeight >= 1.2 && value.lineHeight <= 2.4)) fail2("lineHeight must be 1.2..2.4");\n  }\n\n  // lib/links.js\n  function validateLink(node2) {\n    const fail2 = (message) => {\n      throw Error("DSH UI: " + message);\n    };\n    if ([node2.href, node2.path, node2.action].filter((v2) => v2 !== void 0).length !== 1) fail2(`node.${node2.id}: choose exactly one href (http/https), path (file), or action (Agent follow-up)`);\n    if (node2.variant !== void 0 && !["primary", "secondary", "text"].includes(node2.variant)) fail2("link/button variant must be primary/secondary/text");\n    if (node2.href !== void 0) {\n      if (typeof node2.href !== "string" || node2.href.length > 8192 || /[\\u0000-\\u0020\\u007f]/.test(node2.href) || !/^https?:\\/\\//i.test(node2.href)) fail2("href must be an absolute http/https URL; encode spaces");\n      let url;\n      try {\n        url = new URL(node2.href);\n      } catch {\n        fail2("invalid href URL");\n      }\n      if (!url.hostname || url.username || url.password) fail2("href must have a host and must not contain credentials");\n    }\n    if (node2.path !== void 0) {\n      if (typeof node2.path !== "string" || !node2.path.trim() || node2.path.length > 8192 || /[\\u0000-\\u001f\\u007f]/.test(node2.path) || /^\\s*(?:[a-z][a-z\\d+.-]*:|[\\\\/]{2})/i.test(node2.path) && !/^\\s*[a-z]:[\\\\/]/i.test(node2.path)) fail2("path must be a local file path, not a URL, network path or command");\n    }\n  }\n\n  // lib/protocol.js\n  var LIMITS = Object.freeze({ bytes: 131072, nodes: 160, depth: 12, rows: 500, expressions: 128, steps: 4096 });\n  var own2 = (o, k2) => Object.hasOwn(o, k2);\n  var fail = (message) => {\n    throw new Error(`DSH UI: ${message}`);\n  };\n  var object2 = (x) => x !== null && typeof x === "object" && !Array.isArray(x);\n  var finite = (x) => typeof x === "number" && Number.isFinite(x);\n  var scalar = (x) => typeof x === "string" || typeof x === "boolean" || finite(x);\n  var text = (x, at2) => {\n    if (typeof x !== "string" || x.length > 8192) fail(`${at2} must be a string of at most 8192 characters`);\n  };\n  function fields(value, allowed, at2) {\n    if (!object2(value)) fail(`${at2} must be an object`);\n    for (const k2 of Object.keys(value)) if (!allowed.includes(k2)) {\n      const hint = at2 === "document" ? " Controls and visual components belong in nodes as registered typed nodes, not extra document fields." : "";\n      fail(`unknown field ${at2}.${k2}; allowed fields at ${at2}: ${allowed.join(", ")}.${hint}`);\n    }\n  }\n  function safeJson(value, depth = 0, source = false) {\n    if (depth > 48) fail("JSON nesting is too deep");\n    if (value === null || typeof value === "boolean") return;\n    if (typeof value === "string") {\n      if (source) {\n        if (value.length > SANDBOX_LIMITS.source) fail("canvas source exceeds 48 Ki characters");\n        return;\n      }\n      return text(value, "value");\n    }\n    if (typeof value === "number") {\n      if (!finite(value)) fail("numbers must be finite");\n      return;\n    }\n    if (typeof value !== "object") fail("only JSON values are accepted");\n    if (Array.isArray(value) && value.length > LIMITS.rows) fail("too many array items");\n    for (const k2 of Object.keys(value)) {\n      if (["__proto__", "prototype", "constructor"].includes(k2)) fail("unsafe property name");\n      safeJson(value[k2], depth + 1, value.type === "sandbox" && ["html", "css", "script"].includes(k2));\n    }\n  }\n  function initialState(doc2) {\n    return Object.fromEntries(Object.entries(doc2.state).map(([k2, spec]) => [k2, spec.default]));\n  }\n  function validateState(doc2, state2) {\n    if (!object2(state2) || Object.keys(state2).length !== Object.keys(doc2.state).length) fail("state keys do not match the document");\n    const result = {};\n    for (const [k2, s] of Object.entries(doc2.state)) {\n      if (!own2(state2, k2)) fail(`missing state.${k2}`);\n      const v2 = state2[k2];\n      if (s.type === "number") {\n        if (!finite(v2) || v2 < s.min || v2 > s.max) fail(`state.${k2} is outside its numeric range`);\n        const offset = (v2 - s.min) / s.step;\n        if (Math.abs(offset - Math.round(offset)) > 1e-6) fail(`state.${k2} does not match its step`);\n      } else if (s.type === "json") {\n        if (!object2(v2) && !Array.isArray(v2)) fail(`state.${k2} must be an array or object for type json`);\n        safeJson(v2);\n        if (new TextEncoder().encode(JSON.stringify(v2)).length > 16384) fail(`state.${k2} JSON exceeds 16 KiB`);\n      } else if (s.type === "string") text(v2, `state.${k2}`);\n      else if (typeof v2 !== "boolean") fail(`state.${k2} must be boolean`);\n      if (s.options && !s.options.includes(v2)) fail(`invalid option for state.${k2}`);\n      result[k2] = v2;\n    }\n    return result;\n  }\n  var ARITY = { add: [1, 8], sub: [2, 2], mul: [1, 8], div: [2, 2], min: [1, 8], max: [1, 8], round: [1, 1], abs: [1, 1], eq: [2, 2], neq: [2, 2], lt: [2, 2], lte: [2, 2], gt: [2, 2], gte: [2, 2], if: [3, 3] };\n  function reference(doc2, ref) {\n    if (typeof ref !== "string" || !["state", "data", "derived"].includes(ref.split(".")[0]) || ref.split(".").length !== 2 || !validIdentifier(ref.split(".")[1])) fail(`invalid reference ${JSON.stringify(ref)}; use state.key, data.key or derived.key with a letter/underscore identifier`);\n    const [group, k2] = ref.split(".");\n    if (!own2(doc2[group], k2)) fail(`unknown reference ${ref}`);\n    return [group, k2];\n  }\n  function evaluate(doc2, state2) {\n    const derived = {}, active = /* @__PURE__ */ new Set();\n    let steps = 0, generatedRows = 0;\n    const budget = () => {\n      if (++steps > LIMITS.steps) fail("calculation budget exceeded");\n    };\n    const resolve = (ref) => {\n      budget();\n      const [group, k2] = reference(doc2, ref);\n      if (group !== "derived") return (group === "state" ? state2 : doc2.data)[k2];\n      if (own2(derived, k2)) return derived[k2];\n      if (active.has(k2)) fail(`cyclic calculation ${k2}`);\n      active.add(k2);\n      const result2 = expression2(doc2.derived[k2]);\n      active.delete(k2);\n      derived[k2] = result2;\n      return result2;\n    };\n    const expression2 = (e, item) => {\n      budget();\n      if (own2(e, "map")) {\n        const rows = resolve(e.map.source);\n        if ((generatedRows += rows.length) > LIMITS.rows) fail("generated row limit exceeded");\n        return rows.map((row) => Object.fromEntries(Object.entries(e.map.fields).map(([k2, value]) => {\n          const out2 = expression2(value, row);\n          if (!scalar(out2)) fail("generated cells must be scalar");\n          return [k2, out2];\n        })));\n      }\n      if (own2(e, "const")) return e.const;\n      if (own2(e, "ref")) {\n        if (e.ref.startsWith("item.")) {\n          const k2 = e.ref.slice(5);\n          if (!item || !own2(item, k2) || !scalar(item[k2])) fail("invalid item reference");\n          return item[k2];\n        }\n        return resolve(e.ref);\n      }\n      if (e.op === "if") {\n        const condition = expression2(e.args[0], item);\n        if (typeof condition !== "boolean") fail("if condition must be boolean");\n        return expression2(e.args[condition ? 1 : 2], item);\n      }\n      const a = e.args.map((arg) => expression2(arg, item));\n      if (e.op === "eq") return a[0] === a[1];\n      if (e.op === "neq") return a[0] !== a[1];\n      if (!a.every(finite)) fail(`operator ${e.op} requires finite numbers`);\n      let out;\n      switch (e.op) {\n        case "add":\n          out = a.reduce((x, y2) => x + y2, 0);\n          break;\n        case "sub":\n          out = a[0] - a[1];\n          break;\n        case "mul":\n          out = a.reduce((x, y2) => x * y2, 1);\n          break;\n        case "div":\n          if (a[1] === 0) fail("division by zero");\n          out = a[0] / a[1];\n          break;\n        case "min":\n          out = Math.min(...a);\n          break;\n        case "max":\n          out = Math.max(...a);\n          break;\n        case "round":\n          out = Math.round(a[0]);\n          break;\n        case "abs":\n          out = Math.abs(a[0]);\n          break;\n        case "lt":\n          return a[0] < a[1];\n        case "lte":\n          return a[0] <= a[1];\n        case "gt":\n          return a[0] > a[1];\n        case "gte":\n          return a[0] >= a[1];\n        default:\n          fail(`unsupported operator ${e.op}`);\n      }\n      if (!finite(out)) fail("non-finite calculation result");\n      return out;\n    };\n    for (const k2 of Object.keys(doc2.derived)) resolve(`derived.${k2}`);\n    if (new TextEncoder().encode(JSON.stringify(derived)).length > LIMITS.bytes) fail("derived output exceeds 128 KiB");\n    const result = { derived, resolveValue: (value) => {\n      if (!object2(value)) return value;\n      return expression2(value);\n    } };\n    checkViewValues(doc2, result);\n    return result;\n  }\n  function checkViewValues(doc2, evaluated) {\n    function walk(list) {\n      for (const n of list) {\n        if (n.type === "table" || n.type === "chart") {\n          const rows = evaluated.resolveValue(n.rows);\n          if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object2)) fail("table/chart rows must reference an array of objects");\n          if (n.type === "chart" && rows.some((r) => !own2(r, n.labelKey) || !scalar(r[n.labelKey]) || !own2(r, n.valueKey) || !finite(r[n.valueKey]))) fail("chart requires labels and finite numeric values");\n          if (n.type === "chart" && n.xScale === "linear" && rows.some((r) => !finite(r[n.labelKey]))) fail("linear chart requires numeric x values");\n        }\n        if (n.type === "metric" && !scalar(evaluated.resolveValue(n.value))) fail(`node.${n.id}.value must resolve to a number, string or boolean; use table for rows or a canvas for structured data`);\n        if (n.type === "progress") {\n          const v2 = evaluated.resolveValue(n.value), max = evaluated.resolveValue(n.max);\n          if (!finite(v2) || !finite(max) || max <= 0 || v2 < 0 || v2 > max) fail("progress requires 0 <= value <= positive max");\n        }\n        if (n.children) walk(n.children);\n      }\n    }\n    walk(doc2.nodes);\n  }\n  function validateDocument(input) {\n    safeJson(input);\n    const json = JSON.stringify(input);\n    if (new TextEncoder().encode(json).length > LIMITS.bytes) fail("document exceeds 128 KiB");\n    const normalized = normalizeAuthoring(JSON.parse(json));\n    safeJson(normalized);\n    const doc2 = expandExpressions(normalized);\n    fields(doc2, ["version", "title", "fallback", "state", "data", "derived", "nodes", "actions", "presentation"], "document");\n    if (doc2.presentation !== void 0) {\n      fields(doc2.presentation, ["layout", "accent", "density", "preset"], "presentation");\n      if (doc2.presentation.preset !== void 0 && !TEXT_PRESETS.includes(doc2.presentation.preset)) fail("unknown presentation preset; use " + TEXT_PRESETS.join("/"));\n      for (const [k2, allowed] of Object.entries({ layout: UI_LAYOUTS, accent: UI_ACCENTS, density: ["comfortable", "compact"] }))\n        if (doc2.presentation[k2] !== void 0 && !allowed.includes(doc2.presentation[k2])) fail(`unknown presentation ${k2}`);\n    }\n    if (doc2.version !== 1) fail("unsupported protocol version");\n    text(doc2.title, "title");\n    text(doc2.fallback, "fallback");\n    if (!doc2.title.trim() || !doc2.fallback.trim()) fail("title and fallback cannot be empty");\n    for (const group of ["state", "data", "derived", "actions"]) {\n      doc2[group] ??= {};\n      if (!object2(doc2[group]) || Object.keys(doc2[group]).length > 64) fail(`invalid ${group}`);\n      for (const k2 of Object.keys(doc2[group])) if (!validIdentifier(k2)) fail(`invalid key in ${group}: ${JSON.stringify(k2)}; use 1..64 letters, numbers or underscores, starting with a letter/underscore (Chinese letters supported); no spaces, dots or hyphens. Put display labels in label/text`);\n    }\n    for (const [k2, s] of Object.entries(doc2.state)) {\n      fields(s, ["type", "default", "min", "max", "step", "options"], `state.${k2}`);\n      if (s.type === "string" && (Array.isArray(s.default) || object2(s.default)) && !own2(s, "options")) s.type = "json";\n      if (!["number", "string", "boolean", "json"].includes(s.type)) fail(`unsupported state type ${k2}; use number, string, boolean or json (arrays/objects)`);\n      if (s.type === "json" && own2(s, "options")) fail(`state.${k2}: json state does not support select options; use scalar options or a canvas`);\n      if (s.type === "number") {\n        for (const field of ["default", "min", "max", "step"]) if (!finite(s[field])) fail(`state.${k2}.${field} must be a finite JSON number; received ${s[field] === null ? "null" : typeof s[field]}. Supply {type:"number",default:2,min:1,max:12,step:1}; do not omit limits or include units in numeric fields`);\n        if (s.min >= s.max || s.step <= 0) fail(`invalid numeric limits for state.${k2}: require min < max and step > 0; received min=${s.min}, max=${s.max}, step=${s.step}`);\n        if ((s.max - s.min) / s.step > 1e9) fail(`numeric step too small for ${k2}`);\n      } else if (["min", "max", "step"].some((p2) => own2(s, p2))) fail(`numeric limits on non-number ${k2}`);\n      if (s.options !== void 0 && (!Array.isArray(s.options) || !s.options.length || s.options.length > 64 || !s.options.every(scalar))) fail(`state.${k2}.options must be a direct array of 1..64 scalar values, e.g. options:["3","5","7"], not {item:[...]}`);\n    }\n    const defaults = validateState(doc2, initialState(doc2));\n    let expressions = 0;\n    for (const [k2, spec] of Object.entries(doc2.state))\n      for (const option of spec.options ?? []) validateState(doc2, { ...defaults, [k2]: option });\n    function validateExpression(e, depth = 0, itemRows, at2 = "expression") {\n      if (++expressions > LIMITS.expressions || depth > LIMITS.depth) fail("expression limit exceeded");\n      if (!object2(e)) fail(`${at2}: expression must be an object`);\n      if (own2(e, "map")) {\n        if (depth !== 0) fail("map is only allowed at the root of a derived value");\n        fields(e, ["map"], "expression");\n        fields(e.map, ["source", "fields"], "map");\n        if (typeof e.map.source !== "string" || !e.map.source.startsWith("data.")) fail(\'map source must reference static data using a string such as "data.samples"; put object rows in document.data.samples, not inline in map.source\');\n        const [, k2] = reference(doc2, e.map.source), rows = doc2.data[k2];\n        if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object2)) fail("map source must be object rows");\n        if (!object2(e.map.fields) || !Object.keys(e.map.fields).length || Object.keys(e.map.fields).length > 16) fail("map requires 1..16 fields");\n        for (const [k3, value2] of Object.entries(e.map.fields)) {\n          if (!validIdentifier(k3)) fail(`invalid map field ${JSON.stringify(k3).slice(0, 100)}; use a letter/underscore identifier such as powerW or \\u529F\\u7387, without spaces, dots or hyphens`);\n          validateExpression(value2, depth + 1, rows, `${at2}.map.fields.${k3}`);\n        }\n        return;\n      }\n      if (own2(e, "const")) {\n        fields(e, ["const"], "expression");\n        if (!scalar(e.const)) fail("constant must be scalar");\n        return;\n      }\n      if (own2(e, "ref")) {\n        fields(e, ["ref"], "expression");\n        if (typeof e.ref === "string" && e.ref.startsWith("item.")) {\n          const k2 = e.ref.slice(5);\n          if (!itemRows || !validIdentifier(k2) || itemRows.some((row) => !own2(row, k2) || !scalar(row[k2]))) fail("invalid or unscoped item reference");\n        } else reference(doc2, e.ref);\n        return;\n      }\n      fields(e, ["op", "args"], "expression");\n      const arity = ARITY[e.op];\n      if (!arity || !Array.isArray(e.args) || e.args.length < arity[0] || e.args.length > arity[1]) fail(`${at2}: invalid operator or argument count for ${JSON.stringify(e.op)}; args must be a direct array${arity ? ` with ${arity[0]}..${arity[1]} expressions` : " and op must be registered"}. Received ${Array.isArray(e.args) ? e.args.length + " arguments" : typeof e.args}. Prefer {expr:"state.people * state.days"} for arithmetic; missing operands cannot be inferred`);\n      e.args.forEach((a, i) => validateExpression(a, depth + 1, itemRows, `${at2}.args[${i}]`));\n    }\n    Object.entries(doc2.derived).forEach(([k2, e]) => validateExpression(e, 0, void 0, `derived.${k2}`));\n    const visited = /* @__PURE__ */ new Set(), active = /* @__PURE__ */ new Set();\n    function visit(k2) {\n      if (active.has(k2)) fail(`cyclic calculation ${k2}`);\n      if (visited.has(k2)) return;\n      active.add(k2);\n      function walk(e) {\n        if (e.ref?.startsWith("derived.")) visit(e.ref.split(".")[1]);\n        for (const a of e.args ?? []) walk(a);\n        for (const value2 of Object.values(e.map?.fields ?? {})) walk(value2);\n      }\n      walk(doc2.derived[k2]);\n      active.delete(k2);\n      visited.add(k2);\n    }\n    Object.keys(doc2.derived).forEach(visit);\n    for (const [k2, a] of Object.entries(doc2.actions)) {\n      fields(a, ["type", "intent", "stateKeys"], `actions.${k2}`);\n      if (a.type !== "agent.followup") fail("only agent.followup actions are supported");\n      text(a.intent, "action intent");\n      if (!a.intent.trim() || !Array.isArray(a.stateKeys) || a.stateKeys.length > 64 || new Set(a.stateKeys).size !== a.stateKeys.length || a.stateKeys.some((s) => !own2(doc2.state, s))) fail("invalid action stateKeys");\n    }\n    const ids = /* @__PURE__ */ new Map();\n    let count2 = 0;\n    const value = (v2, at2) => {\n      if (object2(v2)) {\n        if (own2(v2, "map")) fail("map belongs in derived");\n        validateExpression(v2);\n      } else if (!scalar(v2)) fail(`invalid value at ${at2}`);\n    };\n    function nodes(list, depth = 0, path = "nodes") {\n      if (!Array.isArray(list) || depth > LIMITS.depth) fail("invalid node children or depth");\n      for (const [index, n] of list.entries()) {\n        const at2 = `${path}[${index}]`;\n        if (++count2 > LIMITS.nodes) fail("too many nodes");\n        if (!object2(n)) fail(`${at2} must be a node object`);\n        if (!own2(n, "id")) fail(`${at2}.id is missing (type=${JSON.stringify(n.type)}). Every node, including sandbox, needs its own id; add e.g. id:"canvas". JSON field order does not matter`);\n        if (!validIdentifier(n.id)) fail(`${at2}.id is invalid: ${JSON.stringify(n.id)}. Use 1..64 letters/numbers/underscores starting with a letter/underscore`);\n        if (ids.has(n.id)) fail(`${at2}.id duplicates ${JSON.stringify(n.id)} first declared at ${ids.get(n.id)}. Give each node a unique id; state keys and node ids are separate namespaces`);\n        ids.set(n.id, `${at2}.id`);\n        if (!Object.hasOwn(COMPONENTS, n.type)) fail("unsupported component " + n.type);\n        if (["table", "chart"].includes(n.type) && typeof n.rows === "string" && /^(data|derived)\\./.test(n.rows)) n.rows = { ref: n.rows };\n        switch (n.type) {\n          case "visual": {\n            const previous = Array.isArray(n.warnings) ? n.warnings.filter((x) => typeof x === "string").map((x) => x.slice(0, 512)).slice(0, 12) : [];\n            const checked = validateVisual(n.spec);\n            n.spec = checked.spec;\n            n.warnings = [.../* @__PURE__ */ new Set([...previous, ...checked.warnings])].slice(0, 12);\n            count2 += checked.count;\n            if (count2 > LIMITS.nodes) fail("too many nodes, including visual components");\n            if (!validIdentifier(n.stateKey) || doc2.state[n.stateKey]?.type !== "json") fail("visual requires its own json stateKey");\n            break;\n          }\n          case "sandbox": {\n            text(n.title, `${at2}.title (canvas title)`);\n            text(n.fallback, `${at2}.fallback (canvas fallback)`);\n            if (!n.title.trim()) fail(`${at2}.title must not be empty`);\n            if (!n.fallback.trim()) fail(`${at2}.fallback must not be empty`);\n            if (typeof n.html !== "string" || !n.html.trim()) fail(`${at2}.html must be a non-empty HTML string; script/css/fallback belong beside html on the sandbox node, not inside it`);\n            for (const field of ["html", "css", "script"]) if (n[field] !== void 0 && (typeof n[field] !== "string" || n[field].length > SANDBOX_LIMITS.source)) fail("canvas source exceeds 48 Ki characters");\n            if (n.height !== void 0 && (!Number.isInteger(n.height) || n.height < 160 || n.height > SANDBOX_LIMITS.height)) fail("canvas height must be 160..1000");\n            for (const [field, group] of [["stateKeys", "state"], ["dataKeys", "data"], ["derivedKeys", "derived"]]) if (n[field] !== void 0 && (!Array.isArray(n[field]) || n[field].length > 64 || new Set(n[field]).size !== n[field].length || n[field].some((k2) => !own2(doc2[group], k2)))) fail("invalid canvas " + field);\n            break;\n          }\n          case "row":\n          case "column":\n            if (n.gap !== void 0 && !(typeof n.gap === "number" && Number.isFinite(n.gap) && n.gap >= 0 && n.gap <= 40)) fail("gap must be 0..40 pixels");\n            if (n.columns !== void 0 && (!Number.isInteger(n.columns) || n.columns < 1 || n.columns > 4)) fail("columns must be 1..4");\n            break;\n          case "card":\n            if (n.title !== void 0) text(n.title, "card title");\n            if (n.surface !== void 0 && !UI_SURFACES.includes(n.surface)) fail("unknown card surface");\n            break;\n          case "details":\n            text(n.title, "details title");\n            if (n.open === "true" || n.open === "false") n.open = n.open === "true";\n            if (n.open !== void 0 && typeof n.open !== "boolean") fail(`node.${n.id}.open must be boolean true or false`);\n            break;\n          case "badge":\n            value(n.text, "badge text");\n            break;\n          case "progress":\n            text(n.label, "progress label");\n            value(n.value, "progress value");\n            value(n.max, "progress max");\n            if (n.unit !== void 0) text(n.unit, "progress unit");\n            break;\n          case "steps": {\n            if (n.title !== void 0) text(n.title, "steps title");\n            const at3 = `node.${n.id}.items`;\n            if (!Array.isArray(n.items)) fail(`${at3} must be an array of 1..12 step objects, received ${n.items === null ? "null" : typeof n.items}. Use items:[{"title":"First step","description":"One sentence"}], not items:{item:[...]}. status is optional for a static guide`);\n            if (!n.items.length || n.items.length > 12) fail(`${at3} requires 1..12 items; received ${n.items.length}. Split a longer guide into separate steps nodes`);\n            for (const [i, item] of n.items.entries()) {\n              const stepAt = `${at3}[${i}]`;\n              fields(item, ["title", "description", "status"], stepAt);\n              text(item.title, `${stepAt}.title`);\n              if (item.description !== void 0) text(item.description, `${stepAt}.description`);\n              if (item.status !== void 0 && !["pending", "active", "done", "error"].includes(item.status)) fail(`${stepAt}.status must be pending, active, done or error; omit status for a static guide`);\n            }\n            break;\n          }\n          case "heading":\n          case "text":\n          case "callout":\n            if (n.type === "text") {\n              if (n.title !== void 0) text(n.title, "text block title");\n              if (n.copyable !== void 0 && typeof n.copyable !== "boolean") fail("copyable must be boolean");\n            }\n            validateTypography(n, `node.${n.id}`);\n            if (n.spans !== void 0) {\n              if (n.text !== void 0) fail(`node.${n.id}: use text or spans, not both`);\n              if (!Array.isArray(n.spans) || !n.spans.length || n.spans.length > 80) fail("spans must contain 1..80 text fragments");\n              for (const [i, span] of n.spans.entries()) {\n                fields(span, ["text", ...TYPE_FIELDS], `node.${n.id}.spans[${i}]`);\n                text(span.text, "span text");\n                validateTypography(span, `node.${n.id}.spans[${i}]`);\n              }\n            } else value(n.text, "text");\n            break;\n          case "metric":\n            text(n.label, "metric label");\n            value(n.value, "metric value");\n            if (n.unit !== void 0) text(n.unit, "unit");\n            if (n.decimals !== void 0 && (!Number.isInteger(n.decimals) || n.decimals < 0 || n.decimals > 6)) fail("invalid decimals");\n            break;\n          case "input":\n          case "slider":\n          case "select":\n          case "toggle": {\n            text(n.label, "control label");\n            if (typeof n.bind !== "string" || !n.bind.startsWith("state.")) fail("controls must bind state");\n            const [, k2] = reference(doc2, n.bind), spec = doc2.state[k2];\n            if (n.type === "slider" && spec.type !== "number") fail("slider requires numeric state");\n            if (n.type === "toggle" && spec.type !== "boolean") fail("toggle requires boolean state");\n            if (["input", "select"].includes(n.type) && spec.type === "json") fail(`node.${n.id}: structured state requires a sandbox with DSHUI.setState; use separate boolean states and toggle nodes for a native checklist`);\n            if (n.type === "input" && spec.type === "boolean") fail("use toggle for boolean state");\n            if (n.type === "select" && !spec.options) fail("select requires options");\n            break;\n          }\n          case "code":\n            if (typeof n.code !== "string" || n.code.length > SANDBOX_LIMITS.source) fail("code must be a string of at most 48 Ki characters");\n            if (n.lang !== void 0) text(n.lang, "code language");\n            if (n.title !== void 0) text(n.title, "code title");\n            if (n.wrap !== void 0 && typeof n.wrap !== "boolean") fail("code wrap must be boolean");\n            break;\n          case "button":\n          case "link":\n            text(n.text, "button text");\n            validateLink(n);\n            if (n.action !== void 0 && !own2(doc2.actions, n.action)) fail("unknown action");\n            break;\n          case "divider":\n            if (n.label !== void 0) text(n.label, "divider label");\n            break;\n          case "table": {\n            if (n.label !== void 0) text(n.label, "table label");\n            if (!Array.isArray(n.rows)) value(n.rows, "table rows");\n            if (!Array.isArray(n.columns) || !n.columns.length || n.columns.length > 16) fail("invalid table columns");\n            const cols = /* @__PURE__ */ new Set();\n            for (const c of n.columns) {\n              fields(c, ["key", "label", "unit"], "column");\n              if (!validIdentifier(c.key) || cols.has(c.key)) fail("invalid or duplicate column key");\n              cols.add(c.key);\n              text(c.label, "column label");\n              if (c.unit !== void 0) text(c.unit, "column unit");\n            }\n            break;\n          }\n          case "chart":\n            if (!Array.isArray(n.rows)) value(n.rows, "chart rows");\n            if (!["bar", "line"].includes(n.kind) || !validIdentifier(n.labelKey) || !validIdentifier(n.valueKey)) fail("invalid chart");\n            text(n.label, "chart label");\n            if (n.unit !== void 0) text(n.unit, "chart unit");\n            if (n.xScale !== void 0 && (!["category", "linear"].includes(n.xScale) || n.xScale === "linear" && n.kind !== "line")) fail("invalid xScale");\n            break;\n          default:\n            fail(`unsupported component ${n.type}`);\n        }\n        if (["heading", "text", "callout", "card", "metric", "button", "link", "badge", "progress", "details"].includes(n.type)) {\n          if (n.icon !== void 0 && !UI_ICONS.includes(n.icon)) fail("unknown UI icon");\n          if (!["button", "link"].includes(n.type)) {\n            if (n.tone !== void 0 && !UI_TONES.includes(n.tone)) fail("unknown UI tone");\n          }\n        }\n        fields(n, componentFields(n.type), `node.${n.id}`);\n        if (["row", "column", "card", "details"].includes(n.type)) nodes(n.children, depth + 1, `${at2}.children`);\n      }\n    }\n    nodes(doc2.nodes);\n    if (!count2) fail("at least one node is required");\n    evaluate(doc2, defaults);\n    return doc2;\n  }\n\n  // src/export-runtime.js\n  var payload = JSON.parse(document.getElementById("dsh-ui-export").textContent);\n  var doc = validateDocument(payload.document);\n  var node = doc.nodes.flatMap(function flatten(n) {\n    return [n, ...(n.children ?? []).flatMap(flatten)];\n  }).find((n) => n.id === payload.nodeId && n.type === "sandbox");\n  if (!node) throw Error("\\u5BFC\\u51FA\\u7684\\u753B\\u5E03\\u4E0D\\u5B58\\u5728");\n  var state = validateState(doc, payload.state);\n  var connected = false;\n  var start = Date.now();\n  var count = 0;\n  var token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b2) => b2.toString(16).padStart(2, "0")).join("");\n  var channel = token();\n  var nonce = payload.nonce;\n  var frame = document.createElement("iframe");\n  frame.title = node.title;\n  frame.sandbox = "allow-scripts";\n  frame.referrerPolicy = "no-referrer";\n  frame.style.cssText = "display:block;width:100%;height:" + (node.height ?? 420) + "px;border:0";\n  var status = document.getElementById("status");\n  var publish = () => {\n    try {\n      frame.contentWindow.postMessage({ dshCanvas: 1, channel, type: "snapshot", payload: { ...canvasSnapshot(node, state, doc.data, evaluate(doc, state).derived, false, payload.theme), visible: !document.hidden } }, "*");\n    } catch (e) {\n      status.textContent = "\\u8BA1\\u7B97\\u5931\\u8D25\\uFF1A" + e.message;\n    }\n  };\n  addEventListener("message", (event) => {\n    const m2 = event.data;\n    if (event.source !== frame.contentWindow || m2?.channel !== channel || m2.dshCanvas !== 1) return;\n    if (Date.now() - start > 1e3) {\n      start = Date.now();\n      count = 0;\n    }\n    if (++count > SANDBOX_LIMITS.rate) return;\n    if (m2.type === "ready") {\n      connected = true;\n      publish();\n    } else if (m2.type === "patch" && connected) {\n      try {\n        const next = validateState(doc, { ...state, ...canvasPatch(m2.payload, node) });\n        evaluate(doc, next);\n        state = next;\n        status.textContent = "\\u672C\\u5730\\u53C2\\u6570\\u5DF2\\u66F4\\u65B0\\uFF1B\\u5237\\u65B0\\u6587\\u4EF6\\u4F1A\\u56DE\\u5230\\u5BFC\\u51FA\\u65F6\\u7684\\u53C2\\u6570\\u3002";\n      } catch (e) {\n        status.textContent = "\\u53C2\\u6570\\u65E0\\u6548\\uFF1A" + e.message;\n      }\n      publish();\n    } else if (m2.type === "height" && Number.isFinite(m2.payload) && m2.payload >= 0) frame.style.height = Math.max(32, Math.min(1e3, Math.ceil(m2.payload))) + "px";\n    else if (m2.type === "error") status.textContent = "\\u753B\\u5E03\\u8FD0\\u884C\\u5F02\\u5E38\\uFF1A" + String(m2.payload).slice(0, 1e3);\n  });\n  document.addEventListener("visibilitychange", () => {\n    if (connected) publish();\n  });\n  document.getElementById("surface").append(frame);\n  frame.srcdoc = sandboxDocument(node, channel, nonce);\n})();\n';
+var EXPORT_RUNTIME = '(() => {\n  // lib/presentation.js\n  var UI_ICONS = Object.freeze(["sparkles", "sliders", "layers", "chart", "gauge", "cpu", "database", "info", "check", "warning", "arrow", "target", "external", "file", "globe"]);\n  var UI_TONES = Object.freeze(["neutral", "accent", "success", "warning", "danger"]);\n  var UI_LAYOUTS = Object.freeze(["dashboard", "workbench", "comparison", "guide", "status", "report"]);\n  var UI_ACCENTS = Object.freeze(["blue", "teal", "violet", "amber", "rose"]);\n  var UI_SURFACES = Object.freeze(["outline", "soft", "featured"]);\n\n  // lib/mechanism-runtime-bundle.js\n  var MECHANISM_RUNTIME = \'var __MotionMechanism=(()=>{var it=Object.defineProperty;var Ot=Object.getOwnPropertyDescriptor;var Et=Object.getOwnPropertyNames;var It=Object.prototype.hasOwnProperty;var zt=(t,a)=>{for(var n in a)it(t,n,{get:a[n],enumerable:!0})},Pt=(t,a,n,o)=>{if(a&&typeof a=="object"||typeof a=="function")for(let e of Et(a))!It.call(t,e)&&e!==n&&it(t,e,{get:()=>a[e],enumerable:!(o=Ot(a,e))||o.enumerable});return t};var _t=t=>Pt(it({},"__esModule",{value:!0}),t);var Tt={};zt(Tt,{createMechanismAPI:()=>Ft});var st=Math.PI/180,Ct=Math.sqrt(1.6);function yt({scale:t,azimuth:a=45,elevation:n=30}){let o=a*st,e=n*st;return{sinA:Math.sin(o),cosA:Math.cos(o),sinE:Math.sin(e),cosE:Math.cos(e),k:t*Ct}}function q([t,a,n],o){let{origin:e}=o,{sinA:i,cosA:r,sinE:p,cosE:d,k:m}=yt(o);return[e[0]+(t*i-a*r)*m,e[1]+((t*r+a*i)*p-n*d)*m]}function tt([t,a,n],o){let{sinA:e,cosA:i,sinE:r,cosE:p}=yt(o);return(t*i+a*e)*p+n*r}function vt({x:t,y:a,w:n,d:o,r:e},i=8){let r=Math.max(0,Math.min(e,n/2,o/2)),p=[[t+n-r,a+r,-90],[t+n-r,a+o-r,0],[t+r,a+o-r,90],[t+r,a+r,180]],d=[];for(let[m,s,c]of p){let u=r>0?i:0;for(let f=0;f<=u;f++){let g=(c+(u?90*f/u:45))*st;d.push([m+r*Math.cos(g),s+r*Math.sin(g)])}}return d}function lt(t,a,n,o=40){return Array.from({length:o},(e,i)=>{let r=i/o*Math.PI*2;return[t+n*Math.cos(r),a+n*Math.sin(r)]})}function ct(t,a,n,{pad:o=24,headroom:e=0,azimuth:i=45,elevation:r=30}={}){let p={origin:[0,0],scale:1,azimuth:i,elevation:r},d=t.map(M=>q(M,p)),m=d.map(([M])=>M),s=d.map(([,M])=>M),c=Math.min(...m),u=Math.max(...m),f=Math.min(...s),g=Math.max(...s),h=Math.min((a-o*2)/(u-c),(n-o*2-e)/(g-f));return{origin:[a/2-(c+u)/2*h,e+(n-e)/2-(f+g)/2*h],scale:h,azimuth:i,elevation:r}}var Nt=Object.freeze({parts:96,teeth:64,faces:8192}),Ht=t=>typeof t=="number"&&Number.isFinite(t),y=t=>{throw Error("Motion mechanism: "+t)},v=(t,a,n=-1e4,o=1e4)=>((!Ht(t)||t<n||t>o)&&y(a+" must be a finite number in "+n+".."+o),t),U=(t,a)=>((!Array.isArray(t)||t.length!==3)&&y(a+" must be [x,y,z]"),t.map((n,o)=>v(n,a+"["+o+"]"))),et=t=>typeof t=="string"&&/^[\\\\p{L}_][\\\\p{L}\\\\p{M}\\\\p{N}_]{0,63}$/u.test(t)&&!["constructor","prototype","__proto__"].includes(t),kt=["box","cylinder","gear","rod","spring"],I=(t,a)=>t.map((n,o)=>n+a[o]),B=(t,a)=>t.map((n,o)=>n-a[o]),_=(t,a)=>t.map(n=>n*a),dt=(t,a)=>t.reduce((n,o,e)=>n+o*a[e],0),V=(t,a)=>[t[1]*a[2]-t[2]*a[1],t[2]*a[0]-t[0]*a[2],t[0]*a[1]-t[1]*a[0]],J=t=>{let a=Math.hypot(...t);return a<1e-6&&y("zero-length axis"),_(t,1/a)};function Y(t){(!t||typeof t!="object"||Array.isArray(t))&&y("scene must be an object"),(!Array.isArray(t.parts)||!t.parts.length||t.parts.length>Nt.parts)&&y("parts requires 1..96 objects");let a=new Set,n=new Set;for(let[o,e]of t.parts.entries()){let i="parts["+o+"]";(!e||typeof e!="object"||!et(e.id)||a.has(e.id))&&y(i+".id must be a unique identifier"),a.add(e.id),kt.includes(e.type)||y(i+".type must be "+kt.join("/")),e.group!==void 0&&(et(e.group)||y(i+".group must be an identifier"),n.add(e.group));for(let r of["label","description"])e[r]!==void 0&&(typeof e[r]!="string"||e[r].length>1024)&&y(i+"."+r+" must be short text");if(e.cover!==void 0&&typeof e.cover!="boolean"&&y(i+".cover must be boolean"),e.material!==void 0&&!["metal","dark","accent","warm","cool"].includes(e.material)&&y(i+".material must be metal/dark/accent/warm/cool"),e.at!==void 0&&U(e.at,i+".at"),e.explode!==void 0&&U(e.explode,i+".explode"),e.rotation!==void 0&&v(e.rotation,i+".rotation",-1e9,1e9),e.axis!==void 0&&!["x","y","z"].includes(e.axis)&&y(i+".axis must be x/y/z"),e.type==="box"){let r=U(e.size,i+".size");r.some(p=>p<=0||p>2e3)&&y(i+".size must be positive and <=2000"),e.round!==void 0&&v(e.round,i+".round",0,Math.min(r[0],r[1])/2)}if(["cylinder","gear"].includes(e.type)&&(v(e.radius,i+".radius",.1,1e3),v(e.height??8,i+".height",.1,1e3),e.inner!==void 0&&v(e.inner,i+".inner",0,e.radius-.01)),e.type==="gear"){let r=v(e.teeth,i+".teeth",6,64);Number.isInteger(r)||y(i+".teeth must be an integer"),e.module!==void 0&&v(e.module,i+".module",.1,e.radius/3)}if(["rod","spring"].includes(e.type)&&(U(e.from,i+".from"),U(e.to,i+".to"),Math.hypot(...B(e.to,e.from))<.1&&y(i+" endpoints must differ"),v(e.radius??2,i+".radius",.1,200)),e.type==="spring"){let r=v(e.turns??8,i+".turns",2,24);Number.isInteger(r)||y(i+".turns must be integer")}}if(t.groups!==void 0){(!Array.isArray(t.groups)||t.groups.length>12)&&y("groups must be an array of <=12 labels");let o=new Set;for(let e of t.groups)(!e||!et(e.id)||o.has(e.id)||!n.has(e.id)||typeof e.label!="string"||e.label.length>128)&&y("groups must name unique existing part groups"),o.add(e.id)}if(t.bounds!==void 0){(!Array.isArray(t.bounds)||t.bounds.length!==2)&&y("bounds must be [minXYZ,maxXYZ]");let[o,e]=t.bounds.map((i,r)=>U(i,"bounds["+r+"]"));o.some((i,r)=>i>=e[r])&&y("bounds min must be below max on every axis")}if(t.azimuth!==void 0&&v(t.azimuth,"azimuth",10,80),t.elevation!==void 0&&v(t.elevation,"elevation",15,70),t.title!==void 0&&(typeof t.title!="string"||t.title.length>256)&&y("title must be short text"),t.bind!==void 0){(!t.bind||typeof t.bind!="object"||Array.isArray(t.bind))&&y("bind must be an object");for(let[o,e]of Object.entries(t.bind))(!["explode","selected","cutaway"].includes(o)||!et(e))&&y("bind only accepts declared state keys for explode/selected/cutaway")}return t}function Lt(t){return t==="x"?[[0,1,0],[0,0,1],[1,0,0]]:t==="y"?[[0,0,1],[1,0,0],[0,1,0]]:[[1,0,0],[0,1,0],[0,0,1]]}var at=(t,a,n,o)=>I(I(_(t[0],a),_(t[1],n)),_(t[2],o));function Rt(t,a,n,o){let e=t.map(([m,s])=>at(n,m,s,-a/2)),i=t.map(([m,s])=>at(n,m,s,a/2)),r=[],p=o?.map(([m,s])=>at(n,m,s,a/2)),d=o?.map(([m,s])=>at(n,m,s,-a/2));r.push({points:i,holes:p?[p.slice().reverse()]:[],normal:n[2]},{points:e.slice().reverse(),holes:d?[d]:[],normal:_(n[2],-1)});for(let m=0;m<t.length;m++){let s=(m+1)%t.length;Math.hypot(...B(e[s],e[m]))<1e-6||(r.push({points:[e[m],e[s],i[s],i[m]],normal:J(V(B(e[s],e[m]),n[2]))}),o&&r.push({points:[d[s],d[m],p[m],p[s]],normal:J(V(B(d[m],d[s]),n[2]))}))}return r}function ot(t){let a=Lt(t.axis),n,o,e;if(t.type==="box"&&(n=vt({x:-t.size[0]/2,y:-t.size[1]/2,w:t.size[0],d:t.size[1],r:t.round??Math.min(2,t.size[0]/2,t.size[1]/2)},3),o=t.size[2]),t.type==="cylinder"&&(n=lt(0,0,t.radius,24),o=t.height??8),t.type==="gear"){let s=Math.PI*2/t.teeth,c=t.module??t.radius*2/t.teeth;n=[];for(let u=0;u<t.teeth;u++)for(let[f,g]of[[-.5,t.radius-c*.85],[-.32,t.radius-c*.85],[-.17,t.radius+c*.7],[.17,t.radius+c*.7],[.32,t.radius-c*.85]]){let h=(u+f)*s;n.push([Math.cos(h)*g,Math.sin(h)*g])}o=t.height??8}if(t.type==="rod"){let s=J(B(t.to,t.from)),c=J(V(s,Math.abs(s[2])<.9?[0,0,1]:[0,1,0]));a=[c,V(s,c),s],n=lt(0,0,t.radius??2,16),o=Math.hypot(...B(t.to,t.from))}if(t.type==="spring"){let s=J(B(t.to,t.from)),c=J(V(s,Math.abs(s[2])<.9?[0,0,1]:[0,1,0])),u=V(s,c),f=[];for(let g=0;g<=128;g++){let h=g/128,M=h*(t.turns??8)*Math.PI*2,O=Math.min(1,h*12,(1-h)*12);f.push(I(I(t.from,_(B(t.to,t.from),h)),I(_(c,Math.cos(M)*(t.radius??6)*O),_(u,Math.sin(M)*(t.radius??6)*O))))}return{line:f,points:f}}let i=t.rotation??0,r=Math.cos(i),p=Math.sin(i);n=n.map(([s,c])=>[s*r-c*p,s*p+c*r]);let d=t.inner?n.map(([s,c])=>{let u=Math.atan2(c,s);return[Math.cos(u)*t.inner,Math.sin(u)*t.inner]}):void 0;e=Rt(n,o,a,d);let m=t.type==="rod"?_(I(t.from,t.to),.5):t.at??[0,0,0];return e=e.map(s=>({...s,points:s.points.map(c=>I(c,m)),holes:s.holes?.map(c=>c.map(u=>I(u,m)))})),{faces:e,points:e.flatMap(s=>s.points)}}function wt(t){if(t.bounds){let[a,n]=t.bounds;return Array.from({length:8},(o,e)=>[e&1?n[0]:a[0],e&2?n[1]:a[1],e&4?n[2]:a[2]])}return t.parts.flatMap(a=>ot(a).points.flatMap(o=>[o,I(o,a.explode??[0,0,0])]))}function W({driverTeeth:t=16,drivenTeeth:a=32,rpm:n=30,angle:o=0,module:e=2}={}){for(let[i,r]of Object.entries({driverTeeth:t,drivenTeeth:a}))(!Number.isInteger(r)||r<6||r>64)&&y(i+" must be integer 6..64");return v(n,"rpm",-600,600),v(o,"angle",-1e9,1e9),v(e,"module",.1,10),{driverRadius:t*e/2,drivenRadius:a*e/2,centerDistance:(t+a)*e/2,driverAngle:o,drivenAngle:-o*t/a+Math.PI-Math.PI/a,driverRpm:n,drivenRpm:-n*t/a,ratio:a/t}}function X({angle:t=0,radius:a=20,rod:n=70,z:o=20}={}){v(t,"angle",-1e9,1e9),v(a,"radius",.1,200),v(n,"rod",.1,1e3),v(o,"z"),n<=a&&y("connecting rod length must exceed crank radius");let e=[a*Math.cos(t),a*Math.sin(t),o],i=e[0]+Math.sqrt(n*n-e[1]*e[1]);return{crank:e,piston:[i,0,o],position:i,stroke:a*2,angle:t}}function Mt(t,a,n,o=.16){return v(t,"value",-1e9,1e9),v(a,"target",-1e9,1e9),v(n,"delta",0,.1),v(o,"tau",.01,10),t+(a-t)*(1-Math.exp(-n/o))}var $t=Math.PI*2;function nt(t,a){Y(t);let n=a&&!t.bounds?t.parts.filter(o=>!a.cutaway||!o.cover).flatMap(o=>ot(o).points.map(e=>I(e,_(o.explode??[0,0,0],a.explode??0)))):wt(t);return ct(n.length?n:[[0,0,0],[1,1,1]],600,340,{pad:24,azimuth:t.azimuth??45,elevation:t.elevation??30})}var At=t=>t.map(([a,n],o)=>(o?"L":"M")+Math.round(a*10)/10+" "+Math.round(n*10)/10).join("")+"Z";function mt(t,a,{explode:n=0,selected:o="all",cutaway:e=!1,pose:i={}}={},r=new Map){if(typeof n!="number"||!Number.isFinite(n)||n<0||n>1)throw Error("Motion mechanism: explode must be 0..1");if(typeof o!="string"||typeof e!="boolean")throw Error("Motion mechanism: selected must be text and cutaway boolean");if(!i||typeof i!="object"||Array.isArray(i))throw Error("Motion mechanism: pose must be an object");for(let c of Object.keys(i))if(!t.parts.some(u=>u.id===c))throw Error("Motion mechanism: unknown pose part "+c);let p=(a.azimuth??45)*$t/360,d=(a.elevation??30)*$t/360,m=[Math.cos(p)*Math.cos(d),Math.sin(p)*Math.cos(d),Math.sin(d)],s=[];for(let c of t.parts){if(e&&c.cover)continue;let u=i[c.id]??{};for(let $ of Object.keys(u))if(!["at","rotation","from","to"].includes($))throw Error("Motion mechanism: unsupported pose field "+$);let f={...c,...u},g=JSON.stringify(f),h=r.get(c.id);h?.key!==g&&(Y({parts:[f]}),h={key:g,...ot(f)},r.set(c.id,h));let M=_(f.explode??[0,0,0],n),O=Math.min(...h.points.map($=>$[2]))+M[2],N=o==="all"||o===c.id||o===c.group;if(h.line){let $=h.line.map(P=>I(P,M));s.push({floor:O,key:f.id+"_line",part:f.id,group:f.group,d:$.map((P,A)=>(A?"L":"M")+q(P,a).join(" ")).join(""),depth:tt($[Math.floor($.length/2)],a),line:!0,tone:1,material:f.material??"metal",active:N});continue}for(let[$,P]of h.faces.entries()){if(dt(P.normal,m)<=1e-4)continue;let w=P.points.map(S=>I(S,M)),T=P.holes?.map(S=>S.map(H=>I(H,M))),D=_(w.reduce((S,H)=>I(S,H),[0,0,0]),1/w.length),G=dt(P.normal,[-.25,-.4,.88]);s.push({floor:O,key:f.id+"_"+$,part:f.id,group:f.group,d:At(w.map(S=>q(S,a)))+(T??[]).map(S=>At(S.map(H=>q(H,a)))).join(""),depth:tt(D,a),line:!1,tone:G>.5?0:G>.1?1:G>-.4?2:3,material:f.material??"metal",active:N})}}if(s.length>8192)throw Error("Motion mechanism: face budget exceeded");return s.sort((c,u)=>c.floor-u.floor||c.depth-u.depth||c.key.localeCompare(u.key))}var z=(t,a,n,o,e,i={})=>({id:t,type:"box",label:a,at:n,size:o,group:e,...i}),F=(t,a,n,o,e,i,r={})=>({id:t,type:"cylinder",label:a,at:n,radius:o,height:e,group:i,...r});function ut(t,a,n,o,e=3,i=18){return[[-1,-1],[-1,1],[1,-1],[1,1]].map(([r,p],d)=>F(o+"_bolt_"+d,"\\\\u56FA\\\\u5B9A\\\\u87BA\\\\u6813",[t+r*i,a+p*i,n],e,3,o,{material:"dark",explode:[0,0,26]}))}function ft(){return{title:"\\\\u5206\\\\u5C42\\\\u7ED3\\\\u6784 \\\\xB7 \\\\u793A\\\\u610F\\\\u88C5\\\\u914D",groups:[{id:"base",label:"\\\\u5E95\\\\u5EA7",description:"\\\\u652F\\\\u6491\\\\u6574\\\\u4F53\\\\uFF0C\\\\u5E76\\\\u63D0\\\\u4F9B\\\\u5B89\\\\u88C5\\\\u4F4D\\\\u7F6E\\\\u3002"},{id:"board",label:"\\\\u529F\\\\u80FD\\\\u677F",description:"\\\\u8FDE\\\\u63A5\\\\u8F93\\\\u5165\\\\u4E0E\\\\u5904\\\\u7406\\\\u6A21\\\\u5757\\\\uFF1B\\\\u793A\\\\u610F\\\\u7ED3\\\\u6784\\\\uFF0C\\\\u4E0D\\\\u5BF9\\\\u5E94\\\\u7279\\\\u5B9A\\\\u4EA7\\\\u54C1\\\\u3002"},{id:"sink",label:"\\\\u6563\\\\u70ED\\\\u5C42",description:"\\\\u5C06\\\\u70ED\\\\u91CF\\\\u4F20\\\\u5230\\\\u66F4\\\\u5927\\\\u7684\\\\u8868\\\\u9762\\\\u79EF\\\\u3002"},{id:"cover",label:"\\\\u5916\\\\u58F3",description:"\\\\u4FDD\\\\u62A4\\\\u5185\\\\u90E8\\\\uFF1B\\\\u5256\\\\u5F00\\\\u9009\\\\u9879\\\\u901A\\\\u8FC7\\\\u9690\\\\u85CF\\\\u5916\\\\u58F3\\\\u5C55\\\\u793A\\\\u7ED3\\\\u6784\\\\u3002"}],parts:[z("base","\\\\u5B89\\\\u88C5\\\\u5E95\\\\u5EA7",[0,0,0],[120,85,10],"base",{round:6,material:"metal"}),...[-1,1].flatMap((t,a)=>[-1,1].map((n,o)=>F("foot_"+a+o,"\\\\u9632\\\\u6ED1\\\\u811A",[t*46,n*30,-8],6,7,"base",{material:"dark"}))),z("board","\\\\u529F\\\\u80FD\\\\u677F",[0,0,15],[96,62,4],"board",{round:3,material:"cool",explode:[0,0,35]}),z("chip","\\\\u5904\\\\u7406\\\\u6A21\\\\u5757",[-16,0,22],[25,24,10],"board",{round:2,material:"dark",explode:[0,0,35]}),z("connector","\\\\u8FDE\\\\u63A5\\\\u7AEF\\\\u53E3",[32,0,24],[16,36,14],"board",{round:2,material:"warm",explode:[0,0,35]}),...ut(0,0,20,"board",2,24),z("spreader","\\\\u5BFC\\\\u70ED\\\\u5E95\\\\u677F",[-16,0,32],[44,42,5],"sink",{round:2,material:"metal",explode:[-10,0,65]}),...Array.from({length:7},(t,a)=>z("fin_"+a,"\\\\u6563\\\\u70ED\\\\u9CCD\\\\u7247",[-34+a*6,0,44],[2.4,40,20],"sink",{round:1,material:"metal",explode:[-10,0,65]})),z("top","\\\\u9876\\\\u76D6",[0,0,61],[124,89,5],"cover",{round:6,cover:!0,material:"metal",explode:[12,0,85]}),z("side","\\\\u4FA7\\\\u677F",[0,-44,32],[124,4,58],"cover",{round:2,cover:!0,material:"metal",explode:[12,-22,50]})]}}function pt({driverTeeth:t=16,drivenTeeth:a=32,module:n=1.5}={}){let o=W({driverTeeth:t,drivenTeeth:a,module:n}),e=o.centerDistance;return{title:"\\\\u9F7F\\\\u8F6E\\\\u4F20\\\\u52A8 \\\\xB7 \\\\u7B80\\\\u5316\\\\u76F4\\\\u9F7F\\\\u8F6E\\\\u793A\\\\u610F",azimuth:70,elevation:55,groups:[{id:"frame",label:"\\\\u652F\\\\u67B6",description:"\\\\u56FA\\\\u5B9A\\\\u8F74\\\\u5FC3\\\\u4F4D\\\\u7F6E\\\\uFF1B\\\\u4E24\\\\u8F74\\\\u4E2D\\\\u5FC3\\\\u8DDD\\\\u7531\\\\u9F7F\\\\u6570\\\\u4E0E\\\\u6A21\\\\u6570\\\\u5171\\\\u540C\\\\u786E\\\\u5B9A\\\\u3002"},{id:"driver",label:"\\\\u4E3B\\\\u52A8\\\\u8F6E",description:"\\\\u8F93\\\\u5165\\\\u8F6C\\\\u901F\\\\uFF0C\\\\u7531\\\\u9F7F\\\\u6570\\\\u51B3\\\\u5B9A\\\\u8282\\\\u5706\\\\u534A\\\\u5F84\\\\u3002"},{id:"driven",label:"\\\\u4ECE\\\\u52A8\\\\u8F6E",description:"\\\\u5916\\\\u556E\\\\u5408\\\\u8F6C\\\\u5411\\\\u76F8\\\\u53CD\\\\uFF0C\\\\u8F6C\\\\u901F\\\\u6309\\\\u9F7F\\\\u6570\\\\u6BD4\\\\u53D8\\\\u5316\\\\u3002"},{id:"cover",label:"\\\\u5916\\\\u58F3",description:"\\\\u9690\\\\u85CF\\\\u76D6\\\\u677F\\\\u4EE5\\\\u89C2\\\\u5BDF\\\\u4F20\\\\u52A8\\\\uFF1B\\\\u4E0D\\\\u662F\\\\u52A0\\\\u5DE5\\\\u6216\\\\u53D7\\\\u529B\\\\u4EFF\\\\u771F\\\\u3002"}],parts:[z("base","\\\\u5B89\\\\u88C5\\\\u5E95\\\\u5EA7",[30,0,-8],[140,90,10],"frame",{round:6,material:"metal"}),...ut(30,0,0,"frame",3,32),...[0,e].flatMap((i,r)=>[F("bearing_"+r,"\\\\u8F74\\\\u627F\\\\u5EA7",[i,0,4],10,12,"frame",{inner:4,material:"dark"}),F("shaft_"+r,"\\\\u4F20\\\\u52A8\\\\u8F74",[i,0,16],3.8,28,r?"driven":"driver",{material:"metal",explode:[r?24:-24,0,20]}),F("hub_"+r,"\\\\u8F6E\\\\u6BC2",[i,0,27],6,6,r?"driven":"driver",{inner:3.8,material:"warm",explode:[r?24:-24,0,20]})]),{id:"driverGear",type:"gear",label:"\\\\u4E3B\\\\u52A8\\\\u9F7F\\\\u8F6E",group:"driver",at:[0,0,20],radius:o.driverRadius,teeth:t,module:n,height:7,inner:4,material:"accent",explode:[-24,0,20]},{id:"drivenGear",type:"gear",label:"\\\\u4ECE\\\\u52A8\\\\u9F7F\\\\u8F6E",group:"driven",at:[e,0,20],radius:o.drivenRadius,teeth:a,module:n,height:7,inner:4,material:"cool",rotation:o.drivenAngle,explode:[24,0,20]},z("cover","\\\\u9632\\\\u62A4\\\\u76D6\\\\u677F",[30,0,36],[140,90,4],"cover",{round:6,cover:!0,material:"metal",explode:[0,0,62]})]}}function ht({radius:t=20,rod:a=70,angle:n=0}={}){let o=X({radius:t,rod:a,angle:n,z:28});return{title:"\\\\u66F2\\\\u67C4\\\\u8FDE\\\\u6746 \\\\xB7 \\\\u65CB\\\\u8F6C\\\\u8F6C\\\\u4E3A\\\\u5F80\\\\u590D",groups:[{id:"frame",label:"\\\\u652F\\\\u67B6\\\\u4E0E\\\\u5BFC\\\\u8F68",description:"\\\\u652F\\\\u6491\\\\u8F74\\\\u5FC3\\\\uFF0C\\\\u9650\\\\u5236\\\\u6ED1\\\\u5757\\\\u6CBF\\\\u540C\\\\u4E00\\\\u65B9\\\\u5411\\\\u8FD0\\\\u52A8\\\\u3002"},{id:"crank",label:"\\\\u66F2\\\\u67C4",description:"\\\\u66F2\\\\u67C4\\\\u7ED5\\\\u56FA\\\\u5B9A\\\\u8F74\\\\u5FC3\\\\u65CB\\\\u8F6C\\\\u3002"},{id:"rod",label:"\\\\u8FDE\\\\u6746",description:"\\\\u8FDE\\\\u63A5\\\\u66F2\\\\u67C4\\\\u9500\\\\u548C\\\\u6ED1\\\\u5757\\\\uFF0C\\\\u957F\\\\u5EA6\\\\u4FDD\\\\u6301\\\\u4E0D\\\\u53D8\\\\u3002"},{id:"piston",label:"\\\\u6ED1\\\\u5757",description:"\\\\u6CBF\\\\u5BFC\\\\u8F68\\\\u5F80\\\\u590D\\\\uFF1B\\\\u5B8C\\\\u6574\\\\u884C\\\\u7A0B\\\\u7B49\\\\u4E8E\\\\u66F2\\\\u67C4\\\\u534A\\\\u5F84\\\\u7684\\\\u4E24\\\\u500D\\\\u3002"}],parts:[z("base","\\\\u5B89\\\\u88C5\\\\u5E95\\\\u5EA7",[35,0,-6],[175,80,10],"frame",{round:6,material:"metal"}),...ut(35,0,1,"frame",3,30),F("bearing","\\\\u66F2\\\\u8F74\\\\u8F74\\\\u627F",[0,0,7],11,15,"frame",{inner:4,material:"dark"}),F("axle","\\\\u66F2\\\\u8F74",[0,0,15],3.8,26,"crank",{material:"metal",explode:[0,-18,18]}),F("flywheel","\\\\u66F2\\\\u67C4\\\\u76D8",[0,0,20],t+6,6,"crank",{inner:4,material:"accent",explode:[0,-18,18]}),z("railA","\\\\u5BFC\\\\u8F68",[74,-16,13],[85,5,6],"frame",{round:1,material:"dark"}),z("railB","\\\\u5BFC\\\\u8F68",[74,16,13],[85,5,6],"frame",{round:1,material:"dark"}),F("crankPin","\\\\u66F2\\\\u67C4\\\\u9500",o.crank,3,12,"crank",{material:"warm",explode:[0,-18,18]}),{id:"link",type:"rod",label:"\\\\u8FDE\\\\u6746",from:o.crank,to:o.piston,radius:2.4,group:"rod",material:"metal",explode:[0,0,45]},z("piston","\\\\u6ED1\\\\u5757",[o.position,0,22],[18,24,16],"piston",{round:3,material:"cool",explode:[20,0,18]}),F("pistonPin","\\\\u6ED1\\\\u5757\\\\u9500",o.piston,3,10,"piston",{material:"warm",explode:[20,0,18]})]}}var St=`\\n.mui-mechanism{font:15px/1.7 system-ui,sans-serif;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:24px;padding:20px;max-width:100%;box-sizing:border-box}.mui-mechanism *{box-sizing:border-box}.mui-mechanism h2{font-size:22px;line-height:1.35;margin:0 0 8px;font-weight:750}.mui-mechanism p{margin:0;color:var(--canvas-muted)}\\n.mui-mechanism-svg{display:block;width:100%;height:auto;max-height:420px;touch-action:pan-y}.mui-mechanism-svg path{stroke:color-mix(in srgb,var(--canvas-ink) 38%,var(--canvas-bg));stroke-width:.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;fill:var(--mech-base,var(--canvas-soft))}.mui-mechanism-svg [data-material=metal]{--mech-base:color-mix(in srgb,var(--canvas-muted) 32%,var(--canvas-bg))}.mui-mechanism-svg [data-material=dark]{--mech-base:color-mix(in srgb,var(--canvas-ink) 78%,var(--canvas-bg))}.mui-mechanism-svg [data-material=accent]{--mech-base:var(--canvas-accent)}.mui-mechanism-svg [data-material=cool]{--mech-base:color-mix(in srgb,#22998a 70%,var(--canvas-bg))}.mui-mechanism-svg [data-material=warm]{--mech-base:color-mix(in srgb,#dd9c42 75%,var(--canvas-bg))}\\n.mui-mechanism-svg [data-tone="0"]{fill:color-mix(in srgb,var(--mech-base) 74%,var(--canvas-bg))}.mui-mechanism-svg [data-tone="1"]{fill:var(--mech-base)}.mui-mechanism-svg [data-tone="2"]{fill:color-mix(in srgb,var(--mech-base) 85%,var(--canvas-ink))}.mui-mechanism-svg [data-tone="3"]{fill:color-mix(in srgb,var(--mech-base) 68%,var(--canvas-ink))}.mui-mechanism-svg [data-line]{fill:none;stroke:var(--mech-base);stroke-width:2}.mui-mechanism-svg [data-active=false]{opacity:.2}.mui-mechanism-svg [data-active=true]{opacity:1}\\n.mui-mechanism-nav{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px}.mui-mechanism button{font:inherit;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:999px;padding:6px 13px;cursor:pointer;min-height:36px}.mui-mechanism button[aria-pressed=true]{color:var(--canvas-bg);background:var(--canvas-ink);border-color:var(--canvas-ink)}.mui-mechanism button:focus-visible,.mui-mechanism input:focus-visible{outline:2px solid var(--canvas-accent);outline-offset:3px}.mui-mechanism button:disabled{opacity:.5;cursor:default}\\n.mui-mechanism-controls{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:12px 14px;border-radius:16px;background:var(--canvas-soft);margin:8px 0}.mui-mechanism-controls label{display:flex;align-items:center;gap:9px;flex:1 1 180px;min-width:0}.mui-mechanism-controls input[type=range]{flex:1;min-width:70px;accent-color:var(--canvas-accent)}.mui-mechanism-controls input[type=checkbox]{accent-color:var(--canvas-accent)}.mui-mechanism-controls output{font-variant-numeric:tabular-nums;min-width:40px;text-align:right;font-weight:650}.mui-mechanism-readout{display:block;padding:10px 0;font-weight:700;font-variant-numeric:tabular-nums;color:var(--canvas-ink)}.mui-mechanism-description{min-height:0;font-size:14px}\\n.mui-mechanism[data-style=editorial]{border:0;border-top:1px solid var(--canvas-line);border-radius:0;padding:16px 0}.mui-mechanism[data-style=editorial] h2{font-family:ui-serif,Georgia,serif;font-weight:650}.mui-mechanism[data-style=editorial] .mui-mechanism-controls{border-radius:0;background:transparent;border-block:1px solid var(--canvas-line)}\\n.mui-mechanism[data-style=technical]{border-radius:10px}.mui-mechanism[data-style=technical] button,.mui-mechanism[data-style=technical] .mui-mechanism-controls{border-radius:6px}.mui-mechanism[data-style=technical] .mui-mechanism-readout{font-family:ui-monospace,Consolas,monospace}\\n.mui-mechanism[data-style=soft]{border:0;background:var(--canvas-soft);border-radius:28px 28px 28px 10px}.mui-mechanism[data-style=soft] .mui-mechanism-controls{background:var(--canvas-bg);border-radius:22px}.mui-mechanism[data-style=expressive] h2{font-size:28px;font-weight:850;border-left:5px solid var(--canvas-accent);padding-left:14px}.mui-mechanism[data-style=expressive]{border:0;border-radius:0}.mui-mechanism[data-style=prismframe]{border:1.5px solid var(--canvas-line);box-shadow:4px 5px 0 color-mix(in srgb,var(--canvas-accent) 14%,var(--canvas-bg))}.mui-mechanism[data-style=aurora]{border-radius:28px;box-shadow:0 16px 30px -25px #30204d66}.mui-mechanism[data-style=aurora] .mui-mechanism-controls{border-radius:24px}\\n@media(max-width:500px){.mui-mechanism{padding:14px;border-radius:20px}.mui-mechanism h2{font-size:20px}.mui-mechanism-controls{padding:10px}.mui-mechanism-nav{gap:5px}.mui-mechanism button{padding:6px 10px;font-size:14px}}\\n@media(prefers-reduced-motion:reduce){.mui-mechanism *{animation:none!important;transition:none!important}}\\n@media(forced-colors:active){.mui-mechanism-svg path{fill:Canvas;stroke:CanvasText}.mui-mechanism button[aria-pressed=true]{background:Highlight;color:HighlightText}}\\n`;var xt="http://www.w3.org/2000/svg",C=(t,a,n)=>{let o=document.createElement(t);return a&&(o.className=a),n!==void 0&&(o.textContent=n),o};function Ft(t){function a(o,e){let i=typeof o=="string"?document.querySelector(o):o;if(!i||!i.replaceChildren)throw Error("Motion mechanism: target element not found");Y(e);let r=structuredClone({...e,onSelect:void 0}),p=nt(r),d={explode:0,selected:"all",cutaway:!1,pose:{}},m=!1,s="",c="",u=0,f=new Map,g=new Map,h=new Map,M=[],O=C("section","mui-mechanism"),N=C("h2",null,r.title??"\\\\u7ED3\\\\u6784\\\\u56FE\\\\u89E3"),$=document.createElementNS(xt,"svg"),P=document.createElementNS(xt,"g"),A=C("div","mui-mechanism-nav"),w=C("div","mui-mechanism-controls"),T=C("p","mui-mechanism-description"),D=C("output","mui-mechanism-readout"),G=C("style");G.textContent=St,N.hidden=r.title==="",O.setAttribute("aria-label",r.title??"\\\\u7ED3\\\\u6784\\\\u56FE\\\\u89E3"),$.setAttribute("class","mui-mechanism-svg"),$.setAttribute("viewBox","0 0 600 340"),$.setAttribute("role","img"),$.setAttribute("aria-label","\\\\u53EF\\\\u62C6\\\\u89E3\\\\u7684\\\\u7ED3\\\\u6784\\\\u793A\\\\u610F\\\\u56FE\\\\uFF1B\\\\u4F7F\\\\u7528\\\\u4E0B\\\\u65B9\\\\u6309\\\\u94AE\\\\u9009\\\\u62E9\\\\u90E8\\\\u4EF6"),$.append(P),O.append(G,N,$,A,w,D,T),i.replaceChildren(O);let S=()=>r.groups?.length?r.groups:r.parts.map(l=>({id:l.id,label:l.label??l.id,description:l.description??""}));function H(l){r.bind?.selected?t.setState({[r.bind.selected]:l}):typeof e.onSelect=="function"?e.onSelect(l):Q({selected:l})}function K(){if(A.replaceChildren(),h.clear(),!r.bind?.selected&&typeof e.onSelect!="function"){A.hidden=!0;return}A.hidden=!1;for(let l of[{id:"all",label:"\\\\u5168\\\\u90E8",description:""},...S()]){let b=C("button",null,l.label);b.type="button",b.setAttribute("aria-pressed",String(d.selected===l.id)),b.addEventListener("click",()=>H(l.id)),h.set(l.id,b),A.append(b)}}let x,rt,L;if(r.bind?.explode){let l=C("label",null,"\\\\u62C6\\\\u89E3\\\\u8FDB\\\\u5EA6");x=C("input"),x.type="range",x.min="0",x.max="1",x.step=".01",x.setAttribute("aria-label","\\\\u62C6\\\\u89E3\\\\u8FDB\\\\u5EA6"),rt=C("output"),x.addEventListener("input",()=>t.setState({[r.bind.explode]:Number(x.value)})),l.append(x,rt),w.append(l)}if(r.bind?.cutaway&&r.parts.some(l=>l.cover)){let l=C("label",null,"\\\\u5256\\\\u5F00\\\\u5916\\\\u58F3");L=C("input"),L.type="checkbox",L.setAttribute("aria-label","\\\\u5256\\\\u5F00\\\\u5916\\\\u58F3"),L.addEventListener("change",()=>t.setState({[r.bind.cutaway]:L.checked})),l.prepend(L),w.append(l)}w.hidden=!w.childNodes.length;function jt(l){let b=JSON.stringify([l.explode,l.cutaway]);b!==s&&(p=nt(r,l),s=b);let E=mt(r,p,l,f),k=new Set;for(let j of E){k.add(j.key);let R=g.get(j.key);R||(R=document.createElementNS(xt,"path"),R.setAttribute("fill-rule","evenodd"),g.set(j.key,R));for(let[gt,bt]of Object.entries({d:j.d,"data-part":j.part,"data-material":j.material,"data-tone":j.tone,"data-active":j.active}))R.getAttribute(gt)!==String(bt)&&R.setAttribute(gt,String(bt));j.line?R.setAttribute("data-line",""):R.removeAttribute("data-line")}for(let[j,R]of g)k.has(j)||(R.remove(),g.delete(j));let Z=E.map(j=>j.key).join("|");if(Z!==c){for(let j of E)P.append(g.get(j.key));c=Z}u++}function Q(l={}){if(m)return;for(let k of Object.keys(l))if(!["explode","selected","cutaway","pose","parts","readout"].includes(k))throw Error("Motion mechanism: unknown update field "+k);if(l.parts){let k={...r,parts:l.parts};Y(k);let Z=nt(k);mt(k,Z,{...d,...l},new Map),r=k,p=Z,f.clear(),c="",s=""}let b={...d,...l};l.pose&&(b.pose=l.pose),jt(b),d=b;for(let[k,Z]of h)Z.setAttribute("aria-pressed",String(b.selected===k));let E=S().find(k=>k.id===b.selected)??r.parts.find(k=>k.id===b.selected);T.textContent=E?.description??(b.selected==="all"?"\\\\u9009\\\\u62E9\\\\u4E00\\\\u4E2A\\\\u90E8\\\\u4EF6\\\\uFF0C\\\\u67E5\\\\u770B\\\\u5B83\\\\u7684\\\\u804C\\\\u8D23\\\\uFF1B\\\\u62C6\\\\u89E3\\\\u53EA\\\\u5C55\\\\u793A\\\\u88C5\\\\u914D\\\\u5173\\\\u7CFB\\\\u3002":""),x&&(x.value=String(b.explode),rt.textContent=Math.round(b.explode*100)+"%"),L&&(L.checked=b.cutaway),l.readout!==void 0&&(D.textContent=String(l.readout))}return $.addEventListener("click",l=>{let b=l.target.closest("[data-part]");if(!b)return;let E=r.parts.find(k=>k.id===b.getAttribute("data-part"));E&&H(r.groups?.length?E.group??E.id:E.id)}),K(),M.push(t.subscribe(l=>{if(m)return;let b={};for(let[E,k]of Object.entries(r.bind??{})){if(!Object.hasOwn(l.state,k))throw Error("Motion mechanism: bind."+E+" names undeclared state "+k);b[E]=l.state[k]}O.dataset.style=l.theme?.visualStyle??"";for(let E of h.values())E.disabled=l.disabled;x&&(x.disabled=l.disabled),L&&(L.disabled=l.disabled),Q(b)})),Object.freeze({update:Q,pose:l=>Q({pose:l}),stats:()=>({frames:u,faces:g.size,parts:r.parts.length}),destroy(){m||(m=!0,M.forEach(l=>l()),g.clear(),f.clear(),i.replaceChildren())}})}function n(o,e,i={}){if(!["assembly","gears","crank"].includes(e))throw Error("Motion mechanism: demo must be assembly/gears/crank");let r=i.bind??{},p=()=>t.snapshot.state,d=(A,w)=>Object.hasOwn(r,A)?p()[r[A]]:w;for(let[A,w]of Object.entries(r))if(!["explode","selected","cutaway","rpm","teeth","running","angle","radius"].includes(A)||typeof w!="string"||!Object.hasOwn(p(),w))throw Error("Motion mechanism: invalid demo binding "+A);let m=d("angle",0)*Math.PI/180,s=m,c="",u=!1,f=Object.fromEntries(Object.entries(r).filter(([A])=>["explode","selected","cutaway"].includes(A)));function g(){return e==="assembly"?ft():e==="gears"?pt({driverTeeth:i.driverTeeth??16,drivenTeeth:d("teeth",32),module:i.module??1.5}):ht({radius:d("radius",20),rod:i.rod??70})}let h=a(o,{...g(),...i.title===void 0?{}:{title:i.title},bind:f}),M=!1;function O(A=0,w=!1,T=!0){if(M)return;let D=d("rpm",30),G=d("running",!1),S=d("angle",0)*Math.PI/180,H=s;S!==m?(H=S,m=S):G&&T&&!w&&(H+=D*Math.PI*2/60*A),s=H;let K=JSON.stringify([e,d("teeth",32),d("radius",20)]);if(K!==c&&(h.update({parts:g().parts}),c=K),e==="gears"){let x=W({driverTeeth:i.driverTeeth??16,drivenTeeth:d("teeth",32),rpm:D,angle:s,module:i.module??1.5});h.update({pose:{driverGear:{rotation:x.driverAngle},drivenGear:{rotation:x.drivenAngle}},readout:"\\\\u4E3B\\\\u52A8\\\\u8F6E "+t.formatNumber(x.driverRpm,0)+" rpm \\\\xB7 \\\\u4ECE\\\\u52A8\\\\u8F6E "+t.formatNumber(x.drivenRpm,2)+" rpm \\\\xB7 \\\\u9F7F\\\\u6570\\\\u6BD4 "+t.formatNumber(x.ratio,2)+"\\\\uFF08\\\\u8D1F\\\\u53F7\\\\u8868\\\\u793A\\\\u53CD\\\\u5411\\\\uFF09"})}else if(e==="crank"){let x=X({angle:s,radius:d("radius",20),rod:i.rod??70,z:28});h.update({pose:{crankPin:{at:x.crank},link:{from:x.crank,to:x.piston},piston:{at:[x.position,0,22]},pistonPin:{at:x.piston}},readout:"\\\\u66F2\\\\u67C4\\\\u89D2 "+t.formatNumber((s*180/Math.PI%360+360)%360,1)+"\\\\xB0 \\\\xB7 \\\\u6ED1\\\\u5757\\\\u4F4D\\\\u7F6E "+t.formatNumber(x.position,2)+" \\\\xB7 \\\\u884C\\\\u7A0B "+t.formatNumber(x.stroke,1)+"\\\\uFF08\\\\u793A\\\\u610F\\\\u957F\\\\u5EA6\\\\u5355\\\\u4F4D\\\\uFF09"})}u=w}let N=null,$=()=>{O(0,u,!0),e!=="assembly"&&(d("running",!1)&&!N?N=t.animate(({delta:A,reducedMotion:w,visible:T})=>{T&&!w?O(A,!1,!0):u!==w&&O(0,w,T)}):!d("running",!1)&&N&&(N(),N=null))},P=t.subscribe($);return O(),Object.freeze({...h,destroy(){M||(M=!0,N?.(),P(),h.destroy())}})}return Object.freeze({mount:a,mountDemo:n,gearPair:W,sliderCrank:X,follow:Mt,scenes:Object.freeze({assembly:ft,gears:pt,crank:ht})})}return _t(Tt);})();\\n\';\n\n  // lib/visual-audit.js\n  function measureVisual(root, nodeId = "") {\n    const issues = [], seen = /* @__PURE__ */ new Set(), coverage = { nodeId, elements: 0, truncated: false, contrastChecked: 0, contrastUncovered: 0 };\n    const add = (code, value, el2) => {\n      const id = el2?.closest("[data-ui-node]")?.getAttribute("data-ui-node") ?? nodeId;\n      const k2 = id + ":" + code + ":" + Math.round(value ?? 0);\n      if (!seen.has(k2) && issues.length < 40) {\n        seen.add(k2);\n        issues.push({ code, nodeId: id, ...value === void 0 ? {} : { value: Number(value.toFixed(2)) } });\n      }\n    };\n    const color = (s) => {\n      let m2 = s.match(/^rgba?\\(([^)]+)\\)/);\n      if (m2) {\n        const a = m2[1].split(/[\\s,\\/]+/).map(Number);\n        return [a[0] / 255, a[1] / 255, a[2] / 255, a[3] ?? 1];\n      }\n      m2 = s.match(/^color\\(srgb ([^)]+)\\)/);\n      if (m2) {\n        const a = m2[1].split(/[\\s\\/]+/).map(Number);\n        return [a[0], a[1], a[2], a[3] ?? 1];\n      }\n      return null;\n    };\n    const luminance = (c) => c.slice(0, 3).map((v2) => v2 <= 0.04045 ? v2 / 12.92 : ((v2 + 0.055) / 1.055) ** 2.4).reduce((s, v2, i) => s + v2 * [0.2126, 0.7152, 0.0722][i], 0);\n    const widthRoot = root.id === "canvas" ? document.documentElement : root;\n    if (widthRoot.scrollWidth > widthRoot.clientWidth + 2) add("overflow", widthRoot.scrollWidth - widthRoot.clientWidth);\n    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);\n    let el;\n    while (el = walker.nextNode()) {\n      if (coverage.elements >= 2e3) {\n        coverage.truncated = true;\n        break;\n      }\n      coverage.elements++;\n      if (el.matches("[data-canvas-phase=error]")) add("runtimeError", void 0, el);\n      const css = getComputedStyle(el), box = el.getBoundingClientRect();\n      if (!box.width || !box.height || css.visibility === "hidden" || css.display === "none") continue;\n      const text2 = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());\n      if (text2) {\n        let size = parseFloat(css.fontSize);\n        if (el instanceof SVGElement && el.getScreenCTM) {\n          const m2 = el.getScreenCTM();\n          if (m2) size *= Math.hypot(m2.c, m2.d);\n        }\n        if (size < 11.9) add("smallText", size, el);\n        const fg = color(css.color);\n        let ancestor = el, bg = null, depth = 0;\n        while (ancestor && depth++ < 64) {\n          const style = getComputedStyle(ancestor);\n          if (style.backgroundImage !== "none") break;\n          const c = color(style.backgroundColor);\n          if (c?.[3] === 1) {\n            bg = c;\n            break;\n          }\n          if (c?.[3] > 0) break;\n          ancestor = ancestor.parentElement;\n        }\n        if (!(el instanceof SVGElement) && fg?.[3] === 1 && bg) {\n          coverage.contrastChecked++;\n          const a = luminance(fg), b2 = luminance(bg), ratio = (Math.max(a, b2) + 0.05) / (Math.min(a, b2) + 0.05);\n          if (ratio < (size >= 24 || size >= 18.66 && parseFloat(css.fontWeight) >= 700 ? 3 : 4.5)) add("contrast", ratio, el);\n        } else coverage.contrastUncovered++;\n      }\n      if (el.matches("input:not([type=hidden]),select,textarea,button,[role=button]") && !el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby") && !el.labels?.length && !el.textContent.trim() && !el.getAttribute("title")) add("missingLabel", void 0, el);\n    }\n    Object.defineProperty(issues, "coverage", { value: coverage });\n    return issues;\n  }\n\n  // lib/format-number.js\n  function formatNumber(value, decimals = 2) {\n    if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("DSH UI: formatNumber requires a finite number");\n    if (!Number.isInteger(decimals) || decimals < 0 || decimals > 6) throw new Error("DSH UI: formatNumber decimals must be an integer from 0 to 6");\n    return value.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });\n  }\n\n  // lib/canvas-system.js\n  var CANVAS_SYSTEM_CSS = `\n:root{--canvas-radius:16px;--canvas-gap:16px;--canvas-positive:#167456;--canvas-negative:#b13b3b;--canvas-warning:#875b15}\n:root[data-canvas-scheme=dark]{--canvas-positive:#78d9b4;--canvas-negative:#ffaaaa;--canvas-warning:#edc87e}\n#canvas{display:flow-root}html,body{margin:0;min-width:0;background:var(--canvas-bg,#fff);color:var(--canvas-ink,#182537);font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}*{box-sizing:border-box}svg{max-width:100%;height:auto}button,input,select,textarea{font:inherit;color:inherit}button,input,select,textarea{border:1px solid var(--canvas-line,#ced4df);border-radius:8px;background:var(--canvas-bg,#fff);padding:8px 12px;max-width:100%}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}input[type=range]{padding:0;accent-color:var(--canvas-accent,#3e60d3)}input[type=checkbox],input[type=radio]{accent-color:var(--canvas-accent,#3e60d3)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--canvas-accent,#3e60d3);outline-offset:3px}\n.ui-stack{display:grid;gap:var(--canvas-gap)}.ui-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--canvas-gap)}.ui-surface{padding:20px;border:1px solid var(--canvas-line,#ced4df);border-radius:var(--canvas-radius);background:var(--canvas-soft,#f3f5f8)}.ui-title{margin:0;font-size:clamp(20px,3vw,28px);line-height:1.3;letter-spacing:-.02em}.ui-caption{color:var(--canvas-muted,#526176);margin:8px 0;font-size:14px}.ui-value{font-size:clamp(24px,4vw,36px);font-variant-numeric:tabular-nums;line-height:1.2}.ui-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.ui-field{display:grid;gap:6px;min-width:0}.ui-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px}.ui-status{min-height:1.6em}.ui-error{color:var(--canvas-negative)}.ui-primary{background:var(--canvas-accent,#3e60d3);color:var(--canvas-accent-ink,#fff);border-color:transparent}\nsvg .ui-node{fill:var(--canvas-soft,#f3f5f8);stroke:var(--canvas-line,#ced4df);stroke-width:1}svg .ui-edge{fill:none;stroke:var(--canvas-muted,#526176);stroke-width:1.5}svg .ui-label{fill:var(--canvas-ink,#182537);font:500 14px system-ui,sans-serif}svg .ui-note{fill:var(--canvas-muted,#526176);font:400 13px system-ui,sans-serif}svg .ui-leader{fill:none;stroke:var(--canvas-muted,#526176);stroke-dasharray:3 4}svg .ui-accent{fill:color-mix(in srgb,var(--canvas-accent,#3e60d3) 12%,var(--canvas-bg,#fff));stroke:var(--canvas-accent,#3e60d3)}\n.ui-flow{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 8px;flex-wrap:wrap}.ui-step{display:grid;gap:6px;min-width:130px;max-width:240px;padding:16px 20px;border:1px solid var(--canvas-line);border-radius:6px;background:var(--canvas-bg)}.ui-step strong{font-size:16px;font-weight:600}.ui-step span{font-size:14px;color:var(--canvas-muted)}.ui-arrow{color:var(--canvas-muted);font-size:22px}.ui-callout{border-inline-start:3px solid var(--canvas-accent);padding:8px 16px;color:var(--canvas-ink)}\n.ui-surface,.ui-step{border-radius:var(--canvas-radius);background:var(--canvas-bg,#fff)}button,input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{border-radius:12px}button{border-radius:999px}.ui-primary{background:var(--canvas-ink,#182537);color:var(--canvas-bg,#fff)}.ui-callout{border-radius:0 12px 12px 0;background:color-mix(in srgb,var(--canvas-accent,#3e60d3) 5%,var(--canvas-bg,#fff))}\n@media(max-width:480px){.ui-flow{flex-direction:column;padding:16px 8px;gap:12px}.ui-step{width:100%;max-width:none}.ui-arrow{transform:rotate(90deg)}}\n@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}`;\n\n  // lib/sandbox.js\n  var SANDBOX_LIMITS = Object.freeze({ source: 49152, height: 1e3, message: 16384, rate: 30 });\n  function canvasSnapshot(node2, state2, data, derived, disabled, theme) {\n    const pick = (keys, values) => Object.fromEntries((keys ?? []).map((k2) => [k2, values[k2]]));\n    return { state: pick(node2.stateKeys, state2), data: pick(node2.dataKeys, data), derived: pick(node2.derivedKeys, derived), disabled, theme };\n  }\n  function canvasPatch(message, node2) {\n    if (!message || typeof message !== "object" || Array.isArray(message)) throw new Error("Invalid canvas patch");\n    const keys = Object.keys(message);\n    if (!keys.length || keys.length > 64 || keys.some((k2) => !(node2.stateKeys ?? []).includes(k2))) throw new Error("Canvas state key is not declared");\n    if (JSON.stringify(message).length > SANDBOX_LIMITS.message) throw new Error("Canvas patch is too large");\n    return message;\n  }\n  function sandboxDocument(node2, channel2, nonce2) {\n    const json = (value) => JSON.stringify(value).replace(/</g, "\\\\u003c").replace(/\\u2028/g, "\\\\u2028").replace(/\\u2029/g, "\\\\u2029");\n    return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'nonce-${nonce2}\'; style-src \'unsafe-inline\'; img-src data:; font-src \'none\'; connect-src \'none\'; media-src \'none\'; object-src \'none\'; frame-src \'none\'; worker-src \'none\'; base-uri \'none\'; form-action \'none\'"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${CANVAS_SYSTEM_CSS}</style></head><body><main id="canvas"></main><script nonce="${nonce2}">(()=>{\n  const channel=${json(channel2)}, source=${json({ html: node2.html, css: node2.css ?? "", script: node2.script ?? "" })};\n  let snapshot={state:{},data:{},derived:{},disabled:true,theme:{}}, started=false;\n  const listeners=new Set(), send=(type,payload)=>parent.postMessage({dshCanvas:1,channel,type,payload},\'*\');\n  const report=e=>send(\'error\',String(e?.message??e).slice(0,1000));\n  const audit=${measureVisual.toString()};let auditTimer;const scheduleAudit=()=>{clearTimeout(auditTimer);auditTimer=setTimeout(()=>{const issues=audit(document.getElementById(\'canvas\'),${json(node2.id ?? "")});send(\'audit\',{issues,coverage:issues.coverage})},400)};\n  addEventListener(\'resize\',scheduleAudit);\n  addEventListener(\'error\',e=>report(e.error??e.message));addEventListener(\'unhandledrejection\',e=>report(e.reason));\n  const animations=new Set(), motion=matchMedia(\'(prefers-reduced-motion: reduce)\');\n  let raf=0,last=0,time=0;\n  const visible=()=>snapshot.visible!==false&&!document.hidden;\n  const canAnimate=()=>visible()&&!snapshot.disabled&&!motion.matches;\n  const draw=delta=>{for(const fn of animations)try{fn({time,delta,reducedMotion:motion.matches,visible:visible()})}catch(e){animations.delete(fn);report(e)}};\n  const tick=t=>{raf=0;if(!canAnimate()||!animations.size){last=0;draw(0);return}const delta=last?Math.min(.05,(t-last)/1000):0;last=t;time+=delta;draw(delta);if(animations.size)raf=requestAnimationFrame(tick)};\n  const refresh=()=>{draw(0);if(canAnimate()&&animations.size){if(!raf){last=0;raf=requestAnimationFrame(tick)}}else{cancelAnimationFrame(raf);raf=0;last=0}};\n  motion.addEventListener(\'change\',refresh);document.addEventListener(\'visibilitychange\',refresh);\n  const formatNumber=${formatNumber.toString()};\n  const api={formatNumber,get snapshot(){return structuredClone(snapshot)},subscribe(fn){if(typeof fn!==\'function\')throw Error(\'Listener required\');listeners.add(fn);fn(api.snapshot);return()=>listeners.delete(fn)},setState(patch){if(!snapshot.disabled)send(\'patch\',patch)},animate(fn){if(typeof fn!==\'function\')throw Error(\'Animation callback required\');animations.add(fn);refresh();return()=>{animations.delete(fn);if(!animations.size){cancelAnimationFrame(raf);raf=0;last=0}}}};\n  ${node2.libraries?.includes("mechanism") ? MECHANISM_RUNTIME.replace(/<\\/script/gi, "<\\\\/script") + ";api.mechanism=__MotionMechanism.createMechanismAPI(api);" : ""}\n  Object.defineProperty(window,\'DSHUI\',{value:Object.freeze(api),writable:false});\n  for(const type of [\'click\',\'input\',\'change\',\'keydown\',\'pointerdown\'])document.addEventListener(type,e=>{if(snapshot.disabled){e.preventDefault();e.stopImmediatePropagation()}},true);\n  addEventListener(\'message\',event=>{\n    const m=event.data;if(event.source!==parent||m?.dshCanvas!==1||m.channel!==channel||m.type!==\'snapshot\')return;\n    snapshot=m.payload;for(const [k,v] of Object.entries(snapshot.theme??{}))document.documentElement.style.setProperty(\'--canvas-\'+k,v);\n    document.documentElement.style.colorScheme=snapshot.theme?.scheme??\'light\';document.documentElement.dataset.canvasScheme=snapshot.theme?.scheme??\'light\';\n    const wasStarted=started;\n    if(!started){started=true;document.getElementById(\'canvas\').innerHTML=source.html;const style=document.createElement(\'style\');style.textContent=source.css;document.head.append(style);const script=document.createElement(\'script\');script.nonce=${json(nonce2)};script.textContent=source.script;document.body.append(script)}\n    if(wasStarted)for(const fn of listeners)try{fn(api.snapshot)}catch(e){report(e)}\n    refresh();if(!wasStarted)send(\'mounted\');scheduleAudit();\n  });\n  let resizePending=false;new ResizeObserver(()=>{if(!started||resizePending)return;resizePending=true;requestAnimationFrame(()=>{resizePending=false;send(\'height\',Math.ceil(document.getElementById(\'canvas\').getBoundingClientRect().height))})}).observe(document.getElementById(\'canvas\'));\n  send(\'ready\');\n})();<\\/script></body></html>`;\n  }\n\n  // lib/components.js\n  var define = (fields2, purpose, presentation = "") => Object.freeze({ fields: Object.freeze(fields2), purpose, presentation });\n  var COMPONENTS = Object.freeze({\n    visual: define(["spec", "stateKey", "warnings"], "Extended native charts, tables, plots, quiz, forms, diagrams, media and 3D"),\n    heading: define(["text", "spans", "size", "weight", "color", "align", "lineHeight"], "Section heading", "tone"),\n    text: define(["text", "spans", "size", "weight", "color", "align", "lineHeight", "copyable", "title"], "Readable explanation; copyable:true adds a reusable text panel", "tone"),\n    code: define(["code", "lang", "title", "wrap"], "Literal copyable code; displayed only, never executed"),\n    callout: define(["text", "spans", "size", "weight", "color", "align", "lineHeight"], "A short emphasized paragraph", "tone"),\n    row: define(["children", "columns", "gap"], "Wrapping parallel content"),\n    column: define(["children", "gap"], "Ordered vertical content"),\n    card: define(["title", "children", "surface"], "Meaningful grouped section", "tone"),\n    details: define(["title", "children", "open"], "Collapsible supporting content", "tone"),\n    badge: define(["text"], "Short explicit status label", "tone"),\n    progress: define(["label", "value", "max", "unit"], "Declared numeric progress snapshot", "tone"),\n    steps: define(["title", "items"], "Ordered declared steps with an optional heading"),\n    metric: define(["label", "value", "unit", "decimals"], "Number with units, or a literal/bound status string", "tone"),\n    input: define(["label", "bind"], "String or numeric state input"),\n    slider: define(["label", "bind"], "Numeric state control"),\n    select: define(["label", "bind", "variant"], "Selection from declared state options; variant:segmented for 2..8 short options, dropdown otherwise"),\n    toggle: define(["label", "bind"], "Boolean state control"),\n    button: define(["text", "action", "href", "path", "variant"], "Agent follow-up, web link or host file opener", "icon"),\n    link: define(["text", "href", "path", "variant"], "User-clicked webpage or local file button", "icon"),\n    divider: define(["label"], "Quiet section divider"),\n    table: define(["label", "rows", "columns"], "Supplied or derived values; inline rows or data/derived reference"),\n    chart: define(["kind", "rows", "labelKey", "valueKey", "label", "unit", "xScale"], "Bar/line comparison with accessible data"),\n    sandbox: define(["title", "html", "css", "script", "fallback", "height", "libraries", "stateKeys", "dataKeys", "derivedKeys"], "Freeform isolated HTML/SVG/CSS/JavaScript visualization")\n  });\n  function componentFields(type) {\n    const c = Object.hasOwn(COMPONENTS, type) ? COMPONENTS[type] : void 0;\n    return c && ["id", "type", ...c.fields, ...c.presentation ? ["icon"] : [], ...c.presentation === "tone" ? ["tone"] : []];\n  }\n\n  // lib/identifiers.js\n  var IDENTIFIER_SOURCE = "[\\\\p{L}_][\\\\p{L}\\\\p{M}\\\\p{N}_]{0,63}";\n  var pattern = new RegExp(`^${IDENTIFIER_SOURCE}$`, "u");\n  var validIdentifier = (value) => typeof value === "string" && pattern.test(value) && !["constructor", "prototype", "__proto__"].includes(value);\n\n  // lib/author-expression.js\n  function compileExpression(source) {\n    const fail2 = () => {\n      throw new Error("DSH UI: invalid formula; use state.x, data.x, derived.x, item.x, numbers, strings, + - * /, comparisons, ?: and min/max/round/ceil/floor/abs");\n    };\n    if (typeof source !== "string" || !source.trim() || source.length > 2048) fail2();\n    const tokens = [];\n    let offset = 0;\n    const token2 = new RegExp(String.raw`\\s*(?:(\\d+(?:\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?|("(?:[^"\\\\]|\\\\.)*")|(${IDENTIFIER_SOURCE}(?:\\.${IDENTIFIER_SOURCE})?)|(===|!==|<=|>=|==|!=|[+*/()?,:<>-]))`, "uy");\n    while (offset < source.length) {\n      if (!source.slice(offset).trim()) break;\n      token2.lastIndex = offset;\n      const m2 = token2.exec(source);\n      if (!m2) fail2();\n      offset = token2.lastIndex;\n      tokens.push(m2[1] ? { number: Number(m2[1] + (m2[2] ?? "")) } : m2[3] ? { string: JSON.parse(m2[3]) } : m2[4] ?? m2[5]);\n      if (tokens.length > 256) fail2();\n    }\n    let pos = 0;\n    const operators = { "==": ["eq", 1], "===": ["eq", 1], "!=": ["neq", 1], "!==": ["neq", 1], "<": ["lt", 2], "<=": ["lte", 2], ">": ["gt", 2], ">=": ["gte", 2], "+": ["add", 3], "-": ["sub", 3], "*": ["mul", 4], "/": ["div", 4] };\n    const take = (t) => {\n      if (tokens[pos++] !== t) fail2();\n    };\n    function parse(min = 0, depth = 0) {\n      if (depth > 12) fail2();\n      const t = tokens[pos++];\n      let out;\n      if (t && typeof t === "object") out = { const: Object.hasOwn(t, "number") ? t.number : t.string };\n      else if (t === "true" || t === "false") out = { const: t === "true" };\n      else if (t === "(") {\n        out = parse(0, depth + 1);\n        take(")");\n      } else if (t === "-" || t === "+") {\n        const arg = parse(5, depth + 1);\n        out = t === "-" ? { op: "sub", args: [{ const: 0 }, arg] } : arg;\n      } else if (typeof t === "string" && t.split(".").length === 2 && ["state", "data", "derived", "item"].includes(t.split(".")[0]) && validIdentifier(t.split(".")[1])) out = { ref: t };\n      else if (["min", "max", "round", "ceil", "floor", "abs"].includes(t)) {\n        take("(");\n        const args = [parse(0, depth + 1)];\n        while (tokens[pos] === ",") {\n          pos++;\n          args.push(parse(0, depth + 1));\n          if (args.length > 8) fail2();\n        }\n        take(")");\n        out = { op: t, args };\n      } else fail2();\n      while (typeof tokens[pos] === "string" && Object.hasOwn(operators, tokens[pos]) && operators[tokens[pos]][1] >= min) {\n        const [op, precedence] = operators[tokens[pos++]];\n        out = { op, args: [out, parse(precedence + 1, depth + 1)] };\n      }\n      if (min === 0 && tokens[pos] === "?") {\n        pos++;\n        const yes = parse(0, depth + 1);\n        take(":");\n        out = { op: "if", args: [out, yes, parse(0, depth + 1)] };\n      }\n      return out;\n    }\n    const result = parse();\n    if (pos !== tokens.length) fail2();\n    return result;\n  }\n  function expandExpressions(doc2) {\n    const expression2 = (e) => {\n      if (!e || typeof e !== "object" || Array.isArray(e)) return e;\n      if (Object.hasOwn(e, "expr")) {\n        if (Object.keys(e).length !== 1) throw new Error("DSH UI: expr must be the only formula field");\n        return compileExpression(e.expr);\n      }\n      if (Array.isArray(e.args)) e.args = e.args.map(expression2);\n      if (e.map?.fields) for (const k2 of Object.keys(e.map.fields)) e.map.fields[k2] = expression2(e.map.fields[k2]);\n      return e;\n    };\n    if (doc2.derived && typeof doc2.derived === "object") for (const k2 of Object.keys(doc2.derived)) doc2.derived[k2] = expression2(doc2.derived[k2]);\n    const walk = (nodes) => {\n      if (!Array.isArray(nodes)) return;\n      for (const node2 of nodes) {\n        if (!node2 || typeof node2 !== "object") continue;\n        for (const field of ["text", "value", "max", "rows"]) if (Object.hasOwn(node2, field)) node2[field] = expression2(node2[field]);\n        if (["table", "chart"].includes(node2.type) && Array.isArray(node2.rows)) {\n          for (const row of node2.rows) if (row && typeof row === "object" && !Array.isArray(row)) for (const k2 of Object.keys(row)) row[k2] = expression2(row[k2]);\n        }\n        walk(node2.children);\n      }\n    };\n    walk(doc2.nodes);\n    return doc2;\n  }\n\n  // lib/visual-guard.js\n  var ne = ["h1", "h2", "h3", "body", "muted", "caption"];\n  var te = ["primary", "danger", "success", "ghost"];\n  var ie = ["success", "warn", "danger", "accent"];\n  var re = ["text", "email", "password", "color"];\n  var se = ["info", "success", "warning", "error"];\n  var U = ["bars", "line", "donut"];\n  var oe = ["line", "area", "scatter"];\n  var ae = ["16:9", "4:3", "1:1", "9:16"];\n  var ue = ["box", "sphere", "cone", "cylinder", "torus"];\n  var le = ["file", "dir"];\n  var de = ["architecture", "it-state", "flowchart", "sequence", "state", "er", "timeline", "swimlane", "quadrant", "radar", "loop", "nested", "tree", "org-chart", "layers", "venn", "pyramid", "bar", "line", "gantt", "scatter", "high-level", "process", "medallion", "data-flow", "dp-integration", "dp-security-matrix"];\n  var ce = ["focal", "backend", "store", "external", "input", "optional", "security"];\n  var fe = ["light", "dark", "editorial"];\n  var pe = ["solid", "dashed", "accent", "link"];\n  var me = ["auto", "orthogonal", "straight"];\n  var ge = ["bar", "line", "area", "pie", "scatter", "radar", "gauge", "funnel", "treemap", "sankey", "graph", "heatmap", "bigline", "wordCloud"];\n  var tn = ["hero"];\n  var ye = ["bar", "ring"];\n  var be = ["info", "success", "warning", "danger"];\n  var he = ["accent", "success", "warning", "danger"];\n  var Ee = ["text", "num", "delta", "bar", "badge", "spark", "ring", "index", "group"];\n  var b = (t, i, r = {}, e = {}) => {\n    let s = Object.fromEntries(Object.entries(i).filter(([u]) => u !== "type" && !t.includes(u))), n = e.oneOfRequired ?? [], o = e.conditionalRequired ?? [], a = [...n.map((u) => ({ kind: "one-of-required", fields: u })), ...o];\n    return { required: t, fields: i, optional: s, aliases: r, valueAliases: e.valueAliases ?? {}, oneOfRequired: n, conditionalRequired: o, rules: a, enums: e.enums ?? {}, nested: e.nested ?? {}, ...e.validator === void 0 ? {} : { validator: e.validator } };\n  };\n  var G = (t, i, r = {}, e = {}, s = {}) => ({ required: t, fields: i, enums: e, nested: r, aliases: s });\n  var h = { type: "string", span: "number", id: "string" };\n  var De = G(["label", "value"], { label: "string", value: "number", color: "string" });\n  var rn = G(["label", "data"], { label: "string", color: "string", data: "array" }, { data: De });\n  var sn = G(["title"], { title: "string", desc: "string" });\n  var on = G(["key", "value"], { key: "string", value: "string" }, {}, {}, { label: "key" });\n  var an = G(["title"], { title: "string", desc: "string", time: "string" });\n  var un = G(["path", "newText"], { path: "string", oldText: "string-or-null", newText: "string" });\n  var ln = G(["name", "value"], { name: "string", value: "number", min: "number", max: "number", step: "number", animateTo: "number", durationMs: "number", loop: "boolean" });\n  var dn = G(["expr"], { expr: "string", label: "string", color: "string", kind: "string", params: "array" }, { params: ln }, { kind: oe });\n  var cn = G(["shape"], { shape: "string", color: "string", position: "array", rotation: "array", scale: "unknown", size: "unknown" }, {}, { shape: ue });\n  function Oe(t) {\n    return G(["name"], { name: "string", type: "string", children: "array" }, t > 0 ? { children: Oe(t - 1) } : {}, { type: le }, { label: "name" });\n  }\n  var fn = Oe(6);\n  var pn = G(["label", "items"], { label: "string", items: "nodes", content: "nodes" });\n  var mn = G(["title", "items"], { title: "string", items: "nodes" });\n  var gn = G(["id", "label"], { id: "string", label: "string", sub: "string", type: "string", x: "number", y: "number", w: "number", h: "number", tag: "string" }, {}, { type: ce });\n  var yn = G(["from", "to"], { from: "string", to: "string", label: "string", kind: "string", route: "string" }, {}, { kind: pe, route: me });\n  var bn = G(["label"], { label: "string", x: "number", y: "number", w: "number", h: "number" });\n  var hn = G([], { paper: "string", "paper-2": "string", ink: "string", muted: "string", soft: "string", rule: "string", accent: "string", "accent-tint": "string", link: "string" });\n  var V = b(["items"], { title: "string", gap: "number", panel: "boolean", append: "boolean", items: "nodes" });\n  var T = { accordion: b(["items"], { ...h, items: "array" }, {}, { nested: { items: mn } }), audio: b(["src"], { ...h, src: "string", alt: "string", loop: "boolean" }, { url: "src", link: "src" }), avatar: b(["name"], { ...h, name: "string", color: "string" }), badge: b(["label"], { ...h, label: "string", tone: "string", icon: "string" }, { text: "label", value: "label" }, { enums: { tone: ie } }), breadcrumb: b(["items"], { ...h, items: "array" }), button: b(["label"], { ...h, label: "string", tone: "string", full: "boolean", small: "boolean", icon: "string", action: "string" }, {}, { enums: { tone: te } }), callout: b(["content"], { ...h, title: "string", content: "string", tone: "string" }, { kind: "tone", text: "content", body: "content", desc: "content" }, { enums: { tone: se }, valueAliases: { tone: { danger: "error", warn: "warning" } } }), card: b(["items"], { ...h, title: "string", items: "nodes", tone: "string", accent: "string" }, { label: "title", content: "items" }, { enums: { tone: be } }), chart: b([], { ...h, kind: "string", data: "array", series: "array", horizontal: "boolean", stacked: "boolean", filter: "string", palette: "array" }, {}, { oneOfRequired: [["data", "series"]], conditionalRequired: [{ kind: "required-if", when: { field: "kind", equals: "donut" }, required: ["data"] }], nested: { data: De, series: rn }, enums: { kind: U }, validator: { name: "chart-renderability" } }), checkbox: b(["label"], { ...h, label: "string", checked: "boolean", action: "string", group: "string" }), code: b(["code"], { ...h, lang: "string", code: "string", title: "string", wrap: "boolean" }, { content: "code", text: "code" }), col: b(["items"], { ...h, items: "nodes", gap: "number" }), copy: b(["text"], { ...h, label: "string", text: "string" }, { content: "text", code: "text", value: "text" }), diagram: b(["kind", "nodes"], { ...h, kind: "string", variant: "string", title: "string", nodes: "array", edges: "array", zones: "array", theme: "object" }, {}, { nested: { nodes: gn, edges: yn, zones: bn, theme: hn }, enums: { kind: de, variant: fe } }), diff: b(["diffs"], { ...h, diffs: "array" }, { items: "diffs", files: "diffs" }, { nested: { diffs: un } }), divider: b([], h), echart: b([], { ...h, title: "string", height: "number", preset: "string", data: "array", series: "array", links: "array", palette: "array", option: "object" }, {}, { oneOfRequired: [["option", "data", "series", "links"]], enums: { preset: ge } }), "file-tree": b(["items"], { ...h, items: "array" }, { nodes: "items" }, { nested: { items: fn } }), grid: b(["items"], { ...h, cols: "number", items: "nodes" }), image: b(["src"], { ...h, src: "string", alt: "string" }, { url: "src", link: "src" }), input: b([], { ...h, label: "string", placeholder: "string", value: "string", inputType: "string", action: "string", id: "string" }, {}, { enums: { inputType: re } }), json: b(["value"], { ...h, value: "unknown" }), keyvalue: b(["pairs"], { ...h, pairs: "array" }, { items: "pairs", rows: "pairs", entries: "pairs" }, { nested: { pairs: on } }), link: b(["label"], { ...h, label: "string", href: "string" }), list: b(["items"], { ...h, items: "array", filter: "string" }), mermaid: b(["code"], { ...h, code: "string" }), svg: b(["code"], { ...h, code: "string", title: "string", height: "number" }), plot: b(["series"], { ...h, series: "array", xMin: "number", xMax: "number", yMin: "number", yMax: "number", title: "string" }, {}, { nested: { series: dn } }), progress: b(["value"], { ...h, value: "number", label: "string", valueLabel: "string", variant: "string", target: "number" }, {}, { enums: { variant: ye } }), quiz: b(["question", "options"], { ...h, question: "string", options: "array", explanation: "string", id: "string", action: "string" }, { title: "question", text: "question", choices: "options", items: "options" }), radio: b(["options"], { ...h, label: "string", options: "array", selected: "number", action: "string", group: "string", answer: "unknown", explanation: "string" }, { items: "options" }), row: b(["items"], { ...h, items: "nodes", wrap: "boolean", spacer: "boolean" }), scene3d: b(["meshes"], { ...h, title: "string", meshes: "array", ambient: "number", background: "string" }, {}, { nested: { meshes: cn } }), select: b(["options"], { ...h, label: "string", options: "array", action: "string", selected: "number", id: "string" }, { items: "options" }), slider: b([], { ...h, label: "string", min: "number", max: "number", step: "number", value: "number", action: "string", id: "string" }), spacer: b([], h), hero: b(["title"], { ...h, title: "string", subtitle: "string", value: "string", label: "string", delta: "string", spark: "array", tone: "string" }, {}, { enums: { tone: he } }), stat: b(["label", "value"], { ...h, label: "string", value: "string", delta: "string", spark: "array", size: "string" }, {}, { enums: { size: tn } }), steps: b(["steps"], { ...h, steps: "array", current: "number" }, { items: "steps" }, { nested: { steps: sn } }), submit: b(["label"], { ...h, label: "string", action: "string", resetAction: "string", groups: "array" }), switch: b(["label"], { ...h, label: "string", checked: "boolean", action: "string" }), table: b(["columns", "rows"], { ...h, columns: "array", rows: "array", types: "array", total: "boolean", details: "array", filter: "string", filterColumn: "number", sortField: "string", export: "boolean" }, { headers: "columns", data: "rows", items: "rows" }), tabs: b(["tabs"], { ...h, tabs: "array" }, {}, { nested: { tabs: pn } }), text: b(["content"], { ...h, content: "string", size: "string", center: "boolean", copyable: "boolean", title: "string" }, { text: "content" }, { enums: { size: ne } }), textarea: b([], { ...h, label: "string", placeholder: "string", rows: "number", value: "string", action: "string", id: "string" }), timeline: b(["items"], { ...h, items: "array" }, {}, { nested: { items: an } }), video: b(["src"], { ...h, src: "string", alt: "string", poster: "string", loop: "boolean", muted: "boolean", aspectRatio: "string" }, { url: "src", link: "src" }, { enums: { aspectRatio: ae } }) };\n  var q = new Set(Object.keys(T));\n  function N(t) {\n    if (typeof t != "object" || t === null) return false;\n    let i = t;\n    return typeof i.type != "string" || i.type === "" ? false : Array.isArray(i.items) ? q.has(i.type) : true;\n  }\n  function z(t) {\n    if (typeof t != "object" || t === null) return null;\n    let i = t;\n    if (typeof i.type != "string" || i.type === "") return null;\n    let r = q.has(i.type) ? T[i.type] : void 0, e = typeof i.title == "string" && r !== void 0 && !("title" in r.fields) ? i.title : void 0, s = { ...t };\n    return e !== void 0 && delete s.title, { items: [s], ...e !== void 0 ? { title: e } : {}, ...i.panel === true ? { panel: true } : {}, ...i.append === true ? { append: true } : {} };\n  }\n  var m = { maxDepth: 8, maxNodes: 200, maxString: 2e3, maxCode: 12e3, maxMermaid: 8e3, maxGridCols: 12, maxTabs: 12, maxAccordionItems: 24, maxListItems: 50, maxOptions: 50, maxTableRows: 50, maxTableCols: 12, maxChartPoints: 60, maxPlotSeries: 8, maxPlotParams: 6, maxMeshes: 5, maxQuizOptions: 8, maxSteps: 24, maxTimelineItems: 24, maxBreadcrumbItems: 12, maxKeyValuePairs: 24, maxTreeDepth: 6, maxDiagramNodes: 9, maxDiagramEdges: 12, maxDiagramZones: 3, maxDiagramFocal: 2, maxDiagramLabel: 14, maxEChartOptionDepth: 10, maxEChartArrayLen: 500, maxEChartOptionNodes: 2e3 };\n  function ke(t) {\n    let i = t.columns, r = Array.isArray(i) && i.length > 0, e = r && Array.isArray(i) && typeof i[0] == "object" && i[0] !== null ? i.map($n) : i, s = kn(e), n = t.rows !== void 0 ? t.rows : t.data;\n    if (Array.isArray(n) && n.length > 0 && typeof n[0] == "object" && n[0] !== null && !Array.isArray(n[0])) {\n      let u = Array.isArray(t.columns) && t.columns.length > 0 && typeof t.columns[0] == "object" && t.columns[0] !== null ? t.columns.map(Sn).filter((d) => d !== void 0) : Object.keys(n[0]);\n      n = n.map((d) => u.map((c) => wn(d[c])));\n    }\n    let o = null;\n    if (!r && Array.isArray(n) && n.length > 0 && Array.isArray(n[0])) {\n      let u = xe(n), d = u.length === 0 ? null : An(u);\n      d !== null && xe(d.rows).length === d.rows.length && (o = d, s = d.columns.map((c) => c.slice(0, 128)));\n    }\n    if (s.length === 0 && !Array.isArray(t.columns)) return null;\n    let a = xe(o === null ? n : o.rows);\n    return Array.isArray(n) ? { columns: s.slice(0, m.maxTableCols), rows: a } : null;\n  }\n  function I(t) {\n    return ke(t)?.rows ?? [];\n  }\n  function xn(t, i) {\n    return !Array.isArray(t) || !Array.isArray(i) || i[0] !== "group" ? false : String(t[0] ?? "").trim() !== "" && t.slice(1).every((r) => String(r ?? "").trim() === "");\n  }\n  function C(t, i) {\n    let r = I(t);\n    return i >= 0 && i < r.length && !xn(r[i], t.types);\n  }\n  function kn(t) {\n    if (!Array.isArray(t)) return [];\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxTableCols) break;\n      if (typeof r == "string") i.push(r.slice(0, 128));\n      else if (r !== null && typeof r == "object") {\n        let e = r, s = typeof e.label == "string" ? e.label : typeof e.value == "string" ? e.value : typeof e.title == "string" ? e.title : JSON.stringify(r);\n        i.push(s.slice(0, 128));\n      }\n    }\n    return i;\n  }\n  function xe(t) {\n    if (!Array.isArray(t)) return [];\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxTableRows) break;\n      if (!Array.isArray(r)) continue;\n      let e = [];\n      for (let s of r) {\n        if (e.length >= m.maxTableCols) break;\n        typeof s == "string" ? e.push(s.slice(0, 256)) : typeof s == "number" && Number.isFinite(s) && e.push(s);\n      }\n      e.length > 0 && i.push(e);\n    }\n    return i;\n  }\n  function An(t) {\n    let i = t[0];\n    if (i === void 0 || i.length === 0) return null;\n    let r = t.slice(1);\n    if (r.length === 0) {\n      let e = i.map((s) => String(s).trim());\n      return e.every((s) => s !== "") ? { columns: e, rows: [] } : null;\n    }\n    return r.every((e) => e.length === i.length) ? { columns: i.map((e) => String(e).trim()), rows: r } : { columns: Array.from({ length: i.length }, (e, s) => `\\u5217${s + 1}`), rows: t };\n  }\n  function Sn(t) {\n    if (t === null || typeof t != "object" || Array.isArray(t)) return;\n    let i = t;\n    for (let r of ["key", "dataIndex", "title", "label"]) if (typeof i[r] == "string" && i[r] !== "") return i[r];\n  }\n  function wn(t) {\n    return typeof t == "string" || typeof t == "number" && Number.isFinite(t) ? t : t == null ? "" : JSON.stringify(t);\n  }\n  function $n(t) {\n    if (t === null || typeof t != "object" || Array.isArray(t)) return String(t);\n    let i = t;\n    for (let r of ["title", "label", "key", "dataIndex"]) if (typeof i[r] == "string" && i[r] !== "") return i[r];\n    return JSON.stringify(t);\n  }\n  function O(t) {\n    return typeof t == "object" && t !== null && !Array.isArray(t) ? t : void 0;\n  }\n  function Ae(t) {\n    let i = O(t);\n    return i !== void 0 && typeof i.type == "string";\n  }\n  var Gn = ["label", "value", "delta", "spark", "size"];\n  var Rn = { label: "title", name: "title", description: "desc", content: "desc", text: "desc", body: "desc", detail: "desc" };\n  function Tn(t, i, r) {\n    if (t.length === 0) return null;\n    let e = [];\n    for (let s = 0; s < t.length; s++) {\n      let n = t[s], o = O(n);\n      if (o === void 0) return null;\n      if (Ae(n)) {\n        e.push(r(n, `${i}.items[${s}]`));\n        continue;\n      }\n      if (typeof o.label != "string" && typeof o.value != "string") return null;\n      let a = { type: "stat" };\n      for (let u of Gn) o[u] !== void 0 && (a[u] = o[u]);\n      e.push(a);\n    }\n    return e;\n  }\n  function Cn(t, i, r, e) {\n    let s = T[r];\n    if (s === void 0) return t;\n    let n = { ...t };\n    for (let [o, a] of Object.entries(s.aliases)) {\n      if (!(o in n)) continue;\n      let u = `${i}.${o}`, d = a in n;\n      d || (n[a] = n[o]), delete n[o], e.push({ kind: "alias", path: u, message: d ? `${u} is ignored because canonical field \'${a}\' is present` : `${u} normalized/adopted as \'${a}\'`, type: r, field: o, canonical: a });\n    }\n    for (let [o, a] of Object.entries(s.valueAliases)) {\n      let u = n[o];\n      if (typeof u != "string") continue;\n      let d = a[u];\n      d === void 0 || d === u || (n[o] = d, e.push({ kind: "alias", path: `${i}.${o}`, message: `${i}.${o} \'${u}\' normalized to \'${d}\'`, type: r, field: o, canonical: d }));\n    }\n    return n;\n  }\n  function Se(t, i, r, e, s) {\n    if (Array.isArray(t)) return t.map((a, u) => Se(a, i, `${r}[${u}]`, e, s));\n    let n = O(t);\n    if (n === void 0) return t;\n    let o = { ...n };\n    for (let [a, u] of Object.entries(i.aliases)) !(a in o) || u in o || (o[u] = o[a], delete o[a], s.push({ kind: "alias", path: `${r}.${a}`, message: `${r}.${a} normalized/adopted as \'${u}\'`, type: e, field: a, canonical: u }));\n    for (let [a, u] of Object.entries(i.nested)) o[a] !== void 0 && (o[a] = Se(o[a], u, `${r}.${a}`, e, s));\n    return o;\n  }\n  function we(t) {\n    if (Array.isArray(t)) return t.map(we);\n    let i = O(t);\n    if (i === void 0) return t;\n    let r = { ...i };\n    return r.type === void 0 && Array.isArray(r.children) && (r.type = "dir"), r.children !== void 0 && (r.children = we(r.children)), r;\n  }\n  function $e(t, i, r) {\n    if (!Ae(t)) return t;\n    let e = t.type, s = T[e];\n    if (s === void 0) return t;\n    let n = Cn(t, i, e, r);\n    for (let [u, d] of Object.entries(s.nested)) n[u] !== void 0 && (n[u] = Se(n[u], d, `${i}.${u}`, e, r));\n    let o = (u, d) => $e(u, d, r), a = (u, d) => Array.isArray(u) ? u.map((c, f) => o(c, `${d}[${f}]`)) : u;\n    if (e === "file-tree" && n.items !== void 0 && (n.items = we(n.items)), e === "stat" && Array.isArray(n.items) && n.label === void 0 && n.value === void 0) {\n      let u = Tn(n.items, i, o);\n      if (u !== null) return r.push({ kind: "alias", path: `${i}.items`, message: `${i}.items normalized into a row of \'stat\' nodes`, type: e, field: "items", canonical: "row" }), { type: "row", items: u, ...n.span !== void 0 ? { span: n.span } : {} };\n    }\n    if (e === "row" || e === "col" || e === "grid" || e === "card" || e === "file-tree" || e === "timeline" || e === "breadcrumb") e !== "file-tree" && e !== "timeline" && e !== "breadcrumb" && (n.items = a(n.items, `${i}.items`));\n    else if (e === "list" && Array.isArray(n.items)) n.items = n.items.map((u, d) => {\n      if (Ae(u)) return o(u, `${i}.items[${d}]`);\n      if (Array.isArray(u) && u.length === 1 && typeof u[0] == "string") return u[0];\n      let c = O(u);\n      if (c === void 0) return u;\n      let f = { ...c }, g = `${i}.items[${d}]`;\n      for (let [x, $] of Object.entries(Rn)) {\n        if (!(x in f)) continue;\n        let J = $ in f;\n        J || (f[$] = f[x]), delete f[x], r.push({ kind: "alias", path: `${g}.${x}`, type: e, field: x, canonical: $, message: J ? `${g}.${x} is ignored because canonical field \'${$}\' is present` : `${g}.${x} normalized/adopted as \'${$}\'` });\n      }\n      return !("title" in f) && typeof f.desc == "string" && (f.title = f.desc, delete f.desc, r.push({ kind: "alias", path: `${g}.desc`, type: e, field: "desc", canonical: "title", message: `${g}.desc normalized/adopted as \'title\'` })), f;\n    });\n    else if (e === "keyvalue" && Array.isArray(n.pairs)) n.pairs.length > 0 && n.pairs.every((u) => Array.isArray(u)) && (n.pairs = n.pairs.map((u) => {\n      let d = u;\n      return { key: d[0], value: d.length > 1 ? d[1] : "" };\n    }));\n    else if (e === "tabs" && Array.isArray(n.tabs)) n.tabs = n.tabs.map((u, d) => {\n      let c = O(u);\n      if (c === void 0) return u;\n      let f = { ...c };\n      if ("content" in f) {\n        let g = `${i}.tabs[${d}].content`, x = "items" in f;\n        x || (f.items = f.content), delete f.content, r.push({ kind: "alias", path: g, message: x ? `${g} is ignored because canonical field \'items\' is present` : `${g} normalized/adopted as \'items\'`, type: e, field: "content", canonical: "items" });\n      }\n      return f.items = Array.isArray(f.items) ? f.items.map((g, x) => o(g, `${i}.tabs[${d}].items[${x}]`)) : f.items === void 0 ? [] : [o(f.items, `${i}.tabs[${d}].items[0]`)], f;\n    });\n    else if (e === "accordion" && Array.isArray(n.items)) n.items = n.items.map((u, d) => {\n      let c = O(u);\n      return c === void 0 ? u : { ...c, items: Array.isArray(c.items) ? c.items.map((f, g) => o(f, `${i}.items[${d}].items[${g}]`)) : c.items };\n    });\n    else if (e === "table" && Array.isArray(n.details)) {\n      let u = { columns: n.columns, rows: n.rows, types: n.types };\n      n.details = n.details.map((d, c) => !Array.isArray(d) || !C(u, c) ? d : d.map((f, g) => o(f, `${i}.details[${c}][${g}]`)));\n    }\n    return n;\n  }\n  function Ie(t) {\n    let i = [];\n    if (typeof t == "string") try {\n      let s = JSON.parse(t);\n      (O(s) !== void 0 || Array.isArray(s)) && (t = s, i.push({ kind: "alias", path: "spec", message: "double-encoded JSON string unwrapped into a spec value" }));\n    } catch {\n    }\n    Array.isArray(t) && t.length > 0 && (t = { items: t }, i.push({ kind: "alias", path: "items", message: "root array normalized into an items envelope" }));\n    let r = O(t);\n    if (r === void 0) return { value: t, warnings: i };\n    let e = { ...r };\n    return N(e) ? { value: $e(e, "spec", i), warnings: i } : (Array.isArray(e.items) && (e.items = e.items.map((s, n) => $e(s, `items[${n}]`, i))), { value: e, warnings: i });\n  }\n  function F(t) {\n    return typeof t == "object" && t !== null && !Array.isArray(t) ? t : void 0;\n  }\n  function _e(t) {\n    let i = F(t);\n    return i !== void 0 && typeof i.type == "string";\n  }\n  function Ge(t, i, r) {\n    if (!_e(t)) return;\n    let e = t.type, s = T[e];\n    if (s === void 0) return;\n    r(t, i, s);\n    let n = (o, a) => Ge(o, a, r);\n    if ((e === "row" || e === "col" || e === "grid" || e === "card") && Array.isArray(t.items)) t.items.forEach((o, a) => n(o, `${i}.items[${a}]`));\n    else if (e === "list" && Array.isArray(t.items)) t.items.forEach((o, a) => n(o, `${i}.items[${a}]`));\n    else if (e === "tabs" && Array.isArray(t.tabs)) t.tabs.forEach((o, a) => {\n      let u = F(o);\n      u !== void 0 && (Array.isArray(u.items) ? u.items.forEach((d, c) => n(d, `${i}.tabs[${a}].items[${c}]`)) : n(u.items, `${i}.tabs[${a}].items`));\n    });\n    else if (e === "accordion" && Array.isArray(t.items)) t.items.forEach((o, a) => {\n      let u = F(o);\n      u?.items !== void 0 && Array.isArray(u.items) && u.items.forEach((d, c) => n(d, `${i}.items[${a}].items[${c}]`));\n    });\n    else if (e === "table" && Array.isArray(t.details)) {\n      let o = { columns: t.columns, rows: t.rows, types: t.types };\n      t.details.forEach((a, u) => {\n        Array.isArray(a) && C(o, u) && a.forEach((d, c) => n(d, `${i}.details[${u}][${c}]`));\n      });\n    }\n  }\n  function B(t, i, r, e) {\n    t.push({ kind: "unknown-field", path: `${i}.${r}`, message: `${i}.${r}: unknown field for \'${e}\'`, type: e, field: r });\n  }\n  function Y(t, i, r, e, s) {\n    let n = F(t);\n    if (n !== void 0) {\n      for (let o of Object.keys(n)) o in r.fields || B(s, i, o, e);\n      for (let [o, a] of Object.entries(r.nested)) {\n        let u = n[o];\n        Array.isArray(u) ? u.forEach((d, c) => Y(d, `${i}.${o}[${c}]`, a, e, s)) : u !== void 0 && Y(u, `${i}.${o}`, a, e, s);\n      }\n    }\n  }\n  function Nn(t, i, r, e) {\n    for (let [s, n] of Object.entries(r.nested)) {\n      let o = t[s];\n      Array.isArray(o) ? o.forEach((a, u) => Y(a, `${i}.${s}[${u}]`, n, t.type, e)) : o !== void 0 && Y(o, `${i}.${s}`, n, t.type, e);\n    }\n  }\n  function Pe(t) {\n    let i = [], r = F(t);\n    if (r === void 0) return i;\n    let e = (s, n, o) => {\n      for (let a of Object.keys(s)) a === "type" || a in o.fields || B(i, n, a, s.type);\n      Nn(s, n, o, i), s.type === "list" && Array.isArray(s.items) && s.items.forEach((a, u) => {\n        if (_e(a)) return;\n        let d = F(a);\n        if (d !== void 0) for (let c of Object.keys(d)) {\n          if (c === "title" || c === "desc") continue;\n          let f = `${n}.items[${u}]`;\n          i.push({ kind: "unknown-field", path: `${f}.${c}`, message: `${f}.${c}: list items render \'title\' and \'desc\' only \\u2014 \'${c}\' is dropped`, type: "list", field: c });\n        }\n      });\n    };\n    if (Array.isArray(r.items) && !N(r)) {\n      for (let s of Object.keys(r)) s in V.fields || B(i, "spec", s, "spec");\n      r.items.forEach((s, n) => Ge(s, `items[${n}]`, e));\n    } else if (typeof r.type == "string") Ge(r, "spec", e);\n    else for (let s of Object.keys(r)) s in V.fields || B(i, "spec", s, "spec");\n    return i;\n  }\n  function ve(t, i) {\n    let r = (s, n, o) => {\n      o > m.maxDepth || s.forEach((a, u) => e(a, `${n}[${u}]`, o));\n    }, e = (s, n, o) => {\n      if (!(o > m.maxDepth) && (i(s, n), !(o >= m.maxDepth))) switch (s.type) {\n        case "row":\n        case "col":\n        case "grid":\n        case "card":\n          r(s.items, `${n}.items`, o + 1);\n          break;\n        case "tabs":\n          s.tabs.forEach((a, u) => r(a.items, `${n}.tabs[${u}].items`, o + 1));\n          break;\n        case "accordion":\n          s.items.forEach((a, u) => r(a.items, `${n}.items[${u}].items`, o + 1));\n          break;\n        case "list":\n          s.items.forEach((a, u) => {\n            a !== null && typeof a == "object" && "type" in a && e(a, `${n}.items[${u}]`, o + 1);\n          });\n          break;\n        case "table":\n          s.details?.slice(0, I(s).length).forEach((a, u) => {\n            a !== null && C(s, u) && r(a, `${n}.details[${u}]`, o + 1);\n          });\n          break;\n      }\n    };\n    r(t.items, "items", 0);\n  }\n  function Re(t) {\n    let i = /* @__PURE__ */ new Map(), r = /* @__PURE__ */ new Map(), e = [], s = [];\n    ve(t, (n, o) => {\n      if (n.type === "submit") {\n        n.groups !== void 0 && s.push({ groups: n.groups, path: o });\n        return;\n      }\n      let a, u;\n      switch (n.type) {\n        case "radio":\n          if (n.group === void 0) return;\n          a = { kind: "radio", key: n.group, label: n.label ?? n.group, options: n.options.slice(0, m.maxOptions), ...n.answer === void 0 ? {} : { answer: n.answer }, ...n.explanation === void 0 ? {} : { explanation: n.explanation } }, u = `${o}.group`;\n          break;\n        case "checkbox":\n          if (n.group === void 0) return;\n          a = { kind: "checkbox", key: n.group }, u = `${o}.group`;\n          break;\n        case "input":\n        case "textarea":\n        case "select":\n        case "slider":\n          if (n.id === void 0) return;\n          a = { kind: "field", key: n.id, fieldType: n.type, secret: n.type === "input" && n.inputType === "password" }, u = `${o}.id`;\n          break;\n        default:\n          return;\n      }\n      if (a === void 0) return;\n      let d = i.get(a.key);\n      if (d !== void 0) {\n        (d.kind !== "checkbox" || a.kind !== "checkbox") && e.push(`${u} conflicts with ${r.get(a.key)}: submission key \'${a.key}\' is already used`);\n        return;\n      }\n      i.set(a.key, a), r.set(a.key, u);\n    });\n    for (let { groups: n, path: o } of s) {\n      let a = /* @__PURE__ */ new Set();\n      n.forEach((u, d) => {\n        let c = `${o}.groups[${d}]`;\n        a.has(u) && e.push(`${c}: duplicate submission member \'${u}\'`), a.add(u);\n        let f = i.get(u);\n        f === void 0 ? e.push(`${c}: submit.groups references unknown submission member \'${u}\'`) : f.kind === "field" && f.secret && e.push(`${c}: submit.groups cannot require secret field \'${u}\'`);\n      });\n    }\n    return { registry: { members: i }, diagnostics: e };\n  }\n  function En(t, i) {\n    return typeof t == "string" && i.includes(t);\n  }\n  function p(t, i) {\n    return typeof t == "string" ? t.slice(0, i) : void 0;\n  }\n  var Dn = /^(?:#[\\da-fA-F]{3,8}|rgba?\\([^)]{0,64}\\)|hsla?\\([^)]{0,64}\\)|var\\(--dsw-[\\w-]+(?:,\\s*#[0-9a-fA-F]{3,8})?\\))$/;\n  function E(t) {\n    if (typeof t != "string") return;\n    let i = t.trim();\n    return i.length <= 64 && Dn.test(i) ? i : void 0;\n  }\n  function qe(t) {\n    if (typeof t != "string") return;\n    let i = t.trim();\n    if (!(i.length > 2048)) return /^https?:\\/\\//i.test(i) || /^mailto:[^@\\s]+@[^@\\s]+$/i.test(i) ? i : void 0;\n  }\n  function K(t) {\n    if (typeof t != "string") return;\n    let i = t.trim();\n    if (!(i === "" || i.length > 2048)) {\n      if (/^https?:\\/\\//i.test(i)) return i;\n      if (!(/^[a-z][a-z0-9+.-]*:/i.test(i) || /^[/\\\\]{2}/.test(i))) return i;\n    }\n  }\n  function k(t, i, r) {\n    return typeof t == "number" && Number.isFinite(t) ? Math.min(r, Math.max(i, t)) : void 0;\n  }\n  function D(t, i, r) {\n    return typeof t == "number" && Number.isFinite(t) ? Math.min(r, Math.max(i, Math.trunc(t))) : void 0;\n  }\n  function w(t, i) {\n    return En(t, i) ? t : void 0;\n  }\n  function y(t) {\n    return typeof t == "object" && t !== null && !Array.isArray(t) ? t : void 0;\n  }\n  function l(t, i) {\n    return i === void 0 ? {} : { [t]: i };\n  }\n  function On(t) {\n    if (t.length > 2048) return;\n    let i = t.indexOf("#"), r = i < 0 ? t : t.slice(0, i);\n    if (r.includes("?")) return;\n    let e;\n    try {\n      e = decodeURIComponent(r);\n    } catch {\n      return;\n    }\n    if (e === "" || /[\\u0000-\\u001f\\u007f]/.test(e) || /^[\\\\/]{2}/.test(e) || /^[a-z][a-z\\d+.-]*:/i.test(e) && !/^[a-z]:[\\\\/]/i.test(e)) return;\n    if (i < 0) return { path: e };\n    let s = /^L([1-9]\\d*)(?:-L([1-9]\\d*))?$/.exec(t.slice(i + 1));\n    if (s === null) return;\n    let n = Number(s[1]), o = s[2] === void 0 ? n : Number(s[2]);\n    if (!(!Number.isSafeInteger(n) || !Number.isSafeInteger(o) || o < n)) return { path: e, line: n };\n  }\n  function ze(t) {\n    let i = qe(t);\n    if (i !== void 0) return { type: "external", href: i };\n    if (typeof t != "string") return { type: "invalid" };\n    let r = On(t.trim());\n    return r === void 0 ? { type: "invalid" } : { type: "file", file: r };\n  }\n  function H(t, i) {\n    switch (i) {\n      case "string":\n        return typeof t == "string";\n      case "string-or-null":\n        return t === null || typeof t == "string";\n      case "number":\n        return typeof t == "number" && Number.isFinite(t);\n      case "boolean":\n        return typeof t == "boolean";\n      case "nodes":\n        return Array.isArray(t);\n      case "array":\n        return Array.isArray(t);\n      case "object":\n        return y(t) !== void 0;\n      case "unknown":\n        return true;\n    }\n  }\n  function j(t) {\n    switch (t) {\n      case "string-or-null":\n        return "a string or null";\n      case "number":\n        return "a finite number";\n      case "boolean":\n        return "a boolean";\n      case "nodes":\n      case "array":\n        return "an array";\n      case "object":\n        return "an object";\n      case "unknown":\n        return "a value";\n      default:\n        return "a string";\n    }\n  }\n  function v(t, i, r) {\n    return t.some((e) => e.startsWith(`${i}.${r} `) || e.includes(`\'${r}\'`) || e.includes(`requires ${r}`));\n  }\n  function Ke(t, i, r, e, s = []) {\n    for (let [n, o] of Object.entries(r.fields)) s.includes(n) || t[n] === void 0 || !H(t[n], o) && !v(e, i, n) && e.push(`${i}.${n} must be ${j(o)}`);\n    for (let [n, o] of Object.entries(r.enums)) s.includes(n) || t[n] === void 0 || !H(t[n], "string") || !o.includes(t[n]) && !v(e, i, n) && e.push(`${i}.${n} must be one of ${o.join(", ")}`);\n  }\n  function W(t, i, r, e) {\n    let s = y(t);\n    if (s === void 0) {\n      e.push(`${i} must be an object`);\n      return;\n    }\n    for (let n of r.required) {\n      let o = r.fields[n];\n      s[n] === void 0 ? v(e, i, n) || e.push(`${i}: requires ${n}${o === void 0 ? "" : ` (${j(o)})`}`) : o !== void 0 && !H(s[n], o) && (v(e, i, n) || e.push(`${i}.${n} must be ${j(o)}`));\n    }\n    for (let [n, o] of Object.entries(r.fields)) s[n] !== void 0 && !H(s[n], o) && (v(e, i, n) || e.push(`${i}.${n} must be ${j(o)}`));\n    for (let [n, o] of Object.entries(r.enums)) s[n] !== void 0 && typeof s[n] == "string" && !o.includes(s[n]) && (v(e, i, n) || e.push(`${i}.${n} must be one of ${o.join(", ")}`));\n    for (let [n, o] of Object.entries(r.nested)) {\n      let a = s[n];\n      a !== void 0 && (Array.isArray(a) ? a.forEach((u, d) => W(u, `${i}.${n}[${d}]`, o, e)) : W(a, `${i}.${n}`, o, e));\n    }\n  }\n  function Mn(t, i, r, e) {\n    for (let [s, n] of Object.entries(r.nested)) {\n      let o = t[s];\n      o !== void 0 && (Array.isArray(o) ? o.forEach((a, u) => W(a, `${i}.${s}[${u}]`, n, e)) : W(o, `${i}.${s}`, n, e));\n    }\n  }\n  function He(t) {\n    let i = t.rows !== void 0 ? t.rows : t.data;\n    return !Array.isArray(i) || i.length === 0 ? false : Array.isArray(i[0]);\n  }\n  function In(t, i, r, e) {\n    let s = String(t.type), n = (a) => v(e, i, a), o = s === "table" && He(t) ? "columns" : null;\n    for (let a of r.required) {\n      let u = r.fields[a];\n      if (u === void 0 || t[a] === void 0) {\n        a !== o && !n(a) && e.push(`${i}: type \'${s}\' requires ${a}${u === void 0 ? "" : ` (${j(u)})`}`);\n        continue;\n      }\n      !H(t[a], u) && !n(a) && e.push(`${i}.${a} must be ${j(u)}`);\n    }\n    Ke(t, i, r, e, ["type"]);\n    for (let a of r.oneOfRequired) !a.some((u) => t[u] !== void 0) && !e.some((u) => u.includes(`requires ${a.join(" or ")}`)) && e.push(`${i}: type \'${s}\' requires one of ${a.join(" or ")}`);\n    for (let a of r.conditionalRequired) if (t[a.when.field] === a.when.equals) for (let u of a.required) t[u] === void 0 && !n(u) && e.push(`${i}: type \'${s}\' requires ${u}${a.message === void 0 ? "" : ` (${a.message})`}`);\n    Mn(t, i, r, e);\n  }\n  function _(t, i, r) {\n    if (!Array.isArray(t)) return [];\n    let e = [];\n    for (let s of t) {\n      if (i.remaining <= 0) break;\n      i.remaining -= 1;\n      let n = Je(s, i, r);\n      n !== null && e.push(n);\n    }\n    return e;\n  }\n  function Fe(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t.slice(0, 12)) {\n      let e = E(r);\n      e !== void 0 && i.push(e);\n    }\n    return i.length > 0 ? i : void 0;\n  }\n  function je(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t.slice(0, 60)) {\n      let e = typeof r == "number" ? r : Number(r);\n      if (!Number.isFinite(e)) return;\n      i.push(e);\n    }\n    return i.length >= 2 ? i : void 0;\n  }\n  function Je(t, i, r) {\n    let e = _n(t, i, r);\n    if (e === null) return null;\n    let s = D(y(t)?.span, 2, 12), n = p(y(t)?.id, 64);\n    return { ...e, ...l("span", s), ...l("id", n) };\n  }\n  function _n(t, i, r) {\n    if (r > m.maxDepth) return null;\n    let e = y(t);\n    if (e === void 0) return null;\n    let s = e.type;\n    if (typeof s != "string") return null;\n    switch (s) {\n      case "text": {\n        let n = p(e.content, m.maxString) ?? p(e.text, m.maxString);\n        return n === void 0 ? null : { type: "text", content: n, ...l("copyable", e.copyable === true ? true : void 0), ...l("title", p(e.title, m.maxString)), ...l("size", w(e.size, ne)), ...l("center", e.center === true ? true : void 0) };\n      }\n      case "row":\n        return { type: "row", items: _(e.items, i, r + 1), ...l("wrap", e.wrap === true ? true : void 0), ...l("spacer", e.spacer === true ? true : void 0) };\n      case "col":\n        return { type: "col", items: _(e.items, i, r + 1), ...l("gap", k(e.gap, 0, 96)) };\n      case "grid":\n        return { type: "grid", cols: D(e.cols, 1, m.maxGridCols) ?? 1, items: _(e.items, i, r + 1) };\n      case "card":\n        return { type: "card", items: _(e.items, i, r + 1), ...l("title", p(e.title, m.maxString)), ...l("tone", w(e.tone, be)), ...l("accent", E(e.accent)) };\n      case "button": {\n        let n = p(e.label, m.maxString);\n        return n === void 0 ? null : { type: "button", label: n, ...l("tone", w(e.tone, te)), ...l("full", e.full === true ? true : void 0), ...l("small", e.small === true ? true : void 0), ...l("icon", p(e.icon, 64)), ...l("action", p(e.action, 200)) };\n      }\n      case "input":\n        return { type: "input", ...l("label", p(e.label, m.maxString)), ...l("placeholder", p(e.placeholder, m.maxString)), ...l("value", p(e.value, m.maxString)), ...l("inputType", w(e.inputType, re)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };\n      case "select": {\n        let n = Q(e.options, m.maxOptions, m.maxString);\n        return n === void 0 ? null : { type: "select", options: n, ...l("label", p(e.label, m.maxString)), ...l("action", p(e.action, 200)), ...l("selected", D(e.selected, 0, n.length - 1)), ...l("id", p(e.id, 200)) };\n      }\n      case "checkbox": {\n        let n = p(e.label, m.maxString);\n        return n === void 0 ? null : { type: "checkbox", label: n, ...l("checked", e.checked === true ? true : void 0), ...l("action", p(e.action, 200)), ...l("group", p(e.group, 200)) };\n      }\n      case "link": {\n        let n = p(e.label, m.maxString);\n        if (n === void 0) return null;\n        let o = ze(e.href), a = o.type === "external" ? o.href : o.type === "file" ? String(e.href).trim() : void 0;\n        return { type: "link", label: n, ...l("href", a) };\n      }\n      case "image": {\n        let n = K(e.src);\n        return n === void 0 ? null : { type: "image", src: n, ...l("alt", p(e.alt, m.maxString)) };\n      }\n      case "audio": {\n        let n = K(e.src);\n        return n === void 0 ? null : { type: "audio", src: n, ...l("alt", p(e.alt, m.maxString)), ...l("loop", e.loop === true ? true : void 0) };\n      }\n      case "video": {\n        let n = K(e.src);\n        return n === void 0 ? null : { type: "video", src: n, ...l("alt", p(e.alt, m.maxString)), ...l("poster", K(e.poster)), ...l("loop", e.loop === true ? true : void 0), ...l("muted", e.muted === true ? true : void 0), ...l("aspectRatio", w(e.aspectRatio, ae)) };\n      }\n      case "badge": {\n        let n = p(e.label, m.maxString) ?? p(e.text, m.maxString) ?? p(e.value, m.maxString);\n        return n === void 0 ? null : { type: "badge", label: n, ...l("tone", w(e.tone, ie)), ...l("icon", p(e.icon, 64)) };\n      }\n      case "hero": {\n        let n = p(e.title, m.maxString);\n        return n === void 0 ? null : { type: "hero", title: n, ...l("subtitle", p(e.subtitle, m.maxString)), ...l("value", p(e.value, 128)), ...l("label", p(e.label, m.maxString)), ...l("delta", p(e.delta, 64)), ...l("spark", je(e.spark)), ...l("tone", w(e.tone, he)) };\n      }\n      case "stat": {\n        let n = p(e.label, m.maxString), o = p(e.value, 128);\n        return n === void 0 || o === void 0 ? null : { type: "stat", label: n, value: o, ...l("delta", p(e.delta, 64)), ...l("spark", je(e.spark)), ...l("size", e.size === "hero" ? "hero" : void 0) };\n      }\n      case "progress": {\n        let n = k(e.value, 0, 100);\n        return n === void 0 ? null : { type: "progress", value: n, ...l("label", p(e.label, m.maxString)), ...l("valueLabel", p(e.valueLabel, 64)), ...l("variant", w(e.variant, ye)), ...l("target", k(e.target, 0, 100)) };\n      }\n      case "divider":\n        return { type: "divider" };\n      case "spacer":\n        return { type: "spacer" };\n      case "avatar": {\n        let n = p(e.name, 64);\n        return n === void 0 ? null : { type: "avatar", name: n, ...l("color", E(e.color)) };\n      }\n      case "list": {\n        let n = Pn(e.items, m.maxListItems, i, r + 1);\n        return n === void 0 ? null : { type: "list", items: n, ...l("filter", p(e.filter, 64)) };\n      }\n      case "table": {\n        let n = ke(e);\n        if (n === null) return null;\n        let { columns: o, rows: a } = n, u = Array.isArray(e.types) ? e.types : void 0, d = u === void 0 ? void 0 : o.map((g, x) => {\n          let $ = u[x];\n          return typeof $ == "string" && Ee.includes($) ? $ : "text";\n        }), c = Array.isArray(e.details) ? e.details : void 0, f = c === void 0 ? void 0 : a.map((g, x) => {\n          if (!C({ columns: o, rows: a, types: d }, x)) return null;\n          let $ = _(c[x], i, r + 1);\n          return $.length === 0 ? null : $;\n        });\n        return { type: "table", columns: o, rows: a, ...l("types", d), ...l("total", e.total === true ? true : void 0), ...l("export", e.export === true ? true : void 0), ...l("filter", p(e.filter, 64)), ...l("filterColumn", D(e.filterColumn, 0, m.maxTableCols - 1)), ...l("sortField", p(e.sortField, 64)), ...l("details", f !== void 0 && f.some((g) => g !== null) ? f : void 0) };\n      }\n      case "chart": {\n        let n = Te(e.data, m.maxChartPoints), o = Array.isArray(e.series) ? Le(e.series, m.maxPlotSeries, m.maxChartPoints) : void 0;\n        return n === void 0 && o === void 0 ? null : { type: "chart", data: n ?? [], ...l("kind", w(e.kind, U)), ...l("series", o), ...l("horizontal", e.horizontal === true ? true : void 0), ...l("stacked", e.stacked === true ? true : void 0), ...l("filter", p(e.filter, 64)), ...l("palette", Fe(e.palette)) };\n      }\n      case "tabs": {\n        let n = vn(e.tabs, i, r);\n        return n === void 0 ? null : { type: "tabs", tabs: n };\n      }\n      case "plot": {\n        let n = qn(e.series, m.maxPlotSeries);\n        return n === void 0 ? null : { type: "plot", series: n, ...l("xMin", k(e.xMin, -1e6, 1e6)), ...l("xMax", k(e.xMax, -1e6, 1e6)), ...l("yMin", k(e.yMin, -1e9, 1e9)), ...l("yMax", k(e.yMax, -1e9, 1e9)), ...l("title", p(e.title, m.maxString)) };\n      }\n      case "callout": {\n        let n = p(e.content, m.maxString);\n        return n === void 0 ? null : { type: "callout", content: n, ...l("tone", w(e.tone, se)), ...l("title", p(e.title, m.maxString)) };\n      }\n      case "steps": {\n        let n = zn(e.steps);\n        return n === void 0 ? null : { type: "steps", steps: n, ...l("current", D(e.current, 0, n.length)) };\n      }\n      case "keyvalue": {\n        let n = Fn(e.pairs, m.maxKeyValuePairs);\n        return n === void 0 ? null : { type: "keyvalue", pairs: n };\n      }\n      case "diff": {\n        let n = jn(e.diffs);\n        return n === void 0 ? null : { type: "diff", diffs: n };\n      }\n      case "json":\n        return "value" in e ? { type: "json", value: e.value } : null;\n      case "code": {\n        let n = p(e.code, m.maxCode);\n        return n === void 0 ? null : { type: "code", code: n, ...l("lang", p(e.lang, 64)), ...l("title", p(e.title, m.maxString)), ...l("wrap", e.wrap === true ? true : void 0) };\n      }\n      case "radio": {\n        let n = Q(e.options, m.maxOptions, m.maxString);\n        return n === void 0 ? null : { type: "radio", options: n, ...l("label", p(e.label, m.maxString)), ...l("selected", D(e.selected, 0, n.length - 1)), ...l("action", p(e.action, 200)), ...l("group", p(e.group, 200)), ...l("answer", typeof e.answer == "number" && Number.isFinite(e.answer) && e.answer >= 0 && e.answer < n.length ? Math.trunc(e.answer) : typeof e.answer == "string" ? e.answer.slice(0, 512) : void 0), ...l("explanation", p(e.explanation, m.maxString)) };\n      }\n      case "submit": {\n        let n = p(e.label, m.maxString), o = p(e.action, 200);\n        return n === void 0 ? null : { type: "submit", label: n, ...l("action", o), ...l("resetAction", p(e.resetAction, 200)), ...l("groups", Q(e.groups, m.maxOptions, 200)) };\n      }\n      case "switch": {\n        let n = p(e.label, m.maxString);\n        return n === void 0 ? null : { type: "switch", label: n, ...l("checked", e.checked === true ? true : void 0), ...l("action", p(e.action, 200)) };\n      }\n      case "slider": {\n        let n = k(e.min, -1e9, 1e9) ?? 0, o = k(e.max, -1e9, 1e9) ?? 100, a = Math.min(n, o), u = Math.max(n, o), d = k(e.step, 1e-9, Math.max(u - a, 1e-9)), c = k(e.value, a, u) ?? a;\n        return { type: "slider", min: a, max: u, ...l("step", d), value: c, ...l("label", p(e.label, m.maxString)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };\n      }\n      case "textarea":\n        return { type: "textarea", ...l("label", p(e.label, m.maxString)), ...l("placeholder", p(e.placeholder, m.maxString)), ...l("rows", D(e.rows, 1, 30)), ...l("value", p(e.value, m.maxString)), ...l("action", p(e.action, 200)), ...l("id", p(e.id, 200)) };\n      case "accordion": {\n        let n = Ln(e.items, i, r);\n        return n === void 0 ? null : { type: "accordion", items: n };\n      }\n      case "copy": {\n        let n = p(e.text, m.maxCode);\n        return n === void 0 ? null : { type: "copy", text: n, ...l("label", p(e.label, 128)) };\n      }\n      case "svg": {\n        let n = p(e.code, m.maxCode);\n        return n === void 0 ? null : { type: "svg", code: n, ...l("title", p(e.title, m.maxString)), ...l("height", D(e.height, 100, 800)) };\n      }\n      case "mermaid": {\n        let n = p(e.code, m.maxMermaid);\n        return n === void 0 ? null : { type: "mermaid", code: n };\n      }\n      case "scene3d": {\n        let n = Vn(e.meshes);\n        return n === void 0 ? null : { type: "scene3d", meshes: n, ...l("title", p(e.title, m.maxString)), ...l("ambient", k(e.ambient, 0, 2)), ...l("background", E(e.background)) };\n      }\n      case "diagram":\n        return Bn(e);\n      case "timeline": {\n        let n = Yn(e.items, m.maxTimelineItems);\n        return n === void 0 ? null : { type: "timeline", items: n };\n      }\n      case "file-tree": {\n        let n = Qn(e.items, m.maxListItems);\n        return n === void 0 ? null : { type: "file-tree", items: n };\n      }\n      case "breadcrumb": {\n        let n = Q(e.items, m.maxBreadcrumbItems, m.maxString);\n        return n === void 0 ? null : { type: "breadcrumb", items: n };\n      }\n      case "quiz": {\n        let n = p(e.question, m.maxString), o = Zn(e.options, e.answer);\n        return n === void 0 || o === void 0 ? null : { type: "quiz", question: n, options: o, ...l("explanation", p(e.explanation, m.maxString)), ...l("id", p(e.id, 200)), ...l("action", p(e.action, 200)) };\n      }\n      case "echart": {\n        let n = e.data !== void 0 ? Te(e.data, m.maxChartPoints) : void 0, o = e.series !== void 0 && Array.isArray(e.series) ? Le(e.series, m.maxPlotSeries, m.maxChartPoints) : void 0, a = Array.isArray(e.links) ? e.links.slice(0, m.maxChartPoints).flatMap((c) => {\n          let f = y(c), g = f === void 0 ? void 0 : p(f.from, 64), x = f === void 0 ? void 0 : p(f.to, 64);\n          return g === void 0 || x === void 0 ? [] : [{ from: g, to: x, ...l("value", k(f.value, 0, 1e9)) }];\n        }) : void 0, u = e.option !== void 0 ? Ce(e.option, 0, { count: m.maxEChartOptionNodes }) : void 0, d = u === void 0 || typeof u != "object" || u === null || Array.isArray(u) ? void 0 : u;\n        return d === void 0 && n === void 0 && o === void 0 && (a === void 0 || a.length === 0) ? null : { type: "echart", ...l("title", p(e.title, m.maxString)), ...l("height", D(e.height, 100, 800)), ...l("preset", w(e.preset, ge)), ...l("data", n), ...l("series", o), ...l("links", a !== void 0 && a.length > 0 ? a : void 0), ...l("palette", Fe(e.palette)), ...l("option", d) };\n      }\n      default:\n        return t;\n    }\n  }\n  function Q(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= i) break;\n      if (typeof s == "string") e.push(s.slice(0, r));\n      else if (s !== null && typeof s == "object") {\n        let n = s, o = typeof n.label == "string" ? n.label : typeof n.value == "string" ? n.value : typeof n.title == "string" ? n.title : JSON.stringify(s);\n        e.push(o.slice(0, r));\n      }\n    }\n    return e;\n  }\n  function Pn(t, i, r, e) {\n    if (!Array.isArray(t)) return;\n    let s = [];\n    for (let n of t) {\n      if (s.length >= i) break;\n      if (typeof n == "string") {\n        s.push(n.slice(0, m.maxString));\n        continue;\n      }\n      let o = y(n);\n      if (o !== void 0 && typeof o.type == "string") {\n        if (r.remaining <= 0) break;\n        r.remaining -= 1;\n        let u = Je(o, r, e);\n        u !== null && s.push(u);\n        continue;\n      }\n      let a = o === void 0 ? void 0 : p(o.title, m.maxString);\n      a !== void 0 && s.push({ title: a, ...l("desc", p(o?.desc, m.maxString)) });\n    }\n    return s;\n  }\n  function Te(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let e of t) {\n      if (r.length >= i) break;\n      let s = y(e), n = s === void 0 ? void 0 : p(s.label, 128), o = s === void 0 ? void 0 : k(s.value, -1e12, 1e12);\n      n === void 0 || o === void 0 || r.push({ label: n, value: o, ...l("color", s === void 0 ? void 0 : E(s.color)) });\n    }\n    return r;\n  }\n  function Le(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= i) break;\n      let n = y(s), o = n === void 0 ? void 0 : p(n.label, 128), a = n === void 0 ? void 0 : Te(n.data, r);\n      o === void 0 || a === void 0 || e.push({ label: o, data: a, ...l("color", n === void 0 ? void 0 : E(n.color)) });\n    }\n    return e;\n  }\n  function vn(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= m.maxTabs) break;\n      let n = y(s), o = n === void 0 ? void 0 : p(n.label, 128);\n      if (o === void 0 || n === void 0) continue;\n      let a = n.items !== void 0 ? n.items : n.content !== void 0 ? Array.isArray(n.content) ? n.content : [n.content] : void 0;\n      e.push({ label: o, items: _(a, i, r + 1) });\n    }\n    return e;\n  }\n  function qn(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let e of t) {\n      if (r.length >= i) break;\n      let s = y(e), n = s === void 0 ? void 0 : p(s.expr, 512);\n      if (n === void 0 || s === void 0) continue;\n      let o = [];\n      if (Array.isArray(s.params)) for (let a of s.params) {\n        if (o.length >= m.maxPlotParams) break;\n        let u = y(a), d = u === void 0 ? void 0 : p(u.name, 64), c = u === void 0 ? void 0 : k(u.value, -1e9, 1e9);\n        d === void 0 || c === void 0 || o.push({ name: d, value: c, ...l("min", u === void 0 ? void 0 : k(u.min, -1e9, 1e9)), ...l("max", u === void 0 ? void 0 : k(u.max, -1e9, 1e9)), ...l("step", u === void 0 ? void 0 : k(u.step, 1e-9, 1e9)), ...l("animateTo", u === void 0 ? void 0 : k(u.animateTo, -1e9, 1e9)), ...l("durationMs", u === void 0 ? void 0 : k(u.durationMs, 1, 12e4)), ...l("loop", u === void 0 ? void 0 : u.loop === true ? true : void 0) });\n      }\n      r.push({ expr: n, ...l("label", p(s.label, 128)), ...l("color", E(s.color)), ...l("kind", w(s.kind, oe)), ...l("params", o.length > 0 ? o : void 0) });\n    }\n    return r;\n  }\n  function zn(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxSteps) break;\n      let e = y(r), s = e === void 0 ? void 0 : p(e.title, 256);\n      s !== void 0 && i.push({ title: s, ...l("desc", e === void 0 ? void 0 : p(e.desc, m.maxString)) });\n    }\n    return i;\n  }\n  function Fn(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let e of t) {\n      if (r.length >= i) break;\n      let s = y(e), n = s === void 0 ? void 0 : p(s.key, 256), o = s === void 0 ? void 0 : p(s.value, m.maxString);\n      n === void 0 || o === void 0 || r.push({ key: n, value: o });\n    }\n    return r;\n  }\n  function jn(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= 24) break;\n      let e = y(r), s = e === void 0 ? void 0 : p(e.path, 1024), n = e === void 0 ? void 0 : p(e.newText, 2e4);\n      if (s === void 0 || n === void 0) continue;\n      let o = e === void 0 ? void 0 : e.oldText;\n      i.push({ path: s, newText: n, oldText: o === null || typeof o != "string" ? null : o.slice(0, 2e4) });\n    }\n    return i;\n  }\n  function Ln(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= m.maxAccordionItems) break;\n      let n = y(s), o = n === void 0 ? void 0 : p(n.title, 256);\n      o === void 0 || n === void 0 || e.push({ title: o, items: _(n.items, i, r + 1) });\n    }\n    return e;\n  }\n  function Vn(t) {\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxMeshes) break;\n      let e = y(r), s = e === void 0 ? void 0 : w(e.shape, ue);\n      if (s === void 0) continue;\n      let n = e === void 0 ? void 0 : k(e.scale, -1e6, 1e6) ?? Z(e.scale), o = e === void 0 ? void 0 : k(e.size, -1e6, 1e6) ?? Z(e.size);\n      i.push({ shape: s, ...l("color", e === void 0 ? void 0 : E(e.color)), ...l("position", e === void 0 ? void 0 : Z(e.position)), ...l("rotation", e === void 0 ? void 0 : Z(e.rotation)), ...l("scale", n), ...l("size", o) });\n    }\n    return i;\n  }\n  function Z(t) {\n    if (!Array.isArray(t) || t.length !== 3) return;\n    let [i, r, e] = t;\n    if (!(typeof i != "number" || !Number.isFinite(i) || typeof r != "number" || !Number.isFinite(r) || typeof e != "number" || !Number.isFinite(e))) return [Math.min(1e6, Math.max(-1e6, i)), Math.min(1e6, Math.max(-1e6, r)), Math.min(1e6, Math.max(-1e6, e))];\n  }\n  function P(t, i, r) {\n    return Math.min(r, Math.max(i, Math.round(t / 4) * 4));\n  }\n  function Kn(t) {\n    if (!Array.isArray(t)) return;\n    let i = [], r = /* @__PURE__ */ new Set();\n    for (let e of t) {\n      if (i.length >= m.maxDiagramNodes) break;\n      let s = y(e);\n      if (s === void 0) continue;\n      let n = p(s.id, 128), o = p(s.label, m.maxString);\n      if (n === void 0 || o === void 0 || r.has(n)) continue;\n      r.add(n);\n      let a = w(s.type, ce), u = s.x === void 0 ? void 0 : P(k(s.x, -1e6, 1e6) ?? 0, 0, 1e6), d = s.y === void 0 ? void 0 : P(k(s.y, -1e6, 1e6) ?? 0, 0, 1e6), c = s.w === void 0 ? void 0 : P(k(s.w, -1e6, 1e6) ?? 96, 40, 2e3), f = s.h === void 0 ? void 0 : P(k(s.h, -1e6, 1e6) ?? 48, 24, 1200);\n      i.push({ id: n, label: o, ...l("sub", p(s.sub, 256)), ...l("type", a), ...l("x", u), ...l("y", d), ...l("w", c), ...l("h", f), ...l("tag", p(s.tag, 32)) });\n    }\n    return i;\n  }\n  function Hn(t) {\n    if (t === void 0) return [];\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxDiagramEdges) break;\n      let e = y(r);\n      if (e === void 0) continue;\n      let s = p(e.from, 128), n = p(e.to, 128);\n      s === void 0 || n === void 0 || i.push({ from: s, to: n, ...l("label", p(e.label, m.maxDiagramLabel)), ...l("kind", w(e.kind, pe)), ...l("route", w(e.route, me)) });\n    }\n    return i;\n  }\n  function Jn(t) {\n    let i = y(t);\n    if (i === void 0) return;\n    let r = {};\n    for (let e of ["paper", "paper-2", "ink", "muted", "soft", "rule", "accent", "accent-tint", "link"]) {\n      let s = E(i[e]);\n      s !== void 0 && (r[e] = s);\n    }\n    return Object.keys(r).length === 0 ? void 0 : r;\n  }\n  function Un(t) {\n    if (t === void 0) return [];\n    if (!Array.isArray(t)) return;\n    let i = [];\n    for (let r of t) {\n      if (i.length >= m.maxDiagramZones) break;\n      let e = y(r);\n      if (e === void 0) continue;\n      let s = p(e.label, 64);\n      s !== void 0 && i.push({ label: s, ...l("x", e.x === void 0 ? void 0 : P(k(e.x, -1e6, 1e6) ?? 0, 0, 1e6)), ...l("y", e.y === void 0 ? void 0 : P(k(e.y, -1e6, 1e6) ?? 0, 0, 1e6)), ...l("w", e.w === void 0 ? void 0 : P(k(e.w, -1e6, 1e6) ?? 100, 40, 2e3)), ...l("h", e.h === void 0 ? void 0 : P(k(e.h, -1e6, 1e6) ?? 100, 40, 1200)) });\n    }\n    return i;\n  }\n  function Bn(t) {\n    let i = y(t);\n    if (i === void 0) return null;\n    let r = w(i.kind, de);\n    if (r === void 0) return null;\n    let e = Kn(i.nodes);\n    if (e === void 0) return null;\n    let s = Hn(i.edges);\n    if (s === void 0) return null;\n    let n = Un(i.zones);\n    return n === void 0 ? null : { type: "diagram", kind: r, nodes: e, edges: s, ...l("zones", n.length > 0 ? n : void 0), ...l("variant", w(i.variant, fe)), ...l("title", p(i.title, 256)), ...l("theme", Jn(i.theme)) };\n  }\n  function Yn(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let e of t) {\n      if (r.length >= i) break;\n      let s = y(e), n = s === void 0 ? void 0 : p(s.title, 256);\n      n !== void 0 && r.push({ title: n, ...l("desc", s === void 0 ? void 0 : p(s.desc, m.maxString)), ...l("time", s === void 0 ? void 0 : p(s.time, 128)) });\n    }\n    return r;\n  }\n  function Qn(t, i) {\n    return Ue(t, i, m.maxTreeDepth);\n  }\n  function Ue(t, i, r) {\n    if (!Array.isArray(t)) return;\n    let e = [];\n    for (let s of t) {\n      if (e.length >= i) break;\n      let n = y(s), o = n === void 0 ? void 0 : p(n.name, 256);\n      if (o === void 0) continue;\n      let a = n !== void 0 && r > 0 && Array.isArray(n.children) ? Ue(n.children, i, r - 1) : void 0;\n      e.push({ name: o, ...l("type", n === void 0 ? void 0 : w(n.type, le)), ...l("children", a) });\n    }\n    return e;\n  }\n  function Zn(t, i) {\n    if (!Array.isArray(t)) return;\n    let r = [];\n    for (let s of t) {\n      if (r.length >= m.maxQuizOptions) break;\n      let n = y(s), o = typeof s == "string" ? p(s, 512) : n === void 0 ? void 0 : p(n.label, 512);\n      o !== void 0 && r.push({ label: o, ...l("correct", n === void 0 ? void 0 : n.correct === true ? true : void 0), ...l("feedback", n === void 0 ? void 0 : p(n.feedback, m.maxString)) });\n    }\n    if (r.length === 0) return;\n    if (r.some((s) => s.correct === true)) return r;\n    let e = typeof i == "number" && Number.isFinite(i) ? Math.trunc(i) : typeof i == "string" ? r.findIndex((s) => s.label === i.slice(0, 512)) : -1;\n    return e < 0 || e >= r.length ? r : r.map((s, n) => n === e ? { ...s, correct: true } : s);\n  }\n  var Wn = /<(?:script|img|svg|iframe|video|audio|object|embed|source)\\b|on[a-z]+\\s*=|javascript:/i;\n  function Ce(t, i, r) {\n    if (r.count <= 0 || (r.count -= 1, i > m.maxEChartOptionDepth)) return;\n    if (typeof t == "string") {\n      let n = t.slice(0, m.maxString);\n      return n.toLowerCase().includes("url(") || Wn.test(n) ? void 0 : n;\n    }\n    if (typeof t == "number" && Number.isFinite(t) || typeof t == "boolean") return t;\n    if (t === null) return null;\n    if (Array.isArray(t)) {\n      let n = Math.min(t.length, m.maxEChartArrayLen), o = [];\n      for (let a = 0; a < n; a++) {\n        let u = Ce(t[a], i + 1, r);\n        u !== void 0 && o.push(u);\n      }\n      return o.length > 0 || t.length === 0 ? o : void 0;\n    }\n    let e = y(t);\n    if (e === void 0) return;\n    let s = {};\n    for (let [n, o] of Object.entries(e)) {\n      let a = Ce(o, i + 1, r);\n      a !== void 0 && (n === "tooltip" && typeof a == "object" && a !== null && !Array.isArray(a) && (a.renderMode = "richText"), s[n] = a);\n    }\n    return Object.keys(s).length > 0 || Object.keys(e).length === 0 ? s : void 0;\n  }\n  function Be(t) {\n    let i = y(t);\n    if (i === void 0) return null;\n    if (N(t)) {\n      let e = z(t);\n      return e === null ? null : Be(e);\n    }\n    if (!Array.isArray(i.items)) return null;\n    let r = { remaining: m.maxNodes };\n    return { ...l("title", p(i.title, m.maxString)), ...l("gap", k(i.gap, 0, 96)), ...l("panel", i.panel === true ? true : void 0), ...l("append", i.append === true ? true : void 0), items: _(i.items, r, 0) };\n  }\n  function Xn(t, i = Number.POSITIVE_INFINITY) {\n    let r = 0, e = (n) => {\n      if (Array.isArray(n)) for (let o of n) {\n        if (r >= i) return;\n        r += 1;\n        let a = y(o);\n        if (a !== void 0) {\n          if (a.type === "tabs" && Array.isArray(a.tabs)) for (let u of a.tabs) {\n            if (r >= i) return;\n            let d = y(u);\n            d !== void 0 && e(d.items);\n          }\n          else if (a.type === "accordion" && Array.isArray(a.items)) for (let u of a.items) {\n            if (r >= i) return;\n            let d = y(u);\n            d !== void 0 && e(d.items);\n          }\n          else if ((a.type === "row" || a.type === "col" || a.type === "grid" || a.type === "card") && Array.isArray(a.items)) e(a.items);\n          else if (a.type !== "file-tree") {\n            if (a.type === "list" && Array.isArray(a.items)) for (let u of a.items) {\n              if (r >= i) return;\n              let d = y(u);\n              d !== void 0 && typeof d.type == "string" && e([d]);\n            }\n            else if (a.type === "table" && Array.isArray(a.details)) {\n              let u = I(a).length;\n              for (let d = 0; d < Math.min(a.details.length, u); d++) {\n                if (r >= i) return;\n                let c = a.details[d];\n                Array.isArray(c) && C(a, d) && e(c);\n              }\n            }\n          }\n        }\n      }\n    }, s = y(t);\n    return e(s === void 0 ? [] : s.items), r;\n  }\n  var et = q;\n  function nt(t, i, r) {\n    let e = 0, s = (d) => {\n      let c = y(d);\n      return c !== void 0 && typeof c.type == "string" && et.has(c.type);\n    };\n    function n(d, c) {\n      if (Array.isArray(d)) {\n        for (let f = 0; f < d.length; f++) if (o(d[f], `${c}[${f}]`), e >= i) return;\n      }\n    }\n    function o(d, c) {\n      if (e >= i || !s(d)) return;\n      let f = y(d);\n      if (f !== void 0) {\n        if (e += 1, r(f, c), f.type === "tabs" && Array.isArray(f.tabs)) for (let g = 0; g < f.tabs.length; g++) a(f.tabs[g], `${c}.tabs[${g}]`);\n        else if (f.type === "accordion" && Array.isArray(f.items)) for (let g = 0; g < f.items.length; g++) a(f.items[g], `${c}.items[${g}]`);\n        else if ((f.type === "row" || f.type === "col" || f.type === "grid" || f.type === "card") && Array.isArray(f.items)) n(f.items, `${c}.items`);\n        else if (f.type === "list" && Array.isArray(f.items)) for (let g = 0; g < f.items.length; g++) o(f.items[g], `${c}.items[${g}]`);\n        else if (f.type === "table" && Array.isArray(f.details)) {\n          let g = I(f).length;\n          for (let x = 0; x < Math.min(f.details.length, g); x++) Array.isArray(f.details[x]) && C(f, x) && n(f.details[x], `${c}.details[${x}]`);\n        }\n      }\n    }\n    function a(d, c) {\n      let f = y(d);\n      if (f === void 0) return;\n      let g = f.items !== void 0 ? f.items : f.content;\n      Array.isArray(g) ? n(g, `${c}.items`) : o(g, `${c}.items`);\n    }\n    let u = y(t);\n    return u === void 0 || (N(u) && s(t) ? o(t, "spec") : n(u.items, "items")), e;\n  }\n  function Ye(t, i = Number.POSITIVE_INFINITY) {\n    return nt(t, i, () => {\n    });\n  }\n  function tt(t, i = Number.POSITIVE_INFINITY) {\n    return Ye(t, i);\n  }\n  function Qe(t) {\n    let i = [], r = y(t);\n    if (r === void 0) return { ok: false, errors: ["spec root must be an object"] };\n    if (N(t)) {\n      let a = z(t);\n      return a !== null ? Qe(a) : { ok: false, errors: ["spec.items must be an array"] };\n    }\n    if (!Array.isArray(r.items)) return { ok: false, errors: ["spec.items must be an array"] };\n    Ke(r, "spec", V, i, ["items"]);\n    let e = 0, s = false, n = (a, u, d) => {\n      if (!s) {\n        if (!Array.isArray(a)) {\n          i.push(`${d} must be an array`);\n          return;\n        }\n        for (let c = 0; c < a.length; c++) {\n          if (s || e >= m.maxNodes) {\n            s || (i.push(`spec exceeds ${m.maxNodes} nodes; tail elided`), s = true);\n            return;\n          }\n          e += 1;\n          let f = `${d}[${c}]`;\n          Xe(a[c], u, f, i, n);\n        }\n      }\n    };\n    n(r.items, 0, "items"), i.length === 0 && i.push(...Re(r).diagnostics);\n    let o = [...new Set(i)];\n    return { ok: o.length === 0, errors: o };\n  }\n  function Ze(t) {\n    let i = Ie(t), r = Be(i.value), e = Qe(i.value), s = Ye(i.value, m.maxNodes + 1), n = r === null ? 0 : tt(r), o = r === null ? 0 : Xn(r), a = e.errors.filter((u) => !u.includes(": unknown type "));\n    return r !== null && a.length === 0 && a.push(...Re(r).diagnostics), s > n && a.push(`repair dropped ${s - n} declared native node(s): declared ${s}, rendered ${n}`), { value: i.value, normalized: i.value, repaired: r, spec: r, errors: [...new Set(a)], warnings: [...i.warnings, ...Pe(i.value)], declaredCount: s, renderedCount: o, declaredNativeCount: s, renderedNativeCount: n, renderedTotalCount: o };\n  }\n  function it(t) {\n    return t.errors.length > 0 && t.errors.every((i) => i.startsWith("spec exceeds ") || i.startsWith("repair dropped ")) && t.renderedNativeCount === m.maxNodes && t.declaredNativeCount === m.maxNodes + 1;\n  }\n  function Ne(t) {\n    return t.spec !== null && (t.errors.length === 0 || it(t));\n  }\n  var rt = /^(items\\[\\d+\\](?:\\.(?:items\\[\\d+\\]|tabs\\[\\d+\\]\\.items\\[\\d+\\]|details\\[\\d+\\](?:\\[\\d+\\])?))*)/;\n  function st(t) {\n    let i = rt.exec(t);\n    return i === null ? null : i[1] ?? null;\n  }\n  function Ve(t, i) {\n    let r = [...i.matchAll(/(?:^|\\.)(items|tabs|details)\\[(\\d+)\\]|\\[(\\d+)\\]/g)];\n    if (r.length === 0 || r[r.length - 1][1] === "tabs") return;\n    let e = t;\n    for (let s = 0; s < r.length; s++) {\n      let n = r[s], o = n[1] === void 0 ? e : y(e)?.[n[1]], a = Number(n[2] ?? n[3]);\n      if (!Array.isArray(o) || a >= o.length) return;\n      if (s === r.length - 1) return { array: o, index: a, preserveIndex: n[1] === "details" };\n      if (e = o[a], e === void 0) return;\n    }\n  }\n  function ot(t) {\n    try {\n      return y(JSON.parse(JSON.stringify(t))) ?? null;\n    } catch {\n      return null;\n    }\n  }\n  function at(t) {\n    if (Ne(t)) return t.spec;\n    if (t.spec === null) return null;\n    let i = y(t.value);\n    if (i === void 0) return null;\n    let r = /* @__PURE__ */ new Set(), e = /* @__PURE__ */ new Set();\n    for (let d of t.errors) {\n      if (d.startsWith("spec exceeds ")) continue;\n      let c = st(d);\n      c !== null && (d === `${c}.details must not contain more entries than rows` ? e.add(c) : r.add(c));\n    }\n    if (r.size === 0 && e.size === 0) return null;\n    let s = ot(N(i) ? z(i) : i);\n    if (s === null) return null;\n    let n = [...r].map((d) => Ve(s, d)).filter((d) => d !== void 0), o = [...e].map((d) => Ve(s, d)).filter((d) => d !== void 0);\n    for (let { array: d, index: c } of o) {\n      let f = y(d[c]);\n      f?.type === "table" && Array.isArray(f.details) && (f.details.length = Math.min(f.details.length, I(f).length));\n    }\n    let a = /* @__PURE__ */ new Map();\n    for (let { array: d, index: c, preserveIndex: f } of n) {\n      if (f) {\n        d[c] = null;\n        continue;\n      }\n      let g = a.get(d);\n      g === void 0 ? a.set(d, [c]) : g.push(c);\n    }\n    for (let [d, c] of a) {\n      c.sort((f, g) => g - f);\n      for (let f of c) d.splice(f, 1);\n    }\n    let u = Ze(s);\n    return !Ne(u) || u.renderedNativeCount === 0 ? null : u.spec;\n  }\n  function We(t, i, r) {\n    if (Array.isArray(t)) for (let e = 0; e < t.length; e++) {\n      let s = y(t[e]), n = `${i}[${e}]`;\n      if (s === void 0) {\n        r.push(`${n} must be an object`);\n        continue;\n      }\n      typeof s.label != "string" && r.push(`${n}.label must be a string`), (typeof s.value != "number" || !Number.isFinite(s.value)) && r.push(`${n}.value must be a finite number`), s.color !== void 0 && typeof s.color != "string" && r.push(`${n}.color must be a string`);\n    }\n  }\n  function ut(t, i, r) {\n    if (Array.isArray(t)) for (let e = 0; e < t.length; e++) {\n      let s = y(t[e]), n = `${i}[${e}]`;\n      if (s === void 0) {\n        r.push(`${n} must be an object`);\n        continue;\n      }\n      typeof s.label != "string" && r.push(`${n}.label must be a string`), s.color !== void 0 && typeof s.color != "string" && r.push(`${n}.color must be a string`), Array.isArray(s.data) || r.push(`${n}.data must be an array`), We(s.data, `${n}.data`, r);\n    }\n  }\n  function lt(t, i, r) {\n    !Array.isArray(t.data) && !Array.isArray(t.series) && r.push(`${i}: type \'chart\' requires data or series (array)`), t.variant !== void 0 && r.push(`${i}.variant is unsupported; use kind`), t.data !== void 0 && !Array.isArray(t.data) && r.push(`${i}.data must be an array`), t.series !== void 0 && !Array.isArray(t.series) && r.push(`${i}.series must be an array`), t.kind !== void 0 && (typeof t.kind != "string" || !U.includes(t.kind)) && r.push(`${i}.kind must be bars, line, or donut`);\n    let e = t.kind === void 0 ? "bars" : t.kind, s = Array.isArray(t.series) ? t.series : void 0;\n    if (Array.isArray(t.data) && t.data.length === 0 && (s === void 0 || s.length === 0) && r.push(`${i}.data must not be empty`), s !== void 0) {\n      s.length === 0 && r.push(`${i}.series must not be empty`), e === "donut" && r.push(`${i}.series is only supported for bars and line`);\n      for (let n = 0; n < s.length; n++) {\n        let o = y(s[n]);\n        o !== void 0 && Array.isArray(o.data) && o.data.length === 0 && r.push(`${i}.series[${n}].data must not be empty`);\n      }\n    }\n    e === "donut" && t.data === void 0 && r.push(`${i}.data is required for donut`), e === "line" && t.data === void 0 && (s === void 0 || s.length === 0) && r.push(`${i}.data is required for line (or provide series)`), We(t.data, `${i}.data`, r), ut(t.series, `${i}.series`, r);\n  }\n  function dt(t, i, r) {\n    if (Array.isArray(t)) for (let e = 0; e < t.length; e++) {\n      let s = t[e];\n      if (y(s) === void 0) {\n        if (!Array.isArray(s)) {\n          r.push(`${i}[${e}] must be an array or object`);\n          continue;\n        }\n        for (let n = 0; n < s.length; n++) {\n          let o = s[n];\n          typeof o != "string" && (typeof o != "number" || !Number.isFinite(o)) && r.push(`${i}[${e}][${n}] must be a string or finite number`);\n        }\n      }\n    }\n  }\n  function Xe(t, i, r, e, s) {\n    if (i > m.maxDepth) {\n      e.push(`${r}: exceeds max depth ${m.maxDepth}`);\n      return;\n    }\n    let n = y(t);\n    if (n === void 0) {\n      e.push(`${r}: must be an object`);\n      return;\n    }\n    let o = n.type;\n    if (typeof o != "string") {\n      e.push(`${r}: missing string \'type\'`);\n      return;\n    }\n    let a = (c) => {\n      n[c] !== void 0 && typeof n[c] != "string" && e.push(`${r}: \'${c}\' must be a string`);\n    }, u = (c) => {\n      n[c] !== void 0 && (typeof n[c] != "number" || !Number.isFinite(n[c])) && e.push(`${r}: \'${c}\' must be a finite number`);\n    };\n    switch (o) {\n      case "text":\n        typeof n.content != "string" && typeof n.text != "string" && e.push(`${r}: type \'text\' requires content or text (string)`), a("content"), a("text");\n        break;\n      case "row":\n      case "col":\n      case "card":\n      case "grid":\n        Array.isArray(n.items) || e.push(`${r}: type \'${o}\' requires items (array)`), s(n.items, i + 1, `${r}.items`), o === "grid" && u("cols");\n        break;\n      case "button":\n      case "checkbox":\n      case "link":\n      case "switch":\n        typeof n.label != "string" && e.push(`${r}: type \'${o}\' requires label (string)`), a("label");\n        break;\n      case "image":\n      case "audio":\n      case "video":\n        typeof n.src != "string" && e.push(`${r}: type \'${o}\' requires src (string)`), a("src"), a("alt"), o === "video" && a("poster");\n        break;\n      case "slider":\n        a("label"), u("min"), u("max"), u("step"), u("value");\n        break;\n      case "input":\n      case "textarea":\n        a("label"), a("placeholder"), a("value");\n        break;\n      case "select":\n      case "radio":\n        Array.isArray(n.options) || e.push(`${r}: type \'${o}\' requires options (array)`);\n        break;\n      case "submit":\n        typeof n.label != "string" && e.push(`${r}: type \'submit\' requires label (string)`);\n        break;\n      case "badge":\n        typeof n.label != "string" && typeof n.text != "string" && typeof n.value != "string" && e.push(`${r}: type \'badge\' requires label, text, or value (string)`), a("label"), a("text"), a("value");\n        break;\n      case "hero":\n        typeof n.title != "string" && e.push(`${r}: type \'hero\' requires title (string)`), a("subtitle");\n        break;\n      case "stat":\n        typeof n.label != "string" && e.push(`${r}: type \'stat\' requires label (string)`), typeof n.value != "string" && e.push(`${r}: type \'stat\' requires value (string)`), a("delta");\n        break;\n      case "progress":\n        (typeof n.value != "number" || !Number.isFinite(n.value) || n.value < 0 || n.value > 100) && e.push(`${r}: type \'progress\' requires value (number 0..100)`), u("value");\n        break;\n      case "avatar":\n        typeof n.name != "string" && e.push(`${r}: type \'avatar\' requires name (string)`);\n        break;\n      case "list":\n        if (Array.isArray(n.items) || e.push(`${r}: type \'list\' requires items (array)`), Array.isArray(n.items)) for (let c = 0; c < n.items.length; c++) {\n          let f = y(n.items[c]);\n          f !== void 0 && typeof f.type == "string" && Xe(f, i + 1, `${r}.items[${c}]`, e, s);\n        }\n        break;\n      case "table":\n        if (!Array.isArray(n.columns) && !He(n) && e.push(`${r}: type \'table\' requires columns (array)`), Array.isArray(n.rows) || e.push(`${r}: type \'table\' requires rows (array)`), n.types !== void 0 && !Array.isArray(n.types) && e.push(`${r}.types must be an array of column cell types`), n.details !== void 0 && !Array.isArray(n.details) && e.push(`${r}.details must be an array aligned with rows`), Array.isArray(n.details)) {\n          let c = { columns: n.columns, rows: n.rows, types: n.types }, f = I(c).length;\n          n.details.length > f && e.push(`${r}.details must not contain more entries than rows`);\n          for (let g = 0; g < Math.min(n.details.length, f); g++) {\n            let x = n.details[g];\n            if (!(x === null || !C(c, g))) {\n              if (!Array.isArray(x)) {\n                e.push(`${r}.details[${g}] must be an array or null`);\n                continue;\n              }\n              s(x, i + 1, `${r}.details[${g}]`);\n            }\n          }\n        }\n        dt(n.rows, `${r}.rows`, e);\n        break;\n      case "chart":\n        lt(n, r, e);\n        break;\n      case "tabs": {\n        if (Array.isArray(n.tabs) || e.push(`${r}: type \'tabs\' requires tabs (array)`), Array.isArray(n.tabs)) for (let c = 0; c < n.tabs.length; c++) {\n          let f = y(n.tabs[c]);\n          if (f === void 0) {\n            e.push(`${r}.tabs[${c}] must be an object`);\n            continue;\n          }\n          typeof f.label != "string" && e.push(`${r}.tabs[${c}].label must be a string`), s(f.items, i + 1, `${r}.tabs[${c}].items`);\n        }\n        break;\n      }\n      case "plot":\n        Array.isArray(n.series) || e.push(`${r}: type \'plot\' requires series (array)`);\n        break;\n      case "callout":\n        typeof n.content != "string" && e.push(`${r}: type \'callout\' requires content (string)`);\n        break;\n      case "steps":\n        Array.isArray(n.steps) || e.push(`${r}: type \'steps\' requires steps (array)`);\n        break;\n      case "keyvalue":\n        Array.isArray(n.pairs) || e.push(`${r}: type \'keyvalue\' requires pairs (array)`);\n        break;\n      case "diff":\n        Array.isArray(n.diffs) || e.push(`${r}: type \'diff\' requires diffs (array)`);\n        break;\n      case "json":\n        "value" in n || e.push(`${r}: type \'json\' requires value`);\n        break;\n      case "code":\n        typeof n.code != "string" && e.push(`${r}: type \'code\' requires code (string)`);\n        break;\n      case "accordion":\n        if (Array.isArray(n.items) || e.push(`${r}: type \'accordion\' requires items (array)`), Array.isArray(n.items)) for (let c = 0; c < n.items.length; c++) {\n          let f = y(n.items[c]);\n          if (f === void 0) {\n            e.push(`${r}.items[${c}] must be an object`);\n            continue;\n          }\n          typeof f.title != "string" && e.push(`${r}.items[${c}].title must be a string`), s(f.items, i + 1, `${r}.items[${c}].items`);\n        }\n        break;\n      case "copy":\n        typeof n.text != "string" && e.push(`${r}: type \'copy\' requires text (string)`);\n        break;\n      case "svg":\n        typeof n.code != "string" && e.push(`${r}: type \'svg\' requires code (string)`), u("height");\n        break;\n      case "mermaid":\n        typeof n.code != "string" && e.push(`${r}: type \'mermaid\' requires code (string)`);\n        break;\n      case "scene3d":\n        Array.isArray(n.meshes) || e.push(`${r}: type \'scene3d\' requires meshes (array)`);\n        break;\n      case "timeline":\n        Array.isArray(n.items) || e.push(`${r}: type \'timeline\' requires items (array)`);\n        break;\n      case "file-tree":\n        Array.isArray(n.items) || e.push(`${r}: type \'file-tree\' requires items (array)`);\n        break;\n      case "breadcrumb":\n        Array.isArray(n.items) || e.push(`${r}: type \'breadcrumb\' requires items (array)`);\n        break;\n      case "quiz":\n        typeof n.question != "string" && e.push(`${r}: type \'quiz\' requires question (string)`), Array.isArray(n.options) || e.push(`${r}: type \'quiz\' requires options (array)`);\n        break;\n      case "diagram":\n        typeof n.kind != "string" && e.push(`${r}: type \'diagram\' requires kind (string)`), Array.isArray(n.nodes) || e.push(`${r}: type \'diagram\' requires nodes (array)`), n.edges !== void 0 && !Array.isArray(n.edges) && e.push(`${r}: type \'diagram\' requires edges (array) when present`);\n        break;\n      case "echart":\n        n.option === void 0 && n.data === void 0 && n.series === void 0 && (!Array.isArray(n.links) || n.links.length === 0) && e.push(`${r}: type \'echart\' requires option, data, series, or links`), u("height");\n        break;\n      default:\n        e.push(`${r}: unknown type \'${o}\' (custom renderer?)`);\n    }\n    let d = T[o];\n    d !== void 0 && In(n, r, d, e);\n  }\n\n  // lib/normalize-visual.js\n  function normalizeVisual(value, schemas) {\n    const unwrap = (v2) => v2 && typeof v2 === "object" && !Array.isArray(v2) && Object.keys(v2).length === 1 && Array.isArray(v2.item) ? v2.item : v2;\n    const scalar2 = (v2, kind) => kind === "number" && typeof v2 === "string" && v2.trim() !== "" && Number.isFinite(Number(v2)) ? Number(v2) : kind === "boolean" && (v2 === "true" || v2 === "false") ? v2 === "true" : v2;\n    function record(input, schema, depth = 0) {\n      if (!input || typeof input !== "object" || Array.isArray(input) || depth > 32) return input;\n      const out2 = { ...input };\n      for (const [key, v2] of Object.entries(input)) {\n        const target = schema.aliases?.[key] ?? key, kind = schema.fields?.[target];\n        if (kind === "array" || kind === "nodes") {\n          let array2 = unwrap(v2);\n          if (Array.isArray(array2)) array2 = array2.map((x) => kind === "nodes" ? node2(x, depth + 1) : schema.nested?.[target] ? record(x, schema.nested[target], depth + 1) : x);\n          out2[key] = array2;\n        } else out2[key] = scalar2(v2, kind);\n      }\n      return out2;\n    }\n    function node2(v2, depth) {\n      if (!v2 || typeof v2 !== "object" || Array.isArray(v2)) return v2;\n      if (v2.type === "heading") {\n        v2 = { ...v2, type: "text", content: v2.content ?? v2.text ?? v2.title, size: v2.size ?? "h3" };\n        delete v2.text;\n        delete v2.title;\n      }\n      if (["card", "row", "col", "grid"].includes(v2.type) && v2.items === void 0 && Array.isArray(unwrap(v2.children))) {\n        v2 = { ...v2, items: unwrap(v2.children) };\n        delete v2.children;\n      }\n      const out2 = record(v2, schemas[v2.type] ?? {}, depth);\n      if (v2.type === "quiz" && Array.isArray(out2.options)) out2.options = out2.options.map((x) => record(x, { fields: { correct: "boolean" } }));\n      if (v2.type === "table") {\n        for (const key of ["rows", "data", "items", "details"]) if (Array.isArray(out2[key])) out2[key] = out2[key].map((row) => {\n          row = unwrap(row);\n          return key === "details" && Array.isArray(row) ? row.map((x) => node2(x, depth + 1)) : row;\n        });\n      }\n      if (v2.type === "echart") {\n        for (const key of ["data", "series", "links"]) if (Array.isArray(out2[key])) out2[key] = out2[key].map((x) => record(x, { fields: { value: "number", data: "array" }, nested: { data: { fields: { value: "number" } } } }));\n      }\n      return out2;\n    }\n    if (Array.isArray(value)) return { items: value.map((x) => node2(x, 0)) };\n    if (!value || typeof value !== "object") return value;\n    const out = { ...value }, items = unwrap(value.items);\n    if (Array.isArray(items)) out.items = items.map((x) => node2(x, 0));\n    return out;\n  }\n\n  // lib/visual.js\n  var VISUAL_TYPES = Object.freeze([...q]);\n  function validateVisual(value) {\n    const encoded = JSON.stringify(value);\n    if (!encoded || new TextEncoder().encode(encoded).length > 131072) throw Error("DSH UI: visual spec exceeds 128 KiB");\n    const processed = Ze(normalizeVisual(value, T)), spec = Ne(processed) ? processed.spec : at(processed);\n    if (!spec || !processed.renderedNativeCount) throw Error("DSH UI: visual spec: " + (processed.errors.slice(0, 4).join("; ") || "requires registered components"));\n    const critical = /* @__PURE__ */ new Set(["quiz", "radio", "submit", "input", "textarea", "select", "slider", "checkbox", "switch"]);\n    const inventory = (items, path = "items", result = []) => {\n      for (const [n, v2] of (Array.isArray(items) ? items : []).entries()) {\n        if (!v2 || typeof v2 !== "object") continue;\n        const at2 = path + "[" + n + "]";\n        if (critical.has(v2.type)) result.push({ type: v2.type, id: v2.id ?? v2.group ?? v2.question ?? v2.label, path: at2 });\n        if (["row", "col", "grid", "card"].includes(v2.type)) inventory(v2.items, at2 + ".items", result);\n        if (v2.type === "tabs") for (const [i, t] of (v2.tabs ?? []).entries()) inventory(t.items, at2 + ".tabs[" + i + "].items", result);\n        if (v2.type === "accordion") for (const [i, t] of (v2.items ?? []).entries()) inventory(t.items, at2 + ".items[" + i + "].items", result);\n      }\n      return result;\n    };\n    const source = normalizeVisual(value, T), before = inventory(source.items), after = inventory(spec.items);\n    const available = [...after], missing = before.filter((v2) => {\n      const i = available.findIndex((n) => n.type === v2.type && n.id === v2.id);\n      if (i < 0) return true;\n      available.splice(i, 1);\n      return false;\n    });\n    if (missing.length) throw Error("DSH UI: critical component was rejected at " + missing.map((v2) => v2.path + " (" + v2.type + ")").join(", ") + ". " + processed.errors.slice(0, 4).join("; "));\n    const stableIds = /* @__PURE__ */ new Set();\n    function walk(items) {\n      for (const n of items) {\n        if (n.id !== void 0) {\n          if (stableIds.has(n.id)) throw Error("DSH UI: duplicate extended component id " + n.id);\n          stableIds.add(n.id);\n        }\n        if (!VISUAL_TYPES.includes(n.type)) throw Error("DSH UI: unsupported visual component " + n.type);\n        if (n.type === "input" && n.inputType === "password") throw Error("DSH UI: do not collect passwords or secrets in a UI");\n        if (n.type !== "file-tree" && Array.isArray(n.items)) walk(n.items.filter((x) => x && typeof x === "object" && "type" in x));\n        for (const t of n.tabs ?? []) walk(t.items ?? []);\n        if (n.type === "table") {\n          for (const d of n.details ?? []) if (d) walk(d);\n        }\n      }\n    }\n    walk(spec.items);\n    delete spec.panel;\n    delete spec.append;\n    return { spec, warnings: processed.errors.slice(0, 12), count: processed.renderedNativeCount };\n  }\n  function visualDocument(value) {\n    if (Array.isArray(value)) value = { items: value };\n    const { spec, warnings } = validateVisual(value), title = spec.title || "\\u53EF\\u89C6\\u5316";\n    const texts = [];\n    function gather(v2) {\n      if (!v2 || typeof v2 !== "object") return;\n      for (const [k2, x] of Object.entries(v2)) {\n        if (["title", "content", "label", "question", "explanation", "alt"].includes(k2) && typeof x === "string") texts.push(x);\n        else if (x && typeof x === "object") Array.isArray(x) ? x.forEach(gather) : gather(x);\n      }\n    }\n    gather(spec);\n    return { version: 1, title, fallback: texts.join("\\n").slice(0, 8192) || title, nodes: [{ id: "visual", type: "visual", spec, warnings }] };\n  }\n\n  // lib/normalize-authoring.js\n  var object = (v2) => v2 !== null && typeof v2 === "object" && !Array.isArray(v2);\n  var own = (v2, k2) => Object.hasOwn(v2, k2);\n  var singleItem = (v2) => object(v2) && Object.keys(v2).length === 1 && own(v2, "item");\n  var array = (v2) => {\n    let candidate = v2;\n    for (let i = 0; i < 8 && singleItem(candidate); i++) candidate = candidate.item;\n    return Array.isArray(candidate) ? candidate : v2;\n  };\n  var numericOps = /* @__PURE__ */ new Set(["add", "sub", "mul", "div", "min", "max", "round", "ceil", "floor", "abs", "lt", "lte", "gt", "gte"]);\n  function number(v2) {\n    if (typeof v2 !== "string" || !/^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:e[+-]?\\d+)?$/i.test(v2.trim())) return v2;\n    const n = Number(v2);\n    return Number.isFinite(n) && (!Number.isInteger(n) || Number.isSafeInteger(n)) ? n : v2;\n  }\n  var boolean = (v2) => v2 === "true" ? true : v2 === "false" ? false : v2;\n  function expression(e, numeric = false, logical = false) {\n    if (!object(e)) return e;\n    if (own(e, "const")) {\n      if (numeric) e.const = number(e.const);\n      if (logical) e.const = boolean(e.const);\n    }\n    if (own(e, "args")) e.args = array(e.args);\n    if (Array.isArray(e.args)) e.args.forEach((arg, i) => expression(arg, numericOps.has(e.op) || e.op === "if" && i > 0 && numeric, e.op === "if" && i === 0));\n    if (object(e.map?.fields)) Object.values(e.map.fields).forEach((e2) => expression(e2));\n    return e;\n  }\n  function normalizeAuthoring(doc2) {\n    if (Array.isArray(doc2)) doc2 = visualDocument(doc2);\n    if (object(doc2) && !own(doc2, "nodes") && (own(doc2, "items") || typeof doc2.type === "string")) doc2 = visualDocument(doc2);\n    if (!object(doc2)) return doc2;\n    if (own(doc2, "version")) doc2.version = number(doc2.version);\n    if (object(doc2.state)) for (const k2 of Object.keys(doc2.state)) {\n      let s = doc2.state[k2];\n      if (typeof s === "string" && s.trim().startsWith("{")) {\n        try {\n          const parsed = JSON.parse(s);\n          if (object(parsed)) s = parsed;\n        } catch {\n        }\n      }\n      if (singleItem(s) && object(s.item)) s = s.item;\n      doc2.state[k2] = s;\n      if (!object(s)) continue;\n      if (own(s, "options")) s.options = array(s.options);\n      if (s.type === "number") {\n        for (const field of ["default", "min", "max", "step"]) if (own(s, field)) s[field] = number(s[field]);\n        if (Array.isArray(s.options)) s.options = s.options.map(number);\n      } else if (s.type === "boolean") {\n        if (own(s, "default")) s.default = boolean(s.default);\n        if (Array.isArray(s.options)) s.options = s.options.map(boolean);\n      }\n    }\n    if (object(doc2.derived)) Object.values(doc2.derived).forEach((e) => expression(e));\n    if (object(doc2.actions)) {\n      for (const action of Object.values(doc2.actions)) if (object(action) && own(action, "stateKeys")) action.stateKeys = array(action.stateKeys);\n    }\n    function nodes(list) {\n      list = array(list);\n      if (!Array.isArray(list)) return list;\n      for (const node2 of list) {\n        if (!object(node2)) continue;\n        if (["text", "heading", "callout"].includes(node2.type) && own(node2, "content")) {\n          if (!own(node2, "text")) {\n            node2.text = node2.content;\n            delete node2.content;\n          } else if (node2.text === node2.content) delete node2.content;\n        }\n        if (["text", "heading", "callout"].includes(node2.type) && typeof node2.text === "string") {\n          const spans = array(node2.spans);\n          if (Array.isArray(spans) && spans.every((s) => object(s) && typeof s.text === "string") && spans.map((s) => s.text).join("") === node2.text) delete node2.text;\n        }\n        if (node2.type === "table" && own(node2, "types")) {\n          const columns = array(node2.columns), rows = array(node2.rows), types = array(node2.types);\n          const allowed = ["id", "type", "label", "columns", "rows", "types"];\n          if (Object.keys(node2).every((k2) => allowed.includes(k2)) && Array.isArray(columns) && columns.length && columns.every((c) => object(c) && typeof c.key === "string" && typeof c.label === "string" && Object.keys(c).every((k2) => ["key", "label", "unit"].includes(k2))) && new Set(columns.map((c) => c.key)).size === columns.length && Array.isArray(rows) && rows.every(object) && Array.isArray(types) && types.length === columns.length && types.every((t) => ["text", "num", "delta", "bar", "badge"].includes(t))) {\n            const spec = { ...node2.label ? { title: node2.label } : {}, items: [{ type: "table", columns: columns.map((c) => c.label + (c.unit ? ` (${c.unit})` : "")), rows: rows.map((row) => columns.map((c) => row[c.key] ?? null)), types }] }, id = node2.id;\n            for (const k2 of Object.keys(node2)) delete node2[k2];\n            Object.assign(node2, { ...id !== void 0 ? { id } : {}, type: "visual", spec });\n          }\n        }\n        if (typeof node2.id === "string" && VISUAL_TYPES.includes(node2.type) && !own(COMPONENTS, node2.type)) {\n          const spec = { items: [{ ...node2 }] }, id = node2.id;\n          for (const k2 of Object.keys(node2)) delete node2[k2];\n          Object.assign(node2, { id, type: "visual", spec });\n        }\n        if (node2.type === "table" && Array.isArray(node2.columns) && node2.columns.length && node2.columns.every((c) => object(c) && typeof c.key === "string") && new Set(node2.columns.map((c) => c.key)).size === node2.columns.length && Array.isArray(node2.rows) && node2.rows.every((row) => Array.isArray(row) && row.length === node2.columns.length)) {\n          node2.rows = node2.rows.map((row) => Object.fromEntries(node2.columns.map((c, i) => [c.key, row[i]])));\n        }\n        if (node2.type === "table" && Array.isArray(node2.columns) && node2.columns.length && Array.isArray(node2.rows) && node2.rows.every(Array.isArray) && node2.columns.every((c) => object(c) && Number.isInteger(c.key) && c.key >= 0) && new Set(node2.columns.map((c) => c.key)).size === node2.columns.length) {\n          const columns = node2.columns.map((c) => ({ ...c, key: "col_" + c.key }));\n          node2.rows = node2.rows.map((row) => Object.fromEntries(node2.columns.map((c) => ["col_" + c.key, row[c.key] ?? null])));\n          node2.columns = columns;\n        }\n        if (node2.type === "visual" && typeof node2.id === "string") {\n          node2.stateKey ??= "visual_" + node2.id;\n          doc2.state ??= {};\n          if (!own(doc2.state, node2.stateKey)) doc2.state[node2.stateKey] = { type: "json", default: {} };\n        }\n        if (node2.type === "sandbox") {\n          if (!own(node2, "title")) node2.title = doc2.title;\n          if (!own(node2, "fallback")) node2.fallback = doc2.fallback;\n        }\n        for (const field of ["children", "items", "columns", "libraries", "stateKeys", "dataKeys", "derivedKeys"]) if (own(node2, field)) node2[field] = array(node2[field]);\n        if (["table", "chart"].includes(node2.type) && own(node2, "rows")) node2.rows = array(node2.rows);\n        for (const field of ["decimals", "height"]) if (own(node2, field)) node2[field] = number(node2[field]);\n        if (["row", "column"].includes(node2.type)) {\n          if (own(node2, "gap")) node2.gap = number(node2.gap);\n          if (node2.type === "row" && own(node2, "columns")) node2.columns = number(node2.columns);\n        }\n        if (["text", "heading", "callout"].includes(node2.type)) {\n          for (const field of ["size", "weight", "lineHeight"]) if (own(node2, field)) node2[field] = number(node2[field]);\n          if (own(node2, "spans")) node2.spans = array(node2.spans);\n          if (Array.isArray(node2.spans)) {\n            for (const span of node2.spans) if (object(span)) {\n              for (const field of ["size", "weight", "lineHeight"]) if (own(span, field)) span[field] = number(span[field]);\n            }\n          }\n        }\n        if (node2.type === "details" && own(node2, "open")) node2.open = boolean(node2.open);\n        if (node2.type === "text" && own(node2, "copyable")) node2.copyable = boolean(node2.copyable);\n        if (node2.type === "code" && own(node2, "wrap")) node2.wrap = boolean(node2.wrap);\n        for (const field of ["text", "value", "max", "rows"]) if (own(node2, field)) expression(node2[field], node2.type === "progress");\n        if (["row", "column", "card", "details"].includes(node2.type) && own(node2, "children")) node2.children = nodes(node2.children);\n      }\n      return list;\n    }\n    if (own(doc2, "nodes")) doc2.nodes = nodes(doc2.nodes);\n    return doc2;\n  }\n\n  // lib/typography.js\n  var TEXT_PRESETS = Object.freeze(["reading", "brief", "comparison", "list", "callout", "scorecard", "flow", "minimal"]);\n  var TYPE_FIELDS = Object.freeze(["size", "weight", "color", "align", "lineHeight"]);\n  var TEXT_SIZES = Object.freeze({ sm: 14, md: 16, lg: 20, xl: 26, hero: 36 });\n  var TEXT_COLORS = Object.freeze({ default: "var(--du-ink)", muted: "var(--du-muted)", accent: "var(--du-accent)", success: "var(--du-green)", warning: "var(--du-amber)", danger: "var(--du-red)", violet: "var(--du-violet)" });\n  function validateTypography(value, at2 = "text") {\n    const fail2 = (message) => {\n      throw Error(`DSH UI: ${at2}.${message}`);\n    };\n    if (value.size !== void 0 && !(typeof value.size === "number" && Number.isFinite(value.size) && value.size >= 12 && value.size <= 48) && !Object.hasOwn(TEXT_SIZES, value.size)) fail2("size must be 12..48 px or sm/md/lg/xl/hero");\n    if (value.weight !== void 0 && ![400, 500, 600, 700, 800].includes(value.weight)) fail2("weight must be 400/500/600/700/800");\n    if (value.color !== void 0 && (typeof value.color !== "string" || !Object.hasOwn(TEXT_COLORS, value.color) && !/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.color))) fail2("color must be default/muted/accent/success/warning/danger/violet or #RGB/#RRGGBB");\n    if (value.align !== void 0 && !["left", "center", "right"].includes(value.align)) fail2("align must be left/center/right");\n    if (value.lineHeight !== void 0 && !(typeof value.lineHeight === "number" && value.lineHeight >= 1.2 && value.lineHeight <= 2.4)) fail2("lineHeight must be 1.2..2.4");\n  }\n\n  // lib/links.js\n  function validateLink(node2) {\n    const fail2 = (message) => {\n      throw Error("DSH UI: " + message);\n    };\n    if ([node2.href, node2.path, node2.action].filter((v2) => v2 !== void 0).length !== 1) fail2(`node.${node2.id}: choose exactly one href (http/https), path (file), or action (Agent follow-up)`);\n    if (node2.variant !== void 0 && !["primary", "secondary", "text"].includes(node2.variant)) fail2("link/button variant must be primary/secondary/text");\n    if (node2.href !== void 0) {\n      if (typeof node2.href !== "string" || node2.href.length > 8192 || /[\\u0000-\\u0020\\u007f]/.test(node2.href) || !/^https?:\\/\\//i.test(node2.href)) fail2("href must be an absolute http/https URL; encode spaces");\n      let url;\n      try {\n        url = new URL(node2.href);\n      } catch {\n        fail2("invalid href URL");\n      }\n      if (!url.hostname || url.username || url.password) fail2("href must have a host and must not contain credentials");\n    }\n    if (node2.path !== void 0) {\n      if (typeof node2.path !== "string" || !node2.path.trim() || node2.path.length > 8192 || /[\\u0000-\\u001f\\u007f]/.test(node2.path) || /^\\s*(?:[a-z][a-z\\d+.-]*:|[\\\\/]{2})/i.test(node2.path) && !/^\\s*[a-z]:[\\\\/]/i.test(node2.path)) fail2("path must be a local file path, not a URL, network path or command");\n    }\n  }\n\n  // lib/protocol.js\n  var LIMITS = Object.freeze({ bytes: 131072, nodes: 160, depth: 12, rows: 500, expressions: 128, steps: 4096 });\n  var own2 = (o, k2) => Object.hasOwn(o, k2);\n  var fail = (message) => {\n    throw new Error(`DSH UI: ${message}`);\n  };\n  var object2 = (x) => x !== null && typeof x === "object" && !Array.isArray(x);\n  var finite = (x) => typeof x === "number" && Number.isFinite(x);\n  var scalar = (x) => typeof x === "string" || typeof x === "boolean" || finite(x);\n  var text = (x, at2) => {\n    if (typeof x !== "string" || x.length > 8192) fail(`${at2} must be a string of at most 8192 characters`);\n  };\n  function fields(value, allowed, at2) {\n    if (!object2(value)) fail(`${at2} must be an object`);\n    for (const k2 of Object.keys(value)) if (!allowed.includes(k2)) {\n      const hint = at2 === "document" ? " Controls and visual components belong in nodes as registered typed nodes, not extra document fields." : "";\n      fail(`unknown field ${at2}.${k2}; allowed fields at ${at2}: ${allowed.join(", ")}.${hint}`);\n    }\n  }\n  function safeJson(value, depth = 0, source = false) {\n    if (depth > 48) fail("JSON nesting is too deep");\n    if (value === null || typeof value === "boolean") return;\n    if (typeof value === "string") {\n      if (source) {\n        if (value.length > SANDBOX_LIMITS.source) fail("canvas source exceeds 48 Ki characters");\n        return;\n      }\n      return text(value, "value");\n    }\n    if (typeof value === "number") {\n      if (!finite(value)) fail("numbers must be finite");\n      return;\n    }\n    if (typeof value !== "object") fail("only JSON values are accepted");\n    if (Array.isArray(value) && value.length > LIMITS.rows) fail("too many array items");\n    for (const k2 of Object.keys(value)) {\n      if (["__proto__", "prototype", "constructor"].includes(k2)) fail("unsafe property name");\n      safeJson(value[k2], depth + 1, value.type === "sandbox" && ["html", "css", "script"].includes(k2));\n    }\n  }\n  function initialState(doc2) {\n    return Object.fromEntries(Object.entries(doc2.state).map(([k2, spec]) => [k2, spec.default]));\n  }\n  function validateState(doc2, state2) {\n    if (!object2(state2) || Object.keys(state2).length !== Object.keys(doc2.state).length) fail("state keys do not match the document");\n    const result = {};\n    for (const [k2, s] of Object.entries(doc2.state)) {\n      if (!own2(state2, k2)) fail(`missing state.${k2}`);\n      const v2 = state2[k2];\n      if (s.type === "number") {\n        if (!finite(v2) || v2 < s.min || v2 > s.max) fail(`state.${k2} is outside its numeric range`);\n        const offset = (v2 - s.min) / s.step;\n        if (Math.abs(offset - Math.round(offset)) > 1e-6) fail(`state.${k2} does not match its step`);\n      } else if (s.type === "json") {\n        if (!object2(v2) && !Array.isArray(v2)) fail(`state.${k2} must be an array or object for type json`);\n        safeJson(v2);\n        if (new TextEncoder().encode(JSON.stringify(v2)).length > 16384) fail(`state.${k2} JSON exceeds 16 KiB`);\n      } else if (s.type === "string") text(v2, `state.${k2}`);\n      else if (typeof v2 !== "boolean") fail(`state.${k2} must be boolean`);\n      if (s.options && !s.options.includes(v2)) fail(`invalid option for state.${k2}`);\n      result[k2] = v2;\n    }\n    return result;\n  }\n  var ARITY = { add: [1, 8], sub: [2, 2], mul: [1, 8], div: [2, 2], min: [1, 8], max: [1, 8], round: [1, 1], ceil: [1, 1], floor: [1, 1], abs: [1, 1], eq: [2, 2], neq: [2, 2], lt: [2, 2], lte: [2, 2], gt: [2, 2], gte: [2, 2], if: [3, 3] };\n  function reference(doc2, ref) {\n    if (typeof ref !== "string" || !["state", "data", "derived"].includes(ref.split(".")[0]) || ref.split(".").length !== 2 || !validIdentifier(ref.split(".")[1])) fail(`invalid reference ${JSON.stringify(ref)}; use state.key, data.key or derived.key with a letter/underscore identifier`);\n    const [group, k2] = ref.split(".");\n    if (!own2(doc2[group], k2)) fail(`unknown reference ${ref}`);\n    return [group, k2];\n  }\n  function evaluate(doc2, state2) {\n    const derived = {}, active = /* @__PURE__ */ new Set();\n    let steps = 0, generatedRows = 0;\n    const budget = () => {\n      if (++steps > LIMITS.steps) fail("calculation budget exceeded");\n    };\n    const resolve = (ref) => {\n      budget();\n      const [group, k2] = reference(doc2, ref);\n      if (group !== "derived") return (group === "state" ? state2 : doc2.data)[k2];\n      if (own2(derived, k2)) return derived[k2];\n      if (active.has(k2)) fail(`cyclic calculation ${k2}`);\n      active.add(k2);\n      const result2 = expression2(doc2.derived[k2]);\n      active.delete(k2);\n      derived[k2] = result2;\n      return result2;\n    };\n    const expression2 = (e, item) => {\n      budget();\n      if (own2(e, "map")) {\n        const rows = resolve(e.map.source);\n        if ((generatedRows += rows.length) > LIMITS.rows) fail("generated row limit exceeded");\n        return rows.map((row) => Object.fromEntries(Object.entries(e.map.fields).map(([k2, value]) => {\n          const out2 = expression2(value, row);\n          if (!scalar(out2)) fail("generated cells must be scalar");\n          return [k2, out2];\n        })));\n      }\n      if (own2(e, "const")) return e.const;\n      if (own2(e, "ref")) {\n        if (e.ref.startsWith("item.")) {\n          const k2 = e.ref.slice(5);\n          if (!item || !own2(item, k2) || !scalar(item[k2])) fail("invalid item reference");\n          return item[k2];\n        }\n        return resolve(e.ref);\n      }\n      if (e.op === "if") {\n        const condition = expression2(e.args[0], item);\n        if (typeof condition !== "boolean") fail("if condition must be boolean");\n        return expression2(e.args[condition ? 1 : 2], item);\n      }\n      const a = e.args.map((arg) => expression2(arg, item));\n      if (e.op === "eq") return a[0] === a[1];\n      if (e.op === "neq") return a[0] !== a[1];\n      if (!a.every(finite)) fail(`operator ${e.op} requires finite numbers`);\n      let out;\n      switch (e.op) {\n        case "add":\n          out = a.reduce((x, y2) => x + y2, 0);\n          break;\n        case "sub":\n          out = a[0] - a[1];\n          break;\n        case "mul":\n          out = a.reduce((x, y2) => x * y2, 1);\n          break;\n        case "div":\n          if (a[1] === 0) fail("division by zero");\n          out = a[0] / a[1];\n          break;\n        case "min":\n          out = Math.min(...a);\n          break;\n        case "max":\n          out = Math.max(...a);\n          break;\n        case "round":\n          out = Math.round(a[0]);\n          break;\n        case "ceil":\n          out = Math.ceil(a[0]);\n          break;\n        case "floor":\n          out = Math.floor(a[0]);\n          break;\n        case "abs":\n          out = Math.abs(a[0]);\n          break;\n        case "lt":\n          return a[0] < a[1];\n        case "lte":\n          return a[0] <= a[1];\n        case "gt":\n          return a[0] > a[1];\n        case "gte":\n          return a[0] >= a[1];\n        default:\n          fail(`unsupported operator ${e.op}`);\n      }\n      if (!finite(out)) fail("non-finite calculation result");\n      return out;\n    };\n    for (const k2 of Object.keys(doc2.derived)) resolve(`derived.${k2}`);\n    if (new TextEncoder().encode(JSON.stringify(derived)).length > LIMITS.bytes) fail("derived output exceeds 128 KiB");\n    const resolveCell = (cell) => {\n      const out = expression2(cell);\n      if (!scalar(out)) fail("inline row formula cells must resolve to a string, boolean or finite number");\n      return out;\n    };\n    const result = { derived, resolveValue: (value) => {\n      if (Array.isArray(value)) return value.map((row) => object2(row) ? Object.fromEntries(Object.entries(row).map(([k2, cell]) => [k2, object2(cell) && ["const", "ref", "op"].some((field) => own2(cell, field)) ? resolveCell(cell) : cell])) : row);\n      if (!object2(value)) return value;\n      return expression2(value);\n    } };\n    checkViewValues(doc2, result);\n    return result;\n  }\n  function checkViewValues(doc2, evaluated) {\n    function walk(list) {\n      for (const n of list) {\n        if (n.type === "table" || n.type === "chart") {\n          const rows = evaluated.resolveValue(n.rows);\n          if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object2)) fail("table/chart rows must reference an array of objects");\n          if (n.type === "chart") {\n            const index = rows.findIndex((r) => !own2(r, n.labelKey) || !scalar(r[n.labelKey]) || !own2(r, n.valueKey) || !finite(r[n.valueKey]));\n            if (index >= 0) {\n              const row = rows[index], missing = [n.labelKey, n.valueKey].filter((k2) => !own2(row, k2));\n              fail("chart requires labels and finite numeric values. node." + n.id + ".rows[" + index + "]: " + (missing.length ? "missing field(s) " + missing.join(", ") : n.valueKey + " must resolve to a finite number") + ". Available keys: " + Object.keys(row).slice(0, 16).join(", ") + ". For live values use inline rows:[{" + n.labelKey + \':"\\u9879\\u76EE",\' + n.valueKey + \':{ref:"derived.amount"}}]; static data labels alone contain no amounts. Keep all nodes/state/derived when correcting the document\');\n            }\n          }\n          if (n.type === "chart" && n.xScale === "linear" && rows.some((r) => !finite(r[n.labelKey]))) fail("linear chart requires numeric x values");\n        }\n        if (n.type === "metric" && !scalar(evaluated.resolveValue(n.value))) fail(`node.${n.id}.value must resolve to a number, string or boolean; use table for rows or a canvas for structured data`);\n        if (n.type === "progress") {\n          const v2 = evaluated.resolveValue(n.value), max = evaluated.resolveValue(n.max);\n          if (!finite(v2) || !finite(max) || max <= 0 || v2 < 0 || v2 > max) fail("progress requires 0 <= value <= positive max");\n        }\n        if (n.children) walk(n.children);\n      }\n    }\n    walk(doc2.nodes);\n  }\n  function validateDocument(input) {\n    safeJson(input);\n    const json = JSON.stringify(input);\n    if (new TextEncoder().encode(json).length > LIMITS.bytes) fail("document exceeds 128 KiB");\n    const normalized = normalizeAuthoring(JSON.parse(json));\n    safeJson(normalized);\n    const doc2 = expandExpressions(normalized);\n    fields(doc2, ["version", "title", "fallback", "state", "data", "derived", "nodes", "actions", "presentation"], "document");\n    if (doc2.presentation !== void 0) {\n      fields(doc2.presentation, ["layout", "accent", "density", "preset"], "presentation");\n      if (doc2.presentation.preset !== void 0 && !TEXT_PRESETS.includes(doc2.presentation.preset)) fail("unknown presentation preset; use " + TEXT_PRESETS.join("/"));\n      for (const [k2, allowed] of Object.entries({ layout: UI_LAYOUTS, accent: UI_ACCENTS, density: ["comfortable", "compact"] }))\n        if (doc2.presentation[k2] !== void 0 && !allowed.includes(doc2.presentation[k2])) fail(`unknown presentation ${k2}`);\n    }\n    if (doc2.version !== 1) fail(own2(doc2, "version") ? "document.version must be 1" : "document.version is missing. render_ui creates a complete document, not a partial patch: send {version:1,title,fallback,nodes:[...]} for shared controls/formulas, or {title,items:[...]} for extended visuals. Include all content, not only data/derived");\n    text(doc2.title, "title");\n    text(doc2.fallback, "fallback");\n    if (!doc2.title.trim() || !doc2.fallback.trim()) fail("title and fallback cannot be empty");\n    for (const group of ["state", "data", "derived", "actions"]) {\n      doc2[group] ??= {};\n      if (!object2(doc2[group]) || Object.keys(doc2[group]).length > 64) fail(`invalid ${group}`);\n      for (const k2 of Object.keys(doc2[group])) if (!validIdentifier(k2)) fail(`invalid key in ${group}: ${JSON.stringify(k2)}; use 1..64 letters, numbers or underscores, starting with a letter/underscore (Chinese letters supported); no spaces, dots or hyphens. Put display labels in label/text`);\n    }\n    for (const [k2, s] of Object.entries(doc2.state)) {\n      fields(s, ["type", "default", "min", "max", "step", "options"], `state.${k2}`);\n      if (s.type === "string" && (Array.isArray(s.default) || object2(s.default)) && !own2(s, "options")) s.type = "json";\n      if (!["number", "string", "boolean", "json"].includes(s.type)) fail(`unsupported state type ${k2}; use number, string, boolean or json (arrays/objects)`);\n      if (s.type === "json" && own2(s, "options")) fail(`state.${k2}: json state does not support select options; use scalar options or a canvas`);\n      if (s.type === "number") {\n        for (const field of ["default", "min", "max", "step"]) if (!finite(s[field])) fail(`state.${k2}.${field} must be a finite JSON number; received ${s[field] === null ? "null" : typeof s[field]}. Supply {type:"number",default:2,min:1,max:12,step:1}; do not omit limits or include units in numeric fields`);\n        if (s.min >= s.max || s.step <= 0) fail(`invalid numeric limits for state.${k2}: require min < max and step > 0; received min=${s.min}, max=${s.max}, step=${s.step}`);\n        if ((s.max - s.min) / s.step > 1e9) fail(`numeric step too small for ${k2}`);\n      } else if (["min", "max", "step"].some((p2) => own2(s, p2))) fail(`numeric limits on non-number ${k2}`);\n      if (s.options !== void 0 && (!Array.isArray(s.options) || !s.options.length || s.options.length > 64 || !s.options.every(scalar))) fail(`state.${k2}.options must be a direct array of 1..64 scalar values, e.g. options:["3","5","7"], not {item:[...]}`);\n    }\n    const defaults = validateState(doc2, initialState(doc2));\n    let expressions = 0;\n    const expressionShapes = /* @__PURE__ */ new Set();\n    for (const [k2, spec] of Object.entries(doc2.state))\n      for (const option of spec.options ?? []) validateState(doc2, { ...defaults, [k2]: option });\n    function validateExpression(e, depth = 0, itemRows, at2 = "expression") {\n      if (depth > LIMITS.depth) fail(at2 + ": expression nesting exceeds " + LIMITS.depth);\n      const shape = JSON.stringify(e);\n      if (!expressionShapes.has(shape)) {\n        expressionShapes.add(shape);\n        if (++expressions > LIMITS.expressions) fail(at2 + ": expression limit exceeded (128 distinct expressions). Reuse derived references instead of expanding long formulas; keep the complete document when retrying");\n      }\n      if (!object2(e)) fail(`${at2}: expression must be an object`);\n      if (own2(e, "map")) {\n        if (depth !== 0) fail("map is only allowed at the root of a derived value");\n        fields(e, ["map"], "expression");\n        fields(e.map, ["source", "fields"], "map");\n        if (typeof e.map.source !== "string" || !e.map.source.startsWith("data.")) fail(\'map source must reference static data using a string such as "data.samples"; put object rows in document.data.samples, not inline in map.source\');\n        const [, k2] = reference(doc2, e.map.source), rows = doc2.data[k2];\n        if (!Array.isArray(rows) || rows.length > LIMITS.rows || !rows.every(object2)) fail("map source must be object rows");\n        if (!object2(e.map.fields) || !Object.keys(e.map.fields).length || Object.keys(e.map.fields).length > 16) fail("map requires 1..16 fields");\n        for (const [k3, value2] of Object.entries(e.map.fields)) {\n          if (!validIdentifier(k3)) fail(`invalid map field ${JSON.stringify(k3).slice(0, 100)}; use a letter/underscore identifier such as powerW or \\u529F\\u7387, without spaces, dots or hyphens`);\n          validateExpression(value2, depth + 1, rows, `${at2}.map.fields.${k3}`);\n        }\n        return;\n      }\n      if (own2(e, "const")) {\n        fields(e, ["const"], "expression");\n        if (!scalar(e.const)) fail("constant must be scalar");\n        return;\n      }\n      if (own2(e, "ref")) {\n        fields(e, ["ref"], "expression");\n        if (typeof e.ref === "string" && e.ref.startsWith("item.")) {\n          const k2 = e.ref.slice(5);\n          if (!itemRows || !validIdentifier(k2) || itemRows.some((row) => !own2(row, k2) || !scalar(row[k2]))) fail("invalid or unscoped item reference");\n        } else reference(doc2, e.ref);\n        return;\n      }\n      fields(e, ["op", "args"], "expression");\n      const arity = ARITY[e.op];\n      if (!arity || !Array.isArray(e.args) || e.args.length < arity[0] || e.args.length > arity[1]) fail(`${at2}: invalid operator or argument count for ${JSON.stringify(e.op)}; args must be a direct array${arity ? ` with ${arity[0]}..${arity[1]} expressions` : " and op must be registered"}. Received ${Array.isArray(e.args) ? e.args.length + " arguments" : typeof e.args}. Prefer {expr:"state.people * state.days"} for arithmetic; missing operands cannot be inferred`);\n      e.args.forEach((a, i) => validateExpression(a, depth + 1, itemRows, `${at2}.args[${i}]`));\n    }\n    Object.entries(doc2.derived).forEach(([k2, e]) => validateExpression(e, 0, void 0, `derived.${k2}`));\n    const visited = /* @__PURE__ */ new Set(), active = /* @__PURE__ */ new Set();\n    function visit(k2) {\n      if (active.has(k2)) fail(`cyclic calculation ${k2}`);\n      if (visited.has(k2)) return;\n      active.add(k2);\n      function walk(e) {\n        if (e.ref?.startsWith("derived.")) visit(e.ref.split(".")[1]);\n        for (const a of e.args ?? []) walk(a);\n        for (const value2 of Object.values(e.map?.fields ?? {})) walk(value2);\n      }\n      walk(doc2.derived[k2]);\n      active.delete(k2);\n      visited.add(k2);\n    }\n    Object.keys(doc2.derived).forEach(visit);\n    for (const [k2, a] of Object.entries(doc2.actions)) {\n      fields(a, ["type", "intent", "stateKeys"], `actions.${k2}`);\n      if (a.type !== "agent.followup") fail("only agent.followup actions are supported");\n      text(a.intent, "action intent");\n      if (!a.intent.trim() || !Array.isArray(a.stateKeys) || a.stateKeys.length > 64 || new Set(a.stateKeys).size !== a.stateKeys.length || a.stateKeys.some((s) => !own2(doc2.state, s))) fail("invalid action stateKeys");\n    }\n    const ids = /* @__PURE__ */ new Map();\n    let count2 = 0;\n    const value = (v2, at2) => {\n      if (object2(v2)) {\n        if (own2(v2, "map")) fail("map belongs in derived");\n        validateExpression(v2);\n      } else if (!scalar(v2)) fail(`invalid value at ${at2}`);\n    };\n    function nodes(list, depth = 0, path = "nodes") {\n      if (!Array.isArray(list)) fail(path === "nodes" ? \'document.nodes is missing or is not an array. State/derived define values but do not create visible UI. Include nodes:[{id:"heading",type:"heading",text:"..."},...] and actual controls in the SAME complete document; do not resend state/data/derived alone. Declared state keys: \' + Object.keys(doc2.state).join(", ") : path + " must be an array of child nodes; use children:[{id,type,...}]");\n      if (depth > LIMITS.depth) fail(path + " exceeds maximum node depth " + LIMITS.depth);\n      for (const [index, n] of list.entries()) {\n        const at2 = `${path}[${index}]`;\n        if (++count2 > LIMITS.nodes) fail("too many nodes");\n        if (!object2(n)) fail(`${at2} must be a node object`);\n        if (!own2(n, "id")) fail(`${at2}.id is missing (type=${JSON.stringify(n.type)}). Every node, including sandbox, needs its own id; add e.g. id:"canvas". JSON field order does not matter`);\n        if (!validIdentifier(n.id)) fail(`${at2}.id is invalid: ${JSON.stringify(n.id)}. Use 1..64 letters/numbers/underscores starting with a letter/underscore`);\n        if (ids.has(n.id)) fail(`${at2}.id duplicates ${JSON.stringify(n.id)} first declared at ${ids.get(n.id)}. Give each node a unique id; state keys and node ids are separate namespaces`);\n        ids.set(n.id, `${at2}.id`);\n        if (!Object.hasOwn(COMPONENTS, n.type)) fail("unsupported component " + n.type);\n        if (["table", "chart"].includes(n.type) && typeof n.rows === "string" && /^(data|derived)\\./.test(n.rows)) n.rows = { ref: n.rows };\n        switch (n.type) {\n          case "visual": {\n            const previous = Array.isArray(n.warnings) ? n.warnings.filter((x) => typeof x === "string").map((x) => x.slice(0, 512)).slice(0, 12) : [];\n            const checked = validateVisual(n.spec);\n            n.spec = checked.spec;\n            n.warnings = [.../* @__PURE__ */ new Set([...previous, ...checked.warnings])].slice(0, 12);\n            count2 += checked.count;\n            if (count2 > LIMITS.nodes) fail("too many nodes, including visual components");\n            if (!validIdentifier(n.stateKey) || doc2.state[n.stateKey]?.type !== "json") fail("visual requires its own json stateKey");\n            break;\n          }\n          case "sandbox": {\n            text(n.title, `${at2}.title (canvas title)`);\n            text(n.fallback, `${at2}.fallback (canvas fallback)`);\n            if (!n.title.trim()) fail(`${at2}.title must not be empty`);\n            if (!n.fallback.trim()) fail(`${at2}.fallback must not be empty`);\n            if (typeof n.html !== "string" || !n.html.trim()) fail(`${at2}.html must be a non-empty HTML string; script/css/fallback belong beside html on the sandbox node, not inside it`);\n            for (const field of ["html", "css", "script"]) if (n[field] !== void 0 && (typeof n[field] !== "string" || n[field].length > SANDBOX_LIMITS.source)) fail("canvas source exceeds 48 Ki characters");\n            if (n.libraries !== void 0 && (!Array.isArray(n.libraries) || n.libraries.length > 1 || n.libraries.some((v2) => v2 !== "mechanism"))) fail(\'canvas libraries supports only ["mechanism"] or []\');\n            if (n.height !== void 0 && (!Number.isInteger(n.height) || n.height < 160 || n.height > SANDBOX_LIMITS.height)) fail("canvas height must be 160..1000");\n            for (const [field, group] of [["stateKeys", "state"], ["dataKeys", "data"], ["derivedKeys", "derived"]]) if (n[field] !== void 0 && (!Array.isArray(n[field]) || n[field].length > 64 || new Set(n[field]).size !== n[field].length || n[field].some((k2) => !own2(doc2[group], k2)))) fail("invalid canvas " + field);\n            break;\n          }\n          case "row":\n          case "column":\n            if (n.gap !== void 0 && !(typeof n.gap === "number" && Number.isFinite(n.gap) && n.gap >= 0 && n.gap <= 40)) fail("gap must be 0..40 pixels");\n            if (n.columns !== void 0 && (!Number.isInteger(n.columns) || n.columns < 1 || n.columns > 4)) fail("columns must be 1..4");\n            break;\n          case "card":\n            if (n.title !== void 0) text(n.title, "card title");\n            if (n.surface !== void 0 && !UI_SURFACES.includes(n.surface)) fail("unknown card surface");\n            break;\n          case "details":\n            text(n.title, "details title");\n            if (n.open === "true" || n.open === "false") n.open = n.open === "true";\n            if (n.open !== void 0 && typeof n.open !== "boolean") fail(`node.${n.id}.open must be boolean true or false`);\n            break;\n          case "badge":\n            value(n.text, "badge text");\n            break;\n          case "progress":\n            text(n.label, "progress label");\n            value(n.value, "progress value");\n            value(n.max, "progress max");\n            if (n.unit !== void 0) text(n.unit, "progress unit");\n            break;\n          case "steps": {\n            if (n.title !== void 0) text(n.title, "steps title");\n            const at3 = `node.${n.id}.items`;\n            if (!Array.isArray(n.items)) fail(`${at3} must be an array of 1..12 step objects, received ${n.items === null ? "null" : typeof n.items}. Use items:[{"title":"First step","description":"One sentence"}], not items:{item:[...]}. status is optional for a static guide`);\n            if (!n.items.length || n.items.length > 12) fail(`${at3} requires 1..12 items; received ${n.items.length}. Split a longer guide into separate steps nodes`);\n            for (const [i, item] of n.items.entries()) {\n              const stepAt = `${at3}[${i}]`;\n              fields(item, ["title", "description", "status"], stepAt);\n              text(item.title, `${stepAt}.title`);\n              if (item.description !== void 0) text(item.description, `${stepAt}.description`);\n              if (item.status !== void 0 && !["pending", "active", "done", "error"].includes(item.status)) fail(`${stepAt}.status must be pending, active, done or error; omit status for a static guide`);\n            }\n            break;\n          }\n          case "heading":\n          case "text":\n          case "callout":\n            if (n.type === "text") {\n              if (n.title !== void 0) text(n.title, "text block title");\n              if (n.copyable !== void 0 && typeof n.copyable !== "boolean") fail("copyable must be boolean");\n            }\n            validateTypography(n, `node.${n.id}`);\n            if (n.spans !== void 0) {\n              if (n.text !== void 0) fail(`node.${n.id}: use text or spans, not both`);\n              if (!Array.isArray(n.spans) || !n.spans.length || n.spans.length > 80) fail("spans must contain 1..80 text fragments");\n              for (const [i, span] of n.spans.entries()) {\n                fields(span, ["text", ...TYPE_FIELDS], `node.${n.id}.spans[${i}]`);\n                text(span.text, "span text");\n                validateTypography(span, `node.${n.id}.spans[${i}]`);\n              }\n            } else value(n.text, "text");\n            break;\n          case "metric":\n            text(n.label, "metric label");\n            value(n.value, "metric value");\n            if (n.unit !== void 0) text(n.unit, "unit");\n            if (n.decimals !== void 0 && (!Number.isInteger(n.decimals) || n.decimals < 0 || n.decimals > 6)) fail("invalid decimals");\n            break;\n          case "input":\n          case "slider":\n          case "select":\n          case "toggle": {\n            text(n.label, "control label");\n            if (typeof n.bind !== "string" || !n.bind.startsWith("state.")) fail("controls must bind state");\n            const [, k2] = reference(doc2, n.bind), spec = doc2.state[k2];\n            if (n.type === "slider" && spec.type !== "number") fail("slider requires numeric state");\n            if (n.type === "toggle" && spec.type !== "boolean") fail("toggle requires boolean state");\n            if (["input", "select"].includes(n.type) && spec.type === "json") fail(`node.${n.id}: structured state requires a sandbox with DSHUI.setState; use separate boolean states and toggle nodes for a native checklist`);\n            if (n.type === "input" && spec.type === "boolean") fail("use toggle for boolean state");\n            if (n.type === "select" && !spec.options) fail("select requires options");\n            if (n.type === "select" && n.variant !== void 0 && !["dropdown", "segmented"].includes(n.variant)) fail(`node.${n.id}.variant must be dropdown or segmented`);\n            break;\n          }\n          case "code":\n            if (typeof n.code !== "string" || n.code.length > SANDBOX_LIMITS.source) fail("code must be a string of at most 48 Ki characters");\n            if (n.lang !== void 0) text(n.lang, "code language");\n            if (n.title !== void 0) text(n.title, "code title");\n            if (n.wrap !== void 0 && typeof n.wrap !== "boolean") fail("code wrap must be boolean");\n            break;\n          case "button":\n          case "link":\n            text(n.text, "button text");\n            validateLink(n);\n            if (n.action !== void 0 && !own2(doc2.actions, n.action)) fail("unknown action");\n            break;\n          case "divider":\n            if (n.label !== void 0) text(n.label, "divider label");\n            break;\n          case "table": {\n            if (n.label !== void 0) text(n.label, "table label");\n            if (!Array.isArray(n.rows)) value(n.rows, "table rows");\n            if (!Array.isArray(n.columns) || !n.columns.length || n.columns.length > 16) fail("invalid table columns");\n            const cols = /* @__PURE__ */ new Set();\n            for (const c of n.columns) {\n              fields(c, ["key", "label", "unit"], "column");\n              if (!validIdentifier(c.key) || cols.has(c.key)) fail("invalid or duplicate column key");\n              cols.add(c.key);\n              text(c.label, "column label");\n              if (c.unit !== void 0) text(c.unit, "column unit");\n            }\n            break;\n          }\n          case "chart":\n            if (!Array.isArray(n.rows)) value(n.rows, "chart rows");\n            if (!["bar", "line"].includes(n.kind) || !validIdentifier(n.labelKey) || !validIdentifier(n.valueKey)) fail("invalid chart");\n            text(n.label, "chart label");\n            if (n.unit !== void 0) text(n.unit, "chart unit");\n            if (n.xScale !== void 0 && (!["category", "linear"].includes(n.xScale) || n.xScale === "linear" && n.kind !== "line")) fail("invalid xScale");\n            break;\n          default:\n            fail(`unsupported component ${n.type}`);\n        }\n        if (["heading", "text", "callout", "card", "metric", "button", "link", "badge", "progress", "details"].includes(n.type)) {\n          if (n.icon !== void 0 && !UI_ICONS.includes(n.icon)) fail("unknown UI icon");\n          if (!["button", "link"].includes(n.type)) {\n            if (n.tone !== void 0 && !UI_TONES.includes(n.tone)) fail("unknown UI tone");\n          }\n        }\n        if (["table", "chart"].includes(n.type) && Array.isArray(n.rows)) {\n          for (const [i, row] of n.rows.entries()) if (object2(row)) {\n            for (const [k2, cell] of Object.entries(row)) if (object2(cell) && ["const", "ref", "op"].some((field) => own2(cell, field))) value(cell, at2 + ".rows[" + i + "]." + k2);\n          }\n        }\n        fields(n, componentFields(n.type), `node.${n.id}`);\n        if (["row", "column", "card", "details"].includes(n.type)) nodes(n.children, depth + 1, `${at2}.children`);\n      }\n    }\n    nodes(doc2.nodes);\n    if (!count2) fail("at least one node is required");\n    evaluate(doc2, defaults);\n    return doc2;\n  }\n\n  // src/export-runtime.js\n  var payload = JSON.parse(document.getElementById("dsh-ui-export").textContent);\n  var doc = validateDocument(payload.document);\n  var node = doc.nodes.flatMap(function flatten(n) {\n    return [n, ...(n.children ?? []).flatMap(flatten)];\n  }).find((n) => n.id === payload.nodeId && n.type === "sandbox");\n  if (!node) throw Error("\\u5BFC\\u51FA\\u7684\\u753B\\u5E03\\u4E0D\\u5B58\\u5728");\n  var state = validateState(doc, payload.state);\n  var connected = false;\n  var start = Date.now();\n  var count = 0;\n  var token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b2) => b2.toString(16).padStart(2, "0")).join("");\n  var channel = token();\n  var nonce = payload.nonce;\n  var frame = document.createElement("iframe");\n  frame.title = node.title;\n  frame.sandbox = "allow-scripts";\n  frame.referrerPolicy = "no-referrer";\n  frame.style.cssText = "display:block;width:100%;height:" + (node.height ?? 420) + "px;border:0";\n  var status = document.getElementById("status");\n  var publish = () => {\n    try {\n      frame.contentWindow.postMessage({ dshCanvas: 1, channel, type: "snapshot", payload: { ...canvasSnapshot(node, state, doc.data, evaluate(doc, state).derived, false, payload.theme), visible: !document.hidden } }, "*");\n    } catch (e) {\n      status.textContent = "\\u8BA1\\u7B97\\u5931\\u8D25\\uFF1A" + e.message;\n    }\n  };\n  addEventListener("message", (event) => {\n    const m2 = event.data;\n    if (event.source !== frame.contentWindow || m2?.channel !== channel || m2.dshCanvas !== 1) return;\n    if (Date.now() - start > 1e3) {\n      start = Date.now();\n      count = 0;\n    }\n    if (++count > SANDBOX_LIMITS.rate) return;\n    if (m2.type === "ready") {\n      connected = true;\n      publish();\n    } else if (m2.type === "patch" && connected) {\n      try {\n        const next = validateState(doc, { ...state, ...canvasPatch(m2.payload, node) });\n        evaluate(doc, next);\n        state = next;\n        status.textContent = "\\u672C\\u5730\\u53C2\\u6570\\u5DF2\\u66F4\\u65B0\\uFF1B\\u5237\\u65B0\\u6587\\u4EF6\\u4F1A\\u56DE\\u5230\\u5BFC\\u51FA\\u65F6\\u7684\\u53C2\\u6570\\u3002";\n      } catch (e) {\n        status.textContent = "\\u53C2\\u6570\\u65E0\\u6548\\uFF1A" + e.message;\n      }\n      publish();\n    } else if (m2.type === "height" && Number.isFinite(m2.payload) && m2.payload >= 0) frame.style.height = Math.max(32, Math.min(1e3, Math.ceil(m2.payload))) + "px";\n    else if (m2.type === "error") status.textContent = "\\u753B\\u5E03\\u8FD0\\u884C\\u5F02\\u5E38\\uFF1A" + String(m2.payload).slice(0, 1e3);\n  });\n  document.addEventListener("visibilitychange", () => {\n    if (connected) publish();\n  });\n  document.getElementById("surface").append(frame);\n  frame.srcdoc = sandboxDocument(node, channel, nonce);\n})();\n';
 
 // lib/canvas-export.js
 function standaloneCanvas(document2, node, state, theme = {}) {
@@ -3325,54 +3510,184 @@ function standaloneCanvas(document2, node, state, theme = {}) {
 }
 
 // src/view-settings.js
-var import_react4 = require("react");
+var import_react6 = require("react");
+
+// lib/style-system.js
+var STYLE_SYSTEM = Object.freeze({
+  editorial: { description: "\u5F00\u653E\u6B63\u6587 \xB7 \u6742\u5FD7\u5C42\u7EA7 \xB7 \u7EC6\u7EBF\u5206\u7EC4", grammar: "\u7F16\u8F91\u5F0F\u9605\u8BFB", composition: "\u5148\u7ED9\u4E00\u4E2A\u660E\u786E\u7ED3\u8BBA\uFF0C\u518D\u7528\u5F00\u653E\u6B63\u6587\u3001\u5DE6\u53F3\u5BF9\u9F50\u6BD4\u8F83\u548C\u7EC6\u7EBF\u6BB5\u843D\u5C55\u5F00\u3002\u7528 column \u7EC4\u7EC7\u6587\u7AE0\uFF0Ccard \u5728\u6B64\u98CE\u683C\u4E2D\u662F\u7AE0\u8282\uFF0C\u4E0D\u662F\u5C01\u95ED\u9762\u677F\uFF1B\u4E0D\u8981\u7ED9\u6BCF\u6BB5\u5957\u6846\u3002\u6307\u6807\u5D4C\u5728\u89E3\u91CA\u65C1\uFF0C\u6D41\u7A0B\u50CF\u6587\u4E2D\u7684\u7F16\u53F7\u63D0\u7EB2\u3002", typography: "\u6807\u9898\u6709\u886C\u7EBF\u9605\u8BFB\u611F\uFF0C\u6B63\u6587\u884C\u8DDD\u8212\u5C55\uFF1B\u6807\u9898\u3001\u6B63\u6587\u3001\u6CE8\u91CA\u81F3\u5C11\u4E09\u4E2A\u5C42\u7EA7\uFF0C\u5F3A\u8C03\u4F9D\u8D56\u5B57\u91CD\u548C\u4F4D\u7F6E\u3002", surfaces: "\u900F\u660E\u6B63\u6587\u3001\u7EC6\u5206\u9694\u7EBF\u3001\u4F4E\u9634\u5F71\u6216\u65E0\u9634\u5F71\uFF1B\u4FDD\u6301\u7ED3\u6784\u6027\u7559\u767D\uFF0C\u4E0D\u52A0\u5927\u9762\u79EF\u6E10\u53D8\u3002", controls: "\u8868\u5355\u50CF\u6587\u7AE0\u4E2D\u7684\u8BBE\u7F6E\u884C\uFF0C\u6807\u7B7E\u4E0E\u5F53\u524D\u503C\u5DE6\u53F3\u5BF9\u9F50\uFF1B\u6309\u94AE\u7D27\u51D1\uFF0C\u4EE3\u7801\u50CF\u6709\u8FB9\u6CE8\u7684\u6458\u5F55\u3002", avoid: "\u907F\u514D\u5927\u5F69\u8272\u5361\u7247\u3001\u6BCF\u4E2A\u6570\u5B57\u4E00\u4E2A\u76D2\u5B50\u3001\u7C97\u91CD\u8FB9\u6846\u548C\u88C5\u9970\u6027\u80CC\u666F\u3002", native: { title: 27, weight: 650, gap: 24, radius: 12, metric: 32, feedback: 210, gain: 0.25 } },
+  soft: { description: "\u7B14\u8BB0\u8272\u5757 \xB7 \u67D4\u5706\u5206\u7EC4 \xB7 \u8212\u7F13\u8282\u594F", grammar: "\u67D4\u548C\u5F69\u8272\u7B14\u8BB0", composition: "\u50CF\u6E05\u6670\u53CB\u597D\u7684\u7B14\u8BB0\uFF1A\u628A\u76F8\u5173\u5185\u5BB9\u653E\u5728\u67D4\u5706\u8272\u5757\u91CC\uFF0C\u5148\u63D0\u793A\u4E3B\u9898\uFF0C\u518D\u7ED9\u4E24\u4E09\u9879\u8981\u70B9\u3002\u7AE0\u8282\u6807\u9898\u53EF\u4EE5\u662F\u5C0F\u6807\u7B7E\uFF1B\u6BD4\u8F83\u9879\u5982\u5E76\u6392\u4FBF\u7B7E\uFF0C\u6D41\u7A0B\u50CF\u4E00\u4E32\u6709\u95F4\u8DDD\u7684\u7B14\u8BB0\u3002", typography: "\u5706\u6DA6\u6807\u9898\u548C\u6E29\u548C\u5B57\u91CD\uFF1B\u6B63\u6587\u6E05\u695A\uFF0C\u6570\u503C\u4E0E\u5355\u4F4D\u8D34\u8FD1\uFF0C\u6B21\u8981\u8BF4\u660E\u653E\u5728\u7EC4\u5185\u3002", surfaces: "\u4F4E\u9971\u548C\u5F69\u8272\u4FBF\u7B7E\u3001\u4E0D\u540C\u7AE0\u8282\u8F7B\u5FAE\u4EA4\u66FF\u8272\u5757\u3001\u4E0D\u5BF9\u79F0\u7684\u5927\u5706\u89D2\uFF1B\u4F7F\u7528\u5B9E\u8272\u5E95\u6216\u5C11\u91CF\u67D4\u548C\u6E10\u53D8\u3002", controls: "\u63A7\u4EF6\u5185\u5D4C\u5728\u67D4\u8272\u5206\u7EC4\uFF0C\u9009\u62E9\u5668\u50CF\u6807\u7B7E\uFF0C\u64CD\u4F5C\u6709\u67D4\u548C\u56DE\u5F39\uFF1B\u907F\u514D\u6BCF\u884C\u90FD\u53D8\u6210\u8FB9\u6846\u8868\u5355\u3002", avoid: "\u907F\u514D\u5DE5\u7A0B\u7F51\u683C\u3001\u91CD\u9ED1\u6D77\u62A5\u3001\u900F\u660E\u73BB\u7483\u3001\u6CDB\u767D\u4F4E\u5BF9\u6BD4\u5EA6\u6587\u5B57\u3002", native: { title: 25, weight: 700, gap: 20, radius: 28, metric: 36, feedback: 390, gain: 0.7 } },
+  technical: { description: "\u5DE5\u7A0B\u7F51\u683C \xB7 \u6570\u636E\u6761\u5E26 \xB7 \u7F16\u53F7\u8FDE\u63A5", grammar: "\u6280\u672F\u8BF4\u660E\u4E0E\u5DE5\u7A0B\u56FE", composition: "\u50CF\u5DE5\u7A0B\u8BF4\u660E\uFF1A\u6309\u8F93\u5165\u2192\u673A\u5236\u2192\u8F93\u51FA\u7EC4\u7EC7\uFF1B\u4F18\u5148\u5BF9\u9F50\u7684\u6570\u636E\u6761\u5E26\u3001\u7F16\u53F7\u6D41\u7A0B\u3001\u8868\u683C\u548C\u6709\u610F\u4E49\u7684\u8FDE\u63A5\u7EBF\u3002\u6307\u6807\u653E\u6210\u7D27\u51D1\u6D4B\u91CF\u5E26\u800C\u975E\u4E00\u6392\u88C5\u9970\u5361\uFF1B\u6BD4\u8F83\u56F4\u7ED5\u76F8\u540C\u7EF4\u5EA6\u5BF9\u9F50\u3002", typography: "\u4E2D\u6587\u6B63\u6587\u4FDD\u6301\u6B63\u5E38\u5B57\u53F7\uFF0C\u6570\u503C/\u5355\u4F4D/\u5E8F\u53F7\u7528\u7B49\u5BBD\u5B57\u4F53\u4E0E tabular-nums\uFF1B\u6807\u9898\u7B80\u77ED\u7CBE\u786E\uFF0C\u660E\u786E\u57FA\u51C6\u3001\u5355\u4F4D\u548C\u5047\u8BBE\u3002", surfaces: "\u7EC6\u7EBF\u7F51\u683C\u3001\u89C4\u5219\u7684\u5C0F\u5706\u89D2\u3001\u6E05\u6670\u8FB9\u754C\u548C\u8868\u5934\u3001\u65E0\u6D6E\u52A8\u6295\u5F71\u3002\u7F51\u683C\u4EC5\u5728\u56FE\u89E3\u80CC\u666F\u4F7F\u7528\uFF0C\u6587\u5B57\u533A\u57DF\u4FDD\u6301\u5E72\u51C0\u3002", controls: "\u6807\u7B7E\u548C\u8F93\u5165\u4E25\u683C\u5BF9\u9F50\uFF0C\u53C2\u6570\u533A\u50CF\u4EEA\u8868\u8BBE\u7F6E\u884C\uFF1B\u6309\u94AE\u548C\u5206\u6BB5\u9009\u9879\u91C7\u7528\u89C4\u5219\u77E9\u5F62\uFF0C\u4FDD\u7559\u952E\u76D8\u53CA\u5168\u5C40\u53CD\u9988\u3002", avoid: "\u907F\u514D\u80F6\u56CA\u5806\u53E0\u3001\u5DE8\u5927\u6D77\u62A5\u6570\u5B57\u3001\u5F69\u8272\u4FBF\u7B7E\u3001\u88C5\u9970\u7BAD\u5934\u3001\u9760\u5C0F\u5B57\u786C\u585E\u4FE1\u606F\u3002", native: { title: 22, weight: 750, gap: 16, radius: 10, metric: 28, feedback: 180, gain: 0.3 } },
+  expressive: { description: "\u6D77\u62A5\u5C42\u7EA7 \xB7 \u975E\u5BF9\u79F0\u91CD\u70B9 \xB7 \u9192\u76EE\u6570\u5B57", grammar: "\u6D3B\u529B\u5C55\u793A\u4E0E\u91CD\u70B9\u6D77\u62A5", composition: "\u5148\u9009\u4E00\u4E2A\u771F\u6B63\u7684\u89C6\u89C9\u4E2D\u5FC3\uFF1A\u5927\u6807\u9898\u6216\u5173\u952E\u6570\u5B57\uFF0C\u518D\u7528\u4E0D\u5BF9\u79F0\u5206\u680F\u5C55\u5F00\u89E3\u91CA\u3002\u4E3B\u8981\u7ED3\u8BBA\u5360\u66F4\u5927\u7A7A\u95F4\uFF0C\u6B21\u8981\u6BD4\u8F83\u9000\u540E\uFF1B\u6D41\u7A0B\u7528\u9192\u76EE\u7684\u5E8F\u53F7\u4E0E\u77ED\u53E5\u3002\u4E0D\u8981\u628A\u6BCF\u4E00\u9879\u90FD\u505A\u6210\u540C\u7B49\u5927\u5C0F\u5361\u7247\u3002", typography: "\u77ED\u800C\u6709\u529B\u7684\u91CD\u6807\u9898\u3001\u5927\u6570\u5B57\u3001\u7D27\u51D1\u6807\u9898\u884C\u8DDD\uFF0C\u6B63\u6587\u4ECD\u6613\u8BFB\u3002\u6700\u591A\u4E00\u4E2A\u4E3B\u8981\u5F3A\u8C03\u533A\uFF0C\u5176\u4F59\u7559\u767D\u548C\u7EC6\u7EBF\u8F85\u52A9\u3002", surfaces: "\u5B9E\u8272\u8272\u5757\u3001\u7C97\u7EC6\u660E\u786E\u7684\u8FB9\u7EBF\u3001\u5C40\u90E8\u9AD8\u5BF9\u6BD4\u5F3A\u8C03\uFF1B\u53EF\u7528\u6A59/\u73CA\u745A/\u6696\u9EC4\uFF0C\u4F46\u4E0D\u80FD\u6574\u9875\u4E89\u62A2\u6CE8\u610F\u529B\u3002", controls: "\u4E3B\u8981\u64CD\u4F5C\u9192\u76EE\u3001\u6B21\u8981\u64CD\u4F5C\u8F7B\u91CF\uFF1B\u8868\u5355\u548C\u6570\u636E\u4FDD\u6301\u5BF9\u9F50\uFF0C\u56DE\u5F39\u6BD4\u9605\u8BFB\u98CE\u683C\u660E\u663E\u4F46\u4E0D\u7A7A\u95F2\u5FAA\u73AF\u3002", avoid: "\u907F\u514D\u516D\u5F20\u7B49\u5927\u7684\u6307\u6807\u5361\u3001\u6EE1\u5C4F\u6E10\u53D8\u3001\u5168\u5C4F\u5927\u7559\u767D\u3001\u65E0\u610F\u4E49\u6570\u5B57\u88C5\u9970\u3002", native: { title: 34, weight: 850, gap: 22, radius: 20, metric: 50, feedback: 480, gain: 1.1 } },
+  prismframe: { description: "\u5E94\u7528\u6A21\u5757 \xB7 \u5B9E\u8272\u63A7\u4EF6 \xB7 \u504F\u79FB\u5E95\u9762", grammar: "\u660E\u4EAE\u6241\u5E73\u7684\u8F7B\u91CF\u5E94\u7528", composition: "\u50CF\u53EF\u76F4\u63A5\u4F7F\u7528\u7684\u8F7B\u91CF\u5E94\u7528\uFF1A\u4EFB\u52A1\u6807\u9898\u3001\u8F93\u5165\u6A21\u5757\u3001\u7ED3\u679C\u6A21\u5757\u3001\u89E3\u91CA\u533A\u804C\u8D23\u6E05\u695A\u3002\u6A21\u5757\u4F7F\u7528\u7A33\u5B9A\u7F51\u683C\uFF0C\u64CD\u4F5C\u9760\u8FD1\u5BF9\u5E94\u7ED3\u679C\uFF1B\u6BD4\u8F83\u3001\u6D41\u7A0B\u548C\u6570\u636E\u770B\u677F\u5404\u81EA\u91C7\u7528\u5408\u9002\u7ED3\u6784\uFF0C\u4E0D\u56FA\u5B9A\u6210\u540C\u4E00\u5957\u5361\u7247\u3002", typography: "\u5706\u6DA6\u6E05\u6670\u7684\u7CFB\u7EDF\u5B57\u4F53\u3001\u660E\u786E\u6A21\u5757\u6807\u9898\u3001\u4E2D\u7B49\u5927\u6570\u5B57\uFF1B\u6570\u5B57\u7ED1\u5B9A\u540D\u79F0\u548C\u5355\u4F4D\uFF0C\u56FE\u5F62\u627F\u62C5\u5173\u7CFB\u8BF4\u660E\u3002", surfaces: "\u6D45\u5F69\u5E95\u3001\u767D\u8272\u5B9E\u5FC3\u6A21\u5757\u3001\u7EC6\u5F69\u8272\u8FB9\u7EBF\u548C\u6241\u5E73\u504F\u79FB\u5E95\u9762\uFF1B\u5C40\u90E8\u591A\u8272\u7528\u6765\u533A\u5206\u804C\u8D23\uFF0C\u907F\u514D\u6BCF\u5757\u540C\u8272\u540C\u5F62\u3002", controls: "\u6574\u9F50\u4E14\u6709\u9762\u79EF\u7684\u5B9E\u8272\u8868\u5355\u884C\u3001\u6E05\u6670\u72B6\u6001\u6807\u7B7E\uFF0C\u4E3B\u8981\u64CD\u4F5C\u6709\u8F7B\u5FAE\u504F\u79FB\u5E95\u9762\uFF1B\u4E0D\u662F\u78E8\u7802\u73BB\u7483\u3002", avoid: "\u907F\u514D\u6587\u6863\u5F0F\u6EE1\u5C4F\u7EC6\u7EBF\u3001\u6D77\u62A5\u5F0F\u8D85\u5927\u5B57\u3001\u900F\u660E\u5C42\u53E0\u3001\u89C6\u9891\u9875\u7801\u548C\u5B57\u5E55\u3001\u91CD\u590D\u6807\u9898\u3002", native: { title: 26, weight: 780, gap: 20, radius: 24, metric: 36, feedback: 320, gain: 0.65 } },
+  aurora: { description: "\u4EA7\u54C1\u5C42\u7EA7 \xB7 \u6696\u767D\u66F2\u9762 \xB7 \u5C40\u90E8\u6E10\u5F69", grammar: "\u67D4\u5149\u6E10\u5F69\u7684\u7CBE\u81F4\u4EA7\u54C1\u754C\u9762", composition: "\u50CF\u7CBE\u81F4\u7684\u4EA7\u54C1\u9762\u677F\uFF1A\u6696\u767D\u5F00\u653E\u80CC\u666F\u4E0A\u5B89\u6392\u5C11\u91CF\u5B9E\u5FC3\u8868\u9762\uFF0C\u6807\u9898\u7B80\u6D01\u3001\u6307\u6807\u7A81\u51FA\u3001\u63A7\u4EF6\u987A\u624B\u3002\u7528\u5BBD\u7A84\u548C\u758F\u5BC6\u533A\u5206\u4E3B\u8981\u7ED3\u679C\u4E0E\u6B21\u8981\u8BF4\u660E\uFF1B\u6309\u94AE\u3001\u8868\u5355\u3001\u8868\u683C\u3001\u4EE3\u7801\u4E0E\u6587\u5B57\u8981\u5C5E\u4E8E\u540C\u4E00\u5957\u8BED\u8A00\u3002", typography: "\u8FD1\u9ED1\u6807\u9898\u3001\u6E05\u6670\u7684\u5B57\u91CD\u5DEE\u3001\u5927\u800C\u5229\u843D\u7684\u6570\u5B57\u3001\u67D4\u548C\u6B21\u8981\u8BF4\u660E\uFF1B\u4E0D\u628A\u6587\u5B57\u90FD\u67D3\u6210\u7D2B\u8272\u3002", surfaces: "\u6696\u767D\u5B9E\u8272\u300124..30px \u5706\u6DA6\u8868\u9762\u3001\u67D4\u548C\u6295\u5F71\u3001\u5C40\u90E8\u7D2B\u84DD\u9752\u6E10\u5F69\u5F3A\u8C03\uFF1B\u4E0D\u628A\u6574\u9875\u94FA\u6210\u7D2B\u9762\u677F\u3002", controls: "\u5706\u6DA6\u5185\u5D4C\u8F93\u5165\u3001\u80F6\u56CA\u9009\u62E9\u5668\u3001\u6DF1\u8272\u4E3B\u64CD\u4F5C\u4E0E\u6E10\u5F69\u56FE\u6807\u5706\u70B9\uFF1B\u771F\u5B9E\u64CD\u4F5C\u89E6\u53D1\u6E10\u53D8\u6269\u6563\u548C\u5F39\u6027\u53CD\u9988\u3002", avoid: "\u7981\u6B62\u73BB\u7483/backdrop-filter\u3001\u6CDB\u767D\u4F4E\u5BF9\u6BD4\u5EA6\u3001\u4EC5\u52A0\u4E00\u4E2A\u6F14\u793A\u6309\u94AE\u5C31\u7B97\u98CE\u683C\u3001\u7A7A\u95F2\u6F02\u6D6E\u3002", native: { title: 28, weight: 780, gap: 24, radius: 28, metric: 42, feedback: 460, gain: 1 } }
+});
+function grammarPrompt(id2) {
+  const g = STYLE_SYSTEM[id2];
+  return `\u89C6\u89C9\u8BED\u8A00\uFF1A${g.grammar}
+\u6784\u56FE\uFF1A${g.composition}
+\u6587\u5B57\u5C42\u7EA7\uFF1A${g.typography}
+\u8868\u9762\u4E0E\u8FB9\u754C\uFF1A${g.surfaces}
+\u63A7\u4EF6\u4E0E\u53CD\u9988\uFF1A${g.controls}
+\u907F\u514D\uFF1A${g.avoid}
+\u540C\u4E00\u4EFB\u52A1\u5728\u6B64\u98CE\u683C\u4E0B\u5E94\u5177\u6709\u53EF\u8FA8\u8BC6\u7684\u5C42\u7EA7\u4E0E\u6784\u56FE\uFF0C\u4E0D\u80FD\u53EA\u6362\u5F3A\u8C03\u8272\u3002\u6240\u6709\u98CE\u683C\u5171\u7528\u539F\u751F\u4EA4\u4E92\u80FD\u529B\uFF1B\u52A8\u753B\u53EA\u56DE\u5E94\u771F\u5B9E\u64CD\u4F5C\u3001\u652F\u6301 reduced motion\u3002\u4FDD\u6301\u5185\u5BB9\u5B8C\u6574\u548C DOM \u9605\u8BFB\u987A\u5E8F\uFF0C\u4E0D\u4E3A\u4E86\u98CE\u683C\u91CD\u6392\u8BA1\u7B97\u542B\u4E49\u3002\u7528\u6237\u660E\u786E\u6307\u5B9A\u7684\u5C3A\u5BF8\u3001\u989C\u8272\u4E0E\u5E03\u5C40\u4F18\u5148\u3002\u7981\u6B62\u73BB\u7483\u6750\u8D28\u3002\u793A\u4F8B\u6F14\u793A\u6784\u56FE\uFF0C\u4E0D\u8981\u6C42\u6BCF\u6B21\u8F93\u51FA\u6240\u6709\u6A21\u5757\uFF1B\u7B80\u5355\u9700\u6C42\u7528\u7B80\u77ED\u6B63\u6587\u6216\u4E00\u7EC4\u6570\u5B57\uFF0C\u4E0D\u80FD\u4E3A\u4E86\u5C55\u793A\u98CE\u683C\u6269\u5199\u5185\u5BB9\u3002`;
+}
+function grammarExample(id2) {
+  const heading = { type: "heading", text: "\u5148\u4EA4\u4ED8\u4E00\u4E2A\u53EF\u7528\u7248\u672C" }, body = { type: "text", text: "\u628A\u76EE\u6807\u7F29\u5C0F\uFF0C\u628A\u5173\u952E\u4F53\u9A8C\u505A\u597D\u3002" }, note = { type: "text", text: "\u5148\u9A8C\u8BC1\uFF0C\u518D\u9010\u6B65\u5B8C\u5584\u3002", color: "muted" };
+  const choice = (title, text2) => ({ type: "card", title, children: [{ type: "text", text: text2 }] });
+  const choices = [choice("\u5148\u505A\u5C0F\u7248\u672C", "\u9A8C\u8BC1\u91CD\u70B9"), choice("\u5148\u94FA\u5168\u529F\u80FD", "\u8986\u76D6\u9700\u6C42")];
+  const metrics = [{ type: "metric", label: "\u63A8\u8FDB\u9636\u6BB5", value: 3, unit: "\u6B65" }, { type: "metric", label: "\u6838\u5FC3\u76EE\u6807", value: 1, unit: "\u4E2A" }];
+  const flow = { type: "steps", items: [{ title: "\u660E\u786E\u76EE\u6807", description: "\u5148\u6293\u4F4F\u91CD\u70B9\u3002" }, { title: "\u89E3\u91CA\u5173\u7CFB", description: "\u7528\u56FE\u5F62\u8BF4\u660E\u3002" }, { title: "\u7ED9\u51FA\u884C\u52A8", description: "\u6536\u6210\u4E0B\u4E00\u6B65\u3002" }] };
+  let preset = "brief", blocks;
+  if (id2 === "editorial") {
+    preset = "reading";
+    blocks = [heading, body, { type: "row", columns: 2, children: choices }, { type: "row", columns: 2, children: metrics }, flow, note];
+  } else if (id2 === "soft") {
+    blocks = [{ type: "card", title: "\u4ECA\u5929\u7684\u91CD\u70B9", children: [heading, body] }, { type: "row", columns: 2, children: choices }, flow, { type: "row", columns: 2, children: metrics }, note];
+  } else if (id2 === "technical") {
+    blocks = [heading, body, { type: "row", columns: 2, children: metrics }, flow, { type: "table", label: "\u63A8\u8FDB\u65B9\u5F0F", columns: [{ key: "method", label: "\u65B9\u6848" }, { key: "focus", label: "\u91CD\u70B9" }], rows: [{ method: "\u5148\u505A\u5C0F\u7248\u672C", focus: "\u9A8C\u8BC1\u91CD\u70B9" }, { method: "\u5148\u94FA\u5168\u529F\u80FD", focus: "\u8986\u76D6\u9700\u6C42" }] }, note];
+  } else if (id2 === "expressive") {
+    preset = "minimal";
+    blocks = [heading, { type: "row", columns: 2, children: [{ type: "column", children: [metrics[0], body] }, { type: "column", children: [metrics[1], note] }] }, { type: "row", columns: 2, children: choices }, flow];
+  } else if (id2 === "prismframe") {
+    blocks = [heading, body, { type: "row", columns: 2, children: choices }, { type: "row", columns: 2, children: metrics }, { type: "card", title: "\u884C\u52A8\u8DEF\u5F84", children: [flow] }, note];
+  } else {
+    blocks = [heading, body, { type: "row", columns: 2, children: metrics }, { type: "row", columns: 2, children: choices }, flow, note];
+  }
+  return { tool: "render_text", args: { title: "\u628A\u590D\u6742\u95EE\u9898\u8BB2\u6E05\u695A", preset, blocks } };
+}
 
 // lib/visual-styles.js
-var native = (preset, title, blocks) => ({ tool: "render_text", args: { preset, title, blocks } });
-var canvas = (title, html, css) => ({ tool: "render_canvas", args: { title, fallback: title + "\uFF0C\u9759\u6001\u6392\u7248\u793A\u4F8B\u3002", html, css } });
 var DEFAULT_VISUAL_STYLE = "prismframe";
-var VISUAL_STYLES = Object.freeze([
+var PALETTES = [
   {
-    id: "editorial",
-    name: "\u6E05\u723D\u9605\u8BFB",
-    description: "\u8F7B\u8FB9\u6846 \xB7 \u6E05\u6670\u5C42\u7EA7 \xB7 \u5C11\u91CF\u5F3A\u8C03\u8272",
-    preview: { bg: "#fff", ink: "#182537", accent: "#3e60d3", soft: "#f4f6fa", line: "#dfe5ed" },
-    prompt: "\u91C7\u7528\u7F16\u8F91\u5F0F\u9605\u8BFB\u6392\u7248\uFF1A\u4E2D\u6027\u5E95\u8272\u3001\u8F7B\u8FB9\u6846\u3001\u6E05\u6670\u5B57\u53F7\u5C42\u7EA7\u548C\u5145\u8DB3\u4F46\u4E0D\u6D6A\u8D39\u7684\u7559\u767D\u3002\u4EE5\u6B63\u6587\u3001\u5BF9\u9F50\u6BD4\u8F83\u3001\u5206\u9694\u5217\u8868\u548C\u7EC6\u7EBF\u6D41\u7A0B\u4E3A\u4E3B\uFF1B\u5F3A\u8C03\u8272\u53EA\u6807\u51FA\u5173\u952E\u7ED3\u8BBA\uFF0C\u4E0D\u7ED9\u6BCF\u6BB5\u90FD\u5957\u5361\u7247\uFF0C\u4E0D\u52A0\u88C5\u9970\u6027\u9634\u5F71\u548C\u6E10\u53D8\u3002\u4F18\u5148\u4F7F\u7528 render_text \u7684 reading/comparison/list/flow\uFF1B\u56FE\u5F62\u786E\u6709\u4EF7\u503C\u65F6\u518D\u7528\u5C0F\u753B\u5E03\u3002",
-    examples: [native("comparison", "\u53D1\u5E03\u6E20\u9053\u600E\u4E48\u9009", [{ type: "row", columns: 2, children: [{ type: "column", children: [{ type: "heading", text: "\u4E3B\u53D1\u5E03\u5E73\u53F0" }, { type: "text", text: "\u653E\u5B8C\u6574\u8D44\u6599\u4E0E\u7248\u672C\u5386\u53F2\u3002" }] }, { type: "column", children: [{ type: "heading", text: "\u5C55\u793A\u6E20\u9053" }, { type: "text", text: "\u5C55\u793A\u91CD\u70B9\uFF0C\u5E76\u94FE\u63A5\u5230\u5B8C\u6574\u8D44\u6599\u3002" }] }] }, { type: "text", text: "\u5404\u81EA\u627F\u62C5\u4E00\u4E2A\u6E05\u6670\u804C\u8D23\u3002", color: "muted" }]), canvas("\u4E09\u6B65\u53D1\u5E03", '<section><h2>\u628A\u4E00\u4EF6\u4E8B\u8BB2\u6E05\u695A</h2><div class="steps"><p><b>01 \u6574\u7406</b><span>\u8865\u9F50\u8BF4\u660E\u4E0E\u8BB8\u53EF</span></p><p><b>02 \u9A8C\u8BC1</b><span>\u68C0\u67E5\u5B89\u88C5\u4E0E\u8FD0\u884C</span></p><p><b>03 \u53D1\u5E03</b><span>\u8BB0\u5F55\u672C\u6B21\u53D8\u5316</span></p></div></section>', "section{padding:20px;border:1px solid var(--canvas-line);border-radius:16px}h2{font-size:24px;margin:0 0 20px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}p{margin:0}b,span{display:block}span{color:var(--canvas-muted);margin-top:8px}@media(max-width:520px){.steps{grid-template-columns:1fr}}")]
+    "id": "editorial",
+    "name": "\u6E05\u723D\u9605\u8BFB",
+    "preview": {
+      "bg": "#fff",
+      "ink": "#182537",
+      "accent": "#3e60d3",
+      "soft": "#f4f6fa",
+      "line": "#dfe5ed"
+    },
+    "canvasExample": {
+      "tool": "render_canvas",
+      "args": {
+        "title": "\u4E09\u6B65\u53D1\u5E03",
+        "fallback": "\u4E09\u6B65\u53D1\u5E03\uFF0C\u9759\u6001\u6392\u7248\u793A\u4F8B\u3002",
+        "html": '<section><h2>\u628A\u4E00\u4EF6\u4E8B\u8BB2\u6E05\u695A</h2><div class="steps"><p><b>01 \u6574\u7406</b><span>\u8865\u9F50\u8BF4\u660E\u4E0E\u8BB8\u53EF</span></p><p><b>02 \u9A8C\u8BC1</b><span>\u68C0\u67E5\u5B89\u88C5\u4E0E\u8FD0\u884C</span></p><p><b>03 \u53D1\u5E03</b><span>\u8BB0\u5F55\u672C\u6B21\u53D8\u5316</span></p></div></section>',
+        "css": "section{padding:20px;border:1px solid var(--canvas-line);border-radius:16px}h2{font-size:24px;margin:0 0 20px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}p{margin:0}b,span{display:block}span{color:var(--canvas-muted);margin-top:8px}@media(max-width:520px){.steps{grid-template-columns:1fr}}"
+      }
+    }
   },
   {
-    id: "soft",
-    name: "\u67D4\u548C\u5F69\u8272",
-    description: "\u67D4\u548C\u6E10\u53D8 \xB7 \u5706\u6DA6\u5206\u7EC4 \xB7 \u53CB\u597D\u8212\u9002",
-    preview: { bg: "#fbf8ff", ink: "#32294c", accent: "#7954bb", soft: "#eee5fa", line: "#e6dcf2" },
-    prompt: "\u91C7\u7528\u67D4\u548C\u5F69\u8272\u98CE\u683C\uFF1A\u4F4E\u9971\u548C\u7D2B\u8272\u3001\u84DD\u8272\u6216\u8584\u8377\u8272\uFF0C18..24px \u5706\u89D2\uFF0C\u8F7B\u67D4\u6E10\u53D8\u586B\u5145\uFF0C\u67D4\u548C\u800C\u6E05\u6670\u7684\u5206\u7EC4\u3002\u6587\u5B57\u4ECD\u4FDD\u6301\u8DB3\u591F\u5BF9\u6BD4\u5EA6\uFF1B\u6E10\u53D8\u653E\u5728\u5C0F\u9762\u79EF\u91CD\u70B9\u533A\uFF0C\u4E0D\u94FA\u6EE1\u6574\u7BC7\uFF0C\u4E0D\u7528\u73BB\u7483\u6A21\u7CCA\u3001\u53D1\u5149\u6216\u591A\u91CD\u9634\u5F71\u3002\u65E5\u5E38\u6587\u5B57\u7528\u539F\u751F\u9884\u8BBE\u4E0E\u8BED\u4E49\u8272\uFF1B\u786E\u5B9E\u9700\u8981\u6E10\u53D8\u6750\u8D28\u65F6\u4F7F\u7528\u77ED\u5C0F\u9759\u6001\u753B\u5E03\uFF0C\u4E0D\u4E3A\u914D\u8272\u521B\u5EFA\u4EA4\u4E92\u6216\u52A8\u753B\u3002",
-    examples: [native("callout", "\u672C\u5468\u53EA\u6293\u4E00\u4E2A\u91CD\u70B9", [{ type: "heading", text: "\u6BCF\u5929\u7559\u51FA 20 \u5206\u949F" }, { type: "text", text: "\u5148\u8BFB\u4E00\u5C0F\u8282\uFF0C\u518D\u5199\u4E0B\u4E00\u4E2A\u6536\u83B7\u3002", color: "muted" }]), canvas("\u672C\u5468\u9605\u8BFB\u8BA1\u5212", '<section><span class="tag">\u8F7B\u677E\u5F00\u59CB</span><h2>\u6BCF\u5929\u4E00\u70B9\uFF0C\u7A33\u7A33\u524D\u8FDB</h2><div class="plan"><p><b>20 \u5206\u949F</b><span>\u4E13\u6CE8\u9605\u8BFB</span></p><p><b>1 \u4E2A\u6536\u83B7</b><span>\u5199\u4E0B\u81EA\u5DF1\u7684\u7406\u89E3</span></p></div></section>', "section{padding:24px;border-radius:24px;border:1px solid var(--canvas-line);background:linear-gradient(130deg,color-mix(in srgb,#9567d4 12%,var(--canvas-bg)),color-mix(in srgb,#58b7ae 9%,var(--canvas-bg)));color:var(--canvas-ink)}.tag{display:inline-block;border-radius:999px;padding:5px 12px;background:var(--canvas-bg);color:var(--canvas-accent)}h2{font-size:26px;margin:14px 0 20px}.plan{display:flex;flex-wrap:wrap;gap:24px}.plan p{margin:0;flex:1 1 180px;padding:18px;border-radius:18px;background:color-mix(in srgb,var(--canvas-bg) 80%,transparent)}b,span{display:block}b{font-size:22px}.plan span{margin-top:8px;color:var(--canvas-muted)}")]
+    "id": "soft",
+    "name": "\u67D4\u548C\u5F69\u8272",
+    "preview": {
+      "bg": "#fbf8ff",
+      "ink": "#32294c",
+      "accent": "#7954bb",
+      "soft": "#eee5fa",
+      "line": "#e6dcf2"
+    },
+    "canvasExample": {
+      "tool": "render_canvas",
+      "args": {
+        "title": "\u672C\u5468\u9605\u8BFB\u8BA1\u5212",
+        "fallback": "\u672C\u5468\u9605\u8BFB\u8BA1\u5212\uFF0C\u9759\u6001\u6392\u7248\u793A\u4F8B\u3002",
+        "html": '<section><span class="tag">\u8F7B\u677E\u5F00\u59CB</span><h2>\u6BCF\u5929\u4E00\u70B9\uFF0C\u7A33\u7A33\u524D\u8FDB</h2><div class="plan"><p><b>20 \u5206\u949F</b><span>\u4E13\u6CE8\u9605\u8BFB</span></p><p><b>1 \u4E2A\u6536\u83B7</b><span>\u5199\u4E0B\u81EA\u5DF1\u7684\u7406\u89E3</span></p></div></section>',
+        "css": "section{padding:24px;border-radius:24px;border:1px solid var(--canvas-line);background:linear-gradient(130deg,color-mix(in srgb,#9567d4 12%,var(--canvas-bg)),color-mix(in srgb,#58b7ae 9%,var(--canvas-bg)));color:var(--canvas-ink)}.tag{display:inline-block;border-radius:999px;padding:5px 12px;background:var(--canvas-bg);color:var(--canvas-accent)}h2{font-size:26px;margin:14px 0 20px}.plan{display:flex;flex-wrap:wrap;gap:24px}.plan p{margin:0;flex:1 1 180px;padding:18px;border-radius:18px;background:color-mix(in srgb,var(--canvas-bg) 80%,transparent)}b,span{display:block}b{font-size:22px}.plan span{margin-top:8px;color:var(--canvas-muted)}"
+      }
+    }
   },
   {
-    id: "technical",
-    name: "\u6280\u672F\u56FE\u89E3",
-    description: "\u7EC6\u7EBF\u7ED3\u6784 \xB7 \u5BF9\u9F50\u7F51\u683C \xB7 \u6570\u636E\u4F18\u5148",
-    preview: { bg: "#f8fafb", ink: "#1b3440", accent: "#087e8b", soft: "#e7f1f3", line: "#cedde2" },
-    prompt: "\u91C7\u7528\u6280\u672F\u56FE\u89E3\u98CE\u683C\uFF1A\u4E2D\u6027\u5E95\u8272\u3001\u7CBE\u786E\u5BF9\u9F50\u3001\u7EC6\u7EBF\u8FDE\u63A5\u3001\u660E\u786E\u6807\u7B7E\u548C\u5355\u4F4D\u3001\u5C11\u91CF\u9752\u8272\u5F3A\u8C03\u3002\u6570\u636E\u4F7F\u7528\u7B49\u5BBD\u6570\u5B57\uFF1B\u4EE3\u7801\u6216\u5E8F\u53F7\u53EF\u7528\u7B49\u5BBD\u5B57\u4F53\uFF0C\u4E2D\u6587\u6B63\u6587\u4FDD\u6301\u6613\u8BFB\u3002\u4F18\u5148\u7B80\u5355\u6D41\u7A0B\u3001\u5BF9\u6BD4\u8868\u3001\u7ED3\u6784\u56FE\u4E0E\u7D27\u51D1\u6570\u636E\u5757\uFF1B\u7528\u6709\u610F\u4E49\u7684\u7BAD\u5934\u8868\u8FBE\u65B9\u5411\uFF0C\u4E0D\u7528\u88C5\u9970\u6027\u4EEA\u8868\u76D8\u3002\u5706\u89D2\u7EA6 8..14px\uFF0C\u7981\u6B62\u628A\u5B57\u53F7\u7F29\u5C0F\u6765\u585E\u5185\u5BB9\u3002",
-    examples: [native("flow", "\u4E00\u6B21\u8BF7\u6C42\u7ECF\u8FC7\u4EC0\u4E48", [{ type: "steps", items: [{ title: "\u8F93\u5165", description: "\u63A5\u6536\u7528\u6237\u9700\u6C42\u3002" }, { title: "\u5904\u7406", description: "\u6821\u9A8C\u5E76\u8BA1\u7B97\u7ED3\u679C\u3002" }, { title: "\u8F93\u51FA", description: "\u8FD4\u56DE\u53EF\u7406\u89E3\u7684\u53CD\u9988\u3002" }] }]), canvas("\u8BF7\u6C42\u5904\u7406\u6D41\u7A0B", '<section><header><small>REQUEST FLOW</small><h2>\u8F93\u5165 \u2192 \u5904\u7406 \u2192 \u8F93\u51FA</h2></header><div class="flow"><div><i>01</i><b>\u8F93\u5165</b><p>\u63A5\u6536\u9700\u6C42</p></div><span>\u2192</span><div><i>02</i><b>\u5904\u7406</b><p>\u6821\u9A8C\u4E0E\u8BA1\u7B97</p></div><span>\u2192</span><div><i>03</i><b>\u8F93\u51FA</b><p>\u8FD4\u56DE\u53CD\u9988</p></div></div></section>', "section{padding:20px;border:1px solid var(--canvas-line);border-radius:10px}small,i{font:14px ui-monospace,monospace;color:var(--canvas-accent)}h2{font-size:24px;margin:8px 0 20px}.flow{display:flex;gap:12px;align-items:center}.flow div{flex:1;padding:16px;border:1px solid var(--canvas-line);border-radius:10px}.flow b,.flow i{display:block}.flow b{margin-top:10px;font-size:19px}p{margin:6px 0 0;color:var(--canvas-muted)}@media(max-width:520px){.flow{flex-direction:column}.flow div{width:100%}.flow>span{transform:rotate(90deg)}}")]
+    "id": "technical",
+    "name": "\u6280\u672F\u56FE\u89E3",
+    "preview": {
+      "bg": "#f8fafb",
+      "ink": "#1b3440",
+      "accent": "#087e8b",
+      "soft": "#e7f1f3",
+      "line": "#cedde2"
+    },
+    "canvasExample": {
+      "tool": "render_canvas",
+      "args": {
+        "title": "\u8BF7\u6C42\u5904\u7406\u6D41\u7A0B",
+        "fallback": "\u8BF7\u6C42\u5904\u7406\u6D41\u7A0B\uFF0C\u9759\u6001\u6392\u7248\u793A\u4F8B\u3002",
+        "html": '<section><header><small>REQUEST FLOW</small><h2>\u8F93\u5165 \u2192 \u5904\u7406 \u2192 \u8F93\u51FA</h2></header><div class="flow"><div><i>01</i><b>\u8F93\u5165</b><p>\u63A5\u6536\u9700\u6C42</p></div><span>\u2192</span><div><i>02</i><b>\u5904\u7406</b><p>\u6821\u9A8C\u4E0E\u8BA1\u7B97</p></div><span>\u2192</span><div><i>03</i><b>\u8F93\u51FA</b><p>\u8FD4\u56DE\u53CD\u9988</p></div></div></section>',
+        "css": "section{padding:20px;border:1px solid var(--canvas-line);border-radius:10px}small,i{font:14px ui-monospace,monospace;color:var(--canvas-accent)}h2{font-size:24px;margin:8px 0 20px}.flow{display:flex;gap:12px;align-items:center}.flow div{flex:1;padding:16px;border:1px solid var(--canvas-line);border-radius:10px}.flow b,.flow i{display:block}.flow b{margin-top:10px;font-size:19px}p{margin:6px 0 0;color:var(--canvas-muted)}@media(max-width:520px){.flow{flex-direction:column}.flow div{width:100%}.flow>span{transform:rotate(90deg)}}"
+      }
+    }
   },
   {
-    id: "expressive",
-    name: "\u6D3B\u529B\u5C55\u793A",
-    description: "\u9192\u76EE\u6807\u9898 \xB7 \u660E\u5FEB\u8272\u5757 \xB7 \u7B80\u6D01\u6709\u529B",
-    preview: { bg: "#fff9f2", ink: "#362820", accent: "#bd4b26", soft: "#ffead8", line: "#edd7c5" },
-    prompt: "\u91C7\u7528\u6D3B\u529B\u5C55\u793A\u98CE\u683C\uFF1A\u9192\u76EE\u4F46\u4E0D\u8FC7\u5927\u7684\u6807\u9898\u3001\u660E\u5FEB\u8272\u5757\u3001\u6E05\u6670\u7684\u5927\u6570\u5B57\u3001\u5706\u6DA6\u80F6\u56CA\u6309\u94AE\u4E0E\u7B80\u6D01\u7684\u975E\u5BF9\u79F0\u91CD\u70B9\u3002\u7528\u6A59\u8272\u3001\u73CA\u745A\u8272\u6216\u6696\u9EC4\u8272\u505A\u5C40\u90E8\u5F3A\u8C03\uFF0C\u5E76\u9002\u5E94\u6DF1\u6D45\u4E3B\u9898\u3002\u4FDD\u6301\u4FE1\u606F\u91CF\u5C0F\u3001\u91CD\u70B9\u660E\u786E\uFF1B\u6BCF\u5757\u53EA\u6709\u4E00\u4E2A\u89C6\u89C9\u4E2D\u5FC3\uFF0C\u4E0D\u7528\u6EE1\u5C4F\u5F69\u8272\u3001\u5938\u5F20\u52A8\u753B\u6216\u6D77\u62A5\u5F0F\u8D85\u5927\u7559\u767D\u3002\u539F\u751F\u6587\u672C\u53EF\u7528 size/weight/\u8BED\u4E49\u8272\uFF1B\u7279\u6B8A\u8272\u5757\u6784\u56FE\u624D\u4F7F\u7528\u7D27\u51D1\u753B\u5E03\u3002",
-    examples: [native("minimal", "\u5148\u5B8C\u6210\u7B2C\u4E00\u6B65", [{ type: "text", text: "\u5148\u5B8C\u6210\u4E00\u4E2A\u80FD\u6F14\u793A\u7684\u7248\u672C", size: 28, weight: 800 }, { type: "text", text: "\u9009\u4E00\u6761\u4E3B\u7EBF\uFF0C\u4ECA\u5929\u5C31\u505A\u51FA\u53EF\u89C1\u7ED3\u679C\u3002", color: "muted" }]), canvas("\u4ECE\u7B2C\u4E00\u6B65\u5F00\u59CB", '<section><div class="number">01</div><div class="copy"><span>\u4ECA\u5929\u7684\u91CD\u70B9</span><h2>\u5148\u505A\u51FA\u4E00\u4E2A<br>\u80FD\u6F14\u793A\u7684\u7248\u672C</h2><p>\u53EA\u4FDD\u7559\u4E00\u6761\u4E3B\u7EBF\uFF0C\u5C3D\u65E9\u83B7\u5F97\u53CD\u9988\u3002</p></div></section>', "section{display:flex;align-items:center;gap:24px;padding:24px;border:1px solid var(--canvas-line);border-radius:22px;background:color-mix(in srgb,#f0984a 8%,var(--canvas-bg));color:var(--canvas-ink)}.number{font:800 54px/1 system-ui;padding:22px;border-radius:20px;color:var(--canvas-ink);background:color-mix(in srgb,#f0984a 28%,var(--canvas-bg))}.copy>span{font-size:14px;color:var(--canvas-muted)}h2{font-size:28px;line-height:1.3;margin:10px 0}p{margin:0;color:var(--canvas-muted)}@media(max-width:520px){section{align-items:flex-start;flex-direction:column}.number{font-size:36px;padding:16px}}")]
+    "id": "expressive",
+    "name": "\u6D3B\u529B\u5C55\u793A",
+    "preview": {
+      "bg": "#fff9f2",
+      "ink": "#362820",
+      "accent": "#bd4b26",
+      "soft": "#ffead8",
+      "line": "#edd7c5"
+    },
+    "canvasExample": {
+      "tool": "render_canvas",
+      "args": {
+        "title": "\u4ECE\u7B2C\u4E00\u6B65\u5F00\u59CB",
+        "fallback": "\u4ECE\u7B2C\u4E00\u6B65\u5F00\u59CB\uFF0C\u9759\u6001\u6392\u7248\u793A\u4F8B\u3002",
+        "html": '<section><div class="number">01</div><div class="copy"><span>\u4ECA\u5929\u7684\u91CD\u70B9</span><h2>\u5148\u505A\u51FA\u4E00\u4E2A<br>\u80FD\u6F14\u793A\u7684\u7248\u672C</h2><p>\u53EA\u4FDD\u7559\u4E00\u6761\u4E3B\u7EBF\uFF0C\u5C3D\u65E9\u83B7\u5F97\u53CD\u9988\u3002</p></div></section>',
+        "css": "section{display:flex;align-items:center;gap:24px;padding:24px;border:1px solid var(--canvas-line);border-radius:22px;background:color-mix(in srgb,#f0984a 8%,var(--canvas-bg));color:var(--canvas-ink)}.number{font:800 54px/1 system-ui;padding:22px;border-radius:20px;color:var(--canvas-ink);background:color-mix(in srgb,#f0984a 28%,var(--canvas-bg))}.copy>span{font-size:14px;color:var(--canvas-muted)}h2{font-size:28px;line-height:1.3;margin:10px 0}p{margin:0;color:var(--canvas-muted)}@media(max-width:520px){section{align-items:flex-start;flex-direction:column}.number{font-size:36px;padding:16px}}"
+      }
+    }
   },
   {
-    id: "prismframe",
-    name: "\u660E\u4EAE\u6241\u5E73",
-    description: "\u6D45\u5F69\u80CC\u666F \xB7 \u767D\u8272\u5706\u89D2\u5361\u7247 \xB7 \u5F69\u8272\u504F\u79FB\u9634\u5F71",
-    preview: { bg: "#ecf6ff", ink: "#193858", accent: "#3182d9", soft: "#d3e8fc", line: "#9ec9ef" },
-    prompt: "\u91C7\u7528\u660E\u4EAE\u6241\u5E73\u98CE\u683C\uFF1A\u6D45\u5F69\u80CC\u666F\u3001\u767D\u8272\u5927\u5706\u89D2\u5361\u7247\u3001\u7EC6\u5F69\u8272\u8FB9\u7EBF\u3001\u67D4\u8F6F\u6295\u5F71\u4E0E\u6D45\u8272\u504F\u79FB\u5E95\u9762\u3002\u6280\u672F\u4ECB\u7ECD\u7528\u6D45\u84DD #ECF6FF / #3182D9\uFF0C\u673A\u5236\u6D4B\u91CF\u7528\u7C73\u767D #FBFAF5 / #1F9486\uFF0C\u6BD4\u8F83\u9009\u62E9\u7528\u6696\u767D #FFF8ED / #E77946\uFF0C\u6D41\u7A0B\u7528\u6D45\u7EFF #EAF6EF / #29947A\uFF0C\u63D0\u9192\u7528\u6D45\u73CA\u745A #FFF3EF / #D8694A\uFF1B\u6BCF\u5757\u9009\u4E00\u5957\uFF0C\u4FDD\u6301\u6587\u5B57\u5BF9\u6BD4\u5EA6\u5E76\u9002\u914D\u6DF1\u8272\u4E3B\u9898\u3002\u5361\u7247\u5706\u89D2\u7EA6 20..28px\uFF0C\u8FB9\u7EBF\u7EA6 1..2px\uFF0C\u6807\u9898\u4F7F\u7528\u5BBF\u4E3B\u53EF\u7528\u7684\u5706\u6DA6\u5B57\u4F53\u56DE\u9000\uFF0C\u4E0D\u4E0B\u8F7D\u5B57\u4F53\u3002\u5148\u6392\u5185\u5BB9\u518D\u6392\u88C5\u9970\uFF1A\u4E00\u5757\u53EA\u89E3\u91CA\u4E00\u4E2A\u4E3B\u8981\u95EE\u9898\uFF0C\u6570\u5B57\u7ED1\u5B9A\u540D\u79F0\u3001\u6307\u6807\u4E0E\u5355\u4F4D\uFF1B\u7528\u6BD4\u4F8B\u6761\u3001\u683C\u5B50\u548C\u8FDE\u63A5\u7EBF\u89E3\u91CA\u5173\u7CFB\uFF0C\u56FE\u5F62\u5B8C\u6574\u653E\u5728\u6846\u5185\u3002\u7B80\u5355\u6587\u5B57\u4ECD\u4F18\u5148 render_text\uFF1B\u9700\u8981\u504F\u79FB\u9634\u5F71\u3001\u56FE\u89E3\u6784\u56FE\u65F6\u4F7F\u7528\u77ED\u5C0F\u753B\u5E03\u3002\u53EF\u4EA4\u66FF\u5206\u680F\u3001\u7EB5\u6392\u3001\u4E09\u5361\u5E03\u5C40\uFF0C\u4E0D\u80FD\u6BCF\u5757\u5957\u540C\u4E00\u6A21\u677F\u3002\u9759\u6001\u6392\u7248\u9ED8\u8BA4\u5373\u53EF\uFF1B\u786E\u9700\u5165\u573A\u53EA\u505A\u4E00\u6B21\u77ED\u4FC3\u6E10\u663E\u4E0A\u79FB\uFF0C\u5E76\u5C0A\u91CD reduced motion\u3002\u6587\u5B57\u843D\u7A33\u540E\u4E0D\u6301\u7EED\u7F29\u653E\u6216\u6F02\u79FB\u3002\u7981\u6B62\u73BB\u7483\u3001\u6A21\u7CCA\u80CC\u666F\u3001\u51FA\u6846\u900F\u89C6\u3001\u5FAA\u73AF\u88C5\u9970\u52A8\u753B\uFF1B\u4E0D\u590D\u5236\u89C6\u9891\u5B57\u5E55\u3001\u9875\u7801\u3001\u5168\u5C4F\u753B\u5E03\u6216\u591A\u4F59\u5E95\u90E8\u7559\u767D\uFF0C\u4E0D\u6CBF\u7528 Occamy \u7684\u6A21\u578B\u6570\u636E\u3002",
-    examples: [native("list", "\u628A\u590D\u6742\u95EE\u9898\u62C6\u6210\u4E09\u5C42", [{ type: "heading", text: "\u5148\u8BB2\u6E05\u695A\uFF0C\u518D\u9010\u6B65\u5C55\u5F00", size: 24, color: "accent" }, { type: "text", text: "\u76EE\u6807\uFF1A\u5148\u660E\u786E\u9700\u8981\u89E3\u51B3\u7684\u95EE\u9898\u3002" }, { type: "text", text: "\u673A\u5236\uFF1A\u7528\u4E00\u4E2A\u56FE\u5F62\u89E3\u91CA\u5173\u952E\u5173\u7CFB\u3002" }, { type: "text", text: "\u884C\u52A8\uFF1A\u7ED9\u51FA\u4E0B\u4E00\u6B65\u53EF\u6267\u884C\u7684\u5EFA\u8BAE\u3002" }]), canvas("\u4E09\u6B65\u8BA9\u89E3\u91CA\u66F4\u6E05\u695A", '<section><h2>\u628A\u590D\u6742\u95EE\u9898\u8BB2\u6E05\u695A</h2><div class="cards"><article><span>01</span><h3>\u660E\u786E\u76EE\u6807</h3><p>\u5148\u56DE\u7B54\u8981\u89E3\u51B3\u4EC0\u4E48\u3002</p></article><article><span>02</span><h3>\u89E3\u91CA\u5173\u7CFB</h3><p>\u8BA9\u56FE\u5F62\u627F\u62C5\u8BF4\u660E\u3002</p></article><article><span>03</span><h3>\u7ED9\u51FA\u884C\u52A8</h3><p>\u6536\u6210\u4E00\u4E2A\u53EF\u6267\u884C\u6B65\u9AA4\u3002</p></article></div></section>', "section{padding:24px 24px 30px;border-radius:26px;background:color-mix(in srgb,#3182d9 9%,var(--canvas-bg));color:var(--canvas-ink);font-family:ui-rounded,system-ui,sans-serif}h2{font-size:26px;line-height:1.35;margin:0 0 20px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}article{padding:20px;border:1.5px solid color-mix(in srgb,#3182d9 45%,var(--canvas-line));border-radius:22px;background:var(--canvas-bg);box-shadow:4px 6px 0 color-mix(in srgb,#3182d9 18%,var(--canvas-bg)),0 8px 16px #1637590b}article>span{color:var(--canvas-accent);font-size:14px;font-weight:700}h3{font-size:20px;margin:12px 0 8px}p{margin:0;line-height:1.6;color:var(--canvas-muted)}@media(max-width:580px){.cards{grid-template-columns:1fr}}")]
+    "id": "prismframe",
+    "name": "\u660E\u4EAE\u6241\u5E73",
+    "preview": {
+      "bg": "#ecf6ff",
+      "ink": "#193858",
+      "accent": "#3182d9",
+      "soft": "#d3e8fc",
+      "line": "#9ec9ef"
+    },
+    "canvasExample": {
+      "tool": "render_canvas",
+      "args": {
+        "title": "\u4E09\u6B65\u8BA9\u89E3\u91CA\u66F4\u6E05\u695A",
+        "fallback": "\u4E09\u6B65\u8BA9\u89E3\u91CA\u66F4\u6E05\u695A\uFF0C\u9759\u6001\u6392\u7248\u793A\u4F8B\u3002",
+        "html": '<section><h2>\u628A\u590D\u6742\u95EE\u9898\u8BB2\u6E05\u695A</h2><div class="cards"><article><span>01</span><h3>\u660E\u786E\u76EE\u6807</h3><p>\u5148\u56DE\u7B54\u8981\u89E3\u51B3\u4EC0\u4E48\u3002</p></article><article><span>02</span><h3>\u89E3\u91CA\u5173\u7CFB</h3><p>\u8BA9\u56FE\u5F62\u627F\u62C5\u8BF4\u660E\u3002</p></article><article><span>03</span><h3>\u7ED9\u51FA\u884C\u52A8</h3><p>\u6536\u6210\u4E00\u4E2A\u53EF\u6267\u884C\u6B65\u9AA4\u3002</p></article></div></section>',
+        "css": "section{padding:24px 24px 30px;border-radius:26px;background:color-mix(in srgb,#3182d9 9%,var(--canvas-bg));color:var(--canvas-ink);font-family:ui-rounded,system-ui,sans-serif}h2{font-size:26px;line-height:1.35;margin:0 0 20px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}article{padding:20px;border:1.5px solid color-mix(in srgb,#3182d9 45%,var(--canvas-line));border-radius:22px;background:var(--canvas-bg);box-shadow:4px 6px 0 color-mix(in srgb,#3182d9 18%,var(--canvas-bg)),0 8px 16px #1637590b}article>span{color:var(--canvas-accent);font-size:14px;font-weight:700}h3{font-size:20px;margin:12px 0 8px}p{margin:0;line-height:1.6;color:var(--canvas-muted)}@media(max-width:580px){.cards{grid-template-columns:1fr}}"
+      }
+    }
+  },
+  {
+    "id": "aurora",
+    "name": "\u67D4\u5149\u6E10\u5F69",
+    "preview": {
+      "bg": "#f4f2ee",
+      "ink": "#16151b",
+      "accent": "#6a57f2",
+      "soft": "#f5f3ef",
+      "line": "#e2dfda"
+    },
+    "canvasExample": {
+      "tool": "render_canvas",
+      "args": {
+        "title": "\u9009\u62E9\u4E00\u4E2A\u65B9\u6848",
+        "fallback": "\u70B9\u51FB\u9009\u62E9\u6B64\u65B9\u6848\uFF0C\u672C\u5730\u8BB0\u5F55\u9009\u62E9\u72B6\u6001\u3002",
+        "state": {
+          "selected": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "html": '<section class="choice"><h2>\u5148\u9009\u62E9\uFF0C\u518D\u7EE7\u7EED</h2><p>\u6E10\u53D8\u6269\u6563\u548C\u6587\u5B57\u6362\u4F4D\u7531\u5B9E\u9645\u64CD\u4F5C\u89E6\u53D1\u3002</p><button class="action" type="button" aria-pressed="false"><i aria-hidden="true"></i><span class="label"><b>\u9009\u62E9\u6B64\u65B9\u6848</b><b aria-hidden="true">\u9009\u62E9\u6B64\u65B9\u6848</b></span><span class="orb" aria-hidden="true">\u2192</span></button><p class="status" role="status">\u5C1A\u672A\u9009\u62E9</p></section>',
+        "css": ".choice{padding:24px;border:1px solid var(--canvas-line);border-radius:26px;background:var(--canvas-bg);color:var(--canvas-ink)}h2{font-size:24px;margin:0 0 10px}p{color:var(--canvas-muted);line-height:1.7}.action{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;gap:18px;min-height:54px;padding:8px 8px 8px 24px;border:0;border-radius:999px;background:var(--canvas-ink);color:var(--canvas-bg);translate:var(--x,0px) var(--y,0px);box-shadow:0 16px 28px -22px #54457988;transition:translate .7s cubic-bezier(.34,1.45,.64,1)}.action>i{position:absolute;inset:0;z-index:-1;background:linear-gradient(115deg,#7051ed,#326fce 55%,#188e97);clip-path:circle(21px at calc(100% - 29px) 50%);transition:clip-path .7s cubic-bezier(.2,.8,.2,1)}.action:is(:hover,:focus-visible){color:white}.action:is(:hover,:focus-visible)>i{clip-path:circle(160% at calc(100% - 29px) 50%)}.label{position:relative;overflow:hidden;line-height:1.5}.label b{display:block;transition:transform .55s cubic-bezier(.34,1.45,.64,1),opacity .3s}.label b+b{position:absolute;left:0;top:0;transform:translateY(130%);opacity:0}.action:is(:hover,:focus-visible) b:first-child{transform:translateY(-130%);opacity:0}.action:is(:hover,:focus-visible) b+b{transform:none;opacity:1}.orb{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#438eff,#27b6ba);color:white;font-size:22px}.status{margin-bottom:0}@media(prefers-reduced-motion:reduce){.action,.action *{transition:none!important;translate:none!important}}",
+        "script": 'const root=document.querySelector(".choice"),button=root.querySelector("button");button.addEventListener("click",()=>DSHUI.setState({selected:!DSHUI.snapshot.state.selected}));DSHUI.subscribe(({state})=>{button.setAttribute("aria-pressed",String(state.selected));root.querySelectorAll("b").forEach(b=>b.textContent=state.selected?"\u53D6\u6D88\u9009\u62E9":"\u9009\u62E9\u6B64\u65B9\u6848");root.querySelector(".status").textContent=state.selected?"\u5DF2\u9009\u62E9\u6B64\u65B9\u6848":"\u5C1A\u672A\u9009\u62E9"});button.addEventListener("pointermove",e=>{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const r=button.getBoundingClientRect();button.style.setProperty("--x",((e.clientX-r.left-r.width/2)*.035)+"px");button.style.setProperty("--y",((e.clientY-r.top-r.height/2)*.07)+"px")});button.addEventListener("pointerleave",()=>{button.style.setProperty("--x","0px");button.style.setProperty("--y","0px")});'
+      }
+    }
   }
-]);
+];
+var VISUAL_STYLES = Object.freeze(PALETTES.map(({ canvasExample, ...s }) => Object.freeze({ ...s, description: STYLE_SYSTEM[s.id].description, prompt: grammarPrompt(s.id), examples: [grammarExample(s.id), canvasExample] })));
 var VISUAL_STYLE_IDS = Object.freeze(VISUAL_STYLES.map((s) => s.id));
 
 // src/view-settings.js
@@ -3384,7 +3699,7 @@ var subscribe = (fn2) => scope?.subscribe(fn2) ?? (() => {
 });
 var snapshot = () => scope?.getSnapshot()?.value?.showDetails === true;
 function useViewDetails() {
-  return (0, import_react4.useSyncExternalStore)(subscribe, snapshot, () => false);
+  return (0, import_react6.useSyncExternalStore)(subscribe, snapshot, () => false);
 }
 function selectedNativeStyle(value) {
   if (!value || value.designMode === "free") return void 0;
@@ -3392,14 +3707,14 @@ function selectedNativeStyle(value) {
 }
 var styleSnapshot = () => selectedNativeStyle(scope?.getSnapshot()?.value);
 function useNativeStyle() {
-  return (0, import_react4.useSyncExternalStore)(subscribe, styleSnapshot, () => void 0);
+  return (0, import_react6.useSyncExternalStore)(subscribe, styleSnapshot, () => void 0);
 }
 
 // src/action-menu.js
-var import_react5 = __toESM(require("react"), 1);
+var import_react7 = __toESM(require("react"), 1);
 function ActionMenu({ label, children }) {
-  const [open, setOpen] = (0, import_react5.useState)(false), root2 = (0, import_react5.useRef)(null), button = (0, import_react5.useRef)(null);
-  (0, import_react5.useEffect)(() => {
+  const [open, setOpen] = (0, import_react7.useState)(false), root2 = (0, import_react7.useRef)(null), button = (0, import_react7.useRef)(null);
+  (0, import_react7.useEffect)(() => {
     if (!open) return;
     const outside = (e) => {
       if (!root2.current?.contains(e.target)) setOpen(false);
@@ -3417,39 +3732,40 @@ function ActionMenu({ label, children }) {
       document.removeEventListener("keydown", escape);
     };
   }, [open]);
-  return import_react5.default.createElement(
+  return import_react7.default.createElement(
     "div",
     { className: "dgui-action-menu", ref: root2 },
-    import_react5.default.createElement("button", { ref: button, type: "button", className: "dgui-menu-trigger", "aria-label": label, "aria-expanded": open, onClick: () => setOpen(!open) }, "\u22EF"),
-    open && import_react5.default.createElement("div", { className: "dgui-menu-content", "aria-label": label, onClick: (e) => {
+    import_react7.default.createElement("button", { ref: button, type: "button", className: "dgui-menu-trigger", "aria-label": label, "aria-expanded": open, onClick: () => setOpen(!open) }, "\u22EF"),
+    open && import_react7.default.createElement("div", { className: "dgui-menu-content", "aria-label": label, onClick: (e) => {
       if (e.target.closest("button")) setOpen(false);
     } }, children)
   );
 }
 
 // src/sandbox.js
-var h4 = import_react6.default.createElement;
+var h6 = import_react8.default.createElement;
 var randomToken = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b2) => b2.toString(16).padStart(2, "0")).join("");
 function Sandbox({ node, document: doc, state, data, derived, disabled, preview, update, onAudit }) {
   const showDetails = useViewDetails();
-  const frame = (0, import_react6.useRef)(null), latest = (0, import_react6.useRef)(null), connected = (0, import_react6.useRef)(false), loads = (0, import_react6.useRef)(0), visible = (0, import_react6.useRef)(true), errorKind = (0, import_react6.useRef)("");
-  const [error, setError] = (0, import_react6.useState)(""), [stopped, setStopped] = (0, import_react6.useState)(false), [generation, setGeneration] = (0, import_react6.useState)(0);
-  const [height, setHeight] = (0, import_react6.useState)(node.height ?? 420);
-  const [token, setToken] = (0, import_react6.useState)(0);
-  const [mounted, setMounted] = (0, import_react6.useState)(false);
+  const frame2 = (0, import_react8.useRef)(null), latest = (0, import_react8.useRef)(null), connected = (0, import_react8.useRef)(false), loads = (0, import_react8.useRef)(0), visible = (0, import_react8.useRef)(true), errorKind = (0, import_react8.useRef)("");
+  const [error, setError] = (0, import_react8.useState)(""), [stopped, setStopped] = (0, import_react8.useState)(false), [generation, setGeneration] = (0, import_react8.useState)(0);
+  const [height, setHeight] = (0, import_react8.useState)(node.height ?? 420);
+  const [token, setToken] = (0, import_react8.useState)(0);
+  const [mounted, setMounted] = (0, import_react8.useState)(false);
   const sourceKey = JSON.stringify(node);
-  const config = (0, import_react6.useMemo)(() => ({ channel: randomToken(), nonce: randomToken() }), [sourceKey, generation]);
-  const srcDoc = (0, import_react6.useMemo)(() => sandboxDocument(node, config.channel, config.nonce), [sourceKey, config]);
+  const config = (0, import_react8.useMemo)(() => ({ channel: randomToken(), nonce: randomToken() }), [sourceKey, generation]);
+  const srcDoc = (0, import_react8.useMemo)(() => sandboxDocument(node, config.channel, config.nonce), [sourceKey, config]);
   latest.current = { node, state, data, derived, disabled, update, onAudit };
   const publish2 = () => {
-    const el = frame.current, current2 = latest.current;
+    const el = frame2.current, current2 = latest.current;
     if (!el || !connected.current) return;
     const css = getComputedStyle(el.closest(".dgui-root"));
     const theme = Object.fromEntries([["bg", "--du-bg"], ["ink", "--du-ink"], ["muted", "--du-muted"], ["accent", "--du-accent"], ["line", "--du-line"], ["soft", "--du-soft"]].map(([k2, v2]) => [k2, css.getPropertyValue(v2).trim()]));
+    theme.visualStyle = el.closest(".dgui-root")?.dataset.visualStyle ?? "";
     theme.scheme = document.body.hasAttribute("data-ds-dark-theme") || el.closest("[data-preview-theme=dark]") ? "dark" : "light";
     el.contentWindow?.postMessage({ dshCanvas: 1, channel: config.channel, type: "snapshot", payload: { ...canvasSnapshot(current2.node, current2.state, current2.data, current2.derived, current2.disabled, theme), visible: visible.current && !document.hidden } }, "*");
   };
-  (0, import_react6.useEffect)(() => {
+  (0, import_react8.useEffect)(() => {
     if (preview || stopped) return;
     connected.current = false;
     loads.current = 0;
@@ -3460,7 +3776,7 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
     let start = Date.now(), count = 0;
     const receive = (event) => {
       const m2 = event.data;
-      if (event.source !== frame.current?.contentWindow || m2?.dshCanvas !== 1 || m2.channel !== config.channel) return;
+      if (event.source !== frame2.current?.contentWindow || m2?.dshCanvas !== 1 || m2.channel !== config.channel) return;
       if (Date.now() - start > 1e3) {
         start = Date.now();
         count = 0;
@@ -3503,13 +3819,13 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
     }, 5e3);
     const observer = new MutationObserver(publish2);
     observer.observe(document.body, { attributes: true });
-    const root2 = frame.current?.closest(".dgui-root");
+    const root2 = frame2.current?.closest(".dgui-root");
     if (root2) observer.observe(root2, { attributes: true });
     const intersection = new IntersectionObserver((entries) => {
       visible.current = entries[0]?.isIntersecting ?? true;
       publish2();
     });
-    if (frame.current) intersection.observe(frame.current);
+    if (frame2.current) intersection.observe(frame2.current);
     document.addEventListener("visibilitychange", publish2);
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     reduced.addEventListener("change", publish2);
@@ -3523,7 +3839,7 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
       intersection.disconnect();
     };
   }, [config, preview, stopped]);
-  (0, import_react6.useEffect)(() => {
+  (0, import_react8.useEffect)(() => {
     publish2();
   }, [state, data, derived, disabled, config, token]);
   const inactive = preview || stopped;
@@ -3533,8 +3849,9 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
   };
   const download = () => {
     try {
-      const el = frame.current, css = getComputedStyle(el.closest(".dgui-root"));
+      const el = frame2.current, css = getComputedStyle(el.closest(".dgui-root"));
       const theme = Object.fromEntries(["bg", "ink", "muted", "accent", "line", "soft"].map((k2) => [k2, css.getPropertyValue("--du-" + k2).trim()]));
+      theme.visualStyle = el.closest(".dgui-root")?.dataset.visualStyle ?? "";
       theme.scheme = document.body.hasAttribute("data-ds-dark-theme") || el.closest("[data-preview-theme=dark]") ? "dark" : "light";
       const url = URL.createObjectURL(new Blob([standaloneCanvas(doc, node, state, theme)], { type: "text/html;charset=utf-8" }));
       const link = document.createElement("a");
@@ -3546,48 +3863,48 @@ function Sandbox({ node, document: doc, state, data, derived, disabled, preview,
       setError("\u5BFC\u51FA\u5931\u8D25\uFF1A" + e.message);
     }
   };
-  return h4(
+  return h6(
     "section",
     { className: "dgui-canvas", "data-ui-node": node.id, "data-canvas-phase": inactive ? stopped ? "stopped" : "preview" : error ? "error" : mounted ? "ready" : "loading", "aria-label": node.title },
-    !preview && !showDetails && h4(
+    !preview && !showDetails && h6(
       ActionMenu,
       { label: `${node.title}\u64CD\u4F5C` },
-      h4("button", { type: "button", disabled: disabled || !doc || stopped, onClick: download }, "\u5BFC\u51FA\u72EC\u7ACB HTML"),
-      h4("button", { type: "button", disabled, onClick: restart }, stopped ? "\u6062\u590D\u4EA4\u4E92" : "\u91CD\u7F6E\u753B\u5E03"),
-      !stopped && h4("button", { type: "button", onClick: () => setStopped(true) }, "\u505C\u6B62\u753B\u5E03")
+      h6("button", { type: "button", disabled: disabled || !doc || stopped, onClick: download }, "\u5BFC\u51FA\u72EC\u7ACB HTML"),
+      h6("button", { type: "button", disabled, onClick: restart }, stopped ? "\u6062\u590D\u4EA4\u4E92" : "\u91CD\u7F6E\u753B\u5E03"),
+      !stopped && h6("button", { type: "button", onClick: () => setStopped(true) }, "\u505C\u6B62\u753B\u5E03")
     ),
-    preview ? h4(CanvasPreview, { node }) : inactive ? h4("div", { className: "dgui-canvas-placeholder", role: "status" }, h4("p", null, "\u753B\u5E03\u5DF2\u505C\u6B62\u3002"), stopped && h4("button", { type: "button", className: "dgui-secondary", onClick: restart }, "\u6062\u590D\u4EA4\u4E92")) : h4(
+    preview ? h6(CanvasPreview, { node }) : inactive ? h6("div", { className: "dgui-canvas-placeholder", role: "status" }, h6("p", null, "\u753B\u5E03\u5DF2\u505C\u6B62\u3002"), stopped && h6("button", { type: "button", className: "dgui-secondary", onClick: restart }, "\u6062\u590D\u4EA4\u4E92")) : h6(
       "div",
       { className: "dgui-canvas-stage", style: { minHeight: mounted || error ? void 0 : Math.min(height, 420) } },
-      !mounted && !error && h4("div", { className: "dgui-canvas-loading", role: "status" }, h4("span", { className: "dgui-canvas-spinner", "aria-hidden": true }), "\u6B63\u5728\u51C6\u5907\u4EA4\u4E92\u2026"),
-      h4("iframe", { key: config.channel, ref: frame, title: node.title, sandbox: "allow-scripts", referrerPolicy: "no-referrer", srcDoc, onLoad: () => {
+      !mounted && !error && h6("div", { className: "dgui-canvas-loading", role: "status" }, h6("span", { className: "dgui-canvas-spinner", "aria-hidden": true }), "\u6B63\u5728\u51C6\u5907\u4EA4\u4E92\u2026"),
+      h6("iframe", { key: config.channel, ref: frame2, title: node.title, sandbox: "allow-scripts", referrerPolicy: "no-referrer", srcDoc, onLoad: () => {
         if (++loads.current > 1) {
           setStopped(true);
           setError("\u753B\u5E03\u53D1\u751F\u9875\u9762\u5BFC\u822A\uFF0C\u5DF2\u505C\u6B62\u3002");
         }
       }, style: { width: "100%", height, border: 0, display: "block", visibility: mounted || error ? "visible" : "hidden" }, allow: "camera 'none'; microphone 'none'; geolocation 'none'; clipboard-read 'none'; clipboard-write 'none'" })
     ),
-    error && h4("div", { className: "dgui-canvas-issue", role: "alert" }, h4("strong", null, "\u4EA4\u4E92\u9047\u5230\u95EE\u9898"), h4("p", null, "\u53EF\u4EE5\u91CD\u65B0\u8F7D\u5165\uFF1B\u5DF2\u4FDD\u5B58\u7684\u53C2\u6570\u4F1A\u4FDD\u7559\u3002"), h4("div", { className: "dgui-recovery" }, h4("button", { type: "button", className: "dgui-secondary", onClick: restart }, "\u91CD\u7F6E\u753B\u5E03"), !stopped && h4("button", { type: "button", className: "dgui-secondary", onClick: () => setStopped(true) }, "\u505C\u6B62\u753B\u5E03")), h4("details", null, h4("summary", null, "\u9519\u8BEF\u8BE6\u60C5"), h4("pre", null, error))),
-    error && !showDetails && h4("p", { className: "dgui-error" }, node.fallback),
-    showDetails && h4(
+    error && h6("div", { className: "dgui-canvas-issue", role: "alert" }, h6("strong", null, "\u4EA4\u4E92\u9047\u5230\u95EE\u9898"), h6("p", null, "\u53EF\u4EE5\u91CD\u65B0\u8F7D\u5165\uFF1B\u5DF2\u4FDD\u5B58\u7684\u53C2\u6570\u4F1A\u4FDD\u7559\u3002"), h6("div", { className: "dgui-recovery" }, h6("button", { type: "button", className: "dgui-secondary", onClick: restart }, "\u91CD\u7F6E\u753B\u5E03"), !stopped && h6("button", { type: "button", className: "dgui-secondary", onClick: () => setStopped(true) }, "\u505C\u6B62\u753B\u5E03")), h6("details", null, h6("summary", null, "\u9519\u8BEF\u8BE6\u60C5"), h6("pre", null, error))),
+    error && !showDetails && h6("p", { className: "dgui-error" }, node.fallback),
+    showDetails && h6(
       "details",
       { className: "dgui-canvas-options" },
-      h4("summary", null, "\u8BF4\u660E\u4E0E\u64CD\u4F5C"),
-      h4("p", { className: "dgui-copy" }, node.fallback),
-      !preview && h4("button", { type: "button", className: "dgui-secondary", disabled: disabled || !doc || stopped, onClick: download }, "\u5BFC\u51FA\u72EC\u7ACB HTML"),
-      !preview && !error && !stopped && h4("div", { className: "dgui-recovery" }, h4("button", { type: "button", className: "dgui-secondary", onClick: restart }, "\u91CD\u7F6E\u753B\u5E03"), h4("button", { type: "button", className: "dgui-secondary", onClick: () => setStopped(true) }, "\u505C\u6B62\u753B\u5E03"))
+      h6("summary", null, "\u8BF4\u660E\u4E0E\u64CD\u4F5C"),
+      h6("p", { className: "dgui-copy" }, node.fallback),
+      !preview && h6("button", { type: "button", className: "dgui-secondary", disabled: disabled || !doc || stopped, onClick: download }, "\u5BFC\u51FA\u72EC\u7ACB HTML"),
+      !preview && !error && !stopped && h6("div", { className: "dgui-recovery" }, h6("button", { type: "button", className: "dgui-secondary", onClick: restart }, "\u91CD\u7F6E\u753B\u5E03"), h6("button", { type: "button", className: "dgui-secondary", onClick: () => setStopped(true) }, "\u505C\u6B62\u753B\u5E03"))
     )
   );
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.6.0", "id": "0.6.0+185e0952117f", "sourceHash": "185e0952117fa36c7fd9bd5c1d6b04868628a4042bd2534cadd9f3f3ffce8f99" });
+var BUILD_INFO = Object.freeze({ "version": "0.7.0", "id": "0.7.0+6adc22f63978", "sourceHash": "6adc22f639783dee4cfb7400828727748c020f09b8e912e4500dde67fc871562" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38" });
 
 // src/current-document.js
-var import_react7 = require("react");
+var import_react9 = require("react");
 var current = /* @__PURE__ */ new Map();
 var listeners2 = /* @__PURE__ */ new Set();
 function publishDocument(raw) {
@@ -3598,9 +3915,9 @@ function publishDocument(raw) {
   listeners2.forEach((fn2) => fn2());
 }
 function useCurrentDocument(raw, sessionId) {
-  const [, wake] = (0, import_react7.useState)(0);
-  const [attempt, retry] = (0, import_react7.useState)(0), [load, setLoad] = (0, import_react7.useState)({ status: "loading" });
-  (0, import_react7.useEffect)(() => {
+  const [, wake] = (0, import_react9.useState)(0);
+  const [attempt, retry] = (0, import_react9.useState)(0), [load, setLoad] = (0, import_react9.useState)({ status: "loading" });
+  (0, import_react9.useEffect)(() => {
     if (!raw.documentId || !sessionId) return;
     const notify = () => wake((v2) => v2 + 1);
     listeners2.add(notify);
@@ -3626,10 +3943,10 @@ function useCurrentDocument(raw, sessionId) {
 }
 
 // src/history-view.js
-var import_react8 = __toESM(require("react"), 1);
-var h5 = import_react8.default.createElement;
+var import_react10 = __toESM(require("react"), 1);
+var h7 = import_react10.default.createElement;
 function HistoryView({ record, sessionId }) {
-  const [versions, setVersions] = (0, import_react8.useState)(null), [error, setError] = (0, import_react8.useState)(""), [busy, setBusy] = (0, import_react8.useState)(false), [preview, setPreview] = (0, import_react8.useState)(null);
+  const [versions, setVersions] = (0, import_react10.useState)(null), [error, setError] = (0, import_react10.useState)(""), [busy, setBusy] = (0, import_react10.useState)(false), [preview, setPreview] = (0, import_react10.useState)(null);
   const url = "/api/plugins/dsh-generative-ui/history?" + new URLSearchParams({ documentId: record.documentId, sessionId });
   async function request2(options) {
     const r = await fetch(url, { credentials: "same-origin", ...options }), value = await r.json();
@@ -3674,33 +3991,33 @@ function HistoryView({ record, sessionId }) {
       setBusy(false);
     }
   }
-  return h5(
+  return h7(
     "details",
     { className: "dgui-fallback dgui-history", onToggle: (e) => {
       if (e.currentTarget.open && !versions && !busy) load();
     } },
-    h5("summary", null, `\u7248\u672C\u5386\u53F2 \xB7 v${record.documentRevision ?? 0}`),
-    h5("p", null, "\u6062\u590D\u4F1A\u751F\u6210\u65B0\u7248\u672C\uFF0C\u4FDD\u7559\u5386\u53F2\u548C\u5DF2\u4FDD\u5B58\u53C2\u6570\u3002"),
-    h5("button", { type: "button", className: "dgui-secondary", disabled: busy, onClick: load }, busy ? "\u6B63\u5728\u8BFB\u53D6\u2026" : "\u5237\u65B0\u5386\u53F2"),
-    versions?.versions.map((v2) => h5(
+    h7("summary", null, `\u7248\u672C\u5386\u53F2 \xB7 v${record.documentRevision ?? 0}`),
+    h7("p", null, "\u6062\u590D\u4F1A\u751F\u6210\u65B0\u7248\u672C\uFF0C\u4FDD\u7559\u5386\u53F2\u548C\u5DF2\u4FDD\u5B58\u53C2\u6570\u3002"),
+    h7("button", { type: "button", className: "dgui-secondary", disabled: busy, onClick: load }, busy ? "\u6B63\u5728\u8BFB\u53D6\u2026" : "\u5237\u65B0\u5386\u53F2"),
+    versions?.versions.map((v2) => h7(
       "div",
       { key: v2.revision, className: "dgui-history-row" },
-      h5("span", null, `v${v2.revision} \xB7 ${v2.title}${v2.restoredFrom !== null ? ` \xB7 \u6062\u590D\u81EA v${v2.restoredFrom}` : ""}`),
-      h5("button", { type: "button", className: "dgui-secondary", disabled: busy, onClick: () => inspect(v2.revision) }, `\u9884\u89C8 v${v2.revision}`),
-      h5("button", { type: "button", className: "dgui-secondary", disabled: busy || v2.revision === (record.documentRevision ?? 0), onClick: () => restore(v2.revision) }, v2.revision === (record.documentRevision ?? 0) ? "\u5F53\u524D\u7248\u672C" : `\u6062\u590D v${v2.revision}`)
+      h7("span", null, `v${v2.revision} \xB7 ${v2.title}${v2.restoredFrom !== null ? ` \xB7 \u6062\u590D\u81EA v${v2.restoredFrom}` : ""}`),
+      h7("button", { type: "button", className: "dgui-secondary", disabled: busy, onClick: () => inspect(v2.revision) }, `\u9884\u89C8 v${v2.revision}`),
+      h7("button", { type: "button", className: "dgui-secondary", disabled: busy || v2.revision === (record.documentRevision ?? 0), onClick: () => restore(v2.revision) }, v2.revision === (record.documentRevision ?? 0) ? "\u5F53\u524D\u7248\u672C" : `\u6062\u590D v${v2.revision}`)
     )),
-    preview && h5("div", { className: "dgui-version-preview" }, h5("p", null, `v${preview.documentRevision ?? 0} \xB7 \u521D\u59CB\u53C2\u6570\u53EA\u8BFB\u9884\u89C8\uFF1B\u753B\u5E03\u811A\u672C\u4E0D\u6267\u884C\u3002`), h5("button", { type: "button", className: "dgui-secondary", onClick: () => setPreview(null) }, "\u5173\u95ED\u7248\u672C\u9884\u89C8"), h5(UiView, { record: preview, sessionId, preview: true })),
-    versions?.truncated && h5("p", null, "\u663E\u793A\u6700\u8FD1 200 \u4E2A\u7248\u672C\u3002"),
-    error && h5("p", { role: "alert" }, error)
+    preview && h7("div", { className: "dgui-version-preview" }, h7("p", null, `v${preview.documentRevision ?? 0} \xB7 \u521D\u59CB\u53C2\u6570\u53EA\u8BFB\u9884\u89C8\uFF1B\u753B\u5E03\u811A\u672C\u4E0D\u6267\u884C\u3002`), h7("button", { type: "button", className: "dgui-secondary", onClick: () => setPreview(null) }, "\u5173\u95ED\u7248\u672C\u9884\u89C8"), h7(UiView, { record: preview, sessionId, preview: true })),
+    versions?.truncated && h7("p", null, "\u663E\u793A\u6700\u8FD1 200 \u4E2A\u7248\u672C\u3002"),
+    error && h7("p", { role: "alert" }, error)
   );
 }
 
 // src/presentation.js
-var import_react11 = __toESM(require("react"), 1);
+var import_react13 = __toESM(require("react"), 1);
 var import_react_dom = require("react-dom");
 
 // src/presentation-store.js
-var import_react9 = require("react");
+var import_react11 = require("react");
 var records = /* @__PURE__ */ new Map();
 var listeners3 = /* @__PURE__ */ new Set();
 var locations = /* @__PURE__ */ new Map();
@@ -3725,7 +4042,7 @@ var subscribeUi = (fn2) => {
   return () => listeners3.delete(fn2);
 };
 function useUiRegistry() {
-  (0, import_react9.useSyncExternalStore)(subscribeUi, () => revision, () => 0);
+  (0, import_react11.useSyncExternalStore)(subscribeUi, () => revision, () => 0);
   return uiRecords();
 }
 function setPanelOpener(fn2) {
@@ -3738,24 +4055,24 @@ function setPanelOpener(fn2) {
     }
   };
 }
-function setMarkerLocation(id, host) {
-  locations.set(id, host);
+function setMarkerLocation(id2, host) {
+  locations.set(id2, host);
   emit();
 }
-function removeMarkerLocation(id, host) {
-  if (locations.get(id) === host) {
-    locations.delete(id);
+function removeMarkerLocation(id2, host) {
+  if (locations.get(id2) === host) {
+    locations.delete(id2);
     emit();
   }
 }
-var markerLocation = (id) => locations.get(id);
+var markerLocation = (id2) => locations.get(id2);
 
 // src/markers.js
 var idPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 function markedUiId(block) {
   const code = block.querySelector("code"), pre = block.matches("pre") ? block : block.querySelector("pre");
-  const id = (code?.textContent ?? pre?.textContent ?? "").trim();
-  return idPattern.test(id) ? id : null;
+  const id2 = (code?.textContent ?? pre?.textContent ?? "").trim();
+  return idPattern.test(id2) ? id2 : null;
 }
 function startUiMarkers(root2, sessionId) {
   const claims = /* @__PURE__ */ new Map(), references = /* @__PURE__ */ new Map();
@@ -3777,19 +4094,19 @@ function startUiMarkers(root2, sessionId) {
     for (const block of root2.querySelectorAll("div.md-code-block,pre")) {
       if (block.matches("pre") && block.closest("div.md-code-block")) continue;
       if (block.closest("[data-dsh-generative-ui]") || claims.has(block)) continue;
-      const id = markedUiId(block);
-      if (!known.has(id)) continue;
-      if ([...claims.values()].some((c) => c.id === id)) {
-        if (!references.has(block)) references.set(block, { id, display: block.style.display });
+      const id2 = markedUiId(block);
+      if (!known.has(id2)) continue;
+      if ([...claims.values()].some((c) => c.id === id2)) {
+        if (!references.has(block)) references.set(block, { id: id2, display: block.style.display });
         block.style.display = "none";
         continue;
       }
       const host = block.ownerDocument.createElement("div");
-      host.dataset.dguiMarker = id;
+      host.dataset.dguiMarker = id2;
       host.uiMarkerBlock = block;
       block.before(host);
-      claims.set(block, { id, host, display: block.style.display });
-      setMarkerLocation(id, host);
+      claims.set(block, { id: id2, host, display: block.style.display });
+      setMarkerLocation(id2, host);
     }
   };
   const queue = () => {
@@ -3818,11 +4135,11 @@ function startUiMarkers(root2, sessionId) {
 }
 
 // src/presentation-owner.js
-var import_react10 = require("react");
+var import_react12 = require("react");
 var roots = /* @__PURE__ */ new WeakMap();
 function usePresentationOwner(anchor, documentId, sessionId) {
-  const [owner, setOwner] = (0, import_react10.useState)(false);
-  (0, import_react10.useEffect)(() => {
+  const [owner, setOwner] = (0, import_react12.useState)(false);
+  (0, import_react12.useEffect)(() => {
     const element = anchor.current;
     if (!element) return;
     const root2 = element.closest("[data-conversation-scroll]") ?? element.parentElement;
@@ -3859,17 +4176,17 @@ function usePresentationOwner(anchor, documentId, sessionId) {
 }
 
 // src/presentation.js
-var h6 = import_react11.default.createElement;
+var h8 = import_react13.default.createElement;
 var scanners = /* @__PURE__ */ new WeakMap();
 var focused = /* @__PURE__ */ new Map();
 function PresentationView({ raw, sessionId, sendPrompt, openFile, scope: scope2 }) {
   const showDetails = useViewDetails();
-  const anchor = (0, import_react11.useRef)(null), records2 = useUiRegistry(), host = markerLocation(raw.documentId);
+  const anchor = (0, import_react13.useRef)(null), records2 = useUiRegistry(), host = markerLocation(raw.documentId);
   const owner = usePresentationOwner(anchor, raw.documentId, sessionId);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react13.useEffect)(() => {
     rememberUi(raw, sessionId, sendPrompt, openFile);
   }, [raw, sessionId, sendPrompt, openFile]);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react13.useEffect)(() => {
     const root2 = anchor.current?.closest("[data-conversation-scroll]");
     if (!root2) return;
     let entry = scanners.get(root2);
@@ -3890,7 +4207,7 @@ function PresentationView({ raw, sessionId, sendPrompt, openFile, scope: scope2 
       }
     };
   }, [sessionId]);
-  (0, import_react11.useEffect)(() => {
+  (0, import_react13.useEffect)(() => {
     const block = host?.uiMarkerBlock;
     if (!block || !owner) return;
     const previous = block.style.display;
@@ -3899,40 +4216,465 @@ function PresentationView({ raw, sessionId, sendPrompt, openFile, scope: scope2 
       block.style.display = previous;
     };
   }, [host, owner]);
-  const content = h6(ValidatedView, { raw, fallback: raw.document.fallback, sessionId, sendPrompt, openFile });
-  return h6(
+  const content = h8(ValidatedView, { raw, fallback: raw.document.fallback, sessionId, sendPrompt, openFile });
+  return h8(
     "div",
     { ref: anchor, "data-dgui-presentation": raw.documentId },
     owner && (host ? (0, import_react_dom.createPortal)(content, host) : content),
-    showDetails && owner && !host && h6("small", { className: "dgui-copy" }, "\u672A\u63D0\u4F9B\u6B63\u6587\u6807\u8BB0\uFF0C\u754C\u9762\u663E\u793A\u5728\u56DE\u7B54\u4E0B\u65B9\u3002")
+    showDetails && owner && !host && h8("small", { className: "dgui-copy" }, "\u672A\u63D0\u4F9B\u6B63\u6587\u6807\u8BB0\uFF0C\u754C\u9762\u663E\u793A\u5728\u56DE\u7B54\u4E0B\u65B9\u3002")
   );
 }
 function UiPanel({ sessionId, sendPrompt }) {
-  const records2 = useUiRegistry().filter((r) => r.sessionId === sessionId), [selected, setSelected] = (0, import_react11.useState)(focused.get(sessionId));
-  (0, import_react11.useEffect)(() => subscribeUi(() => setSelected(focused.get(sessionId))), [sessionId]);
+  const records2 = useUiRegistry().filter((r) => r.sessionId === sessionId), [selected, setSelected] = (0, import_react13.useState)(focused.get(sessionId));
+  (0, import_react13.useEffect)(() => subscribeUi(() => setSelected(focused.get(sessionId))), [sessionId]);
   const record = records2.find((r) => r.raw.documentId === selected) ?? records2.at(-1);
-  return h6(
+  return h8(
     "div",
     { className: "dgui-panel" },
-    h6("div", { className: "dgui-root" }, h6("label", null, "\u672C\u4F1A\u8BDD\u754C\u9762", h6("select", { "aria-label": "\u672C\u4F1A\u8BDD\u754C\u9762", value: record?.raw.documentId ?? "", onChange: (e) => {
+    h8("div", { className: "dgui-root" }, h8("label", null, "\u672C\u4F1A\u8BDD\u754C\u9762", h8("select", { "aria-label": "\u672C\u4F1A\u8BDD\u754C\u9762", value: record?.raw.documentId ?? "", onChange: (e) => {
       focused.set(sessionId, e.target.value);
       setSelected(e.target.value);
-    } }, records2.map((r) => h6("option", { key: r.raw.documentId, value: r.raw.documentId }, r.raw.document.title))))),
-    record ? h6(ValidatedView, { key: record.raw.documentId, raw: record.raw, sessionId, sendPrompt: sendPrompt ?? record.sendPrompt, openFile: record.openFile }) : h6("p", null, "\u5F53\u524D\u4F1A\u8BDD\u8FD8\u6CA1\u6709\u751F\u6210\u754C\u9762\u3002")
+    } }, records2.map((r) => h8("option", { key: r.raw.documentId, value: r.raw.documentId }, r.raw.document.title))))),
+    record ? h8(ValidatedView, { key: record.raw.documentId, raw: record.raw, sessionId, sendPrompt: sendPrompt ?? record.sendPrompt, openFile: record.openFile }) : h8("p", null, "\u5F53\u524D\u4F1A\u8BDD\u8FD8\u6CA1\u6709\u751F\u6210\u754C\u9762\u3002")
   );
 }
-function focusUi(id, sessionId) {
-  focused.set(sessionId, id);
+function focusUi(id2, sessionId) {
+  focused.set(sessionId, id2);
   notifyUi();
 }
 
+// lib/third-party/anatomy-iso.mjs
+var AZIMUTH = 45;
+var ELEVATION = 30;
+var RADIANS = Math.PI / 180;
+var UNIT = Math.sqrt(1.6);
+function cameraOf({ scale, azimuth = AZIMUTH, elevation = ELEVATION }) {
+  const a = azimuth * RADIANS;
+  const e = elevation * RADIANS;
+  return { sinA: Math.sin(a), cosA: Math.cos(a), sinE: Math.sin(e), cosE: Math.cos(e), k: scale * UNIT };
+}
+function iso([x, y2, z2], projection) {
+  const { origin } = projection;
+  const { sinA, cosA, sinE, cosE, k: k2 } = cameraOf(projection);
+  return [origin[0] + (x * sinA - y2 * cosA) * k2, origin[1] + ((x * cosA + y2 * sinA) * sinE - z2 * cosE) * k2];
+}
+function depthOf([x, y2, z2], projection) {
+  const { sinA, cosA, sinE, cosE } = cameraOf(projection);
+  return (x * cosA + y2 * sinA) * cosE + z2 * sinE;
+}
+function roundedPlan({ x, y: y2, w: w2, d, r }, steps = 8) {
+  const radius = Math.max(0, Math.min(r, w2 / 2, d / 2));
+  const corners = [
+    [x + w2 - radius, y2 + radius, -90],
+    [x + w2 - radius, y2 + d - radius, 0],
+    [x + radius, y2 + d - radius, 90],
+    [x + radius, y2 + radius, 180]
+  ];
+  const out = [];
+  for (const [cx, cy, start] of corners) {
+    const count = radius > 0 ? steps : 0;
+    for (let step = 0; step <= count; step++) {
+      const angle = (start + (count ? 90 * step / count : 45)) * RADIANS;
+      out.push([cx + radius * Math.cos(angle), cy + radius * Math.sin(angle)]);
+    }
+  }
+  return out;
+}
+function circleRing(cx, cy, radius, steps = 40) {
+  return Array.from({ length: steps }, (_2, step) => {
+    const angle = step / steps * Math.PI * 2;
+    return [cx + radius * Math.cos(angle), cy + radius * Math.sin(angle)];
+  });
+}
+function fitProjection(points, width, height, { pad = 24, headroom = 0, azimuth = AZIMUTH, elevation = ELEVATION } = {}) {
+  const unit2 = { origin: [0, 0], scale: 1, azimuth, elevation };
+  const flat = points.map((point2) => iso(point2, unit2));
+  const xs = flat.map(([x]) => x);
+  const ys = flat.map(([, y2]) => y2);
+  const left = Math.min(...xs);
+  const right = Math.max(...xs);
+  const up = Math.min(...ys);
+  const down = Math.max(...ys);
+  const scale = Math.min((width - pad * 2) / (right - left), (height - pad * 2 - headroom) / (down - up));
+  return {
+    origin: [width / 2 - (left + right) / 2 * scale, headroom + (height - headroom) / 2 - (up + down) / 2 * scale],
+    scale,
+    azimuth,
+    elevation
+  };
+}
+
+// lib/mechanism-geometry.js
+var MECHANISM_LIMITS = Object.freeze({ parts: 96, teeth: 64, faces: 8192 });
+var finite2 = (v2) => typeof v2 === "number" && Number.isFinite(v2);
+var fail2 = (s) => {
+  throw Error("Motion mechanism: " + s);
+};
+var num = (v2, label, min = -1e4, max = 1e4) => {
+  if (!finite2(v2) || v2 < min || v2 > max) fail2(label + " must be a finite number in " + min + ".." + max);
+  return v2;
+};
+var vector = (v2, label) => {
+  if (!Array.isArray(v2) || v2.length !== 3) fail2(label + " must be [x,y,z]");
+  return v2.map((x, i) => num(x, label + "[" + i + "]"));
+};
+var id = (v2) => typeof v2 === "string" && /^[\p{L}_][\p{L}\p{M}\p{N}_]{0,63}$/u.test(v2) && !["constructor", "prototype", "__proto__"].includes(v2);
+var kinds = ["box", "cylinder", "gear", "rod", "spring"];
+var add = (a, b2) => a.map((v2, i) => v2 + b2[i]);
+var sub = (a, b2) => a.map((v2, i) => v2 - b2[i]);
+var mul = (a, t) => a.map((v2) => v2 * t);
+var dot = (a, b2) => a.reduce((s, v2, i) => s + v2 * b2[i], 0);
+var cross = (a, b2) => [a[1] * b2[2] - a[2] * b2[1], a[2] * b2[0] - a[0] * b2[2], a[0] * b2[1] - a[1] * b2[0]];
+var unit = (a) => {
+  const len = Math.hypot(...a);
+  if (len < 1e-6) fail2("zero-length axis");
+  return mul(a, 1 / len);
+};
+function validateScene(spec) {
+  if (!spec || typeof spec !== "object" || Array.isArray(spec)) fail2("scene must be an object");
+  if (!Array.isArray(spec.parts) || !spec.parts.length || spec.parts.length > MECHANISM_LIMITS.parts) fail2("parts requires 1..96 objects");
+  const seen = /* @__PURE__ */ new Set(), groups = /* @__PURE__ */ new Set();
+  for (const [i, p2] of spec.parts.entries()) {
+    const at2 = "parts[" + i + "]";
+    if (!p2 || typeof p2 !== "object" || !id(p2.id) || seen.has(p2.id)) fail2(at2 + ".id must be a unique identifier");
+    seen.add(p2.id);
+    if (!kinds.includes(p2.type)) fail2(at2 + ".type must be " + kinds.join("/"));
+    if (p2.group !== void 0) {
+      if (!id(p2.group)) fail2(at2 + ".group must be an identifier");
+      groups.add(p2.group);
+    }
+    for (const k2 of ["label", "description"]) if (p2[k2] !== void 0 && (typeof p2[k2] !== "string" || p2[k2].length > 1024)) fail2(at2 + "." + k2 + " must be short text");
+    if (p2.cover !== void 0 && typeof p2.cover !== "boolean") fail2(at2 + ".cover must be boolean");
+    if (p2.material !== void 0 && !["metal", "dark", "accent", "warm", "cool"].includes(p2.material)) fail2(at2 + ".material must be metal/dark/accent/warm/cool");
+    if (p2.at !== void 0) vector(p2.at, at2 + ".at");
+    if (p2.explode !== void 0) vector(p2.explode, at2 + ".explode");
+    if (p2.rotation !== void 0) num(p2.rotation, at2 + ".rotation", -1e9, 1e9);
+    if (p2.axis !== void 0 && !["x", "y", "z"].includes(p2.axis)) fail2(at2 + ".axis must be x/y/z");
+    if (p2.type === "box") {
+      const size = vector(p2.size, at2 + ".size");
+      if (size.some((v2) => v2 <= 0 || v2 > 2e3)) fail2(at2 + ".size must be positive and <=2000");
+      if (p2.round !== void 0) num(p2.round, at2 + ".round", 0, Math.min(size[0], size[1]) / 2);
+    }
+    if (["cylinder", "gear"].includes(p2.type)) {
+      num(p2.radius, at2 + ".radius", 0.1, 1e3);
+      num(p2.height ?? 8, at2 + ".height", 0.1, 1e3);
+      if (p2.inner !== void 0) num(p2.inner, at2 + ".inner", 0, p2.radius - 0.01);
+    }
+    if (p2.type === "gear") {
+      const teeth = num(p2.teeth, at2 + ".teeth", 6, 64);
+      if (!Number.isInteger(teeth)) fail2(at2 + ".teeth must be an integer");
+      if (p2.module !== void 0) num(p2.module, at2 + ".module", 0.1, p2.radius / 3);
+    }
+    if (["rod", "spring"].includes(p2.type)) {
+      vector(p2.from, at2 + ".from");
+      vector(p2.to, at2 + ".to");
+      if (Math.hypot(...sub(p2.to, p2.from)) < 0.1) fail2(at2 + " endpoints must differ");
+      num(p2.radius ?? 2, at2 + ".radius", 0.1, 200);
+    }
+    if (p2.type === "spring") {
+      const turns = num(p2.turns ?? 8, at2 + ".turns", 2, 24);
+      if (!Number.isInteger(turns)) fail2(at2 + ".turns must be integer");
+    }
+  }
+  if (spec.groups !== void 0) {
+    if (!Array.isArray(spec.groups) || spec.groups.length > 12) fail2("groups must be an array of <=12 labels");
+    const ids = /* @__PURE__ */ new Set();
+    for (const g of spec.groups) {
+      if (!g || !id(g.id) || ids.has(g.id) || !groups.has(g.id) || typeof g.label !== "string" || g.label.length > 128) fail2("groups must name unique existing part groups");
+      ids.add(g.id);
+    }
+  }
+  if (spec.bounds !== void 0) {
+    if (!Array.isArray(spec.bounds) || spec.bounds.length !== 2) fail2("bounds must be [minXYZ,maxXYZ]");
+    const [a, b2] = spec.bounds.map((v2, i) => vector(v2, "bounds[" + i + "]"));
+    if (a.some((v2, i) => v2 >= b2[i])) fail2("bounds min must be below max on every axis");
+  }
+  if (spec.azimuth !== void 0) num(spec.azimuth, "azimuth", 10, 80);
+  if (spec.elevation !== void 0) num(spec.elevation, "elevation", 15, 70);
+  if (spec.title !== void 0 && (typeof spec.title !== "string" || spec.title.length > 256)) fail2("title must be short text");
+  if (spec.bind !== void 0) {
+    if (!spec.bind || typeof spec.bind !== "object" || Array.isArray(spec.bind)) fail2("bind must be an object");
+    for (const [k2, v2] of Object.entries(spec.bind)) if (!["explode", "selected", "cutaway"].includes(k2) || !id(v2)) fail2("bind only accepts declared state keys for explode/selected/cutaway");
+  }
+  return spec;
+}
+function frame(axis) {
+  if (axis === "x") return [[0, 1, 0], [0, 0, 1], [1, 0, 0]];
+  if (axis === "y") return [[0, 0, 1], [1, 0, 0], [0, 1, 0]];
+  return [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+}
+var point = (f, x, y2, z2) => add(add(mul(f[0], x), mul(f[1], y2)), mul(f[2], z2));
+function sweep(ring, height, f, inner) {
+  const low = ring.map(([x, y2]) => point(f, x, y2, -height / 2)), high = ring.map(([x, y2]) => point(f, x, y2, height / 2)), faces = [];
+  const topInner = inner?.map(([x, y2]) => point(f, x, y2, height / 2)), bottomInner = inner?.map(([x, y2]) => point(f, x, y2, -height / 2));
+  faces.push({ points: high, holes: topInner ? [topInner.slice().reverse()] : [], normal: f[2] }, { points: low.slice().reverse(), holes: bottomInner ? [bottomInner] : [], normal: mul(f[2], -1) });
+  for (let i = 0; i < ring.length; i++) {
+    const j2 = (i + 1) % ring.length;
+    if (Math.hypot(...sub(low[j2], low[i])) < 1e-6) continue;
+    faces.push({ points: [low[i], low[j2], high[j2], high[i]], normal: unit(cross(sub(low[j2], low[i]), f[2])) });
+    if (inner) faces.push({ points: [bottomInner[j2], bottomInner[i], topInner[i], topInner[j2]], normal: unit(cross(sub(bottomInner[i], bottomInner[j2]), f[2])) });
+  }
+  return faces;
+}
+function partGeometry(p2) {
+  let f = frame(p2.axis), ring, height, faces;
+  if (p2.type === "box") {
+    ring = roundedPlan({ x: -p2.size[0] / 2, y: -p2.size[1] / 2, w: p2.size[0], d: p2.size[1], r: p2.round ?? Math.min(2, p2.size[0] / 2, p2.size[1] / 2) }, 3);
+    height = p2.size[2];
+  }
+  if (p2.type === "cylinder") {
+    ring = circleRing(0, 0, p2.radius, 24);
+    height = p2.height ?? 8;
+  }
+  if (p2.type === "gear") {
+    const step = Math.PI * 2 / p2.teeth, m2 = p2.module ?? p2.radius * 2 / p2.teeth;
+    ring = [];
+    for (let i = 0; i < p2.teeth; i++) for (const [t, r] of [[-0.5, p2.radius - m2 * 0.85], [-0.32, p2.radius - m2 * 0.85], [-0.17, p2.radius + m2 * 0.7], [0.17, p2.radius + m2 * 0.7], [0.32, p2.radius - m2 * 0.85]]) {
+      const a = (i + t) * step;
+      ring.push([Math.cos(a) * r, Math.sin(a) * r]);
+    }
+    height = p2.height ?? 8;
+  }
+  if (p2.type === "rod") {
+    const w2 = unit(sub(p2.to, p2.from)), u = unit(cross(w2, Math.abs(w2[2]) < 0.9 ? [0, 0, 1] : [0, 1, 0]));
+    f = [u, cross(w2, u), w2];
+    ring = circleRing(0, 0, p2.radius ?? 2, 16);
+    height = Math.hypot(...sub(p2.to, p2.from));
+  }
+  if (p2.type === "spring") {
+    const w2 = unit(sub(p2.to, p2.from)), u = unit(cross(w2, Math.abs(w2[2]) < 0.9 ? [0, 0, 1] : [0, 1, 0])), v2 = cross(w2, u), points = [];
+    for (let i = 0; i <= 128; i++) {
+      const t = i / 128, a = t * (p2.turns ?? 8) * Math.PI * 2, fade = Math.min(1, t * 12, (1 - t) * 12);
+      points.push(add(add(p2.from, mul(sub(p2.to, p2.from), t)), add(mul(u, Math.cos(a) * (p2.radius ?? 6) * fade), mul(v2, Math.sin(a) * (p2.radius ?? 6) * fade))));
+    }
+    return { line: points, points };
+  }
+  const rotation = p2.rotation ?? 0, c = Math.cos(rotation), s = Math.sin(rotation);
+  ring = ring.map(([x, y2]) => [x * c - y2 * s, x * s + y2 * c]);
+  const inner = p2.inner ? ring.map(([x, y2]) => {
+    const a = Math.atan2(y2, x);
+    return [Math.cos(a) * p2.inner, Math.sin(a) * p2.inner];
+  }) : void 0;
+  faces = sweep(ring, height, f, inner);
+  const center = p2.type === "rod" ? mul(add(p2.from, p2.to), 0.5) : p2.at ?? [0, 0, 0];
+  faces = faces.map((face) => ({ ...face, points: face.points.map((v2) => add(v2, center)), holes: face.holes?.map((h19) => h19.map((v2) => add(v2, center))) }));
+  return { faces, points: faces.flatMap((f2) => f2.points) };
+}
+function sceneBounds(spec) {
+  if (spec.bounds) {
+    const [a, b2] = spec.bounds;
+    return Array.from({ length: 8 }, (_2, i) => [i & 1 ? b2[0] : a[0], i & 2 ? b2[1] : a[1], i & 4 ? b2[2] : a[2]]);
+  }
+  return spec.parts.flatMap((p2) => {
+    const geometry = partGeometry(p2);
+    return geometry.points.flatMap((v2) => [v2, add(v2, p2.explode ?? [0, 0, 0])]);
+  });
+}
+function gearPair({ driverTeeth = 16, drivenTeeth = 32, rpm = 30, angle = 0, module: module2 = 2 } = {}) {
+  for (const [k2, v2] of Object.entries({ driverTeeth, drivenTeeth })) if (!Number.isInteger(v2) || v2 < 6 || v2 > 64) fail2(k2 + " must be integer 6..64");
+  num(rpm, "rpm", -600, 600);
+  num(angle, "angle", -1e9, 1e9);
+  num(module2, "module", 0.1, 10);
+  return { driverRadius: driverTeeth * module2 / 2, drivenRadius: drivenTeeth * module2 / 2, centerDistance: (driverTeeth + drivenTeeth) * module2 / 2, driverAngle: angle, drivenAngle: -angle * driverTeeth / drivenTeeth + Math.PI - Math.PI / drivenTeeth, driverRpm: rpm, drivenRpm: -rpm * driverTeeth / drivenTeeth, ratio: drivenTeeth / driverTeeth };
+}
+function sliderCrank({ angle = 0, radius = 20, rod = 70, z: z2 = 20 } = {}) {
+  num(angle, "angle", -1e9, 1e9);
+  num(radius, "radius", 0.1, 200);
+  num(rod, "rod", 0.1, 1e3);
+  num(z2, "z");
+  if (rod <= radius) fail2("connecting rod length must exceed crank radius");
+  const crank = [radius * Math.cos(angle), radius * Math.sin(angle), z2], x = crank[0] + Math.sqrt(rod * rod - crank[1] * crank[1]);
+  return { crank, piston: [x, 0, z2], position: x, stroke: radius * 2, angle };
+}
+
+// lib/mechanism-scenes.js
+var box = (id2, label, at2, size, group, extra = {}) => ({ id: id2, type: "box", label, at: at2, size, group, ...extra });
+var round = (id2, label, at2, radius, height, group, extra = {}) => ({ id: id2, type: "cylinder", label, at: at2, radius, height, group, ...extra });
+function bolts(cx, cy, z2, group, r = 3, spread = 18) {
+  return [[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([x, y2], i) => round(group + "_bolt_" + i, "\u56FA\u5B9A\u87BA\u6813", [cx + x * spread, cy + y2 * spread, z2], r, 3, group, { material: "dark", explode: [0, 0, 26] }));
+}
+function assemblyScene() {
+  return { title: "\u5206\u5C42\u7ED3\u6784 \xB7 \u793A\u610F\u88C5\u914D", groups: [{ id: "base", label: "\u5E95\u5EA7", description: "\u652F\u6491\u6574\u4F53\uFF0C\u5E76\u63D0\u4F9B\u5B89\u88C5\u4F4D\u7F6E\u3002" }, { id: "board", label: "\u529F\u80FD\u677F", description: "\u8FDE\u63A5\u8F93\u5165\u4E0E\u5904\u7406\u6A21\u5757\uFF1B\u793A\u610F\u7ED3\u6784\uFF0C\u4E0D\u5BF9\u5E94\u7279\u5B9A\u4EA7\u54C1\u3002" }, { id: "sink", label: "\u6563\u70ED\u5C42", description: "\u5C06\u70ED\u91CF\u4F20\u5230\u66F4\u5927\u7684\u8868\u9762\u79EF\u3002" }, { id: "cover", label: "\u5916\u58F3", description: "\u4FDD\u62A4\u5185\u90E8\uFF1B\u5256\u5F00\u9009\u9879\u901A\u8FC7\u9690\u85CF\u5916\u58F3\u5C55\u793A\u7ED3\u6784\u3002" }], parts: [
+    box("base", "\u5B89\u88C5\u5E95\u5EA7", [0, 0, 0], [120, 85, 10], "base", { round: 6, material: "metal" }),
+    ...[-1, 1].flatMap((x, i) => [-1, 1].map((y2, j2) => round("foot_" + i + j2, "\u9632\u6ED1\u811A", [x * 46, y2 * 30, -8], 6, 7, "base", { material: "dark" }))),
+    box("board", "\u529F\u80FD\u677F", [0, 0, 15], [96, 62, 4], "board", { round: 3, material: "cool", explode: [0, 0, 35] }),
+    box("chip", "\u5904\u7406\u6A21\u5757", [-16, 0, 22], [25, 24, 10], "board", { round: 2, material: "dark", explode: [0, 0, 35] }),
+    box("connector", "\u8FDE\u63A5\u7AEF\u53E3", [32, 0, 24], [16, 36, 14], "board", { round: 2, material: "warm", explode: [0, 0, 35] }),
+    ...bolts(0, 0, 20, "board", 2, 24),
+    box("spreader", "\u5BFC\u70ED\u5E95\u677F", [-16, 0, 32], [44, 42, 5], "sink", { round: 2, material: "metal", explode: [-10, 0, 65] }),
+    ...Array.from({ length: 7 }, (_2, i) => box("fin_" + i, "\u6563\u70ED\u9CCD\u7247", [-34 + i * 6, 0, 44], [2.4, 40, 20], "sink", { round: 1, material: "metal", explode: [-10, 0, 65] })),
+    box("top", "\u9876\u76D6", [0, 0, 61], [124, 89, 5], "cover", { round: 6, cover: true, material: "metal", explode: [12, 0, 85] }),
+    box("side", "\u4FA7\u677F", [0, -44, 32], [124, 4, 58], "cover", { round: 2, cover: true, material: "metal", explode: [12, -22, 50] })
+  ] };
+}
+function gearsScene({ driverTeeth = 16, drivenTeeth = 32, module: module2 = 1.5 } = {}) {
+  const g = gearPair({ driverTeeth, drivenTeeth, module: module2 }), x = g.centerDistance;
+  return { title: "\u9F7F\u8F6E\u4F20\u52A8 \xB7 \u7B80\u5316\u76F4\u9F7F\u8F6E\u793A\u610F", azimuth: 70, elevation: 55, groups: [{ id: "frame", label: "\u652F\u67B6", description: "\u56FA\u5B9A\u8F74\u5FC3\u4F4D\u7F6E\uFF1B\u4E24\u8F74\u4E2D\u5FC3\u8DDD\u7531\u9F7F\u6570\u4E0E\u6A21\u6570\u5171\u540C\u786E\u5B9A\u3002" }, { id: "driver", label: "\u4E3B\u52A8\u8F6E", description: "\u8F93\u5165\u8F6C\u901F\uFF0C\u7531\u9F7F\u6570\u51B3\u5B9A\u8282\u5706\u534A\u5F84\u3002" }, { id: "driven", label: "\u4ECE\u52A8\u8F6E", description: "\u5916\u556E\u5408\u8F6C\u5411\u76F8\u53CD\uFF0C\u8F6C\u901F\u6309\u9F7F\u6570\u6BD4\u53D8\u5316\u3002" }, { id: "cover", label: "\u5916\u58F3", description: "\u9690\u85CF\u76D6\u677F\u4EE5\u89C2\u5BDF\u4F20\u52A8\uFF1B\u4E0D\u662F\u52A0\u5DE5\u6216\u53D7\u529B\u4EFF\u771F\u3002" }], parts: [
+    box("base", "\u5B89\u88C5\u5E95\u5EA7", [30, 0, -8], [140, 90, 10], "frame", { round: 6, material: "metal" }),
+    ...bolts(30, 0, 0, "frame", 3, 32),
+    ...[0, x].flatMap((cx, i) => [round("bearing_" + i, "\u8F74\u627F\u5EA7", [cx, 0, 4], 10, 12, "frame", { inner: 4, material: "dark" }), round("shaft_" + i, "\u4F20\u52A8\u8F74", [cx, 0, 16], 3.8, 28, i ? "driven" : "driver", { material: "metal", explode: [i ? 24 : -24, 0, 20] }), round("hub_" + i, "\u8F6E\u6BC2", [cx, 0, 27], 6, 6, i ? "driven" : "driver", { inner: 3.8, material: "warm", explode: [i ? 24 : -24, 0, 20] })]),
+    { id: "driverGear", type: "gear", label: "\u4E3B\u52A8\u9F7F\u8F6E", group: "driver", at: [0, 0, 20], radius: g.driverRadius, teeth: driverTeeth, module: module2, height: 7, inner: 4, material: "accent", explode: [-24, 0, 20] },
+    { id: "drivenGear", type: "gear", label: "\u4ECE\u52A8\u9F7F\u8F6E", group: "driven", at: [x, 0, 20], radius: g.drivenRadius, teeth: drivenTeeth, module: module2, height: 7, inner: 4, material: "cool", rotation: g.drivenAngle, explode: [24, 0, 20] },
+    box("cover", "\u9632\u62A4\u76D6\u677F", [30, 0, 36], [140, 90, 4], "cover", { round: 6, cover: true, material: "metal", explode: [0, 0, 62] })
+  ] };
+}
+function crankScene({ radius = 20, rod = 70, angle = 0 } = {}) {
+  const k2 = sliderCrank({ radius, rod, angle, z: 28 });
+  return { title: "\u66F2\u67C4\u8FDE\u6746 \xB7 \u65CB\u8F6C\u8F6C\u4E3A\u5F80\u590D", groups: [{ id: "frame", label: "\u652F\u67B6\u4E0E\u5BFC\u8F68", description: "\u652F\u6491\u8F74\u5FC3\uFF0C\u9650\u5236\u6ED1\u5757\u6CBF\u540C\u4E00\u65B9\u5411\u8FD0\u52A8\u3002" }, { id: "crank", label: "\u66F2\u67C4", description: "\u66F2\u67C4\u7ED5\u56FA\u5B9A\u8F74\u5FC3\u65CB\u8F6C\u3002" }, { id: "rod", label: "\u8FDE\u6746", description: "\u8FDE\u63A5\u66F2\u67C4\u9500\u548C\u6ED1\u5757\uFF0C\u957F\u5EA6\u4FDD\u6301\u4E0D\u53D8\u3002" }, { id: "piston", label: "\u6ED1\u5757", description: "\u6CBF\u5BFC\u8F68\u5F80\u590D\uFF1B\u5B8C\u6574\u884C\u7A0B\u7B49\u4E8E\u66F2\u67C4\u534A\u5F84\u7684\u4E24\u500D\u3002" }], parts: [
+    box("base", "\u5B89\u88C5\u5E95\u5EA7", [35, 0, -6], [175, 80, 10], "frame", { round: 6, material: "metal" }),
+    ...bolts(35, 0, 1, "frame", 3, 30),
+    round("bearing", "\u66F2\u8F74\u8F74\u627F", [0, 0, 7], 11, 15, "frame", { inner: 4, material: "dark" }),
+    round("axle", "\u66F2\u8F74", [0, 0, 15], 3.8, 26, "crank", { material: "metal", explode: [0, -18, 18] }),
+    round("flywheel", "\u66F2\u67C4\u76D8", [0, 0, 20], radius + 6, 6, "crank", { inner: 4, material: "accent", explode: [0, -18, 18] }),
+    box("railA", "\u5BFC\u8F68", [74, -16, 13], [85, 5, 6], "frame", { round: 1, material: "dark" }),
+    box("railB", "\u5BFC\u8F68", [74, 16, 13], [85, 5, 6], "frame", { round: 1, material: "dark" }),
+    round("crankPin", "\u66F2\u67C4\u9500", k2.crank, 3, 12, "crank", { material: "warm", explode: [0, -18, 18] }),
+    { id: "link", type: "rod", label: "\u8FDE\u6746", from: k2.crank, to: k2.piston, radius: 2.4, group: "rod", material: "metal", explode: [0, 0, 45] },
+    box("piston", "\u6ED1\u5757", [k2.position, 0, 22], [18, 24, 16], "piston", { round: 3, material: "cool", explode: [20, 0, 18] }),
+    round("pistonPin", "\u6ED1\u5757\u9500", k2.piston, 3, 10, "piston", { material: "warm", explode: [20, 0, 18] })
+  ] };
+}
+
+// lib/mechanism-render.js
+var TAU = Math.PI * 2;
+function projectionFor(spec, options) {
+  validateScene(spec);
+  const points = options && !spec.bounds ? spec.parts.filter((p2) => !options.cutaway || !p2.cover).flatMap((p2) => partGeometry(p2).points.map((v2) => add(v2, mul(p2.explode ?? [0, 0, 0], options.explode ?? 0)))) : sceneBounds(spec);
+  return fitProjection(points.length ? points : [[0, 0, 0], [1, 1, 1]], 600, 340, { pad: 24, azimuth: spec.azimuth ?? 45, elevation: spec.elevation ?? 30 });
+}
+var path = (points) => points.map(([x, y2], i) => (i ? "L" : "M") + Math.round(x * 10) / 10 + " " + Math.round(y2 * 10) / 10).join("") + "Z";
+function renderFaces(spec, projection, { explode = 0, selected = "all", cutaway = false, pose = {} } = {}, cache = /* @__PURE__ */ new Map()) {
+  if (typeof explode !== "number" || !Number.isFinite(explode) || explode < 0 || explode > 1) throw Error("Motion mechanism: explode must be 0..1");
+  if (typeof selected !== "string" || typeof cutaway !== "boolean") throw Error("Motion mechanism: selected must be text and cutaway boolean");
+  if (!pose || typeof pose !== "object" || Array.isArray(pose)) throw Error("Motion mechanism: pose must be an object");
+  for (const id2 of Object.keys(pose)) if (!spec.parts.some((p2) => p2.id === id2)) throw Error("Motion mechanism: unknown pose part " + id2);
+  const a = (projection.azimuth ?? 45) * TAU / 360, e = (projection.elevation ?? 30) * TAU / 360, view = [Math.cos(a) * Math.cos(e), Math.sin(a) * Math.cos(e), Math.sin(e)], faces = [];
+  for (const part of spec.parts) {
+    if (cutaway && part.cover) continue;
+    const override = pose[part.id] ?? {};
+    for (const k2 of Object.keys(override)) if (!["at", "rotation", "from", "to"].includes(k2)) throw Error("Motion mechanism: unsupported pose field " + k2);
+    const p2 = { ...part, ...override }, key2 = JSON.stringify(p2);
+    let geometry = cache.get(part.id);
+    if (geometry?.key !== key2) {
+      validateScene({ parts: [p2] });
+      geometry = { key: key2, ...partGeometry(p2) };
+      cache.set(part.id, geometry);
+    }
+    const offset = mul(p2.explode ?? [0, 0, 0], explode), floor = Math.min(...geometry.points.map((v2) => v2[2])) + offset[2], active = selected === "all" || selected === part.id || selected === part.group;
+    if (geometry.line) {
+      const points = geometry.line.map((v2) => add(v2, offset));
+      faces.push({ floor, key: p2.id + "_line", part: p2.id, group: p2.group, d: points.map((v2, i) => (i ? "L" : "M") + iso(v2, projection).join(" ")).join(""), depth: depthOf(points[Math.floor(points.length / 2)], projection), line: true, tone: 1, material: p2.material ?? "metal", active });
+      continue;
+    }
+    for (const [index, face] of geometry.faces.entries()) {
+      const facing = dot(face.normal, view);
+      if (facing <= 1e-4) continue;
+      const points = face.points.map((v2) => add(v2, offset)), holes = face.holes?.map((h19) => h19.map((v2) => add(v2, offset))), center = mul(points.reduce((s, v2) => add(s, v2), [0, 0, 0]), 1 / points.length), light = dot(face.normal, [-0.25, -0.4, 0.88]);
+      faces.push({ floor, key: p2.id + "_" + index, part: p2.id, group: p2.group, d: path(points.map((v2) => iso(v2, projection))) + (holes ?? []).map((h19) => path(h19.map((v2) => iso(v2, projection)))).join(""), depth: depthOf(center, projection), line: false, tone: light > 0.5 ? 0 : light > 0.1 ? 1 : light > -0.4 ? 2 : 3, material: p2.material ?? "metal", active });
+    }
+  }
+  if (faces.length > 8192) throw Error("Motion mechanism: face budget exceeded");
+  return faces.sort((a2, b2) => a2.floor - b2.floor || a2.depth - b2.depth || a2.key.localeCompare(b2.key));
+}
+function sceneSvg(spec, options = {}) {
+  const projection = projectionFor(spec, options), faces = renderFaces(spec, projection, options).filter((f) => !options.preview || f.tone === 0 || f.line);
+  const runs = [];
+  for (const f of faces) {
+    const last = runs.at(-1);
+    if (last && last.material === f.material && last.tone === f.tone && last.line === f.line) last.d += f.d;
+    else runs.push({ ...f });
+  }
+  const shapes = runs.map((f) => '<path data-material="' + f.material + '" data-tone="' + f.tone + '" d="' + f.d + '" fill-rule="evenodd"' + (f.line ? ' data-line=""' : "") + "/>").join("");
+  return '<svg class="mui-mechanism-svg" viewBox="0 0 600 340" role="img" aria-label="' + (options.preview ? "\u7ED3\u6784\u8F6E\u5ED3\u9884\u89C8\uFF1B\u5B8C\u6210\u540E\u663E\u793A\u7ACB\u4F53\u7EC6\u8282" : "\u7ED3\u6784\u56FE\u89E3\u9884\u89C8") + '">' + shapes + "</svg>";
+}
+
+// lib/mechanism-css.js
+var MECHANISM_CSS = `
+.mui-mechanism{font:15px/1.7 system-ui,sans-serif;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:24px;padding:20px;max-width:100%;box-sizing:border-box}.mui-mechanism *{box-sizing:border-box}.mui-mechanism h2{font-size:22px;line-height:1.35;margin:0 0 8px;font-weight:750}.mui-mechanism p{margin:0;color:var(--canvas-muted)}
+.mui-mechanism-svg{display:block;width:100%;height:auto;max-height:420px;touch-action:pan-y}.mui-mechanism-svg path{stroke:color-mix(in srgb,var(--canvas-ink) 38%,var(--canvas-bg));stroke-width:.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;fill:var(--mech-base,var(--canvas-soft))}.mui-mechanism-svg [data-material=metal]{--mech-base:color-mix(in srgb,var(--canvas-muted) 32%,var(--canvas-bg))}.mui-mechanism-svg [data-material=dark]{--mech-base:color-mix(in srgb,var(--canvas-ink) 78%,var(--canvas-bg))}.mui-mechanism-svg [data-material=accent]{--mech-base:var(--canvas-accent)}.mui-mechanism-svg [data-material=cool]{--mech-base:color-mix(in srgb,#22998a 70%,var(--canvas-bg))}.mui-mechanism-svg [data-material=warm]{--mech-base:color-mix(in srgb,#dd9c42 75%,var(--canvas-bg))}
+.mui-mechanism-svg [data-tone="0"]{fill:color-mix(in srgb,var(--mech-base) 74%,var(--canvas-bg))}.mui-mechanism-svg [data-tone="1"]{fill:var(--mech-base)}.mui-mechanism-svg [data-tone="2"]{fill:color-mix(in srgb,var(--mech-base) 85%,var(--canvas-ink))}.mui-mechanism-svg [data-tone="3"]{fill:color-mix(in srgb,var(--mech-base) 68%,var(--canvas-ink))}.mui-mechanism-svg [data-line]{fill:none;stroke:var(--mech-base);stroke-width:2}.mui-mechanism-svg [data-active=false]{opacity:.2}.mui-mechanism-svg [data-active=true]{opacity:1}
+.mui-mechanism-nav{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px}.mui-mechanism button{font:inherit;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:999px;padding:6px 13px;cursor:pointer;min-height:36px}.mui-mechanism button[aria-pressed=true]{color:var(--canvas-bg);background:var(--canvas-ink);border-color:var(--canvas-ink)}.mui-mechanism button:focus-visible,.mui-mechanism input:focus-visible{outline:2px solid var(--canvas-accent);outline-offset:3px}.mui-mechanism button:disabled{opacity:.5;cursor:default}
+.mui-mechanism-controls{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:12px 14px;border-radius:16px;background:var(--canvas-soft);margin:8px 0}.mui-mechanism-controls label{display:flex;align-items:center;gap:9px;flex:1 1 180px;min-width:0}.mui-mechanism-controls input[type=range]{flex:1;min-width:70px;accent-color:var(--canvas-accent)}.mui-mechanism-controls input[type=checkbox]{accent-color:var(--canvas-accent)}.mui-mechanism-controls output{font-variant-numeric:tabular-nums;min-width:40px;text-align:right;font-weight:650}.mui-mechanism-readout{display:block;padding:10px 0;font-weight:700;font-variant-numeric:tabular-nums;color:var(--canvas-ink)}.mui-mechanism-description{min-height:0;font-size:14px}
+.mui-mechanism[data-style=editorial]{border:0;border-top:1px solid var(--canvas-line);border-radius:0;padding:16px 0}.mui-mechanism[data-style=editorial] h2{font-family:ui-serif,Georgia,serif;font-weight:650}.mui-mechanism[data-style=editorial] .mui-mechanism-controls{border-radius:0;background:transparent;border-block:1px solid var(--canvas-line)}
+.mui-mechanism[data-style=technical]{border-radius:10px}.mui-mechanism[data-style=technical] button,.mui-mechanism[data-style=technical] .mui-mechanism-controls{border-radius:6px}.mui-mechanism[data-style=technical] .mui-mechanism-readout{font-family:ui-monospace,Consolas,monospace}
+.mui-mechanism[data-style=soft]{border:0;background:var(--canvas-soft);border-radius:28px 28px 28px 10px}.mui-mechanism[data-style=soft] .mui-mechanism-controls{background:var(--canvas-bg);border-radius:22px}.mui-mechanism[data-style=expressive] h2{font-size:28px;font-weight:850;border-left:5px solid var(--canvas-accent);padding-left:14px}.mui-mechanism[data-style=expressive]{border:0;border-radius:0}.mui-mechanism[data-style=prismframe]{border:1.5px solid var(--canvas-line);box-shadow:4px 5px 0 color-mix(in srgb,var(--canvas-accent) 14%,var(--canvas-bg))}.mui-mechanism[data-style=aurora]{border-radius:28px;box-shadow:0 16px 30px -25px #30204d66}.mui-mechanism[data-style=aurora] .mui-mechanism-controls{border-radius:24px}
+@media(max-width:500px){.mui-mechanism{padding:14px;border-radius:20px}.mui-mechanism h2{font-size:20px}.mui-mechanism-controls{padding:10px}.mui-mechanism-nav{gap:5px}.mui-mechanism button{padding:6px 10px;font-size:14px}}
+@media(prefers-reduced-motion:reduce){.mui-mechanism *{animation:none!important;transition:none!important}}
+@media(forced-colors:active){.mui-mechanism-svg path{fill:Canvas;stroke:CanvasText}.mui-mechanism button[aria-pressed=true]{background:Highlight;color:HighlightText}}
+`;
+
+// lib/mechanism-catalog.js
+var MECHANISM_SCENES = [{ id: "assembly", title: "\u5206\u5C42\u88C5\u914D\u4E0E\u90E8\u4EF6\u804C\u8D23", description: "22\u4E2A\u90E8\u4EF6\u3001\u6309\u7EC4\u9009\u62E9\u3001\u8FDE\u7EED\u62C6\u89E3\u3001\u9690\u85CF\u5916\u58F3\u3002" }, { id: "gears", title: "\u9F7F\u8F6E\u4F20\u52A8\u4E0E\u901F\u6BD4", description: "\u6539\u53D8\u4ECE\u52A8\u9F7F\u6570\u3001\u8F93\u5165\u8F6C\u901F\uFF0C\u89C2\u5BDF\u53CD\u5411\u8F6C\u52A8\u4E0E\u7CBE\u786E\u901F\u6BD4\u3002" }, { id: "crank", title: "\u66F2\u67C4\u8FDE\u6746\u4E0E\u5F80\u590D\u8FD0\u52A8", description: "\u6539\u53D8\u66F2\u67C4\u534A\u5F84\u548C\u89D2\u5EA6\uFF0C\u8FDE\u6746\u957F\u5EA6\u4FDD\u6301\u4E0D\u53D8\uFF0C\u89C2\u5BDF\u6ED1\u5757\u4F4D\u7F6E\u4E0E\u884C\u7A0B\u3002" }];
+var n = (value, min, max, step = 1) => ({ type: "number", default: value, min, max, step });
+function mechanismExample(name) {
+  if (!MECHANISM_SCENES.some((s) => s.id === name)) throw Error("Motion mechanism: scene must be assembly/gears/crank");
+  const scene = { assembly: assemblyScene, gears: gearsScene, crank: crankScene }[name]();
+  const state = { explode: n(name === "assembly" ? 0.45 : 0, 0, 1, 0.01), selected: { type: "string", default: "all" }, cutaway: { type: "boolean", default: name === "gears" } };
+  const bind = { explode: "explode", selected: "selected", cutaway: "cutaway" }, nodes = [];
+  if (name !== "assembly") {
+    Object.assign(state, { rpm: n(20, 0, 90), running: { type: "boolean", default: false }, angle: n(0, 0, 360) });
+    Object.assign(bind, { rpm: "rpm", running: "running", angle: "angle" });
+    nodes.push({ id: "rpm", type: "slider", label: "\u8F93\u5165\u8F6C\u901F\uFF08rpm\uFF09", bind: "state.rpm" }, { id: "angle", type: "slider", label: "\u624B\u52A8\u89D2\u5EA6\uFF08\xB0\uFF0C\u6682\u505C\u65F6\u8C03\u8282\uFF09", bind: "state.angle" }, { id: "running", type: "toggle", label: "\u8FD0\u884C\u673A\u68B0\u793A\u610F", bind: "state.running" });
+  }
+  if (name === "gears") {
+    state.teeth = n(32, 16, 48);
+    bind.teeth = "teeth";
+    nodes.unshift({ id: "teeth", type: "slider", label: "\u4ECE\u52A8\u8F6E\u9F7F\u6570\uFF08\u4E3B\u52A8\u8F6E16\u9F7F\uFF09", bind: "state.teeth" });
+  }
+  if (name === "crank") {
+    state.radius = n(20, 10, 28);
+    bind.radius = "radius";
+    nodes.unshift({ id: "radius", type: "slider", label: "\u66F2\u67C4\u534A\u5F84\uFF08\u793A\u610F\u957F\u5EA6\u5355\u4F4D\uFF09", bind: "state.radius" });
+  }
+  const fallback = name === "assembly" ? "\u5E95\u5EA7\u652F\u6491\u529F\u80FD\u677F\uFF0C\u5904\u7406\u6A21\u5757\u4E0A\u65B9\u4E3A\u6563\u70ED\u5C42\uFF0C\u5916\u58F3\u4FDD\u62A4\u5185\u90E8\u3002\u62C6\u89E3\u8868\u793A\u88C5\u914D\u5173\u7CFB\uFF0C\u4E0D\u8868\u793A\u53D7\u529B\u8FD0\u52A8\u3002" : name === "gears" ? "\u5916\u556E\u5408\u9F7F\u8F6E\u53CD\u5411\u8F6C\u52A8\u3002\u4E3B\u52A8\u8F6E16\u9F7F\u300120 rpm\uFF0C\u4ECE\u52A8\u8F6E\u9ED8\u8BA432\u9F7F\u3001-10 rpm\uFF0C\u4E2D\u5FC3\u8DDD\u7531\u6A21\u6570\u548C\u9F7F\u6570\u786E\u5B9A\u3002\u9F7F\u5F62\u4E3A\u7B80\u5316\u793A\u610F\uFF0C\u4E0D\u7528\u4E8E\u52A0\u5DE5\u3002" : "\u65CB\u8F6C\u66F2\u67C4\u5E26\u52A8\u5B9A\u957F\u8FDE\u6746\uFF0C\u6ED1\u5757\u6CBF\u5BFC\u8F68\u5F80\u590D\u3002\u9ED8\u8BA4\u534A\u5F8420\u3001\u6746\u957F70\uFF0C\u5B8C\u6574\u884C\u7A0B40\uFF0C\u4F4D\u7F6E\u7531\u51E0\u4F55\u7EA6\u675F\u8BA1\u7B97\u3002\u975E\u52A8\u529B\u5B66\u4EFF\u771F\u3002";
+  nodes.unshift({ id: "mechanism", type: "sandbox", title: scene.title, fallback, height: 560, libraries: ["mechanism"], stateKeys: Object.keys(state), html: '<div id="diagram"><section class="mui-mechanism">' + sceneSvg(scene, { explode: state.explode.default, cutaway: state.cutaway.default, preview: true }) + "<p>" + fallback + "</p></section></div>", css: MECHANISM_CSS, script: 'const diagram=DSHUI.mechanism.mountDemo("#diagram",' + JSON.stringify(name) + ',{title:"",bind:' + JSON.stringify(bind) + '});addEventListener("pagehide",()=>diagram.destroy(),{once:true});' });
+  nodes.push({ id: "accuracy", type: "text", text: fallback });
+  return validateDocument({ version: 1, title: scene.title, fallback, state, nodes });
+}
+
+// lib/mechanism-entry.js
+function mechanismDocument(args = {}) {
+  for (const key2 of Object.keys(args)) if (!["scene", "title", "rpm", "teeth", "radius", "running", "angle", "explode"].includes(key2)) throw Error("DSH UI: unknown render_mechanism argument " + key2);
+  for (const key2 of ["teeth", "radius", "angle"]) if (args[key2] !== void 0 && !Number.isInteger(args[key2])) throw Error("DSH UI: " + key2 + " must be an integer");
+  const doc = mechanismExample(args.scene), node = doc.nodes[0];
+  for (const key2 of ["rpm", "teeth", "radius", "running", "angle", "explode"]) if (args[key2] !== void 0) {
+    if (!doc.state[key2]) throw Error("DSH UI: " + key2 + " is not used by " + args.scene);
+    doc.state[key2].default = args[key2];
+  }
+  validateDocument(doc);
+  if (args.title !== void 0) {
+    doc.title = args.title;
+    node.title = args.title;
+  }
+  const s = Object.fromEntries(Object.entries(doc.state).map(([k2, v2]) => [k2, v2.default]));
+  const fallback = args.scene === "gears" ? `\u5916\u556E\u5408\u9F7F\u8F6E\u53CD\u5411\u8F6C\u52A8\u3002\u4E3B\u52A8\u8F6E16\u9F7F\u3001${s.rpm} rpm\uFF1B\u4ECE\u52A8\u8F6E${s.teeth}\u9F7F\u3001${formatNumber(-s.rpm * 16 / s.teeth, 2)} rpm\u3002\u901F\u5EA6\u6BD4\u7531\u9F7F\u6570\u786E\u5B9A\uFF0C\u9F7F\u5F62\u4E3A\u7B80\u5316\u793A\u610F\uFF0C\u4E0D\u7528\u4E8E\u52A0\u5DE5\u3002` : args.scene === "crank" ? `\u66F2\u67C4\u65CB\u8F6C\u5E26\u52A8\u5B9A\u957F\u8FDE\u6746\uFF0C\u6ED1\u5757\u6CBF\u5BFC\u8F68\u5F80\u590D\u3002\u66F2\u67C4\u534A\u5F84${s.radius}\u3001\u8FDE\u6746\u957F\u5EA670\uFF0C\u5B8C\u6574\u884C\u7A0B${s.radius * 2}\uFF0C\u957F\u5EA6\u4E3A\u793A\u610F\u5355\u4F4D\uFF0C\u975E\u52A8\u529B\u5B66\u4EFF\u771F\u3002` : doc.fallback;
+  doc.fallback = node.fallback = "\u521D\u59CB\u53C2\u6570\u793A\u610F\uFF1A" + fallback;
+  doc.nodes.at(-1).text = args.scene === "gears" ? "\u5916\u556E\u5408\u9F7F\u8F6E\u8F6C\u5411\u76F8\u53CD\uFF1B\u4ECE\u52A8\u8F6C\u901F = \u2212\u4E3B\u52A8\u8F6C\u901F \xD7 \u4E3B\u52A8\u9F7F\u6570 \xF7 \u4ECE\u52A8\u9F7F\u6570\u3002\u5F53\u524D\u53C2\u6570\u4E0E\u6570\u503C\u89C1\u56FE\u4E2D\u5B9E\u65F6\u8BFB\u6570\u3002\u7B80\u5316\u9F7F\u5F62\uFF0C\u4E0D\u7528\u4E8E\u52A0\u5DE5\u3002" : args.scene === "crank" ? "\u8FDE\u6746\u957F\u5EA6\u56FA\u5B9A\u4E3A70\uFF0C\u6ED1\u5757\u6CBF\u5BFC\u8F68\u5F80\u590D\uFF1B\u5B8C\u6574\u884C\u7A0B\u7B49\u4E8E\u66F2\u67C4\u534A\u5F84\u7684\u4E24\u500D\u3002\u5F53\u524D\u534A\u5F84\u3001\u4F4D\u7F6E\u548C\u884C\u7A0B\u89C1\u5B9E\u65F6\u8BFB\u6570\u3002\u957F\u5EA6\u4E3A\u793A\u610F\u5355\u4F4D\uFF0C\u975E\u52A8\u529B\u5B66\u4EFF\u771F\u3002" : fallback;
+  const scene = args.scene === "assembly" ? assemblyScene() : args.scene === "gears" ? gearsScene({ drivenTeeth: s.teeth }) : crankScene({ radius: s.radius, angle: s.angle * Math.PI / 180 });
+  if (args.scene === "gears") {
+    const phase = s.angle * Math.PI / 180;
+    scene.parts.find((p2) => p2.id === "driverGear").rotation = phase;
+    scene.parts.find((p2) => p2.id === "drivenGear").rotation = -phase * 16 / s.teeth + Math.PI - Math.PI / s.teeth;
+  }
+  node.html = '<div id="diagram"><section class="mui-mechanism">' + sceneSvg(scene, { explode: s.explode, cutaway: s.cutaway, preview: true }) + "<p>" + fallback + "</p></section></div>";
+  return validateDocument(doc);
+}
+function previewMechanism(raw) {
+  try {
+    if (typeof raw !== "string" || raw.length > 2048) return null;
+    return mechanismDocument(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+}
+
 // src/stream-surface.js
-var import_react12 = __toESM(require("react"), 1);
+var import_react14 = __toESM(require("react"), 1);
 var import_client = require("react-dom/client");
-var h7 = import_react12.default.createElement;
+var h9 = import_react14.default.createElement;
 var roots2 = /* @__PURE__ */ new WeakMap();
 function StreamNodeView({ node, sessionId }) {
-  return h7(StreamSurface, { stream: node.data, sessionId });
+  return h9(StreamSurface, { stream: node.data, sessionId });
 }
 function dispose(entry) {
   if (entry.disposed) return;
@@ -3946,19 +4688,19 @@ function dispose(entry) {
 function publish(entry, calls, invalidated = []) {
   for (const key2 of invalidated) entry.previews.delete(key2);
   for (const call of calls) {
-    const doc = call.name === "render_text" ? previewText(call.raw) : previewDocument(call.raw);
-    const canvas2 = call.name === "render_canvas" ? previewCanvas(call.raw) : null;
-    if (doc || canvas2) entry.previews.set(call.callId, { call, doc, canvas: canvas2 });
+    const doc = call.name === "render_mechanism" ? previewMechanism(call.raw) : call.name === "render_text" ? previewText(call.raw) : previewDocument(call.raw);
+    const canvas = call.name === "render_canvas" ? previewCanvas(call.raw) : null;
+    if (doc || canvas) entry.previews.set(call.callId, { call, doc, canvas });
   }
-  entry.root.render(h7(import_react12.default.Fragment, null, [...entry.previews.values()].map(({ call, doc, canvas: canvas2 }) => h7(
+  entry.root.render(h9(import_react14.default.Fragment, null, [...entry.previews.values()].map(({ call, doc, canvas }) => h9(
     UiBoundary,
-    { key: call.callId, fallback: doc?.fallback ?? canvas2?.fallback },
-    doc ? h7(UiView, { record: { document: doc, documentId: `preview-${call.callId}` }, sessionId: entry.sessionId, preview: true }) : h7("div", { className: "dgui-root", "data-preview": true }, h7(CanvasPreview, { node: canvas2 }))
+    { key: call.callId, fallback: doc?.fallback ?? canvas?.fallback },
+    doc ? h9(UiView, { record: { document: doc, documentId: `preview-${call.callId}` }, sessionId: entry.sessionId, preview: true }) : h9("div", { className: "dgui-root", "data-preview": true }, h9(CanvasPreview, { node: canvas }))
   ))));
 }
 function StreamSurface({ stream, sessionId, committedIds = [] }) {
-  const anchor = (0, import_react12.useRef)(null);
-  (0, import_react12.useLayoutEffect)(() => {
+  const anchor = (0, import_react14.useRef)(null);
+  (0, import_react14.useLayoutEffect)(() => {
     const scroll = anchor.current?.closest("[data-conversation-scroll]");
     if (!scroll) return;
     let entries = roots2.get(scroll);
@@ -4002,11 +4744,11 @@ function StreamSurface({ stream, sessionId, committedIds = [] }) {
       publish(entry, entry.latest, entry.invalidated);
     }, 120);
   }, [stream, sessionId]);
-  return h7("span", { ref: anchor, hidden: true });
+  return h9("span", { ref: anchor, hidden: true });
 }
 
 // src/visual-view.js
-var import_react13 = __toESM(require("react"), 1);
+var import_react15 = __toESM(require("react"), 1);
 var JSX = __toESM(require("react/jsx-runtime"), 1);
 
 // src/visual-state.js
@@ -4019,16 +4761,16 @@ function visualStateSignature(state = {}, defaults = {}) {
 function visualDefaults(spec) {
   const fields2 = {};
   const walk = (items) => {
-    for (const n of items ?? []) {
-      if (!n || typeof n !== "object") continue;
-      if (n.id) {
-        if (["input", "textarea"].includes(n.type) && typeof n.value === "string") fields2[n.id] = n.value;
-        if (n.type === "slider") fields2[n.id] = String(n.value ?? n.min ?? 0);
-        if (n.type === "select" && Number.isInteger(n.selected) && typeof n.options?.[n.selected] === "string") fields2[n.id] = n.options[n.selected];
+    for (const n2 of items ?? []) {
+      if (!n2 || typeof n2 !== "object") continue;
+      if (n2.id) {
+        if (["input", "textarea"].includes(n2.type) && typeof n2.value === "string") fields2[n2.id] = n2.value;
+        if (n2.type === "slider") fields2[n2.id] = String(n2.value ?? n2.min ?? 0);
+        if (n2.type === "select" && Number.isInteger(n2.selected) && typeof n2.options?.[n2.selected] === "string") fields2[n2.id] = n2.options[n2.selected];
       }
-      if (["card", "row", "col", "grid"].includes(n.type)) walk(n.items);
-      if (n.type === "tabs") for (const t of n.tabs ?? []) walk(t.items);
-      if (n.type === "accordion") for (const t of n.items ?? []) walk(t.items);
+      if (["card", "row", "col", "grid"].includes(n2.type)) walk(n2.items);
+      if (n2.type === "tabs") for (const t of n2.tabs ?? []) walk(t.items);
+      if (n2.type === "accordion") for (const t of n2.items ?? []) walk(t.items);
     }
   };
   walk(spec.items);
@@ -4036,7 +4778,7 @@ function visualDefaults(spec) {
 }
 
 // src/visual-view.js
-var h8 = import_react13.default.createElement;
+var h10 = import_react15.default.createElement;
 var base = "/api/plugins/dsh-generative-ui/assets/";
 var pending;
 function loadVisual() {
@@ -4054,7 +4796,7 @@ function loadVisual() {
     script.onload = () => {
       try {
         const core = window.__MotionVisualFactory((name) => {
-          if (name === "react") return import_react13.default;
+          if (name === "react") return import_react15.default;
           if (name === "react/jsx-runtime") return JSX;
           throw Error("Unexpected visual dependency " + name);
         });
@@ -4078,14 +4820,14 @@ function loadVisual() {
 function VisualView({ node, state, update, disabled, preview, sendPrompt, openFile, provenance, documentTitle }) {
   const defaults = visualDefaults(node.spec), stateSignature = (v2) => visualStateSignature(v2, defaults);
   const showDetails = useViewDetails();
-  const [core, setCore] = (0, import_react13.useState)(), [error, setError] = (0, import_react13.useState)(""), [epoch, setEpoch] = (0, import_react13.useState)(0), [busy, setBusy] = (0, import_react13.useState)(false), [feedback, setFeedback] = (0, import_react13.useState)("");
-  const last = (0, import_react13.useRef)(stateSignature(state)), latest = (0, import_react13.useRef)(state), sending = (0, import_react13.useRef)(false), source = (0, import_react13.useRef)(node.spec);
+  const [core, setCore] = (0, import_react15.useState)(), [error, setError] = (0, import_react15.useState)(""), [epoch, setEpoch] = (0, import_react15.useState)(0), [busy, setBusy] = (0, import_react15.useState)(false), [feedback, setFeedback] = (0, import_react15.useState)("");
+  const last = (0, import_react15.useRef)(stateSignature(state)), latest = (0, import_react15.useRef)(state), sending = (0, import_react15.useRef)(false), source = (0, import_react15.useRef)(node.spec);
   latest.current = state;
   if (source.current !== node.spec) {
     source.current = node.spec;
     last.current = stateSignature(state);
   }
-  (0, import_react13.useEffect)(() => {
+  (0, import_react15.useEffect)(() => {
     let live = true;
     loadVisual().then((c) => {
       if (live) setCore(c);
@@ -4096,7 +4838,7 @@ function VisualView({ node, state, update, disabled, preview, sendPrompt, openFi
       live = false;
     };
   }, []);
-  (0, import_react13.useEffect)(() => {
+  (0, import_react15.useEffect)(() => {
     const serialized = stateSignature(state);
     if (serialized !== last.current) {
       last.current = serialized;
@@ -4133,7 +4875,7 @@ function VisualView({ node, state, update, disabled, preview, sendPrompt, openFi
       setBusy(false);
     }
   };
-  if (!core) return h8("p", { role: "status" }, error || "\u6B63\u5728\u52A0\u8F7D\u53EF\u89C6\u5316\u7EC4\u4EF6\u2026");
+  if (!core) return h10("p", { role: "status" }, error || "\u6B63\u5728\u52A0\u8F7D\u53EF\u89C6\u5316\u7EC4\u4EF6\u2026");
   const spec = node.spec.title === documentTitle ? { ...node.spec, title: void 0 } : node.spec;
   const exportAs = async (format) => {
     try {
@@ -4145,9 +4887,9 @@ function VisualView({ node, state, update, disabled, preview, sendPrompt, openFi
       setError("\u5BFC\u51FA\u5931\u8D25\uFF1A" + e.message);
     }
   };
-  const content = h8(core.ErrorBoundary, { label: "Motion UI" }, h8(core.GenuiBlock, { key: epoch, spec, initialState: state, animateEntrance: !preview, onStateChange: preview ? () => {
+  const content = h10(core.ErrorBoundary, { label: "Motion UI" }, h10(core.GenuiBlock, { key: epoch, spec, initialState: state, animateEntrance: !preview, onStateChange: preview ? () => {
   } : changed }));
-  return h8("section", { "data-ui-node": node.id, "data-motion-visual": true }, h8("div", { inert: disabled || preview || busy ? "" : void 0, "aria-busy": busy }, h8(core.GenuiActionContext.Provider, { value: action }, h8(core.FileLinkOpenContext.Provider, { value: disabled || preview ? void 0 : openFile }, content))), showDetails && !preview && h8("div", { className: "dgui-row" }, h8("button", { type: "button", disabled, onClick: () => exportAs("html") }, "\u5BFC\u51FA HTML"), h8("button", { type: "button", disabled, onClick: () => exportAs("json") }, "\u5BFC\u51FA JSON")), error && h8("p", { role: "alert" }, error), feedback && h8("p", { role: "status" }, feedback));
+  return h10("section", { "data-ui-node": node.id, "data-motion-visual": true }, h10("div", { inert: disabled || preview || busy ? "" : void 0, "aria-busy": busy }, h10(core.GenuiActionContext.Provider, { value: action }, h10(core.FileLinkOpenContext.Provider, { value: disabled || preview ? void 0 : openFile }, content))), showDetails && !preview && h10("div", { className: "dgui-row" }, h10("button", { type: "button", disabled, onClick: () => exportAs("html") }, "\u5BFC\u51FA HTML"), h10("button", { type: "button", disabled, onClick: () => exportAs("json") }, "\u5BFC\u51FA JSON")), error && h10("p", { role: "alert" }, error), feedback && h10("p", { role: "status" }, feedback));
 }
 
 // lib/delivery.js
@@ -4188,8 +4930,8 @@ function resolveSourceFence(raw, { svg = false } = {}) {
 }
 
 // src/copy-block.js
-var import_react14 = __toESM(require("react"), 1);
-var h9 = import_react14.default.createElement;
+var import_react16 = __toESM(require("react"), 1);
+var h11 = import_react16.default.createElement;
 async function copyContent(text2) {
   try {
     if (typeof navigator.clipboard?.writeText === "function") {
@@ -4228,34 +4970,36 @@ var COPY_BLOCK_CSS = `
 .motion-copy-title{flex:1;min-width:0;overflow-wrap:anywhere}.motion-copy-button{display:inline-flex!important;align-items:center;justify-content:center;flex:none;width:32px;height:32px;padding:6px!important;border:0!important;border-radius:10px!important;background:transparent!important;color:inherit;font:inherit;cursor:pointer;margin-left:auto}
 .motion-copy-button:hover{background:var(--du-line,#8882)!important;color:var(--du-ink,inherit)}.motion-copy-button:focus-visible{outline:2px solid var(--du-accent,#508bff);outline-offset:2px}.motion-copy-button:disabled{opacity:.45;cursor:default}.motion-copy-button[data-status=done]{color:var(--du-green,#17995a)}.motion-copy-button[data-status=error]{color:var(--du-red,#d54b5b)}
 .motion-copy-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}.motion-copy-code{margin:0!important;padding:0!important;border:0!important;background:transparent!important;overflow:auto;white-space:pre!important;tab-size:2;font:14px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace}.motion-copy-code[data-wrap]{white-space:pre-wrap!important;overflow-wrap:anywhere}.motion-copy-code code{font:inherit!important;background:none!important;padding:0!important;color:inherit!important}.motion-copy-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.motion-copy-button[data-status=done] .dgui-icon{animation:motion-copy-confirm 420ms cubic-bezier(.34,1.45,.64,1)}.motion-copy-button[data-status=done] path{stroke-dasharray:28;animation:motion-check-draw 450ms ease-out}@keyframes motion-check-draw{from{stroke-dashoffset:28}to{stroke-dashoffset:0}}@keyframes motion-copy-confirm{from{opacity:.5;transform:scale(.8)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.motion-copy-button .dgui-icon,.motion-copy-button path{animation:none!important;transition:none!important}}
 @media(max-width:600px){.motion-copy-block{padding:14px 16px;border-radius:20px}}
 `;
 function CopyBlock({ text: text2, children, title, lang, code = false, wrap = false, disabled = false, style, nodeId, copyLabel, copiedLabel }) {
-  const [status, setStatus] = (0, import_react14.useState)("idle"), timer = (0, import_react14.useRef)();
-  (0, import_react14.useEffect)(() => () => clearTimeout(timer.current), []);
+  const [status, setStatus] = (0, import_react16.useState)("idle"), timer = (0, import_react16.useRef)();
+  (0, import_react16.useEffect)(() => () => clearTimeout(timer.current), []);
   const label = status === "done" ? copiedLabel ?? "\u5DF2\u590D\u5236" : status === "error" ? "\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u5185\u5BB9" : copyLabel ?? (code ? "\u590D\u5236\u4EE3\u7801" : "\u590D\u5236\u6587\u672C");
-  async function copy() {
+  async function copy2() {
     clearTimeout(timer.current);
     setStatus("copying");
     const ok = await copyContent(text2);
     setStatus(ok ? "done" : "error");
     timer.current = setTimeout(() => setStatus("idle"), 2e3);
   }
-  return h9("section", { className: "motion-copy-block", "data-code": code || void 0, "data-ui-node": nodeId, style }, h9("style", null, COPY_BLOCK_CSS), h9("div", { className: "motion-copy-bar" }, code && h9("span", { "aria-hidden": true }, "\u3008/\u3009"), h9("span", { className: "motion-copy-title" }, title ?? (code ? lang || "\u4EE3\u7801" : "\u6587\u672C")), h9("button", { className: "motion-copy-button", type: "button", title: label, "aria-label": label, "data-status": status, disabled: disabled || status === "copying", onClick: copy }, h9(Icon, { name: status === "done" ? "check" : status === "error" ? "warning" : "copy" })), h9("span", { className: "motion-copy-sr", role: "status", "aria-live": "polite" }, status === "done" ? "\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F" : status === "error" ? label : "")), code ? h9("pre", { className: "motion-copy-code", "data-wrap": wrap || void 0 }, h9("code", { "data-language": lang }, text2)) : h9("div", { className: "motion-copy-body" }, children ?? text2));
+  return h11("section", { className: "motion-copy-block", "data-copy-status": status, "data-code": code || void 0, "data-ui-node": nodeId, style }, h11("style", null, COPY_BLOCK_CSS), h11("div", { className: "motion-copy-bar" }, code && h11("span", { "aria-hidden": true }, "\u3008/\u3009"), h11("span", { className: "motion-copy-title" }, title ?? (code ? lang || "\u4EE3\u7801" : "\u6587\u672C")), h11("button", { className: "motion-copy-button", type: "button", title: label, "aria-label": label, "data-status": status, disabled: disabled || status === "copying", onClick: copy2 }, h11(Icon, { name: status === "done" ? "check" : status === "error" ? "warning" : "copy" })), h11("span", { className: "motion-copy-sr", role: "status", "aria-live": "polite" }, status === "done" ? "\u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F" : status === "error" ? label : "")), code ? h11("pre", { className: "motion-copy-code", "data-wrap": wrap || void 0 }, h11("code", { "data-language": lang }, text2)) : h11("div", { className: "motion-copy-body" }, children ?? text2));
 }
 
 // src/view.js
-var h10 = import_react15.default.createElement;
+var h12 = import_react17.default.createElement;
 var display = (value) => value === void 0 || value === null ? "\u2014" : typeof value === "object" ? JSON.stringify(value) : String(value);
-function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
-  const [draft, setDraft] = (0, import_react15.useState)(String(value)), [invalid, setInvalid] = (0, import_react15.useState)(false);
-  (0, import_react15.useEffect)(() => {
+function NumericInput({ id: id2, spec, value, onChange, invalidChanged, disabled }) {
+  const [draft, setDraft] = (0, import_react17.useState)(String(value)), [invalid, setInvalid] = (0, import_react17.useState)(false);
+  (0, import_react17.useEffect)(() => {
     setDraft(String(value));
     setInvalid(false);
-    invalidChanged(id, false);
-  }, [value, id, invalidChanged]);
-  return h10("input", {
-    id,
+    invalidChanged(id2, false);
+  }, [value, id2, invalidChanged]);
+  return h12("input", {
+    id: id2,
     type: "number",
     value: draft,
     min: spec.min,
@@ -4266,24 +5010,24 @@ function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
     onChange(e) {
       const text2 = e.target.value;
       setDraft(text2);
-      const n = Number(text2), bad = text2.trim() === "" || !Number.isFinite(n) || n < spec.min || n > spec.max || Math.abs((n - spec.min) / spec.step - Math.round((n - spec.min) / spec.step)) > 1e-6;
+      const n2 = Number(text2), bad = text2.trim() === "" || !Number.isFinite(n2) || n2 < spec.min || n2 > spec.max || Math.abs((n2 - spec.min) / spec.step - Math.round((n2 - spec.min) / spec.step)) > 1e-6;
       setInvalid(bad);
-      invalidChanged(id, bad);
-      if (!bad) onChange(n);
+      invalidChanged(id2, bad);
+      if (!bad) onChange(n2);
     }
   });
 }
-function Table({ rows, columns, id, label }) {
-  return h10("div", { className: "dgui-table-wrap" }, h10(
+function Table({ rows, columns, id: id2, label }) {
+  return h12("div", { className: "dgui-table-wrap" }, h12(
     "table",
-    { "data-ui-node": id },
-    label && h10("caption", null, label),
-    h10("thead", null, h10("tr", null, columns.map((c) => h10("th", { key: c.key, scope: "col" }, c.label, c.unit ? ` (${c.unit})` : "")))),
-    h10("tbody", null, rows.length ? rows.map((row, i) => h10("tr", { key: i }, columns.map((c) => h10("td", { key: c.key, "data-numeric": typeof row[c.key] === "number" }, display(Object.hasOwn(row, c.key) ? row[c.key] : void 0))))) : h10("tr", null, h10("td", { colSpan: columns.length }, "\u6682\u65E0\u6570\u636E")))
+    { "data-ui-node": id2 },
+    label && h12("caption", null, label),
+    h12("thead", null, h12("tr", null, columns.map((c) => h12("th", { key: c.key, scope: "col" }, c.label, c.unit ? ` (${c.unit})` : "")))),
+    h12("tbody", null, rows.length ? rows.map((row, i) => h12("tr", { key: i }, columns.map((c) => h12("td", { key: c.key, "data-numeric": typeof row[c.key] === "number" }, display(Object.hasOwn(row, c.key) ? row[c.key] : void 0))))) : h12("tr", null, h12("td", { colSpan: columns.length }, "\u6682\u65E0\u6570\u636E")))
   ));
 }
 function Chart({ node, rows }) {
-  const [showData, setShowData] = (0, import_react15.useState)(false);
+  const [showData, setShowData] = (0, import_react17.useState)(false);
   const data = rows.slice(0, 40), values = data.map((r) => r[node.valueKey]);
   const low = node.kind === "line" && values.length ? Math.min(...values) : Math.min(0, ...values);
   const high = node.kind === "line" && values.length ? Math.max(...values) : Math.max(0, ...values), range = high - low || 1;
@@ -4293,46 +5037,46 @@ function Chart({ node, rows }) {
   const xMin = node.xScale === "linear" ? Math.min(...labels) : 0, xMax = node.xScale === "linear" ? Math.max(...labels) : 0;
   const x = (i) => node.xScale === "linear" ? xMax === xMin ? 314 : 44 + (labels[i] - xMin) / (xMax - xMin) * 540 : 44 + cell * (i + 0.5), baseline = y2(0);
   const palette = ["var(--du-accent)", "var(--du-green)", "var(--du-violet)", "var(--du-amber)"];
-  return h10(
+  return h12(
     "figure",
     { className: "dgui-chart", "data-ui-node": node.id },
-    h10("figcaption", null, h10(Icon, { name: "chart" }), node.label, rows.length > 40 && "\uFF08\u56FE\u793A\u524D 40 \u9879\uFF09", node.unit && h10("span", { className: "dgui-chart-unit" }, `(${node.unit})`), h10("button", { type: "button", className: "dgui-chart-data-button", "aria-expanded": showData, onClick: () => setShowData(!showData) }, "\u56FE\u8868\u6570\u636E")),
-    h10("div", { className: "dgui-plot", tabIndex: 0, role: "region", "aria-label": `${node.label}\u56FE\u8868\uFF0C\u53EF\u6A2A\u5411\u6EDA\u52A8` }, h10(
+    h12("figcaption", null, h12(Icon, { name: "chart" }), node.label, rows.length > 40 && "\uFF08\u56FE\u793A\u524D 40 \u9879\uFF09", node.unit && h12("span", { className: "dgui-chart-unit" }, `(${node.unit})`), h12("button", { type: "button", className: "dgui-chart-data-button", "aria-expanded": showData, onClick: () => setShowData(!showData) }, "\u56FE\u8868\u6570\u636E")),
+    h12("div", { className: "dgui-plot", tabIndex: 0, role: "region", "aria-label": `${node.label}\u56FE\u8868\uFF0C\u53EF\u6A2A\u5411\u6EDA\u52A8` }, h12(
       "svg",
       { viewBox: `0 0 ${width} 205`, role: "img", "aria-label": `${node.label}\u3002\u5C55\u5F00\u56FE\u8868\u6570\u636E\u53EF\u67E5\u770B\u6BCF\u9879\u6570\u503C\u3002` },
-      [0, 0.5, 1].map((t) => h10("g", { key: t }, h10("line", { x1: 44, x2: 584, y1: y2(low + range * t), y2: y2(low + range * t), stroke: "var(--du-line)", strokeDasharray: "3 5" }), h10("text", { x: 35, y: y2(low + range * t) + 4, textAnchor: "end", fontSize: 14, fill: "var(--du-muted)" }, Number((low + range * t).toPrecision(3)).toLocaleString()))),
-      low <= 0 && high >= 0 && h10("line", { x1: 44, x2: 584, y1: baseline, y2: baseline, stroke: "var(--du-line)" }),
-      node.kind === "line" && h10("polyline", { points: data.map((r, i) => `${x(i)},${y2(r[node.valueKey])}`).join(" "), fill: "none", stroke: "var(--du-accent)", strokeWidth: 2.5, strokeLinejoin: "round" }),
-      data.map((r, i) => h10(
+      [0, 0.5, 1].map((t) => h12("g", { key: t }, h12("line", { x1: 44, x2: 584, y1: y2(low + range * t), y2: y2(low + range * t), stroke: "var(--du-line)", strokeDasharray: "3 5" }), h12("text", { x: 35, y: y2(low + range * t) + 4, textAnchor: "end", fontSize: 14, fill: "var(--du-muted)" }, Number((low + range * t).toPrecision(3)).toLocaleString()))),
+      low <= 0 && high >= 0 && h12("line", { x1: 44, x2: 584, y1: baseline, y2: baseline, stroke: "var(--du-line)" }),
+      node.kind === "line" && h12("polyline", { points: data.map((r, i) => `${x(i)},${y2(r[node.valueKey])}`).join(" "), fill: "none", stroke: "var(--du-accent)", strokeWidth: 2.5, strokeLinejoin: "round" }),
+      data.map((r, i) => h12(
         "g",
         { key: i },
-        node.kind === "bar" ? h10("rect", { x: x(i) - Math.min(40, cell * 0.3), y: Math.min(y2(r[node.valueKey]), baseline), width: Math.max(1, Math.min(80, cell * 0.6)), height: Math.abs(y2(r[node.valueKey]) - baseline), rx: 4, fill: palette[i % palette.length] }, h10("title", null, `${r[node.labelKey]}: ${r[node.valueKey]}`)) : h10("circle", { cx: x(i), cy: y2(r[node.valueKey]), r: 3.5, fill: "var(--du-accent)", stroke: "var(--du-bg)", strokeWidth: 1.5 }, h10("title", null, `${r[node.labelKey]}: ${r[node.valueKey]}`)),
-        data.length <= 12 && h10("text", { x: x(i), y: y2(r[node.valueKey]) + (r[node.valueKey] < 0 ? 14 : -8), textAnchor: node.xScale === "linear" && i === 0 ? "start" : node.xScale === "linear" && i === data.length - 1 ? "end" : "middle", fontSize: 14, fontWeight: 550, fill: "var(--du-ink)" }, Number(r[node.valueKey].toPrecision(4)).toLocaleString()),
-        (data.length <= 12 || i % Math.ceil(data.length / 12) === 0) && h10("text", { x: x(i), y: 192, textAnchor: "middle", fontSize: 14, fill: "var(--du-muted)" }, String(r[node.labelKey]).slice(0, 12))
+        node.kind === "bar" ? h12("rect", { x: x(i) - Math.min(40, cell * 0.3), y: Math.min(y2(r[node.valueKey]), baseline), width: Math.max(1, Math.min(80, cell * 0.6)), height: Math.abs(y2(r[node.valueKey]) - baseline), rx: 4, fill: palette[i % palette.length] }, h12("title", null, `${r[node.labelKey]}: ${r[node.valueKey]}`)) : h12("circle", { cx: x(i), cy: y2(r[node.valueKey]), r: 3.5, fill: "var(--du-accent)", stroke: "var(--du-bg)", strokeWidth: 1.5 }, h12("title", null, `${r[node.labelKey]}: ${r[node.valueKey]}`)),
+        data.length <= 12 && h12("text", { x: x(i), y: y2(r[node.valueKey]) + (r[node.valueKey] < 0 ? 14 : -8), textAnchor: node.xScale === "linear" && i === 0 ? "start" : node.xScale === "linear" && i === data.length - 1 ? "end" : "middle", fontSize: 14, fontWeight: 550, fill: "var(--du-ink)" }, Number(r[node.valueKey].toPrecision(4)).toLocaleString()),
+        (data.length <= 12 || i % Math.ceil(data.length / 12) === 0) && h12("text", { x: x(i), y: 192, textAnchor: "middle", fontSize: 14, fill: "var(--du-muted)" }, String(r[node.labelKey]).slice(0, 12))
       ))
     )),
-    h10("div", { hidden: !showData }, h10(Table, { rows, columns: [{ key: node.labelKey, label: "\u9879\u76EE" }, { key: node.valueKey, label: node.label, unit: node.unit }], id: `${node.id}-data` }))
+    h12("div", { hidden: !showData }, h12(Table, { rows, columns: [{ key: node.labelKey, label: "\u9879\u76EE" }, { key: node.valueKey, label: node.label, unit: node.unit }], id: `${node.id}-data` }))
   );
 }
 function UiView({ record, sessionId, sendPrompt, openFile, preview = false }) {
   const showDetails = useViewDetails();
   const nativeStyle = useNativeStyle();
   const doc = record.document;
-  const viewId = import_react15.default.useId();
-  const root2 = (0, import_react15.useRef)(null), canvasAudits = (0, import_react15.useRef)(/* @__PURE__ */ new Map()), [audit, setAudit] = (0, import_react15.useState)(null), auditPending = (0, import_react15.useRef)(0);
-  const collectAudit = import_react15.default.useCallback(() => {
+  const viewId = import_react17.default.useId();
+  const root2 = (0, import_react17.useRef)(null), canvasAudits = (0, import_react17.useRef)(/* @__PURE__ */ new Map()), [audit, setAudit] = (0, import_react17.useState)(null), auditPending = (0, import_react17.useRef)(0);
+  const collectAudit = import_react17.default.useCallback(() => {
     clearTimeout(auditPending.current);
     auditPending.current = setTimeout(() => {
       if (!root2.current || preview) return;
-      const native2 = measureVisual(root2.current), canvases = [...canvasAudits.current.values()];
-      const issues = [...native2, ...canvases.flatMap((v2) => v2.issues)].slice(0, 40), coverage = [native2.coverage, ...canvases.map((v2) => v2.coverage).filter(Boolean)].slice(0, 32);
+      const native = measureVisual(root2.current), canvases = [...canvasAudits.current.values()];
+      const issues = [...native, ...canvases.flatMap((v2) => v2.issues)].slice(0, 40), coverage = [native.coverage, ...canvases.map((v2) => v2.coverage).filter(Boolean)].slice(0, 32);
       const report = { width: window.innerWidth, theme: document.body.hasAttribute("data-ds-dark-theme") ? "dark" : "light", issues, coverage };
       setAudit(report);
       fetch("/api/plugins/dsh-generative-ui/document?" + new URLSearchParams({ documentId: record.documentId, sessionId }), { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ documentRevision: record.documentRevision ?? 0, report }) }).catch(() => {
       });
     }, 250);
   }, [record.documentId, record.documentRevision, sessionId, preview]);
-  (0, import_react15.useEffect)(() => {
+  (0, import_react17.useEffect)(() => {
     canvasAudits.current.clear();
     collectAudit();
     window.addEventListener("resize", collectAudit);
@@ -4344,28 +5088,28 @@ function UiView({ record, sessionId, sendPrompt, openFile, preview = false }) {
       observer.disconnect();
     };
   }, [collectAudit]);
-  const onAudit = (id, issues, coverage) => {
+  const onAudit = (id2, issues, coverage) => {
     if (!Array.isArray(issues)) return;
-    canvasAudits.current.set(id, { coverage: coverage ? { ...coverage, nodeId: id } : void 0, issues: issues.filter((i) => Object.hasOwn(AUDIT_MESSAGES, i.code)).slice(0, 40).map((i) => ({ ...i, nodeId: id })) });
+    canvasAudits.current.set(id2, { coverage: coverage ? { ...coverage, nodeId: id2 } : void 0, issues: issues.filter((i) => Object.hasOwn(AUDIT_MESSAGES, i.code)).slice(0, 40).map((i) => ({ ...i, nodeId: id2 })) });
     collectAudit();
   };
   const { state, setState, ready, status, issue, epoch, retry, useRemote, keepLocal } = useSavedState(record, sessionId, preview);
-  const [error, setError] = (0, import_react15.useState)(""), [actionStatus, setActionStatus] = (0, import_react15.useState)("");
-  const [busy, setBusy] = (0, import_react15.useState)(false), [invalidFields, setInvalidFields] = (0, import_react15.useState)({});
-  const pending2 = (0, import_react15.useRef)(false);
-  (0, import_react15.useEffect)(() => {
+  const [error, setError] = (0, import_react17.useState)(""), [actionStatus, setActionStatus] = (0, import_react17.useState)("");
+  const [busy, setBusy] = (0, import_react17.useState)(false), [invalidFields, setInvalidFields] = (0, import_react17.useState)({});
+  const pending2 = (0, import_react17.useRef)(false);
+  (0, import_react17.useEffect)(() => {
     setInvalidFields({});
   }, [epoch]);
-  const invalidChanged = import_react15.default.useCallback((id, invalid) => setInvalidFields((previous) => previous[id] === invalid ? previous : { ...previous, [id]: invalid }), []);
+  const invalidChanged = import_react17.default.useCallback((id2, invalid) => setInvalidFields((previous) => previous[id2] === invalid ? previous : { ...previous, [id2]: invalid }), []);
   let computed;
   try {
     computed = evaluate(doc, state);
   } catch (e) {
     computed = { error: e.message };
   }
-  const currentState = (0, import_react15.useRef)(state);
+  const currentState = (0, import_react17.useRef)(state);
   currentState.current = state;
-  (0, import_react15.useEffect)(() => {
+  (0, import_react17.useEffect)(() => {
     collectAudit();
   }, [state, ready, collectAudit]);
   const updatePatch = (patch) => {
@@ -4402,140 +5146,143 @@ function UiView({ record, sessionId, sendPrompt, openFile, preview = false }) {
     }
   }
   const resolve = (value) => computed.error ? "\u2014" : computed.resolveValue(value);
-  function renderNode(n) {
-    const props = { key: n.id, "data-ui-node": n.id, "data-tone": n.tone, style: ["text", "heading", "callout"].includes(n.type) ? typographyStyle(n) : ["row", "column"].includes(n.type) ? { gap: n.gap, ...n.columns ? { "--du-columns": n.columns } : {} } : void 0 };
-    const copy = () => n.spans ? n.spans.map((span, i) => h10("span", { key: i, style: typographyStyle(span) }, span.text)) : display(resolve(n.text));
-    switch (n.type) {
+  function renderNode(n2) {
+    const props = { key: n2.id, "data-ui-node": n2.id, "data-tone": n2.tone, style: ["text", "heading", "callout"].includes(n2.type) ? typographyStyle(n2) : ["row", "column"].includes(n2.type) ? { gap: n2.gap, ...n2.columns ? { "--du-columns": n2.columns } : {} } : void 0 };
+    const copy2 = () => n2.spans ? n2.spans.map((span, i) => h12("span", { key: i, style: typographyStyle(span) }, span.text)) : display(resolve(n2.text));
+    switch (n2.type) {
       case "visual":
-        return h10(VisualView, { key: n.id, node: n, state: state[n.stateKey], update: (value) => updatePatch({ [n.stateKey]: value }), disabled, preview, sendPrompt, openFile, documentTitle: doc.title, provenance: { documentId: record.documentId, sourceSessionId: record.sessionId, viewedSessionId: sessionId } });
+        return h12(VisualView, { key: n2.id, node: n2, state: state[n2.stateKey], update: (value) => updatePatch({ [n2.stateKey]: value }), disabled, preview, sendPrompt, openFile, documentTitle: doc.title, provenance: { documentId: record.documentId, sourceSessionId: record.sessionId, viewedSessionId: sessionId } });
       case "code":
-        return h10(CopyBlock, { key: n.id, nodeId: n.id, text: n.code, lang: n.lang, title: n.title, wrap: n.wrap, code: true, disabled: preview });
+        return h12(CopyBlock, { key: n2.id, nodeId: n2.id, text: n2.code, lang: n2.lang, title: n2.title, wrap: n2.wrap, code: true, disabled: preview });
       case "sandbox":
-        return h10(Sandbox, { key: n.id, node: n, document: doc, state, data: doc.data, derived: computed.derived ?? {}, disabled, preview: preview || !ready, update: updatePatch, onAudit });
+        return h12(Sandbox, { key: n2.id, node: n2, document: doc, state, data: doc.data, derived: computed.derived ?? {}, disabled, preview: preview || !ready, update: updatePatch, onAudit });
       case "heading":
-        return h10("h4", { ...props, className: "dgui-section-title" }, n.icon && h10(Icon, { name: n.icon }), h10("span", null, copy()));
+        return h12("h4", { ...props, className: "dgui-section-title" }, n2.icon && h12(Icon, { name: n2.icon }), h12("span", null, copy2()));
       case "text":
       case "callout":
-        if (n.copyable) return h10(CopyBlock, { key: n.id, nodeId: n.id, title: n.title, text: n.spans ? n.spans.map((s) => s.text).join("") : display(resolve(n.text)), disabled: preview, style: typographyStyle(n) }, copy());
-        return h10("p", { ...props, className: `dgui-copy${n.type === "callout" ? " dgui-callout" : ""}${n.icon ? " dgui-with-icon" : ""}` }, (n.icon || n.tone && n.tone !== "neutral") && h10(Icon, { name: n.icon ?? (n.tone === "warning" || n.tone === "danger" ? "warning" : n.tone === "success" ? "check" : "info") }), h10("span", null, copy()));
+        if (n2.copyable) return h12(CopyBlock, { key: n2.id, nodeId: n2.id, title: n2.title, text: n2.spans ? n2.spans.map((s) => s.text).join("") : display(resolve(n2.text)), disabled: preview, style: typographyStyle(n2) }, copy2());
+        return h12("p", { ...props, className: `dgui-copy${n2.type === "callout" ? " dgui-callout" : ""}${n2.icon ? " dgui-with-icon" : ""}` }, (n2.icon || n2.tone && n2.tone !== "neutral") && h12(Icon, { name: n2.icon ?? (n2.tone === "warning" || n2.tone === "danger" ? "warning" : n2.tone === "success" ? "check" : "info") }), h12("span", null, copy2()));
       case "row":
       case "column":
       case "card":
-        return h10("div", { ...props, className: `dgui-${n.type}${n.columns ? " dgui-grid" : ""}`, "data-surface": n.surface }, n.title && h10("h4", { className: "dgui-section-title" }, n.icon && h10(Icon, { name: n.icon }), h10("span", null, n.title)), n.children.map(renderNode));
+        return h12("div", { ...props, className: `dgui-${n2.type}${n2.columns ? " dgui-grid" : ""}`, "data-surface": n2.surface, "data-columns": n2.columns }, n2.title && h12("h4", { className: "dgui-section-title" }, n2.icon && h12(Icon, { name: n2.icon }), h12("span", null, n2.title)), n2.children.map(renderNode));
       case "badge":
-        return h10("span", { ...props, className: "dgui-tag" }, h10(Icon, { name: n.icon ?? "info" }), display(resolve(n.text)));
+        return h12("span", { ...props, className: "dgui-tag" }, h12(Icon, { name: n2.icon ?? "info" }), display(resolve(n2.text)));
       case "details":
-        return h10("details", { ...props, className: "dgui-details", open: n.open }, h10("summary", null, h10(Icon, { name: n.icon ?? "info" }), n.title), h10("div", { className: "dgui-column" }, n.children.map(renderNode)));
+        return h12("details", { ...props, className: "dgui-details", open: n2.open }, h12("summary", null, h12(Icon, { name: n2.icon ?? "info" }), n2.title), h12("div", { className: "dgui-column" }, n2.children.map(renderNode)));
       case "progress": {
-        const v2 = resolve(n.value), max = resolve(n.max);
-        return h10("div", { ...props, className: "dgui-progress" }, h10("div", { className: "dgui-progress-label" }, h10("span", null, h10(Icon, { name: n.icon ?? "gauge" }), n.label), h10("span", null, `${display(v2)} / ${display(max)}${n.unit ? " " + n.unit : ""}`)), !computed.error && h10("progress", { value: v2, max, "aria-label": n.label }), h10("small", null, !computed.error ? `${Number((v2 / max * 100).toFixed(1))}%` : "\u2014"));
+        const v2 = resolve(n2.value), max = resolve(n2.max);
+        return h12("div", { ...props, className: "dgui-progress" }, h12("div", { className: "dgui-progress-label" }, h12("span", null, h12(Icon, { name: n2.icon ?? "gauge" }), n2.label), h12("span", null, `${display(v2)} / ${display(max)}${n2.unit ? " " + n2.unit : ""}`)), !computed.error && h12("progress", { value: v2, max, "aria-label": n2.label }), h12("small", null, !computed.error ? `${Number((v2 / max * 100).toFixed(1))}%` : "\u2014"));
       }
       case "steps":
-        return h10("section", props, n.title && h10("h4", { className: "dgui-section-title" }, n.title), h10("ol", { className: "dgui-steps" }, n.items.map((item, i) => h10("li", { key: i, "data-step-status": item.status }, h10("span", { className: "dgui-step-dot", "aria-hidden": true }, item.status === "done" ? h10(Icon, { name: "check" }) : item.status === "error" ? h10(Icon, { name: "warning" }) : i + 1), h10("div", null, h10("strong", null, item.title), item.status && h10("span", { className: "dgui-step-state" }, { pending: "\u5F85\u8FDB\u884C", active: "\u5F53\u524D\u6B65\u9AA4", done: "\u5DF2\u5B8C\u6210", error: "\u5F02\u5E38" }[item.status]), item.description && h10("p", null, item.description))))));
+        return h12("section", props, n2.title && h12("h4", { className: "dgui-section-title" }, n2.title), h12("ol", { className: "dgui-steps" }, n2.items.map((item, i) => h12("li", { key: i, "data-step-status": item.status }, h12("span", { className: "dgui-step-dot", "aria-hidden": true }, item.status === "done" ? h12(Icon, { name: "check" }) : item.status === "error" ? h12(Icon, { name: "warning" }) : i + 1), h12("div", null, h12("strong", null, item.title), item.status && h12("span", { className: "dgui-step-state" }, { pending: "\u5F85\u8FDB\u884C", active: "\u5F53\u524D\u6B65\u9AA4", done: "\u5DF2\u5B8C\u6210", error: "\u5F02\u5E38" }[item.status]), item.description && h12("p", null, item.description))))));
       case "metric": {
-        const v2 = resolve(n.value);
-        return h10("div", { ...props, className: "dgui-metric" }, h10("span", { className: "dgui-metric-label" }, h10(Icon, { name: n.icon ?? "gauge" }), n.label), h10("strong", null, typeof v2 === "number" ? formatNumber(v2, n.decimals ?? 2) : display(v2), " ", h10("small", null, n.unit)));
+        const v2 = resolve(n2.value);
+        return h12("div", { ...props, className: "dgui-metric" }, h12("span", { className: "dgui-metric-label" }, h12(Icon, { name: n2.icon ?? "gauge" }), n2.label), h12(MetricValue, { value: v2, preview: preview || !ready, expressive: true }, typeof v2 === "number" ? formatNumber(v2, n2.decimals ?? 2) : display(v2), " ", h12("small", null, n2.unit)));
       }
       case "input":
       case "slider":
       case "select":
       case "toggle": {
-        const k2 = n.bind.split(".")[1], spec = doc.state[k2], v2 = state[k2], id = `dgui-${record.documentId}-${n.id}-${viewId}`;
+        const k2 = n2.bind.split(".")[1], spec = doc.state[k2], v2 = state[k2], id2 = `dgui-${record.documentId}-${n2.id}-${viewId}`;
         let control;
-        if (n.type === "select") control = h10("select", { id, value: spec.options.indexOf(v2), disabled: !ready, onChange: (e) => update(k2, spec.options[Number(e.target.value)]) }, spec.options.map((o, i) => h10("option", { key: i, value: i }, display(o))));
-        else if (n.type === "toggle") control = h10("input", { id, className: "dgui-toggle", type: "checkbox", checked: v2, disabled: !ready, onChange: (e) => update(k2, e.target.checked) });
-        else if (n.type === "slider") control = h10(import_react15.default.Fragment, null, h10("input", { id, type: "range", min: spec.min, max: spec.max, step: spec.step, value: v2, disabled: !ready, onChange: (e) => update(k2, Number(e.target.value)) }), h10("output", { htmlFor: id }, display(v2)));
-        else if (spec.type === "number") control = h10(NumericInput, { id, spec, value: v2, disabled: !ready, invalidChanged, onChange: (value) => update(k2, value) });
-        else control = h10("input", { id, type: "text", value: v2, maxLength: 8192, disabled: !ready, onChange: (e) => update(k2, e.target.value) });
-        return h10("div", { ...props, className: "dgui-control" }, h10("label", { htmlFor: id }, h10(Icon, { name: n.type === "toggle" ? "layers" : n.type === "select" ? "target" : "sliders" }), h10("span", null, n.label)), control);
+        if (n2.type === "select" && n2.variant === "segmented" && spec.options.length >= 2 && spec.options.length <= 8) control = h12(SegmentedControl, { id: id2, label: n2.label, options: spec.options, value: v2, disabled: !ready, onChange: (value) => update(k2, value) });
+        else if (n2.type === "select") control = h12("select", { id: id2, value: spec.options.indexOf(v2), disabled: !ready, onChange: (e) => update(k2, spec.options[Number(e.target.value)]) }, spec.options.map((o, i) => h12("option", { key: i, value: i }, display(o))));
+        else if (n2.type === "toggle") control = h12(ElasticToggle, { id: id2, checked: v2, disabled: !ready, onChange: (value) => update(k2, value) });
+        else if (n2.type === "toggle") control = h12("input", { id: id2, className: "dgui-toggle", type: "checkbox", checked: v2, disabled: !ready, onChange: (e) => update(k2, e.target.checked) });
+        else if (n2.type === "slider") control = h12(import_react17.default.Fragment, null, h12("input", { id: id2, style: { "--du-range": (spec.max > spec.min ? (v2 - spec.min) / (spec.max - spec.min) * 100 : 0) + "%" }, type: "range", min: spec.min, max: spec.max, step: spec.step, value: v2, disabled: !ready, onChange: (e) => update(k2, Number(e.target.value)) }), h12("output", { htmlFor: id2 }, display(v2)));
+        else if (spec.type === "number") control = h12(NumericInput, { id: id2, spec, value: v2, disabled: !ready, invalidChanged, onChange: (value) => update(k2, value) });
+        else control = h12("input", { id: id2, type: "text", value: v2, maxLength: 8192, disabled: !ready, onChange: (e) => update(k2, e.target.value) });
+        if (n2.type === "input" && spec.type === "number") control = h12(Stepper, { value: v2, spec, label: n2.label, disabled: !ready, onChange: (value) => update(k2, value) }, control);
+        return h12("div", { ...props, className: "dgui-control" }, h12(n2.type === "select" && n2.variant === "segmented" && spec.options.length >= 2 && spec.options.length <= 8 ? "span" : "label", { htmlFor: id2, className: "dgui-control-label" }, h12(Icon, { name: n2.type === "toggle" ? "layers" : n2.type === "select" ? "target" : "sliders" }), h12("span", null, n2.label)), control);
       }
       case "button":
       case "link": {
-        const common = { ...props, className: "dgui-button", "data-variant": n.variant ?? (n.action ? "primary" : "secondary") };
-        if (n.href && !preview) return h10("a", { ...common, href: n.href, target: "_blank", rel: "noopener noreferrer", title: n.href }, n.text, h10(Icon, { name: n.icon ?? "external" }));
-        if (n.path) return h10("button", { ...common, type: "button", disabled: preview || !openFile, title: openFile ? n.path : "\u5F53\u524D\u5BBF\u4E3B\u6CA1\u6709\u63D0\u4F9B\u6587\u4EF6\u6253\u5F00\u63A5\u53E3", onClick: async () => {
+        const common = { ...props, className: "dgui-button", "data-variant": n2.variant ?? (n2.action ? "primary" : "secondary") };
+        if (n2.href && !preview) return h12(ExpressiveAction, { tag: "a", text: n2.text, icon: n2.icon ?? "external", ...common, href: n2.href, target: "_blank", rel: "noopener noreferrer", title: n2.href }, n2.text, h12(Icon, { name: n2.icon ?? "external" }));
+        if (n2.path) return h12(ExpressiveAction, { text: n2.text, icon: n2.icon ?? "file", ...common, type: "button", disabled: preview || !openFile, title: openFile ? n2.path : "\u5F53\u524D\u5BBF\u4E3B\u6CA1\u6709\u63D0\u4F9B\u6587\u4EF6\u6253\u5F00\u63A5\u53E3", onClick: async () => {
           try {
-            await openFile(n.path);
+            await openFile(n2.path);
             setError("");
           } catch (e) {
             setError("\u6253\u5F00\u6587\u4EF6\u5931\u8D25\uFF1A" + e.message);
           }
-        } }, n.text, h10(Icon, { name: n.icon ?? "file" }));
-        return h10("button", { ...common, type: "button", disabled: preview || disabled || !sendPrompt || !n.action, onClick: () => followup(n.action) }, n.text, h10(Icon, { name: n.icon ?? "arrow" }));
+        } }, n2.text, h12(Icon, { name: n2.icon ?? "file" }));
+        return h12(ExpressiveAction, { text: n2.text, icon: n2.icon ?? "arrow", ...common, type: "button", disabled: preview || disabled || !sendPrompt || !n2.action, onClick: () => followup(n2.action) }, n2.text, h12(Icon, { name: n2.icon ?? "arrow" }));
       }
       case "divider":
-        return h10("div", { ...props, className: "dgui-divider", role: "separator" }, n.label && h10("span", null, n.label));
+        return h12("div", { ...props, className: "dgui-divider", role: "separator" }, n2.label && h12("span", null, n2.label));
       case "table":
-        return computed.error ? null : h10(Table, { key: n.id, id: n.id, label: n.label, rows: resolve(n.rows), columns: n.columns });
+        return computed.error ? null : h12(Table, { key: n2.id, id: n2.id, label: n2.label, rows: resolve(n2.rows), columns: n2.columns });
       case "chart":
-        return computed.error ? null : h10(Chart, { key: n.id, node: n, rows: resolve(n.rows) });
+        return computed.error ? null : h12(Chart, { key: n2.id, node: n2, rows: resolve(n2.rows) });
       default:
         return null;
     }
   }
-  return h10(
+  return h12(
     "section",
     { ref: root2, className: "dgui-root", "data-document-revision": record.documentRevision ?? 0, "data-dgui-build": BUILD_INFO.id, "data-dsh-generative-ui": record.documentId, "data-preset": doc.presentation?.preset ?? ({ comparison: "comparison", guide: "list", report: "reading" }[doc.presentation?.layout] ?? "brief"), "data-visual-style": nativeStyle, "data-layout": doc.presentation?.layout, "data-accent": doc.presentation?.accent, "data-density": doc.presentation?.density, "data-preview": preview || void 0, "aria-label": doc.title, "aria-busy": preview || void 0 },
-    doc.title && doc.title !== "\u5185\u5BB9" && h10("header", { className: "dgui-header" }, h10("strong", { className: "dgui-header-title" }, doc.title)),
-    !preview && deliveryDiagnostics(doc).length > 0 && h10("p", { className: "dgui-tool-error", role: "status" }, "\u90E8\u5206\u5185\u5BB9\u672A\u751F\u6210\uFF1B\u6A21\u578B\u53EF\u4FEE\u590D\u5F53\u524D\u754C\u9762\u3002"),
-    h10("div", { key: epoch, className: "dgui-content" }, doc.nodes.map(renderNode)),
-    (Object.keys(doc.state).length > 0 || issue || actionStatus) && h10("div", { className: showDetails || issue || actionStatus ? "dgui-status" : "dgui-sr-only", role: "status", "data-status": /失败|冲突/.test(status) ? "error" : /正在|等待/.test(status) ? "pending" : "saved" }, h10(Icon, { name: /失败|冲突/.test(status) ? "warning" : /正在|等待/.test(status) ? "database" : "check" }), h10("span", null, status), actionStatus && h10("span", null, ` \xB7 ${actionStatus}`)),
-    issue && h10(
+    doc.title && doc.title !== "\u5185\u5BB9" && !(doc.nodes[0]?.type === "heading" && typeof doc.nodes[0].text === "string" && doc.nodes[0].text.trim() === doc.title.trim()) && h12("header", { className: "dgui-header" }, h12("strong", { className: "dgui-header-title" }, doc.title)),
+    !preview && deliveryDiagnostics(doc).length > 0 && h12("p", { className: "dgui-tool-error", role: "status" }, "\u90E8\u5206\u5185\u5BB9\u672A\u751F\u6210\uFF1B\u6A21\u578B\u53EF\u4FEE\u590D\u5F53\u524D\u754C\u9762\u3002"),
+    h12("div", { key: epoch, className: "dgui-content" }, doc.nodes.map(renderNode)),
+    (Object.keys(doc.state).length > 0 || issue || actionStatus) && h12("div", { className: showDetails || issue || actionStatus ? "dgui-status" : "dgui-sr-only", role: "status", "data-status": /失败|冲突/.test(status) ? "error" : /正在|等待/.test(status) ? "pending" : "saved" }, h12(Icon, { name: /失败|冲突/.test(status) ? "warning" : /正在|等待/.test(status) ? "database" : "check" }), h12("span", null, status), actionStatus && h12("span", null, ` \xB7 ${actionStatus}`)),
+    issue && h12(
       "div",
       { className: "dgui-recovery" },
-      issue.kind === "conflict" ? h10(
-        import_react15.default.Fragment,
+      issue.kind === "conflict" ? h12(
+        import_react17.default.Fragment,
         null,
-        h10("button", { type: "button", className: "dgui-secondary", disabled: status === "\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026", onClick: useRemote }, "\u4F7F\u7528\u5DF2\u4FDD\u5B58\u53C2\u6570"),
-        h10("button", { type: "button", className: "dgui-secondary", disabled: status === "\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026", onClick: keepLocal }, "\u4FDD\u7559\u672C\u9875\u53C2\u6570\u5E76\u91CD\u8BD5")
-      ) : h10("button", { type: "button", className: "dgui-secondary", disabled: status === "\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026", onClick: retry }, issue.kind === "load" ? "\u91CD\u65B0\u8BFB\u53D6\u53C2\u6570" : "\u91CD\u8BD5\u4FDD\u5B58")
+        h12("button", { type: "button", className: "dgui-secondary", disabled: status === "\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026", onClick: useRemote }, "\u4F7F\u7528\u5DF2\u4FDD\u5B58\u53C2\u6570"),
+        h12("button", { type: "button", className: "dgui-secondary", disabled: status === "\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026", onClick: keepLocal }, "\u4FDD\u7559\u672C\u9875\u53C2\u6570\u5E76\u91CD\u8BD5")
+      ) : h12("button", { type: "button", className: "dgui-secondary", disabled: status === "\u6B63\u5728\u6062\u590D\u53C2\u6570\u2026", onClick: retry }, issue.kind === "load" ? "\u91CD\u65B0\u8BFB\u53D6\u53C2\u6570" : "\u91CD\u8BD5\u4FDD\u5B58")
     ),
-    (error || computed.error) && h10("p", { className: "dgui-error", role: "alert" }, error || computed.error),
-    Object.values(invalidFields).some(Boolean) && h10("p", { className: "dgui-error", role: "alert" }, "\u8BF7\u8F93\u5165\u8303\u56F4\u5185\u4E14\u7B26\u5408\u6B65\u957F\u7684\u6570\u503C\u3002"),
-    showDetails && !preview && audit && h10("details", { className: "dgui-fallback dgui-audit" }, h10("summary", null, "\u663E\u793A\u68C0\u67E5"), h10("p", null, `${audit.width}px \xB7 ${audit.theme === "dark" ? "\u6DF1\u8272" : "\u6D45\u8272"} \xB7 \u542F\u53D1\u5F0F\u89C2\u5BDF\uFF0C\u4E0D\u4EE3\u8868\u5B8C\u6574\u89C6\u89C9\u9A8C\u6536\u3002`), h10("p", null, "\u672A\u8986\u76D6\uFF1A\u590D\u6742\u80CC\u666F\u3001\u906E\u6321\u5173\u7CFB\u53CA SVG \u914D\u8272\uFF1B\u62A5\u544A\u4E0D\u7B49\u4E8E\u5B8C\u6574\u65E0\u969C\u788D\u68C0\u67E5\u3002"), audit.coverage?.some((c) => c.truncated) && h10("p", null, "\u5185\u5BB9\u8F83\u591A\uFF0C\u672C\u6B21\u53EA\u68C0\u67E5\u4E86\u6BCF\u4E2A\u533A\u57DF\u7684\u524D 2000 \u4E2A\u5143\u7D20\u3002"), audit.issues.length ? h10("ul", null, audit.issues.map((i, j2) => h10("li", { key: j2 }, AUDIT_MESSAGES[i.code], i.nodeId ? `\uFF08${i.nodeId}\uFF09` : ""))) : h10("p", null, "\u672C\u6B21\u68C0\u67E5\u672A\u53D1\u73B0\u6240\u8986\u76D6\u7684\u95EE\u9898\u3002")),
-    showDetails && !preview && h10(HistoryView, { record, sessionId }),
-    showDetails && h10("details", { className: "dgui-fallback" }, h10("summary", null, Object.keys(doc.state).length ? "\u539F\u59CB\u6587\u5B57\u8BF4\u660E\u4E0E\u521D\u59CB\u53C2\u6570" : "\u539F\u59CB\u6587\u5B57\u8BF4\u660E"), h10("p", null, doc.fallback), Object.keys(doc.state).length > 0 && h10("pre", null, JSON.stringify(initialState(doc), null, 2)))
+    (error || computed.error) && h12("p", { className: "dgui-error", role: "alert" }, error || computed.error),
+    Object.values(invalidFields).some(Boolean) && h12("p", { className: "dgui-error", role: "alert" }, "\u8BF7\u8F93\u5165\u8303\u56F4\u5185\u4E14\u7B26\u5408\u6B65\u957F\u7684\u6570\u503C\u3002"),
+    showDetails && !preview && audit && h12("details", { className: "dgui-fallback dgui-audit" }, h12("summary", null, "\u663E\u793A\u68C0\u67E5"), h12("p", null, `${audit.width}px \xB7 ${audit.theme === "dark" ? "\u6DF1\u8272" : "\u6D45\u8272"} \xB7 \u542F\u53D1\u5F0F\u89C2\u5BDF\uFF0C\u4E0D\u4EE3\u8868\u5B8C\u6574\u89C6\u89C9\u9A8C\u6536\u3002`), h12("p", null, "\u672A\u8986\u76D6\uFF1A\u590D\u6742\u80CC\u666F\u3001\u906E\u6321\u5173\u7CFB\u53CA SVG \u914D\u8272\uFF1B\u62A5\u544A\u4E0D\u7B49\u4E8E\u5B8C\u6574\u65E0\u969C\u788D\u68C0\u67E5\u3002"), audit.coverage?.some((c) => c.truncated) && h12("p", null, "\u5185\u5BB9\u8F83\u591A\uFF0C\u672C\u6B21\u53EA\u68C0\u67E5\u4E86\u6BCF\u4E2A\u533A\u57DF\u7684\u524D 2000 \u4E2A\u5143\u7D20\u3002"), audit.issues.length ? h12("ul", null, audit.issues.map((i, j2) => h12("li", { key: j2 }, AUDIT_MESSAGES[i.code], i.nodeId ? `\uFF08${i.nodeId}\uFF09` : ""))) : h12("p", null, "\u672C\u6B21\u68C0\u67E5\u672A\u53D1\u73B0\u6240\u8986\u76D6\u7684\u95EE\u9898\u3002")),
+    showDetails && !preview && h12(HistoryView, { record, sessionId }),
+    showDetails && h12("details", { className: "dgui-fallback" }, h12("summary", null, Object.keys(doc.state).length ? "\u539F\u59CB\u6587\u5B57\u8BF4\u660E\u4E0E\u521D\u59CB\u53C2\u6570" : "\u539F\u59CB\u6587\u5B57\u8BF4\u660E"), h12("p", null, doc.fallback), Object.keys(doc.state).length > 0 && h12("pre", null, JSON.stringify(initialState(doc), null, 2)))
   );
 }
-var UiBoundary = class extends import_react15.default.Component {
+var UiBoundary = class extends import_react17.default.Component {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
   }
   render() {
-    return this.state.failed ? h10("div", { className: "dgui-root", role: "alert" }, "\u4EA4\u4E92\u754C\u9762\u65E0\u6CD5\u663E\u793A\u3002", h10("pre", null, this.props.fallback)) : this.props.children;
+    return this.state.failed ? h12("div", { className: "dgui-root", role: "alert" }, "\u4EA4\u4E92\u754C\u9762\u65E0\u6CD5\u663E\u793A\u3002", h12("pre", null, this.props.fallback)) : this.props.children;
   }
 };
 function ToolView(props) {
-  if (props.phase === "preparing" || props.phase === "start" || typeof props.block?.argsRaw === "string") return h10("p", { className: "dgui-pending", role: "status" }, "\u6B63\u5728\u751F\u6210\u754C\u9762\uFF1B\u5B8C\u6574\u5185\u5BB9\u4F1A\u9010\u6B65\u9884\u89C8\u3002");
+  if (props.phase === "preparing" || props.phase === "start" || typeof props.block?.argsRaw === "string") return h12("p", { className: "dgui-pending", role: "status" }, "\u6B63\u5728\u751F\u6210\u754C\u9762\uFF1B\u5B8C\u6574\u5185\u5BB9\u4F1A\u9010\u6B65\u9884\u89C8\u3002");
   const fallback = (props.block.content ?? []).filter((x) => x.type === "text").map((x) => x.text).join("\n");
-  if (props.block.isError) return h10("div", { className: "dgui-tool-error", role: "alert" }, h10(Icon, { name: "warning" }), h10("span", null, fallback || "\u754C\u9762\u672A\u751F\u6210\uFF0C\u8BF7\u68C0\u67E5\u5DE5\u5177\u53C2\u6570\u3002"));
+  if (props.block.isError) return h12("div", { className: "dgui-tool-error", role: "alert" }, h12(Icon, { name: "warning" }), h12("span", null, fallback || "\u754C\u9762\u672A\u751F\u6210\uFF0C\u8BF7\u68C0\u67E5\u5DE5\u5177\u53C2\u6570\u3002"));
   const raw = props.block.meta?.dshGenerativeUi;
   if (raw?.version === 1) {
     try {
       validateDocument(raw.document);
-      return h10("p", { className: "dgui-pending", role: "status" }, "\u754C\u9762\u5DF2\u751F\u6210\uFF0C\u6574\u8F6E\u56DE\u7B54\u7ED3\u675F\u540E\u542F\u7528\u4EA4\u4E92\u3002");
+      return h12("p", { className: "dgui-pending", role: "status" }, "\u754C\u9762\u5DF2\u751F\u6210\uFF0C\u6574\u8F6E\u56DE\u7B54\u7ED3\u675F\u540E\u542F\u7528\u4EA4\u4E92\u3002");
     } catch {
     }
   }
-  return h10(ValidatedView, { ...props, raw, fallback });
+  return h12(ValidatedView, { ...props, raw, fallback });
 }
 function TurnUiView(props) {
   const stream = props.turn.data.get("dshUiStream");
-  return h10(import_react15.default.Fragment, null, stream && typeof stream === "object" && !Array.isArray(stream) && h10(StreamSurface, { stream, sessionId: props.sessionId, committedIds: (props.turn.data.get("dshGenerativeUi") ?? []).filter((r) => r.displayReady && !r.isPatch).map((r) => r.raw.documentId) }), (props.turn.data.get("dshGenerativeUi") ?? []).filter((r) => r.displayReady === true).map((r) => r.isPatch ? h10(PatchNotice, { key: `patch-${r.seq}`, raw: r.raw }) : h10(PresentationView, { key: r.raw.documentId, ...r, sessionId: props.sessionId, sendPrompt: props.sendPrompt, openFile: props.openFile, scope: props.presentationScope })));
+  return h12(import_react17.default.Fragment, null, stream && typeof stream === "object" && !Array.isArray(stream) && h12(StreamSurface, { stream, sessionId: props.sessionId, committedIds: (props.turn.data.get("dshGenerativeUi") ?? []).filter((r) => r.displayReady && !r.isPatch).map((r) => r.raw.documentId) }), (props.turn.data.get("dshGenerativeUi") ?? []).filter((r) => r.displayReady === true).map((r) => r.isPatch ? h12(PatchNotice, { key: `patch-${r.seq}`, raw: r.raw }) : h12(PresentationView, { key: r.raw.documentId, ...r, sessionId: props.sessionId, sendPrompt: props.sendPrompt, openFile: props.openFile, scope: props.presentationScope })));
 }
 function PatchNotice({ raw }) {
-  (0, import_react15.useEffect)(() => {
+  (0, import_react17.useEffect)(() => {
     try {
       if (raw) publishDocument(raw);
     } catch {
     }
   }, [raw]);
-  return h10("p", { className: "dgui-copy" }, "\u754C\u9762\u4FEE\u6539\u5DF2\u4FDD\u5B58\uFF1B\u539F\u754C\u9762\u5DF2\u66F4\u65B0\u3002");
+  return h12("p", { className: "dgui-copy" }, "\u754C\u9762\u4FEE\u6539\u5DF2\u4FDD\u5B58\uFF1B\u539F\u754C\u9762\u5DF2\u66F4\u65B0\u3002");
 }
 function ValidatedView({ raw, fallback, sessionId, sendPrompt, openFile }) {
   const { record: current2, status, retry } = useCurrentDocument(raw ?? {}, sessionId);
-  const result = (0, import_react15.useMemo)(() => {
+  const result = (0, import_react17.useMemo)(() => {
     try {
       if (!current2 || current2.version !== 1 || typeof current2.documentId !== "string" || typeof current2.callId !== "string") return null;
       return { ...current2, document: validateDocument(current2.document) };
@@ -4543,13 +5290,13 @@ function ValidatedView({ raw, fallback, sessionId, sendPrompt, openFile }) {
       return null;
     }
   }, [current2]);
-  if (!result) return h10("div", { className: "dgui-root" }, h10("p", null, "\u6587\u5B57\u7ED3\u679C\uFF08\u672A\u63D0\u4F9B\u517C\u5BB9\u7684\u754C\u9762\u6570\u636E\uFF09"), h10("pre", null, fallback));
-  return h10(
-    import_react15.default.Fragment,
+  if (!result) return h12("div", { className: "dgui-root" }, h12("p", null, "\u6587\u5B57\u7ED3\u679C\uFF08\u672A\u63D0\u4F9B\u517C\u5BB9\u7684\u754C\u9762\u6570\u636E\uFF09"), h12("pre", null, fallback));
+  return h12(
+    import_react17.default.Fragment,
     null,
-    status === "error" && h10("div", { className: "dgui-root dgui-document-warning", role: "status" }, h10("p", null, "\u672A\u80FD\u786E\u8BA4\u6700\u65B0\u754C\u9762\u7248\u672C\uFF0C\u5F53\u524D\u663E\u793A\u5DF2\u77E5\u7248\u672C\u3002"), h10("button", { type: "button", className: "dgui-secondary", onClick: retry }, "\u91CD\u65B0\u8BFB\u53D6\u6700\u65B0\u754C\u9762")),
-    status === "loading" && h10("p", { className: "dgui-copy", role: "status" }, "\u6B63\u5728\u8BFB\u53D6\u6700\u65B0\u754C\u9762\u7248\u672C\u2026"),
-    h10(UiBoundary, { key: `${result.documentId}:${sessionId}`, fallback: fallback ?? result.document.fallback }, h10(UiView, { key: `${result.documentId}:${sessionId}`, record: result, sessionId, sendPrompt, openFile }))
+    status === "error" && h12("div", { className: "dgui-root dgui-document-warning", role: "status" }, h12("p", null, "\u672A\u80FD\u786E\u8BA4\u6700\u65B0\u754C\u9762\u7248\u672C\uFF0C\u5F53\u524D\u663E\u793A\u5DF2\u77E5\u7248\u672C\u3002"), h12("button", { type: "button", className: "dgui-secondary", onClick: retry }, "\u91CD\u65B0\u8BFB\u53D6\u6700\u65B0\u754C\u9762")),
+    status === "loading" && h12("p", { className: "dgui-copy", role: "status" }, "\u6B63\u5728\u8BFB\u53D6\u6700\u65B0\u754C\u9762\u7248\u672C\u2026"),
+    h12(UiBoundary, { key: `${result.documentId}:${sessionId}`, fallback: fallback ?? result.document.fallback }, h12(UiView, { key: `${result.documentId}:${sessionId}`, record: result, sessionId, sendPrompt, openFile }))
   );
 }
 
@@ -4586,7 +5333,7 @@ var turnUiDefinition = {
 };
 
 // src/stream-history.js
-var names = /* @__PURE__ */ new Set(["render_ui", "render_canvas", "render_text"]);
+var names = /* @__PURE__ */ new Set(["render_ui", "render_canvas", "render_text", "render_mechanism"]);
 var streamUiDefinition = {
   kind: "dshUiStream",
   target: "chat",
@@ -4634,112 +5381,207 @@ var streamUiDefinition = {
 
 // src/native-style.js
 var root = ".dgui-root[data-preset][data-visual-style]";
-var NATIVE_STYLE_CSS = VISUAL_STYLES.map((s) => `
-${root}[data-visual-style="${s.id}"]{--du-style-color:${s.preview.accent};--du-style-wash:${s.preview.bg};--du-radius:${s.id === "technical" ? 14 : 24}px;--du-radius-inner:${s.id === "technical" ? 10 : 20}px}
-`).join("") + `
-${root}{--du-line:color-mix(in srgb,var(--du-style-color) 24%,var(--du-bg));--du-soft:color-mix(in srgb,var(--du-style-color) 6%,var(--du-bg));--du-tint:color-mix(in srgb,var(--du-style-color) 10%,var(--du-bg));border-radius:var(--du-radius);background:var(--du-soft);border-color:var(--du-line);padding:22px;box-shadow:0 3px 12px #18253706}
+var grammar = (id2, css) => css.replaceAll("&", root + "[data-visual-style=" + id2 + "]");
+var NATIVE_STYLE_CSS = VISUAL_STYLES.map((s) => {
+  const n2 = STYLE_SYSTEM[s.id].native;
+  return `${root}[data-visual-style=${s.id}]{--du-style-base:${s.preview.accent};--du-style-color:var(--du-style-base);--du-style-wash:${s.preview.bg};--du-title-size:${n2.title}px;--du-title-weight:${n2.weight};--du-content-gap:${n2.gap}px;--du-radius:${n2.radius}px;--du-radius-inner:${n2.radius - 4}px;--du-metric-size:${n2.metric}px;--du-feedback-ms:${n2.feedback};--du-motion-gain:${n2.gain}}`;
+}).join("\n") + `
+${root}{--du-style-scale:1;--du-line:color-mix(in srgb,var(--du-style-color) 24%,var(--du-bg));--du-soft:color-mix(in srgb,var(--du-style-color) 6%,var(--du-bg));--du-tint:color-mix(in srgb,var(--du-style-color) 10%,var(--du-bg));--du-motion-fill:linear-gradient(115deg,var(--du-accent),color-mix(in srgb,var(--du-accent) 65%,#202832));--du-motion-orb:var(--du-motion-fill);--du-action-radius:999px;--du-orb-radius:50%;border:1px solid var(--du-line);border-radius:var(--du-radius);background:var(--du-soft);padding:calc(24px * var(--du-style-scale));font-size:calc(16px * var(--du-style-scale));line-height:1.75;box-shadow:none;container:motion-surface / inline-size}
 ${root}:not([data-accent]){--du-accent:color-mix(in srgb,var(--du-style-color) 82%,#000)}
-${root} .dgui-header-title{color:var(--du-ink)}
-${root} .dgui-card{background:var(--du-bg);border-radius:var(--du-radius-inner);border-color:var(--du-line);padding:20px;box-shadow:0 3px 10px #18253705}
-${root} .dgui-card>.dgui-section-title{color:var(--du-accent)}
-${root} .dgui-metric{background:var(--du-bg);border:1px solid var(--du-line);border-radius:var(--du-radius-inner);padding:18px 20px;gap:8px;box-shadow:0 3px 10px #18253705;--du-tone:var(--du-accent)}
-${root} .dgui-metric[data-tone=success]{--du-tone:var(--du-green)}
-${root} .dgui-metric[data-tone=warning]{--du-tone:var(--du-amber)}
-${root} .dgui-metric[data-tone=danger]{--du-tone:var(--du-red)}
-${root} .dgui-metric-label .dgui-icon{display:inline-block}
-${root} .dgui-control{padding:12px 14px;border-radius:14px;background:var(--du-soft);gap:14px}
-${root} .dgui-control>label{color:var(--du-ink);font-weight:550}
-${root} .dgui-control output{color:var(--du-accent);background:var(--du-bg);border:1px solid var(--du-line);border-radius:10px;padding:4px 10px;min-width:58px}
+${root} .dgui-header{margin:0 0 var(--du-content-gap);padding:0;border:0;gap:12px}
+${root} .dgui-header-title{color:var(--du-ink);font-size:calc(var(--du-title-size) * var(--du-style-scale));font-weight:var(--du-title-weight);line-height:1.3;letter-spacing:-.5px}
+${root} .dgui-content,${root} .dgui-column{gap:calc(var(--du-content-gap) * var(--du-style-scale))}
+${root} .dgui-row{gap:calc(var(--du-content-gap) * var(--du-style-scale));align-items:stretch}
+${root} .dgui-section-title{font-size:calc(20px * var(--du-style-scale));font-weight:700;line-height:1.45}
+${root}:not(:has(>.dgui-header))>.dgui-content>.dgui-section-title:first-child{font-size:calc(var(--du-title-size) * var(--du-style-scale));font-weight:var(--du-title-weight);line-height:1.3}
+${root} .dgui-copy{font-size:inherit;line-height:1.8;color:var(--du-ink)}
+${root} .dgui-card{background:var(--du-bg);border:1px solid var(--du-line);border-radius:var(--du-radius-inner);padding:calc(20px * var(--du-style-scale));gap:calc(14px * var(--du-style-scale));box-shadow:none}
+${root} .dgui-card>.dgui-section-title{border:0;padding:0;font-size:calc(18px * var(--du-style-scale));color:var(--du-ink)}
+${root} .dgui-metric{background:var(--du-bg);border:1px solid var(--du-line);border-radius:var(--du-radius-inner);padding:calc(18px * var(--du-style-scale));gap:7px;box-shadow:none;--du-tone:var(--du-accent)}
+${root} .dgui-metric[data-tone=success]{--du-tone:var(--du-green)}${root} .dgui-metric[data-tone=warning]{--du-tone:var(--du-amber)}${root} .dgui-metric[data-tone=danger]{--du-tone:var(--du-red)}
+${root} .dgui-metric strong{font-size:calc(var(--du-metric-size) * var(--du-style-scale));font-weight:760;line-height:1.15;letter-spacing:-.6px;color:var(--du-tone)}
+${root} .dgui-metric-label{font-size:calc(13px * var(--du-style-scale))}${root} .dgui-metric small{font-size:calc(14px * var(--du-style-scale));letter-spacing:0}
+${root} .dgui-control{border:0;padding:12px 14px;background:var(--du-soft);border-radius:14px;gap:14px}
+${root} .dgui-control>label,${root} .dgui-control-label{font-size:inherit;color:var(--du-ink);font-weight:550}
+${root} .dgui-control output{color:var(--du-accent);background:var(--du-bg);border:1px solid var(--du-line);border-radius:10px;padding:4px 10px;min-width:58px;font-size:inherit}
+${root} .dgui-control input:not([type=range]):not([type=checkbox]),${root} .dgui-control select{border-radius:12px;background:var(--du-bg);font-size:inherit}
 ${root} .dgui-control input[type=range]{accent-color:var(--du-accent)}
-${root} .dgui-control input:not([type=range]):not([type=checkbox]),${root} .dgui-control select{border-radius:12px;background:var(--du-bg)}
-${root} .dgui-button{background:var(--du-accent);border-color:var(--du-accent);border-radius:999px}
-${root} .motion-copy-block{background:var(--du-bg);border-color:var(--du-line)}
-${root} .motion-copy-block[data-code]{background:var(--du-soft)}
-${root}[data-visual-style=prismframe]{box-shadow:4px 6px 0 color-mix(in srgb,var(--du-style-color) 12%,var(--du-bg));font-family:ui-rounded,var(--dsw-font-family,system-ui,sans-serif)}
-${root}[data-visual-style=prismframe] .dgui-card,${root}[data-visual-style=prismframe] .dgui-metric{border:1.5px solid var(--du-line);box-shadow:3px 4px 0 color-mix(in srgb,var(--du-style-color) 11%,var(--du-bg))}
-${root}[data-visual-style=technical]{box-shadow:none}
-${root}[data-visual-style=technical] .dgui-card,${root}[data-visual-style=technical] .dgui-metric{box-shadow:none}
-${root}[data-visual-style=expressive] .dgui-header-title{font-weight:800}
+${root} .dgui-button{border-radius:var(--du-action-radius);background:var(--du-accent);border-color:var(--du-accent)}
+${root} .dgui-button[data-variant=secondary]{background:transparent;color:var(--du-ink);border-color:var(--du-line)}${root} .dgui-button[data-variant=text]{background:none;color:var(--du-accent);border-color:transparent}
+${root} .dgui-steps{gap:12px;padding:0;margin:0}
+${root} .dgui-steps li{position:relative;padding:14px 16px;display:flex;flex-direction:row;align-items:flex-start;text-align:left;gap:14px;border-radius:var(--du-radius-inner);background:var(--du-bg)}
+${root} .dgui-steps li:before,${root} .dgui-steps li:after{display:none}${root} .dgui-step-dot{display:flex;flex:none;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font:650 14px/1 system-ui;background:var(--du-tint);color:var(--du-tone)}
+${root} .dgui-steps strong{font-size:inherit}${root} .dgui-steps p{font-size:calc(14px * var(--du-style-scale));line-height:1.7}
+${root} .dgui-chart{margin:0;border-radius:var(--du-radius-inner);background:var(--du-bg);padding:16px;border:1px solid var(--du-line)}
+${root} .dgui-table-wrap{border-radius:var(--du-radius-inner);background:var(--du-bg);border:1px solid var(--du-line)}${root} table{font-size:calc(14px * var(--du-style-scale))}${root} th{font-weight:650;color:var(--du-ink);background:var(--du-soft)}
+${root} .motion-copy-block{border-radius:var(--du-radius-inner);background:var(--du-bg);border:1px solid var(--du-line)}${root} .motion-copy-block[data-code]{background:var(--du-soft)}
+${root} .dgui-progress:not([data-tone]),${root} .dgui-progress[data-tone=neutral]{--du-tone:var(--du-accent)}
+${root} [data-motion-component=card],${root} [data-motion-component=stat]{border:1px solid var(--du-line);border-radius:var(--du-radius-inner);background:var(--du-bg);box-shadow:none}
+${root} [data-motion-component=stat] [class*="statValue"]{font-size:var(--du-metric-size);font-weight:var(--du-title-weight);line-height:1.15;letter-spacing:-.7px}
+${root} [data-motion-component=card] [class*="cardTitle"]{font-size:20px;font-weight:var(--du-title-weight)}
+${root} [data-motion-visual] [class*="block"]{--dsl-g-radius-surface:var(--du-radius-inner);--dsl-g-radius-control:var(--du-action-radius);--dsl-g-font-body:16px;--dsl-g-font-title:18px}
 ${root}[data-preset=reading],${root}[data-preset=minimal]{padding:0;border:0;background:transparent;box-shadow:none}
-${root} [data-motion-component=card],${root} [data-motion-component=stat]{border:1px solid var(--du-line);border-radius:var(--du-radius-inner);background:var(--du-bg)}
-${root}[data-visual-style=prismframe] [data-motion-component=card],${root}[data-visual-style=prismframe] [data-motion-component=stat]{box-shadow:3px 4px 0 color-mix(in srgb,var(--du-style-color) 11%,var(--du-bg))}
-body[data-ds-dark-theme] ${root},${root}[data-preview-theme=dark]{--du-style-color:color-mix(in srgb,var(--du-style-wash) 58%,var(--du-style-color));--du-line:color-mix(in srgb,var(--du-style-color) 24%,var(--du-bg));--du-soft:color-mix(in srgb,var(--du-style-color) 8%,var(--du-bg))}
+body[data-ds-dark-theme] ${root},${root}[data-preview-theme=dark]{--du-style-color:color-mix(in srgb,var(--du-style-wash) 58%,var(--du-style-base));--du-line:color-mix(in srgb,var(--du-style-color) 24%,var(--du-bg));--du-soft:color-mix(in srgb,var(--du-style-color) 8%,var(--du-bg))}
 body[data-ds-dark-theme] ${root}:not([data-accent]),${root}[data-preview-theme=dark]:not([data-accent]){--du-accent:var(--du-style-color)}
-@media(max-width:600px){${root}{padding:16px}${root} .dgui-card,${root} .dgui-metric{padding:16px}${root} .dgui-control{padding:10px}}
-@media(forced-colors:active){${root},${root} .dgui-card,${root} .dgui-metric{box-shadow:none;border-color:CanvasText}}
+` + grammar("editorial", `
+&{background:var(--du-bg);border:0;border-radius:0;padding:16px 0;--du-motion-fill:linear-gradient(115deg,#44546a,#182537);--du-motion-orb:#44546a;--du-action-radius:10px;--du-orb-size:28px;--du-feedback-travel:18%;--du-label-ms:220ms}
+& .dgui-header{border-bottom:1px solid var(--du-line);padding-bottom:16px}& .dgui-header-title,& .dgui-section-title{font-family:ui-serif,Georgia,'Noto Serif SC',serif;font-weight:650}
+& .dgui-heading-icon{display:none}& .dgui-copy{max-width:72ch;line-height:1.95}
+& .dgui-card{padding:12px 0 16px;border:0;border-top:1px solid var(--du-line);border-radius:0;background:transparent}
+& .dgui-metric{border:0;border-left:2px solid var(--du-line);border-radius:0;padding:4px 0 4px 18px;background:var(--du-bg);gap:5px}& .dgui-metric strong{font-family:ui-serif,Georgia,serif;font-weight:600;color:var(--du-tone)}
+& .dgui-control{padding:12px 0;border-radius:0;border-bottom:1px solid var(--du-line);background:transparent}& .dgui-control output{background:none;border:0;padding:0}
+& .dgui-steps{border-left:1px solid var(--du-line);margin-left:15px}& .dgui-steps li{padding:4px 0 12px 20px;background:none;border-radius:0}& .dgui-step-dot{margin-left:-36px;background:var(--du-bg);border:1px solid var(--du-line);width:30px;height:30px}
+& .dgui-chart{border:0;border-radius:0;background:transparent;padding:12px 0}& .dgui-table-wrap{border:0;border-top:1px solid var(--du-line);border-radius:0}& th{background:none;border-bottom:2px solid var(--du-line)}
+& .motion-copy-block{border:0;border-left:2px solid var(--du-line);border-radius:0;background:transparent;padding:12px 18px}& .motion-copy-block[data-code]{background:var(--du-soft)}
+& [data-motion-component=card],& [data-motion-component=stat]{border:0;border-top:1px solid var(--du-line);border-radius:0;background:transparent;box-shadow:none}
+`) + grammar("soft", `
+&{border:0;background:color-mix(in srgb,var(--du-style-color) 4%,var(--du-bg));border-radius:30px;--du-motion-fill:linear-gradient(115deg,#7354bd,#307f8c);--du-action-radius:18px;--du-orb-radius:14px;--du-label-ms:430ms;font-family:ui-rounded,var(--dsw-font-family,system-ui,sans-serif)}
+& .dgui-header-title{font-weight:700}& .dgui-header{align-items:flex-start}& .dgui-badge{border-radius:999px;padding:5px 12px}
+& .dgui-card{border:0;border-radius:28px 28px 28px 10px;background:color-mix(in srgb,var(--du-style-color) 8%,var(--du-bg));padding:22px}& .dgui-row>.dgui-card:nth-child(even){border-radius:28px 28px 10px 28px;background:color-mix(in srgb,var(--du-green) 7%,var(--du-bg))}
+& .dgui-card>.dgui-section-title{align-self:flex-start;padding:4px 10px;border-radius:999px;background:var(--du-bg);font-size:calc(15px * var(--du-style-scale))}
+& .dgui-metric{border:0;border-radius:24px 24px 24px 8px;background:color-mix(in srgb,var(--du-style-color) 9%,var(--du-bg));padding:20px}& .dgui-row>.dgui-metric:nth-child(even){background:color-mix(in srgb,var(--du-green) 7%,var(--du-bg))}
+& .dgui-control{border:0;border-radius:20px;background:color-mix(in srgb,var(--du-style-color) 7%,var(--du-bg));padding:14px 16px}& .dgui-control output{border:0;border-radius:999px}
+& .dgui-steps li{border:0;border-radius:24px 24px 24px 8px;padding:16px 20px;background:var(--du-soft)}& .dgui-step-dot{border-radius:12px;background:var(--du-bg);color:var(--du-accent)}
+& .dgui-table-wrap{border:0;border-radius:24px}& th{background:var(--du-tint)}& .dgui-chart{border:0;border-radius:24px;background:var(--du-bg)}
+& .motion-copy-block{border:0;border-radius:24px 24px 24px 8px;background:var(--du-soft)}& .motion-copy-bar{color:var(--du-accent)}
+& [data-motion-component=card],& [data-motion-component=stat]{border:0;border-radius:24px 24px 24px 8px;background:var(--du-soft)}
+`) + grammar("technical", `
+&{border:1px solid var(--du-line);border-radius:10px;background:var(--du-bg);--du-motion-fill:linear-gradient(115deg,#087a93,#15506e);--du-motion-orb:#087a93;--du-action-radius:8px;--du-orb-radius:6px;--du-orb-size:30px;--du-feedback-travel:12%;--du-label-ms:180ms}
+& .dgui-header{padding-bottom:14px;border-bottom:2px solid var(--du-line)}& .dgui-header-title{letter-spacing:.2px}& .dgui-heading-icon{border-radius:6px;background:none;border:1px solid var(--du-line)}
+& .dgui-card{border-radius:8px;padding:16px;border:1px solid var(--du-line);background:var(--du-bg)}& .dgui-card>.dgui-section-title{font-size:calc(16px * var(--du-style-scale));padding-bottom:10px;border-bottom:1px solid var(--du-line)}
+& .dgui-row:has(>.dgui-metric){gap:0;border:1px solid var(--du-line);border-radius:8px;overflow:hidden}& .dgui-row>.dgui-metric{border:0;border-right:1px solid var(--du-line);border-radius:0;padding:16px;background:var(--du-soft)}& .dgui-row>.dgui-metric:last-child{border-right:0}
+& .dgui-metric strong,& .dgui-control output,& .dgui-step-dot,& td[data-numeric=true]{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+& .dgui-control{border-bottom:1px solid var(--du-line);border-radius:0;padding:10px 0;background:none}& .dgui-control output{border-radius:6px;background:var(--du-soft)}& .dgui-control input:not([type=range]):not([type=checkbox]),& .dgui-control select{border-radius:6px}
+& .dgui-segmented,& .dgui-segment-indicator{border-radius:6px}& .dgui-stepper{border-radius:8px;box-shadow:none}& .dgui-stepper>button{border-radius:6px}
+& .dgui-steps li{background:linear-gradient(90deg,var(--du-line) 1px,transparent 1px),linear-gradient(var(--du-line) 1px,transparent 1px),var(--du-bg);background-size:24px 24px;border:1px solid var(--du-line);border-radius:8px;padding:16px}& .dgui-steps li>div{background:var(--du-bg);padding:0 4px}& .dgui-step-dot{border-radius:6px;border:1px solid var(--du-line);background:var(--du-bg)}
+& .dgui-chart{border-radius:8px;padding:14px}& .dgui-table-wrap{border-radius:8px}& table{font-variant-numeric:tabular-nums}& th{border-bottom:2px solid var(--du-line);font-size:calc(13px * var(--du-style-scale))}& th,& td{border-right:1px solid var(--du-line)}& th:last-child,& td:last-child{border-right:0}
+& .motion-copy-block{border-radius:8px;padding:14px 16px;box-shadow:none}& .motion-copy-bar{border-bottom:1px solid var(--du-line);padding-bottom:10px;font-family:ui-monospace,Consolas,monospace}
+& [data-motion-component=card],& [data-motion-component=stat]{border-radius:8px;box-shadow:none}
+@container motion-surface (min-width:640px){& .dgui-steps:not(:has(li:nth-child(5))){display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:18px}& .dgui-steps:not(:has(li:nth-child(5))) li{flex-direction:column}& .dgui-steps:not(:has(li:nth-child(5))) li:not(:last-child):after{content:'\u2192';display:block;position:absolute;right:-17px;top:14px;color:var(--du-muted);font-size:18px}}
+`) + grammar("expressive", `
+&{border:0;border-radius:20px;background:var(--du-bg);--du-motion-fill:linear-gradient(115deg,#be4d29,#a66b15);--du-action-radius:14px;--du-orb-size:44px;--du-label-ms:500ms}
+& .dgui-header{border-left:6px solid var(--du-accent);padding:4px 0 4px 16px}& .dgui-header-title{font-weight:850;letter-spacing:-1.3px}& .dgui-heading-icon{display:none}& .dgui-section-title{font-weight:800;letter-spacing:-.4px}
+& .dgui-card{padding:24px;border:0;border-top:4px solid var(--du-accent);border-radius:4px 20px 20px 20px;background:var(--du-soft)}& .dgui-row>.dgui-card:first-child{flex-grow:1.6;background:var(--du-tint)}& .dgui-row>.dgui-card:nth-child(even){border-top-color:var(--du-ink);background:var(--du-bg);border-bottom:1px solid var(--du-line)}
+& .dgui-metric{border:0;border-radius:0;padding:12px 0;background:var(--du-bg)}& .dgui-metric strong{font-weight:850;letter-spacing:-1.7px}& .dgui-row>.dgui-metric:first-child{flex-grow:1.6;border-left:5px solid var(--du-tone);padding-left:18px}& .dgui-metric-label{font-weight:650;color:var(--du-ink)}
+& .dgui-control{padding:14px 0;background:none;border-radius:0;border-bottom:2px solid var(--du-line)}& .dgui-control output{border:0;background:var(--du-tint);font-size:20px;font-weight:800}
+& .dgui-steps li{padding:14px 0;background:none;border-radius:0;border-bottom:1px solid var(--du-line)}& .dgui-step-dot{font-size:calc(32px * var(--du-style-scale));width:46px;height:44px;border:0;border-radius:0;background:none;color:var(--du-tone);font-weight:850}& .dgui-steps strong{font-weight:800}
+& .dgui-chart{border:0;border-left:5px solid var(--du-accent);border-radius:0;background:var(--du-soft);padding:18px}& .dgui-table-wrap{border:0;border-radius:0}& th{border-bottom:3px solid var(--du-ink);background:none;color:var(--du-ink)}
+& .motion-copy-block{border:0;border-top:4px solid var(--du-accent);border-radius:0 18px 18px 18px;background:var(--du-soft)}& .motion-copy-title{font-weight:750}
+& [data-motion-component=card]{border:0;border-top:4px solid var(--du-accent);border-radius:4px 20px 20px 20px;background:var(--du-soft)}& [data-motion-component=stat]{border:0;border-left:4px solid var(--du-accent);border-radius:0}
+
+@container motion-surface (min-width:640px){& .dgui-grid[data-columns="2"]:has(>.dgui-card),& .dgui-grid[data-columns="2"]:has(>.dgui-metric){grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}& .dgui-grid[data-columns="3"]:has(>.dgui-metric){grid-template-columns:minmax(0,1.5fr) repeat(2,minmax(0,1fr))}}
+`) + grammar("prismframe", `
+&{font-family:ui-rounded,var(--dsw-font-family,system-ui,sans-serif);box-shadow:4px 6px 0 color-mix(in srgb,var(--du-style-color) 12%,var(--du-bg));--du-motion-fill:linear-gradient(115deg,#3069d6,#168ba2);--du-action-radius:16px;--du-orb-radius:12px;--du-label-ms:340ms}
+& .dgui-header-title{font-weight:780}& .dgui-card,& .dgui-metric{border:1.5px solid var(--du-line);box-shadow:3px 4px 0 color-mix(in srgb,var(--du-style-color) 13%,var(--du-bg))}& .dgui-card>.dgui-section-title{color:var(--du-accent)}
+& .dgui-control{border:1px solid var(--du-line);border-radius:16px;background:var(--du-bg);padding:14px 16px}& .dgui-control output{border:0;border-radius:10px;background:var(--du-tint)}
+& .dgui-steps li{border:1.5px solid var(--du-line);border-radius:18px;box-shadow:3px 4px 0 var(--du-tint);padding:16px 18px}& .dgui-step-dot{background:var(--du-tint);border-radius:10px;color:var(--du-accent)}
+& .dgui-chart,& .dgui-table-wrap{border:1.5px solid var(--du-line);border-radius:20px}& .dgui-chart{box-shadow:3px 4px 0 var(--du-tint)}
+& .motion-copy-block{border:1.5px solid var(--du-line);border-radius:20px;box-shadow:3px 4px 0 var(--du-tint)}
+& [data-motion-component=card],& [data-motion-component=stat]{border:1.5px solid var(--du-line);box-shadow:3px 4px 0 var(--du-tint);border-radius:20px}
+`) + grammar("aurora", `
+&{border:1px solid var(--du-line);border-radius:28px;background:#f4f2ee;--du-ink:#16151b;--du-muted:#66616e;--du-soft:color-mix(in srgb,var(--du-muted) 6%,var(--du-bg));--du-line:color-mix(in srgb,var(--du-muted) 17%,var(--du-bg));--du-motion-fill:linear-gradient(115deg,#7051ed,#326fce 55%,#188e97);--du-motion-orb:linear-gradient(135deg,#438ef5,#25b8bd);--du-action-radius:999px;--du-label-ms:550ms;box-shadow:0 16px 32px -28px #30204d40}
+& .dgui-header{margin-bottom:24px}& .dgui-header-title{letter-spacing:-.8px}& .dgui-heading-icon{border:0;border-radius:50%;background:var(--du-motion-orb);color:#fff}& .dgui-badge{border-radius:999px;padding:5px 12px}
+& .dgui-card,& .dgui-metric{border-radius:24px;padding:22px;border:1px solid var(--du-line);box-shadow:0 12px 26px -20px #30204d60}& .dgui-card{background:radial-gradient(ellipse at 100% 0,color-mix(in srgb,var(--du-accent) 7%,transparent),transparent 65%),var(--du-bg)}& .dgui-metric{background:radial-gradient(ellipse at 100% 0,color-mix(in srgb,var(--du-accent) 12%,transparent),transparent 70%),var(--du-bg)}& .dgui-metric:not([data-tone]) strong{color:var(--du-ink);font-weight:780;letter-spacing:-1.3px}
+& .dgui-control{background:var(--du-bg);border:1px solid var(--du-line);border-radius:22px;padding:14px 18px}& .dgui-control output{border:0;border-radius:999px;background:var(--du-soft);font-size:18px;padding:6px 14px;color:var(--du-ink)}& .dgui-control input:not([type=range]):not([type=checkbox]),& .dgui-control select{border-radius:999px;background:var(--du-soft);padding:10px 16px}
+& .dgui-button[data-variant=primary]{background:var(--du-ink);border-color:var(--du-ink);color:var(--du-bg);box-shadow:0 10px 20px -14px #30204d50}
+& .dgui-steps li{border:1px solid var(--du-line);padding:18px;border-radius:22px;box-shadow:0 10px 24px -22px #30204d70}& .dgui-step-dot{border-radius:50%;background:var(--du-ink);color:var(--du-bg)}
+& .dgui-chart,& .dgui-table-wrap{border-radius:24px;border:1px solid var(--du-line);background:var(--du-bg);overflow:hidden}& th,& td{padding:14px 18px}
+& .motion-copy-block{border-radius:24px;padding:18px 22px;box-shadow:0 12px 24px -22px #30204d70}& .motion-copy-block[data-code]{background:var(--du-soft)}& .dgui-segmented,& .dgui-segment-indicator{border-radius:999px}
+& [data-motion-component=card],& [data-motion-component=stat]{border-radius:24px;padding:22px;box-shadow:0 12px 24px -20px #30204d55}
+body[data-ds-dark-theme] &,&[data-preview-theme=dark]{background:var(--du-soft);--du-ink:var(--dsw-alias-label-primary,#f4f0e8);--du-muted:var(--dsw-alias-label-secondary,#bcb5c7)}
+`) + `
+.dgui-root[data-motion-demo]{display:flex;flex-direction:column;gap:16px}.dgui-root[data-motion-demo]>.dgui-segmented{flex:0 0 auto}
+${root} .dgui-card[data-surface=featured]{border-color:var(--du-accent)}${root} .dgui-card[data-surface=soft]{background:var(--du-soft)}${root} .dgui-card[data-tone]>.dgui-section-title{color:var(--du-tone)}
+${root} .dgui-steps li[data-step-status=active]{border-color:var(--du-accent)}${root} .dgui-step-dot .dgui-icon{color:inherit}
+@media(max-width:600px){${root}{padding:16px}${root}[data-preset=reading],${root}[data-preset=minimal]{padding:0}${root} .dgui-card,${root} .dgui-metric{padding:16px}${root} .dgui-control{padding:10px}${root}[data-visual-style=editorial] .dgui-card{padding:12px 0}${root}[data-visual-style=expressive] .dgui-metric{padding:10px 0}${root} .dgui-row:has(>.dgui-metric){flex-wrap:wrap}}
+@media(forced-colors:active){${root},${root} .dgui-card,${root} .dgui-metric,${root} .dgui-control,${root} .dgui-chart,${root} .motion-copy-block{background:Canvas;color:CanvasText;box-shadow:none;border-color:CanvasText}${root} .dgui-steps li{background:Canvas}}
 `;
 
 // src/style-previews.js
-var import_react16 = __toESM(require("react"), 1);
-var h11 = import_react16.default.createElement;
-var PREVIEW_LAYOUTS = [["text", "\u6587\u5B57\u8BF4\u660E"], ["comparison", "\u53CC\u5217\u5BF9\u6BD4"], ["list", "\u5206\u9694\u5217\u8868"], ["summary", "\u6570\u636E\u6458\u8981"], ["flow", "\u6D41\u7A0B\u56FE\u89E3"]];
-function LayoutPreview({ layout }) {
-  if (layout === "text") return h11(import_react16.default.Fragment, null, h11("strong", null, "\u5148\u4EA4\u4ED8\u4E00\u4E2A\u53EF\u7528\u7248\u672C"), h11("p", { className: "dgui-preview-copy" }, "\u628A\u76EE\u6807\u7F29\u5C0F\uFF0C\u628A\u5173\u952E\u4F53\u9A8C\u505A\u597D\u3002"), h11("p", { className: "dgui-preview-note" }, "\u5148\u9A8C\u8BC1\uFF0C\u518D\u9010\u6B65\u5B8C\u5584\u3002"));
-  if (layout === "comparison") return h11(import_react16.default.Fragment, null, h11("strong", null, "\u4E24\u79CD\u63A8\u8FDB\u65B9\u5F0F"), h11("div", { className: "dgui-preview-grid" }, [["\u5148\u505A\u5C0F\u7248\u672C", "\u9A8C\u8BC1\u91CD\u70B9"], ["\u5148\u94FA\u5168\u529F\u80FD", "\u8986\u76D6\u9700\u6C42"]].map(([title, note], i) => h11("div", { key: title, className: "dgui-preview-panel" }, h11("span", null, "\u65B9\u6848 " + (i ? "B" : "A")), h11("b", null, title), h11("em", null, note)))));
-  if (layout === "summary") return h11(import_react16.default.Fragment, null, h11("strong", null, "\u8BA9\u91CD\u70B9\u4E00\u773C\u53EF\u89C1"), h11("div", { className: "dgui-preview-grid" }, [["3", "\u63A8\u8FDB\u9636\u6BB5"], ["1", "\u6838\u5FC3\u76EE\u6807"]].map(([number2, label]) => h11("div", { key: label, className: "dgui-preview-panel" }, h11("span", null, label), h11("b", { className: "dgui-preview-number" }, number2), h11("i", null)))));
-  return h11(import_react16.default.Fragment, null, h11("strong", null, "\u628A\u590D\u6742\u95EE\u9898\u8BB2\u6E05\u695A"), h11("div", { className: "dgui-preview-grid" }, ["\u660E\u786E\u76EE\u6807", "\u89E3\u91CA\u5173\u7CFB", "\u7ED9\u51FA\u884C\u52A8"].map((text2, j2) => h11("div", { key: text2, className: "dgui-preview-panel" }, h11("span", null, layout === "list" ? "\u2713" : "0" + (j2 + 1)), h11("b", null, text2), layout === "list" ? h11("em", null, ["\u5148\u6293\u4F4F\u91CD\u70B9", "\u7528\u56FE\u5F62\u8BF4\u660E", "\u6536\u6210\u4E0B\u4E00\u6B65"][j2]) : h11("i", null)))));
+var import_react18 = __toESM(require("react"), 1);
+var h13 = import_react18.default.createElement;
+var PREVIEW_LAYOUTS = [["text", "\u6587\u5B57\u8BF4\u660E"], ["comparison", "\u53CC\u5217\u5BF9\u6BD4"], ["list", "\u5206\u9694\u5217\u8868"], ["summary", "\u6570\u636E\u6458\u8981"], ["controls", "\u63A7\u4EF6\u8868\u5355"], ["flow", "\u6D41\u7A0B\u56FE\u89E3"]];
+var header = (text2) => h13("div", { className: "dgui-header" }, h13("strong", { className: "dgui-header-title" }, text2));
+var copy = (text2) => h13("p", { className: "dgui-copy" }, text2);
+var card = (title, text2) => h13("div", { key: title, className: "dgui-card" }, h13("strong", { className: "dgui-section-title" }, title), copy(text2));
+var metric = (number2, label) => h13("div", { key: label, className: "dgui-metric" }, h13("span", { className: "dgui-metric-label" }, label), h13("strong", null, number2));
+function StyleSample({ styleId, layout = "text" }) {
+  let body, title;
+  if (layout === "text") {
+    title = "\u5148\u4EA4\u4ED8\u4E00\u4E2A\u53EF\u7528\u7248\u672C";
+    const content = h13("div", { className: "dgui-column" }, copy("\u628A\u76EE\u6807\u7F29\u5C0F\uFF0C\u628A\u5173\u952E\u4F53\u9A8C\u505A\u597D\u3002"), h13("p", { className: "dgui-copy dgui-sample-note" }, "\u5148\u9A8C\u8BC1\uFF0C\u518D\u9010\u6B65\u5B8C\u5584\u3002"));
+    body = styleId === "soft" ? card("\u4ECA\u5929\u7684\u91CD\u70B9", "\u628A\u76EE\u6807\u7F29\u5C0F\uFF0C\u628A\u5173\u952E\u4F53\u9A8C\u505A\u597D\u3002") : content;
+    if (styleId === "soft") body = h13(import_react18.default.Fragment, null, body, h13("p", { className: "dgui-copy dgui-sample-note" }, "\u5148\u9A8C\u8BC1\uFF0C\u518D\u9010\u6B65\u5B8C\u5584\u3002"));
+  } else if (layout === "comparison") {
+    title = "\u4E24\u79CD\u63A8\u8FDB\u65B9\u5F0F";
+    body = h13("div", { className: "dgui-row" }, card("\u5148\u505A\u5C0F\u7248\u672C", "\u9A8C\u8BC1\u91CD\u70B9"), card("\u5148\u94FA\u5168\u529F\u80FD", "\u8986\u76D6\u9700\u6C42"));
+  } else if (layout === "summary") {
+    title = "\u8BA9\u91CD\u70B9\u4E00\u773C\u53EF\u89C1";
+    body = h13("div", { className: "dgui-row" }, metric("3", "\u63A8\u8FDB\u9636\u6BB5"), metric("1", "\u6838\u5FC3\u76EE\u6807"));
+  } else if (layout === "controls") {
+    title = "\u8BA9\u53C2\u6570\u76F4\u63A5\u8BF4\u8BDD";
+    body = h13("div", { className: "dgui-column" }, h13("div", { className: "dgui-control" }, h13("span", { className: "dgui-control-label" }, "\u6BCF\u5468\u6295\u5165"), h13("output", null, "12 \u5C0F\u65F6"), h13("span", { className: "dgui-sample-track" }, h13("i"))), h13("div", { className: "dgui-sample-options" }, ["\u8F7B\u91CF", "\u5747\u8861", "\u6DF1\u5165"].map((t, i) => h13("span", { key: t, "data-selected": i === 1 || void 0 }, t))));
+  } else {
+    title = "\u628A\u590D\u6742\u95EE\u9898\u8BB2\u6E05\u695A";
+    body = h13("ol", { className: "dgui-steps", "data-sample-layout": layout }, ["\u660E\u786E\u76EE\u6807", "\u89E3\u91CA\u5173\u7CFB", "\u7ED9\u51FA\u884C\u52A8"].map((text2, i) => h13("li", { key: text2 }, h13("span", { className: "dgui-step-dot" }, layout === "list" ? "\u2713" : String(i + 1).padStart(2, "0")), h13("div", null, h13("strong", null, text2), layout === "list" && h13("p", null, ["\u5148\u6293\u4F4F\u91CD\u70B9", "\u7528\u56FE\u5F62\u8BF4\u660E", "\u6536\u6210\u4E0B\u4E00\u6B65"][i])))));
+  }
+  return h13("div", { className: "dgui-root dgui-style-preview", "data-preset": "brief", "data-visual-style": styleId, "data-layout": layout, "aria-hidden": true }, header(title), h13("div", { className: "dgui-content" }, body));
 }
 function StyleOptions({ value, disabled, onChange }) {
-  const [layout, setLayout] = (0, import_react16.useState)("text"), id = (0, import_react16.useId)();
-  return h11(
+  const [layout, setLayout] = (0, import_react18.useState)("text"), id2 = (0, import_react18.useId)();
+  return h13(
     "div",
     null,
-    h11("div", { className: "dgui-preview-tabs", role: "tablist", "aria-label": "\u6392\u7248\u9884\u89C8" }, PREVIEW_LAYOUTS.map(([key2, label], i) => h11("button", { key: key2, type: "button", role: "tab", id: id + "-" + key2, "aria-selected": layout === key2, "aria-controls": id + "-panel", tabIndex: layout === key2 ? 0 : -1, onClick: () => setLayout(key2), onKeyDown: (e) => {
+    h13("div", { className: "dgui-preview-tabs", role: "tablist", "aria-label": "\u6392\u7248\u9884\u89C8" }, PREVIEW_LAYOUTS.map(([key2, label], i) => h13("button", { key: key2, type: "button", role: "tab", id: id2 + "-" + key2, "aria-selected": layout === key2, "aria-controls": id2 + "-panel", tabIndex: layout === key2 ? 0 : -1, onClick: () => setLayout(key2), onKeyDown: (e) => {
       if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
       e.preventDefault();
-      const n = e.key === "Home" ? 0 : e.key === "End" ? PREVIEW_LAYOUTS.length - 1 : (i + (e.key === "ArrowLeft" ? -1 : 1) + PREVIEW_LAYOUTS.length) % PREVIEW_LAYOUTS.length;
-      setLayout(PREVIEW_LAYOUTS[n][0]);
-      e.currentTarget.parentElement.children[n].focus();
+      const n2 = e.key === "Home" ? 0 : e.key === "End" ? PREVIEW_LAYOUTS.length - 1 : (i + (e.key === "ArrowLeft" ? -1 : 1) + PREVIEW_LAYOUTS.length) % PREVIEW_LAYOUTS.length;
+      setLayout(PREVIEW_LAYOUTS[n2][0]);
+      e.currentTarget.parentElement.children[n2].focus();
     } }, label))),
-    h11("div", { role: "tabpanel", id: id + "-panel", "aria-labelledby": id + "-" + layout }, h11("div", { className: "dgui-style-options", role: "radiogroup", "aria-label": "\u89C6\u89C9\u98CE\u683C" }, VISUAL_STYLES.map((s, i) => h11(
-      "button",
-      { key: s.id, type: "button", role: "radio", "aria-checked": value === s.id, "aria-label": s.name, disabled, tabIndex: value === s.id ? 0 : -1, className: "dgui-style-option", "data-style": s.id, onClick: () => onChange(s.id), onKeyDown: (e) => {
-        if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) return;
-        e.preventDefault();
-        const n = e.key === "Home" ? 0 : e.key === "End" ? VISUAL_STYLES.length - 1 : (i + (["ArrowLeft", "ArrowUp"].includes(e.key) ? -1 : 1) + VISUAL_STYLES.length) % VISUAL_STYLES.length;
-        e.currentTarget.parentElement.children[n].focus();
-        onChange(VISUAL_STYLES[n].id);
-      }, style: { "--preview-bg": s.preview.bg, "--preview-ink": s.preview.ink, "--preview-accent": s.preview.accent, "--preview-soft": s.preview.soft, "--preview-line": s.preview.line } },
-      h11("div", { className: "dgui-style-preview", "data-layout": layout, "aria-hidden": true }, h11(LayoutPreview, { layout })),
-      h11("div", { className: "dgui-style-name" }, s.name, h11("span", { "aria-hidden": true }, value === s.id ? "\u2713" : "")),
-      h11("div", { className: "dgui-style-description" }, s.description)
-    ))))
+    h13("div", { role: "tabpanel", id: id2 + "-panel", "aria-labelledby": id2 + "-" + layout }, h13("div", { className: "dgui-style-options", role: "radiogroup", "aria-label": "\u89C6\u89C9\u98CE\u683C" }, VISUAL_STYLES.map((s, i) => h13("button", { key: s.id, type: "button", role: "radio", "aria-checked": value === s.id, "aria-label": s.name, disabled, tabIndex: value === s.id ? 0 : -1, className: "dgui-style-option", "data-style": s.id, onClick: () => onChange(s.id), onKeyDown: (e) => {
+      if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) return;
+      e.preventDefault();
+      const n2 = e.key === "Home" ? 0 : e.key === "End" ? VISUAL_STYLES.length - 1 : (i + (["ArrowLeft", "ArrowUp"].includes(e.key) ? -1 : 1) + VISUAL_STYLES.length) % VISUAL_STYLES.length;
+      e.currentTarget.parentElement.children[n2].focus();
+      onChange(VISUAL_STYLES[n2].id);
+    } }, h13(StyleSample, { styleId: s.id, layout }), h13("div", { className: "dgui-style-name" }, s.name, h13("span", { "aria-hidden": true }, value === s.id ? "\u2713" : "")), h13("div", { className: "dgui-style-description" }, s.description)))))
   );
 }
 var STYLE_SETTINGS_CSS = `
 .dgui-settings .dgui-style-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 16px}
 .dgui-settings .dgui-preview-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 8px}
 .dgui-settings .dgui-preview-tabs button{font:inherit;font-size:13px;padding:7px 12px;border:1px solid var(--ui-line,#d4dce5);border-radius:999px;background:transparent;color:inherit;cursor:pointer}
-.dgui-settings .dgui-preview-tabs button[aria-selected=true]{background:#eaf2ff;color:#244e8d;border-color:#a7c3ed}
+.dgui-settings .dgui-preview-tabs button[aria-selected=true]{background:var(--du-tint,#eaf2ff);color:var(--du-accent,#244e8d);border-color:var(--du-accent,#a7c3ed)}
 .dgui-settings .dgui-preview-tabs button:focus-visible{outline:3px solid #6da7e8;outline-offset:2px}
 .dgui-settings .dgui-style-option{appearance:none;min-width:0;text-align:left;padding:10px;border:1px solid var(--ui-line,#d4dce5);border-radius:18px;background:transparent;color:inherit;cursor:pointer;font:inherit;overflow:hidden}
 .dgui-settings .dgui-style-option[aria-checked=true]{border-color:#467bd1;box-shadow:0 0 0 1px #467bd1}
 .dgui-settings .dgui-style-option:focus-visible{outline:3px solid #6da7e8;outline-offset:3px}.dgui-settings .dgui-style-option:disabled{cursor:default;opacity:.6}
-.dgui-settings .dgui-style-preview{box-sizing:border-box;min-height:170px;padding:14px;background:var(--preview-bg);color:var(--preview-ink);border-radius:12px;overflow:hidden}
-.dgui-settings .dgui-style-preview>strong{display:block;font-size:16px;line-height:1.4;margin-bottom:14px;font-weight:750}
-.dgui-settings .dgui-preview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.dgui-settings .dgui-preview-panel{min-width:0;padding:8px 6px;border:1px solid var(--preview-line);border-radius:8px}
-.dgui-settings .dgui-preview-panel span{display:block;color:var(--preview-accent);font-size:11px;font-weight:750}
-.dgui-settings .dgui-preview-panel b{display:block;font-size:12px;margin:5px 0;white-space:nowrap}
-.dgui-settings .dgui-preview-panel i{display:block;height:3px;width:75%;background:var(--preview-soft);border-radius:9px}
-.dgui-settings .dgui-preview-panel em{display:block;font-style:normal;font-size:12px;line-height:1.5;opacity:.85}
-.dgui-settings .dgui-style-preview[data-layout=comparison] .dgui-preview-grid,.dgui-settings .dgui-style-preview[data-layout=summary] .dgui-preview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.dgui-settings .dgui-style-preview[data-layout=list] .dgui-preview-grid{grid-template-columns:1fr;gap:0}
-.dgui-settings .dgui-style-preview[data-layout=list] .dgui-preview-panel{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:6px;border:0;border-bottom:1px solid var(--preview-line);border-radius:0;background:transparent;box-shadow:none;padding:7px 0}
-.dgui-settings .dgui-style-preview[data-layout=list] .dgui-preview-panel:last-child{border-bottom:0}
-.dgui-settings .dgui-style-preview[data-layout=list] .dgui-preview-panel b{margin:0}.dgui-settings .dgui-style-preview[data-layout=list] .dgui-preview-panel span{font-size:12px}
-.dgui-settings .dgui-style-preview .dgui-preview-number{font-size:27px;line-height:1.25;color:var(--preview-accent)}
-.dgui-settings .dgui-preview-copy{font-size:14px;line-height:1.7;margin:0 0 10px;color:var(--preview-ink)}
-.dgui-settings .dgui-preview-note{font-size:13px;line-height:1.6;margin:0;color:var(--preview-accent)}
-.dgui-settings [data-style=soft] .dgui-style-preview[data-layout=text],.dgui-settings [data-style=prismframe] .dgui-style-preview[data-layout=text]{border:1px solid var(--preview-line)}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style]{--du-style-scale:.72;margin:0;min-height:210px;padding:16px;pointer-events:none;user-select:none;font-size:13px;box-sizing:border-box;overflow:hidden}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-header{margin-bottom:14px}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-row{gap:10px;flex-wrap:nowrap}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-row>*{flex-basis:0;min-width:0}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-card{padding:12px;gap:8px}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-metric{padding:12px;gap:6px}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-steps{gap:7px;margin-top:0}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-steps li{padding:8px 10px;gap:10px}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-steps p{font-size:11px}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-control{padding:10px;gap:8px}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-control-label{font-size:13px;flex:1}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-control output{min-width:0;font-size:13px;padding:3px 7px}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style] .dgui-step-dot{width:24px;height:24px;font-size:12px;margin-left:0}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style=editorial]{border:0;border-radius:0;background:var(--du-bg)}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style=editorial] .dgui-card{padding:8px 0}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style=editorial] .dgui-steps{border:0;margin-left:0}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style=technical] .dgui-row:has(>.dgui-metric){gap:0}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style=expressive] .dgui-step-dot{font-size:23px;width:30px}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style=expressive] .dgui-metric:first-child{flex-grow:1.6}
+.dgui-settings .dgui-style-preview.dgui-root[data-preset][data-visual-style=aurora] .dgui-card{border-radius:18px}
+.dgui-sample-note{color:var(--du-muted)!important}.dgui-style-preview[data-visual-style=soft] .dgui-sample-note{padding-left:10px}.dgui-style-preview[data-visual-style=expressive] .dgui-sample-note{border-left:3px solid var(--du-accent);padding-left:10px}
+.dgui-sample-track{width:100%;height:6px;border-radius:999px;display:block;background:var(--du-line);position:relative;margin:8px 0}.dgui-sample-track i{display:block;width:42%;height:100%;border-radius:inherit;background:var(--du-accent)}.dgui-sample-track i:after{content:'';position:absolute;width:15px;height:15px;left:calc(42% - 7px);top:-4.5px;border-radius:50%;background:var(--du-bg);border:3px solid var(--du-accent)}
+.dgui-sample-options{display:flex;gap:6px}.dgui-sample-options span{flex:1;text-align:center;padding:5px 8px;border:1px solid var(--du-line);border-radius:var(--du-radius-inner);font-size:12px}.dgui-sample-options [data-selected]{background:var(--du-tint);color:var(--du-accent);font-weight:700}
 .dgui-settings .dgui-style-name{display:flex;justify-content:space-between;gap:8px;font-size:15px;font-weight:700;margin:11px 2px 5px}.dgui-settings .dgui-style-name>span{color:#467bd1}
 .dgui-settings .dgui-style-description{font-size:12px;line-height:1.6;margin:0 2px;opacity:.8}
-.dgui-settings [data-style=editorial] .dgui-preview-panel{border:0;border-left:1px solid var(--preview-line);border-radius:0}
-.dgui-settings [data-style=soft] .dgui-style-preview{background:linear-gradient(130deg,#f5effc,#eff8f6)}
-.dgui-settings [data-style=soft] .dgui-preview-panel{background:#ffffffba;border-radius:14px;border:0}
-.dgui-settings [data-style=technical] .dgui-preview-panel{border-radius:4px}.dgui-settings [data-style=technical] .dgui-preview-panel span{font-family:ui-monospace,monospace}
-.dgui-settings [data-style=expressive] .dgui-style-preview>strong{font-size:19px}.dgui-settings [data-style=expressive] .dgui-preview-panel{background:var(--preview-soft);border:0;border-radius:12px}.dgui-settings [data-style=expressive] .dgui-preview-panel span{font-size:18px}
-.dgui-settings [data-style=prismframe] .dgui-style-preview{border-radius:18px;font-family:ui-rounded,system-ui,sans-serif}.dgui-settings [data-style=prismframe] .dgui-preview-panel{background:white;border-radius:13px;box-shadow:3px 4px 0 #b5d6f5,0 5px 9px #1938580c}
 @media(max-width:560px){.dgui-settings .dgui-style-options{grid-template-columns:1fr}}
 `;
 
@@ -4865,20 +5707,49 @@ body[data-ds-dark-theme] .dgui-root,.dgui-root[data-preview-theme=dark]{--du-acc
 .dgui-panel{padding:16px;min-width:0;overflow:auto;height:100%;box-sizing:border-box}.dgui-panel>.dgui-root{margin-bottom:16px}.dgui-panel label{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.dgui-panel select{max-width:100%;flex:1;min-width:120px;border:1px solid var(--du-line);border-radius:8px;padding:8px;background:var(--du-bg);color:var(--du-ink)}
 .dgui-history-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--du-line)}.dgui-history-row>span{flex:1;min-width:140px}.dgui-version-preview{margin-top:14px;border:1px solid var(--du-line);border-radius:12px;padding:12px}.dgui-version-preview .dgui-root{margin-top:12px}
 [data-dgui-presentation]>.dgui-secondary{margin:8px 0}[data-dgui-marker]{min-width:0}
-` + SOFT_CSS + READING_CSS + NATIVE_STYLE_CSS + STYLE_SETTINGS_CSS;
+` + SOFT_CSS + READING_CSS + NATIVE_STYLE_CSS + MOTION_CSS + EXPRESSIVE_CSS + STYLE_SETTINGS_CSS;
+
+// src/motion-library.js
+var import_react19 = __toESM(require("react"), 1);
+var h14 = import_react19.default.createElement;
+function MotionLibrary() {
+  const [open, setOpen] = (0, import_react19.useState)(false), [months, setMonths] = (0, import_react19.useState)(1), [seats, setSeats] = (0, import_react19.useState)(2), [checks, setChecks] = (0, import_react19.useState)([false, false, false]), style = useNativeStyle();
+  const total = 29 * months * seats, done = checks.filter(Boolean).length;
+  return h14("section", { "aria-label": "\u52A8\u6001\u4EA4\u4E92\u6848\u4F8B" }, h14("h4", null, "\u52A8\u6001\u4EA4\u4E92\u6848\u4F8B"), h14("p", null, "\u53EF\u76F4\u63A5\u64CD\u4F5C\u7684\u672C\u5730\u6F14\u793A\u3002\u793A\u4F8B\u4EF7\u683C\u4E0D\u662F\u62A5\u4EF7\uFF0C\u52FE\u9009\u4E0D\u4EE3\u8868\u5DF2\u6267\u884C\u68C0\u67E5\uFF1B\u64CD\u4F5C\u4E0D\u4F1A\u8C03\u7528\u6A21\u578B\u6216\u6539\u52A8\u8BBE\u7F6E\u3002"), h14("button", { className: "dgui-secondary", type: "button", "aria-expanded": open, onClick: () => setOpen(!open) }, open ? "\u6536\u8D77\u4EA4\u4E92\u6F14\u793A" : "\u4F53\u9A8C\u4EA4\u4E92\u6F14\u793A"), open && h14(
+    "section",
+    { className: "dgui-root", "data-preset": "brief", "data-visual-style": style, "data-motion-demo": true },
+    h14("h4", null, "\u65B9\u6848\u5207\u6362\u4E0E\u9884\u7B97\u8054\u52A8"),
+    h14(SegmentedControl, { id: "demo-period", label: "\u793A\u4F8B\u8D2D\u4E70\u6708\u6570", options: [1, 3, 12], value: months, onChange: setMonths }),
+    h14("div", { className: "dgui-control" }, h14("label", { htmlFor: "demo-seats" }, "\u793A\u4F8B\u4F7F\u7528\u4EBA\u6570"), h14("input", { id: "demo-seats", type: "range", min: 1, max: 8, value: seats, style: { "--du-range": (seats - 1) / 7 * 100 + "%" }, onChange: (e) => setSeats(Number(e.target.value)) }), h14("output", { htmlFor: "demo-seats" }, seats)),
+    h14("div", { className: "dgui-metric" }, h14("span", { className: "dgui-metric-label" }, "\u793A\u4F8B\u5355\u4EF7 29 \u5143/\u4EBA/\u6708"), h14(MetricValue, { value: total, expressive: true }, total, " ", h14("small", null, "\u5143"))),
+    h14("div", { className: "dgui-control" }, h14("label", { htmlFor: "demo-quantity" }, "\u6570\u91CF\u6B65\u8FDB"), h14(Stepper, { value: seats, spec: { min: 1, max: 8, step: 1 }, label: "\u793A\u4F8B\u4EBA\u6570", onChange: setSeats }, h14("input", { id: "demo-quantity", type: "number", min: 1, max: 8, value: seats, onChange: (e) => {
+      const v2 = Number(e.target.value);
+      if (Number.isInteger(v2) && v2 >= 1 && v2 <= 8) setSeats(v2);
+    } }))),
+    h14("h4", null, "\u52FE\u9009\u4E0E\u8FDB\u5EA6\u53CD\u9988"),
+    h14("div", { className: "dgui-column" }, ["\u8BF4\u660E\u6587\u6863\u5DF2\u68C0\u67E5", "\u5B9E\u9645\u6D4B\u8BD5\u5DF2\u5B8C\u6210", "\u8BB8\u53EF\u8BC1\u5DF2\u786E\u8BA4"].map((label, i) => h14("label", { key: label, className: "dgui-control" }, label, h14(ElasticToggle, { checked: checks[i], onChange: (value) => setChecks((previous) => previous.map((v2, n2) => n2 === i ? value : v2)) })))),
+    h14("div", { className: "dgui-progress" }, h14("span", null, done + " / 3 \u9879"), h14("progress", { value: done, max: 3, "aria-label": "\u6F14\u793A\u5B8C\u6210\u8FDB\u5EA6" })),
+    h14(ExpressiveAction, { text: "\u91CD\u7F6E\u672C\u5730\u6F14\u793A", className: "dgui-button", "data-variant": "primary", type: "button", onClick: () => {
+      setMonths(1);
+      setSeats(2);
+      setChecks([false, false, false]);
+    } }),
+    h14(CopyBlock, { code: true, lang: "bash", title: "\u590D\u5236\u771F\u5B9E\u5185\u5BB9", text: "git status\ngit diff" })
+  ));
+}
 
 // src/settings.js
-var import_react19 = __toESM(require("react"), 1);
+var import_react22 = __toESM(require("react"), 1);
 
 // src/runtime-diagnostics.js
-var import_react17 = __toESM(require("react"), 1);
-var h12 = import_react17.default.createElement;
+var import_react20 = __toESM(require("react"), 1);
+var h15 = import_react20.default.createElement;
 var activation = { active: false, channel: "\u672A\u6FC0\u6D3B", sidebar: false };
 function setRuntimeActivation(patch) {
   activation = { ...activation, ...patch };
 }
 function RuntimeDiagnostics() {
-  const [report, setReport] = (0, import_react17.useState)(), [error, setError] = (0, import_react17.useState)(""), [busy, setBusy] = (0, import_react17.useState)(false);
+  const [report, setReport] = (0, import_react20.useState)(), [error, setError] = (0, import_react20.useState)(""), [busy, setBusy] = (0, import_react20.useState)(false);
   const check = async () => {
     setBusy(true);
     setError("");
@@ -4895,11 +5766,11 @@ function RuntimeDiagnostics() {
       setBusy(false);
     }
   };
-  return h12("section", { "aria-label": "\u8FD0\u884C\u72B6\u6001" }, h12("h4", null, "\u8FD0\u884C\u72B6\u6001"), h12("p", null, "\u5BA2\u6237\u7AEF\uFF1A" + (activation.active ? "\u5DF2\u6FC0\u6D3B" : "\u6B63\u5728\u6FC0\u6D3B") + " \xB7 " + activation.channel), h12("button", { className: "dgui-secondary", type: "button", disabled: busy, onClick: check }, busy ? "\u6B63\u5728\u68C0\u67E5\u2026" : "\u68C0\u67E5\u8FD0\u884C\u72B6\u6001"), report && h12(import_react17.default.Fragment, null, h12("p", null, "\u6784\u5EFA\uFF1A" + report.build.id + (report.build.id === BUILD_INFO.id ? " \xB7 \u524D\u540E\u7AEF\u4E00\u81F4" : " \xB7 \u524D\u540E\u7AEF\u4E0D\u540C\uFF0C\u8BF7\u91CD\u542F\u5BBF\u4E3B\u5E76\u5237\u65B0")), h12("p", null, "\u672C\u5730\u8D44\u6E90\uFF1A" + (report.assets.every((a) => a.available) && report.assetRouteOK ? "\u6B63\u5E38" : "\u6709\u7F3A\u5931\u6216\u8DEF\u7531\u4E0D\u53EF\u7528")), h12("p", null, "\u540C\u8F6E\u4FEE\u590D\u63A5\u53E3\uFF1A" + (report.feedbackHookRegistered ? "\u5DF2\u6CE8\u518C" : "\u5F53\u524D\u5BBF\u4E3B\u4E0D\u53EF\u7528") + " \xB7 \u539F\u751F\u4FA7\u680F\uFF1A" + (activation.sidebar ? "\u5DF2\u63A5\u5165" : "\u5F53\u524D\u5BBF\u4E3B\u672A\u63D0\u4F9B")), h12("p", null, "\u63A7\u4EF6\u4E0E\u6A21\u578B\u811A\u672C\u5728\u6574\u8F6E\u7ED3\u675F\u540E\u542F\u7528\uFF1B\u4E0D\u6539\u53D8\u5BBF\u4E3B\u6743\u9650\u3002")), error && h12("p", { role: "alert" }, error));
+  return h15("section", { "aria-label": "\u8FD0\u884C\u72B6\u6001" }, h15("h4", null, "\u8FD0\u884C\u72B6\u6001"), h15("p", null, "\u5BA2\u6237\u7AEF\uFF1A" + (activation.active ? "\u5DF2\u6FC0\u6D3B" : "\u6B63\u5728\u6FC0\u6D3B") + " \xB7 " + activation.channel), h15("button", { className: "dgui-secondary", type: "button", disabled: busy, onClick: check }, busy ? "\u6B63\u5728\u68C0\u67E5\u2026" : "\u68C0\u67E5\u8FD0\u884C\u72B6\u6001"), report && h15(import_react20.default.Fragment, null, h15("p", null, "\u6784\u5EFA\uFF1A" + report.build.id + (report.build.id === BUILD_INFO.id ? " \xB7 \u524D\u540E\u7AEF\u4E00\u81F4" : " \xB7 \u524D\u540E\u7AEF\u4E0D\u540C\uFF0C\u8BF7\u91CD\u542F\u5BBF\u4E3B\u5E76\u5237\u65B0")), h15("p", null, "\u672C\u5730\u8D44\u6E90\uFF1A" + (report.assets.every((a) => a.available) && report.assetRouteOK ? "\u6B63\u5E38" : "\u6709\u7F3A\u5931\u6216\u8DEF\u7531\u4E0D\u53EF\u7528")), h15("p", null, "\u540C\u8F6E\u4FEE\u590D\u63A5\u53E3\uFF1A" + (report.feedbackHookRegistered ? "\u5DF2\u6CE8\u518C" : "\u5F53\u524D\u5BBF\u4E3B\u4E0D\u53EF\u7528") + " \xB7 \u539F\u751F\u4FA7\u680F\uFF1A" + (activation.sidebar ? "\u5DF2\u63A5\u5165" : "\u5F53\u524D\u5BBF\u4E3B\u672A\u63D0\u4F9B")), h15("p", null, "\u63A7\u4EF6\u4E0E\u6A21\u578B\u811A\u672C\u5728\u6574\u8F6E\u7ED3\u675F\u540E\u542F\u7528\uFF1B\u4E0D\u6539\u53D8\u5BBF\u4E3B\u6743\u9650\u3002")), error && h15("p", { role: "alert" }, error));
 }
 
 // src/scene-library.js
-var import_react18 = __toESM(require("react"), 1);
+var import_react21 = __toESM(require("react"), 1);
 
 // lib/scene-library.js
 var SCENES = Object.freeze([
@@ -4914,28 +5785,28 @@ var SCENES = Object.freeze([
 ]);
 
 // src/scene-library.js
-var h13 = import_react18.default.createElement;
+var h16 = import_react21.default.createElement;
 function SceneLibrary() {
-  const [open, setOpen] = (0, import_react18.useState)(false), [selected, select] = (0, import_react18.useState)("brief"), [status, setStatus] = (0, import_react18.useState)("");
+  const [open, setOpen] = (0, import_react21.useState)(false), [selected, select] = (0, import_react21.useState)("brief"), [status, setStatus] = (0, import_react21.useState)("");
   const scene = SCENES.find((s) => s.id === selected);
-  return h13("section", { "aria-label": "\u573A\u666F\u6848\u4F8B\u5E93" }, h13("h4", null, "\u573A\u666F\u6848\u4F8B\u5E93"), h13("p", null, "\u6309\u7528\u9014\u9884\u89C8\u77ED\u6848\u4F8B\u3002\u6848\u4F8B\u5C55\u793A\u7ED3\u6784\uFF0C\u751F\u6210\u65F6\u4F1A\u9002\u914D\u5F53\u524D\u5F15\u5BFC\u98CE\u683C\uFF1B\u63A7\u4EF6\u5728\u6B64\u5904\u53EA\u4F5C\u9884\u89C8\u3002"), h13("button", { className: "dgui-secondary", type: "button", "aria-expanded": open, onClick: () => setOpen(!open) }, open ? "\u6536\u8D77\u6848\u4F8B" : "\u6D4F\u89C8\u6848\u4F8B"), open && h13(import_react18.default.Fragment, null, h13("div", { className: "dgui-row dgui-scene-choices", role: "group", "aria-label": "\u9009\u62E9\u6848\u4F8B" }, SCENES.map((s) => h13("button", { className: "dgui-secondary", key: s.id, type: "button", "aria-pressed": s.id === selected, onClick: () => {
+  return h16("section", { "aria-label": "\u573A\u666F\u6848\u4F8B\u5E93" }, h16("h4", null, "\u573A\u666F\u6848\u4F8B\u5E93"), h16("p", null, "\u6309\u7528\u9014\u9884\u89C8\u77ED\u6848\u4F8B\u3002\u6848\u4F8B\u5C55\u793A\u7ED3\u6784\uFF0C\u751F\u6210\u65F6\u4F1A\u9002\u914D\u5F53\u524D\u5F15\u5BFC\u98CE\u683C\uFF1B\u63A7\u4EF6\u5728\u6B64\u5904\u53EA\u4F5C\u9884\u89C8\u3002"), h16("button", { className: "dgui-secondary", type: "button", "aria-expanded": open, onClick: () => setOpen(!open) }, open ? "\u6536\u8D77\u6848\u4F8B" : "\u6D4F\u89C8\u6848\u4F8B"), open && h16(import_react21.default.Fragment, null, h16("div", { className: "dgui-row dgui-scene-choices", role: "group", "aria-label": "\u9009\u62E9\u6848\u4F8B" }, SCENES.map((s) => h16("button", { className: "dgui-secondary", key: s.id, type: "button", "aria-pressed": s.id === selected, onClick: () => {
     select(s.id);
     setStatus("");
-  } }, s.name))), h13(UiView, { key: selected, record: { documentId: "scene-" + selected, document: validateDocument(scene.spec) }, sessionId: "scene-preview", preview: true }), h13("button", { className: "dgui-secondary", type: "button", onClick: async () => {
+  } }, s.name))), h16(UiView, { key: selected, record: { documentId: "scene-" + selected, document: validateDocument(scene.spec) }, sessionId: "scene-preview", preview: true }), h16("button", { className: "dgui-secondary", type: "button", onClick: async () => {
     try {
       await navigator.clipboard.writeText(scene.prompt);
       setStatus("\u9700\u6C42\u5DF2\u590D\u5236\uFF0C\u53EF\u4EE5\u4FEE\u6539\u540E\u53D1\u7ED9\u6A21\u578B\u3002");
     } catch {
       setStatus("\u590D\u5236\u4E0D\u53EF\u7528\uFF0C\u8BF7\u590D\u5236\u4E0B\u9762\u7684\u9700\u6C42\u3002");
     }
-  } }, "\u590D\u5236\u6848\u4F8B\u9700\u6C42"), h13("p", null, scene.prompt), status && h13("p", { role: "status" }, status)));
+  } }, "\u590D\u5236\u6848\u4F8B\u9700\u6C42"), h16("p", null, scene.prompt), status && h16("p", { role: "status" }, status)));
 }
 
 // src/settings.js
-var h14 = import_react19.default.createElement;
+var h17 = import_react22.default.createElement;
 function ModeSettings({ scope: scope2 }) {
-  const [snapshot2, setSnapshot] = (0, import_react19.useState)(() => scope2.getSnapshot()), [busy, setBusy] = (0, import_react19.useState)(false), [message, setMessage] = (0, import_react19.useState)(""), pending2 = (0, import_react19.useRef)(false);
-  (0, import_react19.useEffect)(() => scope2.subscribe(() => setSnapshot(scope2.getSnapshot())), [scope2]);
+  const [snapshot2, setSnapshot] = (0, import_react22.useState)(() => scope2.getSnapshot()), [busy, setBusy] = (0, import_react22.useState)(false), [message, setMessage] = (0, import_react22.useState)(""), pending2 = (0, import_react22.useRef)(false);
+  (0, import_react22.useEffect)(() => scope2.subscribe(() => setSnapshot(scope2.getSnapshot())), [scope2]);
   const ready = snapshot2.status === "ready" && snapshot2.value !== void 0;
   async function change(mode, key2 = "designMode") {
     if (pending2.current || !ready) return;
@@ -4956,28 +5827,29 @@ function ModeSettings({ scope: scope2 }) {
       setBusy(false);
     }
   }
-  return h14(
+  return h17(
     "section",
     { className: "dgui-root dgui-settings", "aria-label": "DSH Motion UI \u8BBE\u7F6E" },
-    h14("h3", null, "DSH Motion UI"),
-    h14("label", { htmlFor: "dgui-design-mode" }, "\u8BBE\u8BA1\u6A21\u5F0F"),
-    h14("select", { id: "dgui-design-mode", value: snapshot2.value?.designMode ?? "guided", disabled: !ready || busy, onChange: (e) => change(e.target.value) }, h14("option", { value: "guided" }, "\u5F15\u5BFC\u6A21\u5F0F"), h14("option", { value: "free" }, "\u81EA\u7531\u8BBE\u8BA1\u6A21\u5F0F")),
-    h14("p", null, "\u5F15\u5BFC\u6A21\u5F0F\u63D0\u4F9B\u8BBE\u8BA1\u6280\u80FD\u3001\u7EC4\u4EF6\u534F\u8BAE\u4E0E\u793A\u4F8B\u3002\u81EA\u7531\u8BBE\u8BA1\u6A21\u5F0F\u53EA\u63D0\u4F9B\u753B\u5E03\u63A5\u53E3\u4E0E\u4EA4\u4E92\u7EA6\u675F\uFF0C\u5E03\u5C40\u3001\u56FE\u5F62\u3001\u914D\u8272\u548C\u52A8\u753B\u7531\u6A21\u578B\u51B3\u5B9A\uFF1B\u4E24\u79CD\u6A21\u5F0F\u7684\u8FD0\u884C\u6743\u9650\u76F8\u540C\u3002"),
-    h14("p", null, "\u4E24\u79CD\u6A21\u5F0F\u90FD\u4F1A\u6307\u5BFC\u6A21\u578B\u5224\u65AD\u4F55\u65F6\u4E3B\u52A8\u4F7F\u7528 UI\uFF0C\u5E76\u4F18\u5148\u4EA4\u4ED8\u5C0F\u800C\u5B8C\u6574\u7684\u754C\u9762\u3002"),
-    h14("h4", null, "\u89C6\u89C9\u98CE\u683C\uFF08\u4EC5\u9650\u5F15\u5BFC\u6A21\u5F0F\uFF09"),
-    h14("p", null, "\u70B9\u51FB\u98CE\u683C\u5361\u7247\u5373\u4FDD\u5B58\uFF0C\u4ECE\u4E0B\u4E00\u6B21\u8BF7\u6C42\u5F00\u59CB\u751F\u6548\u3002\u4E0B\u65B9\u53EF\u5207\u6362\u6392\u7248\u9884\u89C8\uFF0C\u4EC5\u4F9B\u6BD4\u8F83\uFF0C\u4E0D\u9650\u5236\u751F\u6210\u6392\u7248\u3002\u81EA\u7531\u6A21\u5F0F\u4E0D\u6CE8\u5165\u98CE\u683C\u6307\u5BFC\u4E0E\u6848\u4F8B\uFF0C\u7531\u6A21\u578B\u81EA\u4E3B\u8BBE\u8BA1\u3002"),
-    h14(StyleOptions, { value: snapshot2.value?.visualStyle ?? DEFAULT_VISUAL_STYLE, disabled: !ready || busy || snapshot2.value?.designMode === "free", onChange: (value) => change(value, "visualStyle") }),
-    h14("p", null, "\u6587\u5B57\u3001\u5BF9\u6BD4\u3001\u5217\u8868\u3001\u6458\u8981\u4E0E\u6D41\u7A0B\u7684\u6392\u7248\u4EA4\u7ED9\u6A21\u578B\u6309\u5185\u5BB9\u81EA\u9009\u3002\u540C\u4E00\u56DE\u590D\u53EF\u7EC4\u5408\u591A\u5757\u4E0D\u540C\u6392\u7248\u7684\u754C\u9762\u3002"),
-    h14("p", null, "\u754C\u9762\u7EDF\u4E00\u901A\u8FC7\u6B63\u6587\u6807\u8BB0\u5B9A\u4F4D\u3002DSH \u4FA7\u680F\u7684\u201C\u667A\u80FD UI\u201D\u5165\u53E3\u53EF\u67E5\u770B\u5F53\u524D\u4F1A\u8BDD\u7684\u754C\u9762\uFF0C\u6B63\u6587\u548C\u4FA7\u680F\u5171\u4EAB\u5DF2\u4FDD\u5B58\u53C2\u6570\u3002"),
-    h14("label", { htmlFor: "dgui-show-details" }, h14("input", { id: "dgui-show-details", type: "checkbox", checked: snapshot2.value?.showDetails === true, disabled: !ready || busy, onChange: (e) => change(e.target.checked, "showDetails") }), " \u663E\u793A\u754C\u9762\u8BE6\u60C5"),
-    h14("p", null, "\u9ED8\u8BA4\u9690\u85CF\u5E95\u90E8\u7684\u53C2\u6570\u72B6\u6001\u3001\u539F\u59CB\u8BF4\u660E\u3001\u663E\u793A\u68C0\u67E5\u548C\u7248\u672C\u5386\u53F2\u3002\u5BFC\u51FA\u4E0E\u91CD\u7F6E\u53EF\u901A\u8FC7\u753B\u5E03\u53F3\u4E0A\u89D2\u64CD\u4F5C\u83DC\u5355\u4F7F\u7528\uFF1B\u9519\u8BEF\u63D0\u793A\u59CB\u7EC8\u4FDD\u7559\u3002"),
-    h14("p", null, "\u6B64\u8BBE\u7F6E\u5F71\u54CD\u5F53\u524D profile \u540E\u7EED\u8BF7\u6C42\u3002\u5DF2\u6709\u4E0A\u4E0B\u6587\u53EF\u80FD\u4FDD\u7559\u65E7\u6307\u5BFC\uFF0C\u5BF9\u6BD4\u6A21\u5F0F\u65F6\u8BF7\u65B0\u5EFA\u4F1A\u8BDD\u3002"),
-    h14("label", null, h14("input", { type: "checkbox", checked: snapshot2.value?.autoRepair !== false, disabled: !ready || busy, onChange: (e) => change(e.target.checked, "autoRepair") }), " \u81EA\u52A8\u53CD\u9988\u754C\u9762\u751F\u6210\u95EE\u9898"),
-    h14("p", null, "\u6700\u591A\u4E24\u6B21\u53BB\u91CD\u63D0\u9192\uFF0C\u4E0D\u9650\u5236\u6A21\u578B\u601D\u8003\u65F6\u957F\uFF1B\u53D6\u6D88\u751F\u6210\u65F6\u4E0D\u518D\u89E6\u53D1\u4FEE\u590D\u3002"),
-    h14(SceneLibrary),
-    h14(RuntimeDiagnostics),
-    !ready && h14("p", { role: "status" }, snapshot2.status === "unavailable" ? "\u63D2\u4EF6\u8BBE\u7F6E\u4E0D\u53EF\u7528\uFF0C\u8BF7\u786E\u8BA4\u5BBF\u4E3B\u5DF2\u52A0\u8F7D\u65B0\u7248\u63D2\u4EF6\u3002" : "\u6B63\u5728\u8BFB\u53D6\u8BBE\u7F6E\u2026"),
-    message && h14("p", { role: "status" }, message)
+    h17("h3", null, "DSH Motion UI"),
+    h17("label", { htmlFor: "dgui-design-mode" }, "\u8BBE\u8BA1\u6A21\u5F0F"),
+    h17("select", { id: "dgui-design-mode", value: snapshot2.value?.designMode ?? "guided", disabled: !ready || busy, onChange: (e) => change(e.target.value) }, h17("option", { value: "guided" }, "\u5F15\u5BFC\u6A21\u5F0F"), h17("option", { value: "free" }, "\u81EA\u7531\u8BBE\u8BA1\u6A21\u5F0F")),
+    h17("p", null, "\u5F15\u5BFC\u6A21\u5F0F\u63D0\u4F9B\u8BBE\u8BA1\u6280\u80FD\u3001\u7EC4\u4EF6\u534F\u8BAE\u4E0E\u793A\u4F8B\u3002\u81EA\u7531\u8BBE\u8BA1\u6A21\u5F0F\u53EA\u63D0\u4F9B\u753B\u5E03\u63A5\u53E3\u4E0E\u4EA4\u4E92\u7EA6\u675F\uFF0C\u5E03\u5C40\u3001\u56FE\u5F62\u3001\u914D\u8272\u548C\u52A8\u753B\u7531\u6A21\u578B\u51B3\u5B9A\uFF1B\u4E24\u79CD\u6A21\u5F0F\u7684\u8FD0\u884C\u6743\u9650\u76F8\u540C\u3002"),
+    h17("p", null, "\u4E24\u79CD\u6A21\u5F0F\u90FD\u4F1A\u6307\u5BFC\u6A21\u578B\u5224\u65AD\u4F55\u65F6\u4E3B\u52A8\u4F7F\u7528 UI\uFF0C\u5E76\u4F18\u5148\u4EA4\u4ED8\u5C0F\u800C\u5B8C\u6574\u7684\u754C\u9762\u3002"),
+    h17("h4", null, "\u89C6\u89C9\u98CE\u683C\uFF08\u4EC5\u9650\u5F15\u5BFC\u6A21\u5F0F\uFF09"),
+    h17("p", null, "\u70B9\u51FB\u98CE\u683C\u5361\u7247\u5373\u4FDD\u5B58\uFF0C\u4ECE\u4E0B\u4E00\u6B21\u8BF7\u6C42\u5F00\u59CB\u751F\u6548\u3002\u4E0B\u65B9\u53EF\u5207\u6362\u6392\u7248\u9884\u89C8\uFF0C\u4EC5\u4F9B\u6BD4\u8F83\uFF0C\u4E0D\u9650\u5236\u751F\u6210\u6392\u7248\u3002\u81EA\u7531\u6A21\u5F0F\u4E0D\u6CE8\u5165\u98CE\u683C\u6307\u5BFC\u4E0E\u6848\u4F8B\uFF0C\u7531\u6A21\u578B\u81EA\u4E3B\u8BBE\u8BA1\u3002"),
+    h17(StyleOptions, { value: snapshot2.value?.visualStyle ?? DEFAULT_VISUAL_STYLE, disabled: !ready || busy || snapshot2.value?.designMode === "free", onChange: (value) => change(value, "visualStyle") }),
+    h17("p", null, "\u6587\u5B57\u3001\u5BF9\u6BD4\u3001\u5217\u8868\u3001\u6458\u8981\u4E0E\u6D41\u7A0B\u7684\u6392\u7248\u4EA4\u7ED9\u6A21\u578B\u6309\u5185\u5BB9\u81EA\u9009\u3002\u540C\u4E00\u56DE\u590D\u53EF\u7EC4\u5408\u591A\u5757\u4E0D\u540C\u6392\u7248\u7684\u754C\u9762\u3002"),
+    h17("p", null, "\u754C\u9762\u7EDF\u4E00\u901A\u8FC7\u6B63\u6587\u6807\u8BB0\u5B9A\u4F4D\u3002DSH \u4FA7\u680F\u7684\u201C\u667A\u80FD UI\u201D\u5165\u53E3\u53EF\u67E5\u770B\u5F53\u524D\u4F1A\u8BDD\u7684\u754C\u9762\uFF0C\u6B63\u6587\u548C\u4FA7\u680F\u5171\u4EAB\u5DF2\u4FDD\u5B58\u53C2\u6570\u3002"),
+    h17("label", { htmlFor: "dgui-show-details" }, h17("input", { id: "dgui-show-details", type: "checkbox", checked: snapshot2.value?.showDetails === true, disabled: !ready || busy, onChange: (e) => change(e.target.checked, "showDetails") }), " \u663E\u793A\u754C\u9762\u8BE6\u60C5"),
+    h17("p", null, "\u9ED8\u8BA4\u9690\u85CF\u5E95\u90E8\u7684\u53C2\u6570\u72B6\u6001\u3001\u539F\u59CB\u8BF4\u660E\u3001\u663E\u793A\u68C0\u67E5\u548C\u7248\u672C\u5386\u53F2\u3002\u5BFC\u51FA\u4E0E\u91CD\u7F6E\u53EF\u901A\u8FC7\u753B\u5E03\u53F3\u4E0A\u89D2\u64CD\u4F5C\u83DC\u5355\u4F7F\u7528\uFF1B\u9519\u8BEF\u63D0\u793A\u59CB\u7EC8\u4FDD\u7559\u3002"),
+    h17("p", null, "\u6B64\u8BBE\u7F6E\u5F71\u54CD\u5F53\u524D profile \u540E\u7EED\u8BF7\u6C42\u3002\u5DF2\u6709\u4E0A\u4E0B\u6587\u53EF\u80FD\u4FDD\u7559\u65E7\u6307\u5BFC\uFF0C\u5BF9\u6BD4\u6A21\u5F0F\u65F6\u8BF7\u65B0\u5EFA\u4F1A\u8BDD\u3002"),
+    h17("label", null, h17("input", { type: "checkbox", checked: snapshot2.value?.autoRepair !== false, disabled: !ready || busy, onChange: (e) => change(e.target.checked, "autoRepair") }), " \u81EA\u52A8\u53CD\u9988\u754C\u9762\u751F\u6210\u95EE\u9898"),
+    h17("p", null, "\u6700\u591A\u4E24\u6B21\u53BB\u91CD\u63D0\u9192\uFF0C\u4E0D\u9650\u5236\u6A21\u578B\u601D\u8003\u65F6\u957F\uFF1B\u53D6\u6D88\u751F\u6210\u65F6\u4E0D\u518D\u89E6\u53D1\u4FEE\u590D\u3002"),
+    h17(SceneLibrary),
+    h17(MotionLibrary),
+    h17(RuntimeDiagnostics),
+    !ready && h17("p", { role: "status" }, snapshot2.status === "unavailable" ? "\u63D2\u4EF6\u8BBE\u7F6E\u4E0D\u53EF\u7528\uFF0C\u8BF7\u786E\u8BA4\u5BBF\u4E3B\u5DF2\u52A0\u8F7D\u65B0\u7248\u63D2\u4EF6\u3002" : "\u6B63\u5728\u8BFB\u53D6\u8BBE\u7F6E\u2026"),
+    message && h17("p", { role: "status" }, message)
   );
 }
 
@@ -5014,7 +5886,7 @@ var fenceUiDefinition = {
 };
 
 // src/fence-view.js
-var import_react20 = __toESM(require("react"), 1);
+var import_react23 = __toESM(require("react"), 1);
 var import_client2 = require("react-dom/client");
 
 // lib/fences.js
@@ -5039,11 +5911,11 @@ function extractUiFences(text2) {
 }
 
 // src/fence-view.js
-var h15 = import_react20.default.createElement;
+var h18 = import_react23.default.createElement;
 var roots3 = /* @__PURE__ */ new WeakMap();
 function FenceContent({ document: document2, sessionId, source, settled, sendPrompt }) {
-  const [record, setRecord] = (0, import_react20.useState)(), [error, setError] = (0, import_react20.useState)("");
-  (0, import_react20.useEffect)(() => {
+  const [record, setRecord] = (0, import_react23.useState)(), [error, setError] = (0, import_react23.useState)("");
+  (0, import_react23.useEffect)(() => {
     if (!settled) return;
     let active = true;
     fetch("/api/plugins/dsh-generative-ui/fence", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ document: document2, sessionId, source }) }).then(async (r) => {
@@ -5060,7 +5932,7 @@ function FenceContent({ document: document2, sessionId, source, settled, sendPro
       active = false;
     };
   }, [document2, sessionId, source, settled]);
-  return h15(UiBoundary, { fallback: document2.fallback }, h15(UiView, { record: record ?? { document: document2, documentId: "fence-preview-" + source }, sessionId, sendPrompt, preview: !record }), error && h15("p", { role: "alert" }, error));
+  return h18(UiBoundary, { fallback: document2.fallback }, h18(UiView, { record: record ?? { document: document2, documentId: "fence-preview-" + source }, sessionId, sendPrompt, preview: !record }), error && h18("p", { role: "alert" }, error));
 }
 function candidates(state) {
   const steps = /* @__PURE__ */ new Map();
@@ -5104,8 +5976,8 @@ function dispose2(e) {
   e.entries.delete(e.key);
 }
 function FenceNodeView({ node, sessionId, sendPrompt }) {
-  const anchor = (0, import_react20.useRef)(null), state = node.data;
-  (0, import_react20.useLayoutEffect)(() => {
+  const anchor = (0, import_react23.useRef)(null), state = node.data;
+  (0, import_react23.useLayoutEffect)(() => {
     const scroll = anchor.current?.closest("[data-conversation-scroll]");
     if (!scroll) return;
     let entries = roots3.get(scroll);
@@ -5144,7 +6016,7 @@ function FenceNodeView({ node, sessionId, sendPrompt }) {
           const fingerprint = JSON.stringify(candidate.document) + ":" + candidate.error + ":" + e.state.settled;
           if (v2.fingerprint !== fingerprint) {
             v2.fingerprint = fingerprint;
-            v2.root.render(candidate.error ? h15("p", { className: "dgui-tool-error", role: "alert" }, "\u754C\u9762\u672A\u5B8C\u6210\uFF1A" + candidate.error) : h15(FenceContent, { document: candidate.document, source: candidate.key, sessionId, settled: e.state.settled, sendPrompt: e.sendPrompt }));
+            v2.root.render(candidate.error ? h18("p", { className: "dgui-tool-error", role: "alert" }, "\u754C\u9762\u672A\u5B8C\u6210\uFF1A" + candidate.error) : h18(FenceContent, { document: candidate.document, source: candidate.key, sessionId, settled: e.state.settled, sendPrompt: e.sendPrompt }));
           }
           const block = [...scroll.querySelectorAll("div.md-code-block,.code-block,.code-block-small,pre")].find((b2) => !b2.closest("[data-dsh-generative-ui]") && String(b2.closest("[data-chat-turn]")?.dataset.chatTurn) === String(e.state.turn) && (b2.querySelector("code")?.textContent ?? b2.querySelector("pre")?.textContent ?? (b2.matches("pre") ? b2.textContent : "")).trim() === candidate.raw.trim());
           if (block) {
@@ -5171,7 +6043,7 @@ function FenceNodeView({ node, sessionId, sendPrompt }) {
     e.sendPrompt = sendPrompt;
     e.queue();
   }, [state, sessionId, sendPrompt]);
-  return h15("span", { ref: anchor, hidden: true });
+  return h18("span", { ref: anchor, hidden: true });
 }
 
 // src/visual-styles.js
@@ -5190,7 +6062,7 @@ function apply(ctx) {
   console.info("[motion-ui] client active; channel=conversation-events/fence-dom");
   const scope2 = ctx.configForms.get("motion-ui");
   configureViewSettings(scope2);
-  ctx.slots.inject("plugins.bundle.config", () => ctx.slots.register({ name: "plugins.bundle.config", key: "dsh-motion-ui" }, (props) => import_react21.default.createElement(ModeSettings, { ...props, scope: scope2 })));
+  ctx.slots.inject("plugins.bundle.config", () => ctx.slots.register({ name: "plugins.bundle.config", key: "dsh-motion-ui" }, (props) => import_react24.default.createElement(ModeSettings, { ...props, scope: scope2 })));
   ctx.uiConversation.events.register(turnUiDefinition);
   ctx.uiConversation.events.register(streamUiDefinition);
   ctx.uiConversation.events.register(fenceUiDefinition);
@@ -5208,17 +6080,17 @@ function apply(ctx) {
     document.head.append(style);
     return () => style.remove();
   });
-  for (const name of ["render_ui", "render_canvas", "render_text"]) ctx.slots.inject("tool.call.toolview", () => ctx.slots.register({
+  for (const name of ["render_ui", "render_canvas", "render_text", "render_mechanism"]) ctx.slots.inject("tool.call.toolview", () => ctx.slots.register({
     name: "tool.call.toolview",
     key: name,
     inject: (sessionId) => ({ sendPrompt: (prompt) => ctx.sessions.scope(sessionId).get("conversation").send(prompt) })
   }, ToolView));
   ctx.inject?.(["sidebarRightTabs", "sidebarRight"], (panel) => {
     setRuntimeActivation({ sidebar: true });
-    const id = "dsh-generative-ui:panel", kind = "dsh-generative-ui";
-    panel.sidebarRightTabs.register({ id, kind, title: () => "\u667A\u80FD UI", guide: [{ id: id + ":entry", order: 43, title: () => "\u667A\u80FD UI", description: () => "\u5F53\u524D\u4F1A\u8BDD\u7684\u4EA4\u4E92\u754C\u9762" }] });
-    panel.slots.inject("sidebar.right.pane.tab", () => panel.slots.register({ name: "sidebar.right.pane.tab", key: id, inject: (sessionId) => ({ sendPrompt: (prompt) => ctx.sessions.scope(sessionId).get("conversation").send(prompt) }) }, UiPanel));
-    panel.slots.inject("sidebar.right.pane.tab.title", () => panel.slots.register({ name: "sidebar.right.pane.tab.title", key: id }, () => "\u667A\u80FD UI"));
+    const id2 = "dsh-generative-ui:panel", kind = "dsh-generative-ui";
+    panel.sidebarRightTabs.register({ id: id2, kind, title: () => "\u667A\u80FD UI", guide: [{ id: id2 + ":entry", order: 43, title: () => "\u667A\u80FD UI", description: () => "\u5F53\u524D\u4F1A\u8BDD\u7684\u4EA4\u4E92\u754C\u9762" }] });
+    panel.slots.inject("sidebar.right.pane.tab", () => panel.slots.register({ name: "sidebar.right.pane.tab", key: id2, inject: (sessionId) => ({ sendPrompt: (prompt) => ctx.sessions.scope(sessionId).get("conversation").send(prompt) }) }, UiPanel));
+    panel.slots.inject("sidebar.right.pane.tab.title", () => panel.slots.register({ name: "sidebar.right.pane.tab.title", key: id2 }, () => "\u667A\u80FD UI"));
     panel.effect(() => setPanelOpener((documentId, sessionId) => {
       focusUi(documentId, sessionId);
       panel.sidebarRight.openTab(kind);
