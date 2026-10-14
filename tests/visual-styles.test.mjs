@@ -17,5 +17,5 @@ test('selected style changes only guided design guidance and examples',()=>{
 });
 
 test('style curriculum defines distinct composition, type, surface and control grammar',()=>{
- assert.deepEqual(Object.keys(STYLE_SYSTEM),VISUAL_STYLES.map(s=>s.id));const examples=new Set(),shapes=new Set();for(const style of VISUAL_STYLES){const g=STYLE_SYSTEM[style.id];for(const k of['composition','typography','surfaces','controls','avoid'])assert.ok(g[k].length>20,style.id+' '+k);examples.add(JSON.stringify(style.examples[0].args.blocks.map(n=>[n.type,n.children?.map(c=>c.type)])));shapes.add(JSON.stringify(g.native));assert.match(style.prompt,/不能只换强调色/);assert.match(style.prompt,/简单需求/)}assert.equal(examples.size,6);assert.equal(shapes.size,6);
+ assert.deepEqual(Object.keys(STYLE_SYSTEM),VISUAL_STYLES.map(s=>s.id));const examples=new Set(),shapes=new Set();for(const style of VISUAL_STYLES){const g=STYLE_SYSTEM[style.id];for(const k of['composition','typography','surfaces','controls','avoid'])assert.ok(g[k].length>20,style.id+' '+k);examples.add(JSON.stringify(style.examples[0].args.blocks.map(n=>[n.type,n.children?.map(c=>c.type)])));shapes.add(JSON.stringify(g.native));assert.match(style.prompt,/不能只换强调色/);assert.match(style.prompt,/不要求每次使用全部模块/)}assert.equal(examples.size,6);assert.equal(shapes.size,6);
 });

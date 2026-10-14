@@ -4,11 +4,29 @@
 
 Interactive, declarative tool views for **DeepSeek Harness Web 0.2.0-rc.2**.
 
-The plugin adds `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
+The plugin adds `render_scene` (short flow/comparison/allocation/budget data), `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
 
 ### v0.7.0：风格、交互与机制图解
 
 六种风格拥有各自的构图与组件形态，设置提供六类真实样式预览；原生交互反馈全局增强。新增 `render_mechanism`，无需生成长篇绘图源码即可交付装配拆解、齿轮传动和曲柄连杆。保留现有文档协议、默认明亮扁平风格、自由模式和参数保存。详细更新见 [CHANGELOG.md](CHANGELOG.md)。
+
+### 提示词组织
+
+引导模式注入三段：通用设计与所选风格、共享接口契约、两个短案例。自由模式只注入表达选择和接口契约，不注入风格或案例。完整手册按需获取：`ui_catalog({topic:"text"|"native"|"visual"|"canvas"|"style"})`；画布加 `scene:"bicycle"|"oscillator"|"architecture"|"scatter"` 只取一个完整案例。通用设计吸收 Taste Skill 的内容优先、信息层级和实质简洁原则，具体配色、材质与构图仍由所选风格决定。
+
+开发者可运行 `node scripts/audit-prompts.mjs` 统计实际注册的提示段、字符数和工具定义；设置 `MOTION_TOKENIZER_MODULE` 为已安装的 `js-tiktoken` 模块路径，可另算 `o200k_base` 参考 token。按需目录和条件纠错分别统计，不计入首次固定注入；参考值不等同于模型供应商计费。
+
+### v0.7.1：轻量场景与局部修改
+
+`render_scene` 直接把任务数据转换为完整的原生界面，保留所选风格、只读流式预览、正文标记、侧栏和独立参数保存。四种场景：`flow`（步骤）、`comparison`（方案）、`allocation`（总量按比例分配）、`budget`（两人一间房的住宿与交通预算）。其他构图仍用 `render_ui/render_canvas`，不会限制自由模式。
+
+`render_scene({scene:"budget",title:"假设旅行预算",values:{people:3,nights:3,roomRate:600,transportPerPerson:800}})`
+
+金额必须由用户、工具或明确标记的假设提供，不会补猜缺失数据。`ui_catalog({topic:"quick"})` 返回短调用示例。`inspect_ui({documentId,query:"总计"})` 可查节点位置和可修改字段；加 `detail:"nodes"` 只读取匹配源码，再使用现有 `patch_ui/update_ui` 修改原文档、保留兼容参数。
+
+视觉观察新增透明背景对比度、文字裁切和明显尾部空白，并返回画布内定位、文字摘要；这些是启发式观察，不代替完整设计或无障碍验收。渐变、SVG 配色等未覆盖部分仍会明确标记。代码块的冗余 `copyable:true`、字面数字 `expr` 和与 state 完全相同的控件范围可无歧义兼容，冲突值与缺失图表数据仍报具体字段错误。
+
+真实模型回归位于 `scripts/verify-model-usability.mjs`，需显式配置 `MOTION_WEB_LOG`（私有登录日志）或 `MOTION_TEST_URL`，默认 M3.1 Flash、测试结果工作区；设置 `MOTION_WORKSPACE_DIR` 可指定对应目录。模型等待无生成时限、不取消推理；记录纯文字、主动 UI、多文档、保参修改及首块可见时间，不把最终交付等同于首次成功。
 
 ### 扩展可视化（v0.6.0）
 

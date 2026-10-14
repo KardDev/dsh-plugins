@@ -6,6 +6,6 @@ test('canvas prefixes decode escapes without completing source or exposing scrip
   assert.ok(count>10);assert.equal(previewCanvas('{"title":"x","fallback":"x","css":"","html":"abc\\u12')?.html,'abc');
   for(const raw of ['{"title":"x","fallback":"x","html":"partial','{"title":"x","fallback":"x","css":"","html":"bad\\q','{"title":"x","title":"y"}',' '.repeat(131073)])assert.equal(previewCanvas(raw),null);
 });
-test('construction handbook is injected and free mode keeps autonomous composition',()=>{
-  assert.match(UI_SKILL_SECTIONS[0].text,/Chinese characters/);assert.match(UI_SKILL_SECTIONS[0].text,/ui-edge/);assert.match(UI_SKILL_SECTIONS[0].text,/zero denominators/);assert.doesNotMatch(promptSections('free')[0].text,/Chinese characters|Construction handbook/);assert.match(promptSections('free')[0].text,/whole assistant turn ends/);
+test('compact canvas contract remains injected and free mode keeps autonomous composition',()=>{
+  assert.match(UI_SKILL_SECTIONS[0].text,/Chinese characters/);assert.match(UI_SKILL_SECTIONS[1].text,/ui-edge/);assert.match(UI_SKILL_SECTIONS[0].text,/zero denominators/);assert.doesNotMatch(promptSections('free')[0].text,/Chinese characters|Construction handbook/);assert.match(promptSections('free')[0].text,/whole assistant turn ends/);
 });

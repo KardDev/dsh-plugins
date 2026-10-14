@@ -1,116 +1,23 @@
-# DSH Motion UI — 设计与生成技能
+# Motion UI — 通用设计指导（引导模式）
 
-生成 UI 时直接使用已注册的 render_ui/render_canvas；不需要先 grep、glob 或用 Shell 查找 DSH 安装源码。协议疑问以本说明和 ui_catalog 为准。这不限制为完成用户实际任务、读取真实数据而使用文件或搜索工具。
+这层规定信息质量，用户选定风格负责构图语言、配色、材质、圆角和阴影；用户当前明确要求优先。不全局禁止渐变、边框或阴影，不要求图片、营销结构、固定数量动画或随机排版。保持无玻璃的产品约定。
 
-`round(x)` 只有一个参数，等同 JavaScript `Math.round`：取最近整数，恰好一半时朝正无穷方向取整，如 `round(2.5)=3`、`round(-2.5)=-2`。它不是向上取整；原生公式支持 `ceil(x)` 向上取整、`floor(x)` 向下取整（各一个参数）；房间数直接用 `{expr:"ceil(state.people / 2)"}`，无需画布或条件链。指标 decimals 只控制显示精度，不改变计算值。
+常见流程、方案对比、比例分配和旅行预算优先考虑 render_scene，用任务数据交付完整界面；结构不合适时再用原生组件或自由画布，不硬套场景。
 
-简单公式优先使用 `{expr:"state.V * state.V / state.R"}`，例如 `derived.power` 的表达式，然后用 `{ref:"derived.power"}` 在指标中显示。支持四则运算、比较、三元条件、括号、`min/max/round/ceil/floor/abs`；字符串使用双引号，引用写完整的 `state.x/data.x/derived.x/item.x`。这会编译为现有解释器协议，不执行任意 JavaScript。复杂动画仍使用画布。
+## 内容决定界面
 
-这是插件主动注入的能力指导；无需用户重复提供，也不依赖你先调用目录才获得这些规则。它是基于公开项目设计思想编写的 DSH 技能，不是 OpenAI 的内部提示词。以下协议与宿主工具权限共同约束输出。
+- 先抓住用户需要理解或完成的一件事：比较对齐同一标准，流程体现顺序，架构体现职责依赖，机械突出对象和部件，实验把参数、主图和结果放在一起。Diagram grammar：层级、流程、时序、依赖、空间装配不可混淆；连线不穿字，方向与标注明确。
+- 先呈现结论、主要证据/图形或关键操作，次要解释与完整数据随后。用大小、对齐和分组建立主次，避免重复标题、同一数字多处重复、每段套卡、无意义KPI和装饰标签。
+- 简洁仍要有内容。去掉装饰后用清楚的解释、图形和尺度补足，不交付空白板。按内容变化构图，风格贯穿文字、控件、图表与画布，不能只给一个按钮换皮。
 
-## 先选择表达方式，再写界面
+## 可读、真实、可操作
 
-首要目标是解决用户的问题。简单事实、短解释、代码修复优先使用普通文字（plain text）。当可视化、参数调节、结构探索或方案对比能显著帮助理解时，原生调用 render_ui 或 render_canvas。用户明确要交互图、动画或计算器时应使用 UI。
+- 优先PC横屏1920px/1365px中实际聊天列，再兼顾768px/390px；画布不是全浏览器宽度。避免空白撑高或缩字硬塞。Chinese characters和长标签按实际渲染尺寸检查；SVG缩放后关键标注至少12px，必要时移到HTML说明。正文、单位、来源和假设可辨认，深浅主题有对比，不只靠颜色表达结论。
+- 数值、图与解释共用计算来源。不同单位分别标轴或明确同基准归一化；不可用未说明尺度暗示大小。真实可编辑参数才放控件，初始状态就有信息，操作有对应反馈。键盘焦点及等价操作可用。
+- 静态状态应已能说明问题，动效再解释变化、装配或操作结果。运动围绕内容组织，节奏可随风格变化；保持阅读稳定，尊重减少动态效果与暂停。允许表现力，不强制所有界面运动，不把真实结果延迟成装饰动画。示意不证明实测、工具成功或工程精度。
 
-按问题选择构图，而不是每次复制仪表盘：
+## 提交与修正
 
-| 任务 | 适合的构图 | 可选交互（并非必需） |
-| --- | --- | --- |
-| 机械/物体拆解 | 大幅 SVG 主体 + 部件说明，exploratory 处理 | 一个展开滑块 + 部件选择 |
-| 原理/参数实验 | 图形占主要空间 + 紧凑参数区，workbench | 参数改变，图与解释同步 |
-| 架构/流程/依赖 | 语义节点、分层与有方向的连线 | 聚焦节点查看职责 |
-| 数据与趋势 | 主图 + 少量指标 + 精确数据表，dashboard | 筛选或参数变化 |
-| 多方案比较 | 相同标准对齐，comparison | 选择要细看的方案 |
-| 解释/教程/报告 | 阅读排版 + 一幅支持理解的图，guide/report | 只保留有必要的展开或探索 |
+只做与任务相称的简短检查：内容完整、必要控件存在、绑定正确、初始图可见、变化有反馈、空值/zero denominators不出错、标签与fallback有效。协议以工具和按需目录为准，不搜索安装源码来学习接口。
 
-exploratory/analytical/editorial/technical 是构图思想，不是合法 layout 枚举；只能使用协议声明的 layout。状态面板仅在确有状态信息时使用 status。
-
-## 轻量图解优先
-
-默认先做静态可视化，不强行交互。一幅小图、3–5 步流程、2–3 方案的对齐对比或少量指标已经可以是完整作品。只有变化、选择或运动确实帮助理解时才添加 state、控件和 script；复杂交互与动画按需求启用，不能成为所有场景的默认。
-
-图解采用编辑式排版：中性底色、细线边框、少量强调色、直接标注、清晰层级。不叠阴影、发光或多重卡片。流程/架构用简单节点与有意义的箭头；可直接使用宿主提供的 ui-flow/ui-step/ui-arrow/ui-callout 类，通常无需自写 CSS 和 script。ui_catalog({topic:"quick"}) 提供流程、对比、架构和小看板四个短例子；优先参考已注入的静态例子，不反复查询目录。先提交足够讲清关系的小作品，按用户后续需求扩展。
-
-## 视觉设计技能
-
-- 用大小、对齐、留白建立层级。让图形或证据成为主体；不把每段文字套进卡片，不堆 KPI，不重复标题。
-- 图标表达内容角色，使用已注册 icon；图表、原理示意可在 sandbox 中自由画 SVG。避免无关 emoji 和装饰动画。
-- 优先宿主主题与系统字体。主体用中性色，重点用一种强调色；成功/危险颜色只表示已确认的语义。颜色之外提供文字或形状说明。
-- 场景变化应改变构图与信息组织，不只是换颜色。阅读页更轻，数据页更对齐，实验页突出对象和反馈。
-- 先检查 PC 横屏 1920px/1365px 中实际聊天列的构图，再补查 768px/390px。深浅主题都检查文字对比；关键标注按实际显示尺寸至少 12px，必要时移到 HTML 说明，不缩成看不清的小字。
-- 将讲清核心关系的主图、必要控件和动态结果靠近；长推导、完整数据表放后面。避免用大幅装饰动画占据首屏、把真正的比较曲线挤到多屏之后；相同数字无需在多种组件里重复。
-- 跨单位比较先明确尺度：分轴并标单位，或使用相对同一基准的倍数。配色只帮助识别，结论仍来自正确关系。透明渐变优先显式 alpha；自写颜色函数须匹配输入格式。
-- 图解先确定关系：层级、流程、时序、依赖或空间装配。节点职责单一，连线不穿文字，箭头方向明确；复杂关系拆成概览与聚焦详情。
-
-## 正确生成的步骤
-
-1. 确定问题与核心可视化；仅有必要时加入一个主要交互和可见反馈，不展开冗长设计复盘。
-2. 优先使用下面已注入的协议和小例子。复杂功能或不确定字段，再调用 ui_catalog({topic:"canvas"|"data"|"scenes"})；不必每次获取 all，也不必重复查询相同目录。
-3. 标准数据、控件使用原生组件；自由形状、SVG、HTML/CSS/JavaScript 动画使用 sandbox。它们可以混排，别因为固定组件不够就退回静态图片。
-4. 原生组件混排使用完整 render_ui({document:...})：先写元数据、state/data/derived/actions，再写 nodes。单独一块自由画布可用 render_canvas({title,fallback,html,css,script,state?...})，源码字段直接传字符串，避免把整份程序再嵌套进 JSON 文档字符串；该入口的画布节点 ID 固定为 canvas。不得在 PTC/run_code 中套用这两个工具。
-5. 若校验失败，根据工具的具体错误修正相关字段后重提。不要照抄失败参数或臆造组件。先交付最小正确界面，再扩展；复杂动画不是简单回答的必要条件。
-6. 成功后用简短文字说明用途和关键限制，不宣称未经验证的精度或效果。
-
-## 状态、动作与动画
-
-- 重要参数放 document.state，标准控件 bind="state.key"。sandbox 的 stateKeys 使用裸 key；从 DSHUI.subscribe 读宿主当前值。
-- 精确计算只保留一份来源：优先 derived，图与表读取同一结果。add 只能加数字，不能拼接字符串；不要为排版而构造无用派生表达式。
-- 同一读数的格式也保持一致。画布中用 DSHUI.formatNumber(value, decimals) 与原生 metric/fallback 共用 0..6 位小数及千分位规则；直接读取共享 derived 后格式化，不另算一份结果。不要混用 toFixed 与原生格式，二进制小数舍入可能让 4.225 显示成不同结果。
-- 本地滑动、筛选、计算与动画不需要模型调用。DSHUI.setState 只提交用户造成的参数变化，subscribe 中不要回写同一值，动画不要逐帧保存状态。
-- 动画优先 DSHUI.animate，delta 单位秒；参数变化不重建画布，暂停不重置相位。处理 reducedMotion，提供有意义的静态图；时间/相位默认可在刷新后重置。
-- SVG 热点可键盘操作，或者提供等价标准选择控件。控件有标签和单位，操作后结果与解释同步。
-- agent.followup 只发起带当前参数的新请求，不能自动当成执行成功。宿主文件、网络、Shell 等操作仍走正常工具与权限。
-
-## 证据与能力边界
-
-标明示例、假设、来源与单位；没有测量就不能写“实测”。数学动画不等于物理仿真；变化率不能直接当作累积量或实际状态，例如只有发热功率、没有时间与散热条件时不能断言温度或“温手/烫手”。每份文档和每个画布都提供有用 fallback；错误时用户仍能理解结果。
-
-画布代码只在成功提交并恢复参数后执行。它没有宿主工具/凭据访问权，不能导入远程包或资源。全部 JavaScript 放 script，CSS 放 css，HTML 事件属性不能使用。浏览器来源隔离不是 CPU/内存硬限制，避免无界循环和过重计算。
-
-当任务超出当前能力时，交付较小但正确的交互或完整文字解释。技能能降低学习和发现成本，不能保证每个模型都能正确设计复杂程序。
-
-## 复杂度选择与渐进交付
-
-不用猜测自己属于哪个能力档。按任务选择足够解决问题的最小方案：
-
-- 基础：原生控件、metric、text、table；最多一个简单 derived 计算。只需展示数值时不要写动画。
-- 中等：一个 sandbox、一幅清晰 SVG、一个主要交互，搭配原生控件。先确保初始图可见、参数确实有反馈，再添加细节。
-- 复杂：多个图形、联动、局部动画。只有问题确实需要时使用；先交付完整的小版本，再用 patch_ui 增强。不要为了看起来高级而把图形、控件和计算全部重写成自制应用。
-
-最常见的错误及修法：slider.bind 必须是 "state.speed"，stateKeys 必须是 ["speed"]；标准 text.text 是字符串或 {ref:...}，不能传 HTML；add 的参数只能是数字；SVG/HTML 中不要写 onclick，脚本用 addEventListener；script 里只访问声明过的宿主键；JSON 字符串正确转义，不要生成半截代码。
-
-长 HTML/SVG 程序遇到 JSON 转义错误时，不要重复手拼多层 JSON。单画布可切换 render_canvas 的独立 html/css/script 字段；重要参数仍在 state 中声明。先交付一幅简单但可操作的图，不在首次生成时穷举机械细节或写庞大的绘图引擎。这个入口同样保留状态保存、检查和局部修改。
-
-## 观察与局部修正
-
-render_ui 的工具结果提供 documentId。需要检查或打磨时，调用 inspect_ui({documentId}) 获取当前 documentRevision、文档、已保存参数、derived 和客户端观察。报告标注时间、视口和主题；只有界面被打开后才会有报告。报告为空时不可宣称体检通过，也不要反复空转轮询。它是启发式观察，不证明美观、代码安全或物理精度。
-
-inspect_ui 默认返回紧凑摘要，不重复传整份程序。要改画布源码，使用 detail="nodes",nodeIds=["画布ID"] 读取该节点；只有确实需要全部结构时使用 detail="full"。摘要中的 omitted 明确表示省略，不能推测其内容。
-
-一次用户请求的自动纠错最多两轮；每轮只检查和修正具体问题。相同错误再次出现时停止机械重试，简化界面或提供完整文字说明，并如实报告未解决的问题。没有观察报告时不轮询；不要为了修饰外观反复重建界面。用户主动要求的新修改不属于上一轮自动纠错。这个规则是模型行为预算，不是服务商推理时间的硬超时。
-
-看到 canvas 的 smallText/overflow/missingLabel/contrast/runtimeError 时，针对相应节点修正；不要因为宿主脚注的小字就重写整份 UI。渐变/透明/图形覆盖等复杂对比度不在可靠检查范围。
-
-修改已有界面用 patch_ui({documentId,documentRevision,changes:[{id:"已有节点ID",props:{...}}]})。只能修改已注册的属性；不能修改 id/type/children/bind/action，也不能改 state/data/derived/actions 定义。可以修改标题文字、颜色语义 tone、sandbox 的 html/css/script/fallback 等。保持准确的 fallback。用检查结果里的最新 revision；冲突先重新 inspect，再修正，不盲目重试。
-
-例：changes:[{id:"note",props:{text:"补充的准确说明"}}]。画布代码变更只重启该画布，重要参数保留，未修改的节点保留现场状态；瞬时动画相位会重置。新结构或新参数定义需要新的 render_ui，不能假装 patch 可以完成。
-
-
-## Daily text and mixed documents
-For everyday structured explanations use render_text with the injected eight text presets and optional typography. Native text, compact comparisons, lists and link pills need no HTML, state or script. Several UI documents can accompany one answer; each document owns its own styling, IDs and state. Preserve reading order and use each returned documentId once in inline mode. Use lightweight borders, readable body text and restrained accents as the default visual direction. The injected text guide is the precise field reference. Web/file links only open after a user click through native link/opener semantics.
-
-### 可复用文本和代码
-文案、提示词等可直接使用的内容，采用 text + copyable:true + title；普通讲解保持轻量，不必每段加框。命令和配置采用 code 节点（code 原文、lang 语言、title 可选、wrap 可选），右上复制按钮保留缩进、换行，不执行代码。原生文本字段为 text，扩展文本字段为 content。交付后不要在正文再重复整段内容。
-
-### 动态交互的选择
-只有真实状态变化需要解释时才用动效。原生 select 的 variant:"segmented" 适合 2..8 个短选项；更多选项自动使用下拉框。滑块填充、开关、复制按钮有内置反馈，不用额外写脚本。数值立即更新到精确结果，图形可短促过渡；不要用计时器假装下载、复制或工具执行成功。复杂交互可通过 ui_catalog({topic:"motion",scene:"plan"|"checklist"|"copy"|"plot"}) 按需取一份完整案例，不整库加载。自由模式保持设计自主，减少动态效果设置必须生效。
-
-### 所有风格共用的动作语言
-动效能力与视觉风格分离，所有风格及自由模式的原生组件均支持轻磁吸、文字滚动、弹性拉伸和数字换位。配色、材质与排版跟随所选风格，不能靠添加演示按钮表示整套风格。柔光渐彩使用暖白实色、近黑层级与局部渐彩，覆盖文字、卡片、表单、指标、表格和代码块。原生主 button/link、toggle、数字 input 与 metric 已有对应实现，不必重写。ui_catalog motion 的 action/quantity/elastic 提供短原生案例；复杂拆分按钮、扇形菜单、多选或双滑块再按实际需要做画布。禁止的是玻璃材质、假成功和空闲循环，不是把所有动效压成轻微渐显。
-
-
-短数据构成图直接使用原生 chart/table 的内联公式单元格：`rows:[{label:"餐饮",value:{ref:"derived.food"}},{label:"住宿",value:{expr:"ceil(state.people / 2) * state.room"}}]`，chart 设置 `labelKey:"label",valueKey:"value"`。这些数值随共享状态本地更新，无需 data + map + 多层 if。静态 data 仅存储真实字面数据，不会自动猜测或生成金额。render_ui 一次提交完整文档；修正失败调用时保留 nodes/state/derived，不能只发送准备补充的字段。
-
-
-## 结构拆解与工作原理
-当零件分层、装配关系、齿轮速比或曲柄连杆能帮助解释时，主动考虑机制图解，不需要用户额外说使用UI。常见场景优先直接调用 render_mechanism({scene:"assembly"/"gears"/"crank",rpm?,teeth?,radius?,running?,angle?,explode?,title?})，不用拼接文档、HTML或读取案例；插件负责图形、控件和绑定。需要其他结构再读 ui_catalog({topic:"mechanism"}) 并用自定义画布。按问题选择少量关键部件、分组职责、拆解进度、隐藏外壳与真实联动参数；无需高密度零件或自动导览。可通过 libraries:["mechanism"] 使用本地等距几何辅助库，自定义 box/cylinder/gear/rod/spring。共享参数必须声明并绑定控件，动画使用 DSHUI.animate，重要参数持久化，瞬时相位可重置。说明简化齿形和运动学的适用范围，不宣称受力、碰撞或制造精度。
+有实际客户端观察或截图时针对可见问题局部修改，先解决内容/功能/可读性，再打磨装饰；未观察就不宣称体检通过。遵守共享交付协议的纠错规则，不要求额外规划输出或给模型设思考上限。
