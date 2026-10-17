@@ -2,7 +2,7 @@ import {useMediaSource} from './media-source.js';
 import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Icon} from './icons.js';
-import {mediaAssetUrl} from './media-history.js';
+import {mediaAssetUrl,visibleMediaRecords} from './media-history.js';
 import {presentMedia} from './media-presentation.js';
 const h=React.createElement,players=new Set(),preferenceKey='dsh-motion-ui:video-playback';
 export function formatMediaTime(seconds){const s=Math.max(0,Math.floor(Number.isFinite(seconds)?seconds:0));return (s>=3600?Math.floor(s/3600)+':':'')+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
@@ -50,14 +50,21 @@ export function VideoPlayer({record}){
   playbackError&&h('div',{className:'motion-video-message',role:'alert'},h('span',null,playbackError),h('button',{type:'button',onClick:()=>{setError('');transport.native?transport.retry():video.current.load()}},'重新加载')),
   notice&&h('p',{className:'motion-video-message',role:'status'},notice));
 }
-function MediaRecords({records,sessionId}){const owner=useRef({});useLayoutEffect(()=>presentMedia(owner.current,sessionId,records),[records,sessionId]);return h(React.Fragment,null,records.filter(r=>r.sessionId===sessionId).map(record=>h(VideoPlayer,{key:record.id,record})))}
+function MediaRecords({records,sessionId}){const owner=useRef({});useLayoutEffect(()=>presentMedia(owner.current,sessionId,records),[records,sessionId]);return h(React.Fragment,null,visibleMediaRecords(records.filter(r=>r.sessionId===sessionId)).map(record=>h(VideoPlayer,{key:record.id,record})))}
 const mediaRoots=new WeakMap(),allMediaRoots=new Set();
 function disposeSurface(entry){if(entry.disposed)return;entry.disposed=true;entry.observer.disconnect();entry.host.remove();entry.entries.delete(entry.key);allMediaRoots.delete(entry);queueMicrotask(()=>entry.root.unmount())}
 export function disposeMediaSurfaces(){for(const entry of [...allMediaRoots])disposeSurface(entry)}
+function mediaSeat(anchor,scroll){
+ // A folded process group is already a turn-local seat. Its parent is the
+ // shared flow slot; skipping that extra parent strands movies at the chat tail.
+ let seat=anchor.closest('[data-chat-turn]')??anchor;
+ for(let el=anchor.parentElement;el&&el!==scroll;el=el.parentElement)
+  if(el.getAttribute('hidden')==='until-found')seat=el;
+ return seat;
+}
 function placeOutsideFold(entry){
  if(!entry.anchor?.isConnected)return;
- let folded=null;for(let el=entry.anchor;el&&el!==entry.scroll;el=el.parentElement)if(el.getAttribute('hidden')==='until-found')folded=el;
- if(!folded)return;const seat=folded.parentElement,parent=seat===entry.scroll?entry.scroll:seat.parentElement,before=seat===entry.scroll?null:seat.nextSibling;
+ const seat=mediaSeat(entry.anchor,entry.scroll),parent=seat.parentElement,before=seat.nextSibling;
  if(before===entry.host||!before&&parent.lastChild===entry.host)return;
  // moveBefore preserves media state in current Chromium. On older engines,
  // restore only movies that were already playing before this DOM relocation.
@@ -76,8 +83,7 @@ export function MediaNodeView({node,sessionId}){
   if(!entry){
    // DSH anchors tool-result nodes inside hidden="until-found" analysis folds.
    // Mount outside the OUTERMOST fold; never unfold a user's tool history.
-   let folded=null;for(let el=anchor.current;el&&el!==scroll;el=el.parentElement)if(el.getAttribute('hidden')==='until-found')folded=el;
-   const seat=folded?.parentElement??anchor.current.closest('[data-chat-turn]')??anchor.current;
+   const seat=mediaSeat(anchor.current,scroll);
    const host=document.createElement('div');host.dataset.motionMediaTurn=String(state.turn);if(seat===scroll)scroll.append(host);else seat.after(host);
    entry={key,entries,host,root:createRoot(host),sessionId,scroll,anchor:anchor.current,url:location.href};
    entry.observer=new MutationObserver(()=>{if(location.href!==entry.url||!host.isConnected||!scroll.isConnected)disposeSurface(entry);else placeOutsideFold(entry)});entry.observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});entries.set(key,entry);allMediaRoots.add(entry);

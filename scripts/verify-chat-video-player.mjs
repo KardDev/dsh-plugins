@@ -33,6 +33,31 @@ try{
  let broken=true;await p.route('**/api/plugins/dsh-generative-ui/media?**',async route=>{const u=new URL(route.request().url());if(broken&&u.searchParams.get('file')==='video.mp4'){await route.fulfill({status:503,body:'temporary'});return}await route.continue()});await p.reload();await p.getByRole('alert').first().waitFor();broken=false;await p.getByRole('button',{name:'重新加载',exact:true}).first().click();await p.waitForFunction(()=>document.querySelector('video')?.readyState>=1);report.checks.push('failed media has actionable feedback and retries successfully');
  await p.unrouteAll();await p.goto('http://127.0.0.1:'+server.address().port+'/folded');const foldedPlayer=p.locator('[data-motion-video]').first();await foldedPlayer.waitFor();assert.equal(await p.locator('#fold').getAttribute('hidden'),'until-found');await foldedPlayer.getByRole('button',{name:'播放视频',exact:true}).click();await p.waitForFunction(()=>document.querySelector('video').currentTime>.2);await p.evaluate(()=>{window.beforeFoldReplay=document.querySelector('video');window.replay(2)});await p.waitForFunction(()=>document.querySelector('video')===window.beforeFoldReplay&&!window.beforeFoldReplay.paused);assert.equal(await p.locator('#fold').getAttribute('hidden'),'until-found');report.checks.push('hidden DSH analysis folds stay closed while an independent visible player survives later prose');await p.evaluate(()=>window.clear());await p.waitForFunction(()=>!document.querySelector('video'));assert.ok(await p.evaluate(()=>window.removed.every(v=>v.paused)));report.checks.push('independent media roots release playback when their films are removed');
  await p.goto('http://127.0.0.1:'+server.address().port+'/late-folded');const latePlayer=p.locator('[data-motion-video]').first();await latePlayer.getByRole('button',{name:'播放视频',exact:true}).click();await p.waitForFunction(()=>document.querySelector('video')?.currentTime>.2);await p.evaluate(()=>{window.beforeLateFold=document.querySelector('video');document.getElementById('fold').setAttribute('hidden','until-found')});await p.waitForFunction(()=>document.querySelector('video')===window.beforeLateFold&&!window.beforeLateFold.paused&&window.beforeLateFold.checkVisibility({contentVisibilityAuto:true,visibilityProperty:true}));report.checks.push('delayed analysis folding moves the same playing media outside without restarting');
+
+ // Real rc.2 structure: the OUTERMOST folded group is a direct child of the
+ // shared flow slot, with later turns as siblings (not children of that group).
+ await p.goto('http://127.0.0.1:'+server.address().port+'/folded');
+ await p.locator('[data-motion-media-turn]').waitFor();
+ await p.evaluate(()=>{
+  const scroll=document.querySelector('[data-conversation-scroll]'),group=document.getElementById('analysis');
+  const flow=document.createElement('div');flow.dataset.slot='conversation.chat.flow';scroll.insertBefore(flow,group);flow.append(group);
+  group.setAttribute('hidden','until-found');group.dataset.chatTurn='1';
+  const next=document.createElement('article');next.id='next-turn';next.dataset.chatTurn='2';next.textContent='New user reply and ongoing thinking';flow.append(next);
+ });
+ await p.waitForFunction(()=>{
+  const host=document.querySelector('[data-motion-media-turn]'),next=document.getElementById('next-turn');
+  return host.parentElement===next.parentElement&&!!(host.compareDocumentPosition(next)&Node.DOCUMENT_POSITION_FOLLOWING);
+ });
+ await p.evaluate(()=>{window.turnVideo=document.querySelector('video');window.turnVideo.currentTime=12;window.replay(17)});
+ await p.waitForFunction(()=>document.querySelector('video')===window.turnVideo&&Math.abs(window.turnVideo.currentTime-12)<.1);
+ assert.equal(await p.locator('#analysis').getAttribute('hidden'),'until-found');
+ report.checks.push('nested rc.2 folded process group keeps historical films before the next reply, preserves video identity and leaves history closed');
+ await p.evaluate(()=>{
+  const group=document.getElementById('analysis');group.removeAttribute('hidden');document.getElementById('fold').removeAttribute('hidden');
+ });
+ await p.waitForFunction(()=>!!(document.querySelector('[data-motion-media-turn]').compareDocumentPosition(document.getElementById('next-turn'))&Node.DOCUMENT_POSITION_FOLLOWING));
+ assert.equal(await p.evaluate(()=>document.querySelector('video')===window.turnVideo),true);
+ report.checks.push('unfolding old process history retains its turn-local player without duplication');
  assert.deepEqual(report.errors,[]);report.passed=true;
 }finally{await browser.close();await new Promise(r=>server.close(r));await fs.writeFile(out+'/verification.json',JSON.stringify(report,null,2));const target=await fs.realpath(dir),temp=await fs.realpath(tmpdir());if(path.dirname(target)!==temp||!path.basename(target).startsWith('motion-player-'))throw Error('Unexpected cleanup target');await fs.rm(target,{recursive:true,force:true})}
 console.log(JSON.stringify(report));

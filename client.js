@@ -4260,7 +4260,7 @@ function Sandbox({ node, document: doc, state: state2, data, derived, disabled, 
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.8.3", "id": "0.8.3+da9b5c9a709d", "sourceHash": "da9b5c9a709de333a5c0348d1e9544ced197459e293f22dcfdc302b8dbb5f3d0" });
+var BUILD_INFO = Object.freeze({ "version": "0.8.3", "id": "0.8.3+6e8d862a5149", "sourceHash": "6e8d862a5149e7e5be873f381ed5b9e3e4f2c8cbb96104ded5da5ab4da937064" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38", clippedText: "\u6587\u5B57\u53EF\u80FD\u88AB\u9690\u85CF\u6216\u88C1\u5207", cardTextOverflow: "\u6587\u5B57\u8D85\u51FA\u5361\u7247\u5185\u5BB9\u8FB9\u754C\uFF1B\u8BF7\u4FDD\u7559\u9634\u5F71\u5E76\u8C03\u6574\u5BB9\u5668\u5C3A\u5BF8\u3001\u5185\u8FB9\u8DDD\u6216\u6587\u5B57\u6392\u7248", bottomWhitespace: "\u5185\u5BB9\u4E0B\u65B9\u5B58\u5728\u660E\u663E\u7A7A\u767D" });
@@ -6574,6 +6574,19 @@ var VISUAL_CSS = `
 // src/media-history.js
 var uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 var allowedFiles = /* @__PURE__ */ new Set(["video.mp4", "poster.jpg", "source.html", "project.zip"]);
+function inputAssetIds(value) {
+  const clips = value.kind === "process" ? value.clips ?? value.recipe?.clips : null;
+  if (!Array.isArray(clips)) return [];
+  return [...new Set(clips.slice(0, 256).flatMap((clip) => {
+    if (typeof clip?.path !== "string") return [];
+    const parts = clip.path.replaceAll("\\", "/").split("/"), id2 = parts.at(-2);
+    return parts.at(-1) === "video.mp4" && uuid.test(id2) ? [id2] : [];
+  }))];
+}
+function visibleMediaRecords(records2) {
+  const consumed = new Set(records2.flatMap((r) => r.inputAssetIds ?? []));
+  return records2.filter((r) => !consumed.has(r.id));
+}
 function mediaRecord(message) {
   if (message?.isError) return null;
   for (const part of message?.content ?? []) {
@@ -6584,7 +6597,7 @@ function mediaRecord(message) {
       const files = (value.files ?? []).map((f) => typeof f === "string" ? f : f?.name).filter((f) => allowedFiles.has(f));
       if (!files.includes("video.mp4")) continue;
       const output = value.output ?? {}, positive = (n2) => typeof n2 === "number" && Number.isFinite(n2) && n2 > 0 ? n2 : null;
-      return { id: value.id, sessionId: value.sessionId, kind: value.kind, files: [...new Set(files)], documentId: uuid.test(value.documentId) ? value.documentId : null, documentRevision: Number.isSafeInteger(value.documentRevision) && value.documentRevision >= 0 ? value.documentRevision : null, nodeId: typeof value.nodeId === "string" ? value.nodeId : null, duration: positive(output.duration), width: positive(output.width), height: positive(output.height), hasAudio: Array.isArray(output.audio) ? output.audio.length > 0 : null };
+      return { id: value.id, sessionId: value.sessionId, kind: value.kind, inputAssetIds: inputAssetIds(value), files: [...new Set(files)], documentId: uuid.test(value.documentId) ? value.documentId : null, documentRevision: Number.isSafeInteger(value.documentRevision) && value.documentRevision >= 0 ? value.documentRevision : null, nodeId: typeof value.nodeId === "string" ? value.nodeId : null, duration: positive(output.duration), width: positive(output.width), height: positive(output.height), hasAudio: Array.isArray(output.audio) ? output.audio.length > 0 : null };
     } catch {
     }
   }
@@ -6865,7 +6878,7 @@ function VideoPlayer({ record }) {
 function MediaRecords({ records: records2, sessionId }) {
   const owner = (0, import_react27.useRef)({});
   (0, import_react27.useLayoutEffect)(() => presentMedia(owner.current, sessionId, records2), [records2, sessionId]);
-  return h20(import_react27.default.Fragment, null, records2.filter((r) => r.sessionId === sessionId).map((record) => h20(VideoPlayer, { key: record.id, record })));
+  return h20(import_react27.default.Fragment, null, visibleMediaRecords(records2.filter((r) => r.sessionId === sessionId)).map((record) => h20(VideoPlayer, { key: record.id, record })));
 }
 var mediaRoots = /* @__PURE__ */ new WeakMap();
 var allMediaRoots = /* @__PURE__ */ new Set();
@@ -6881,12 +6894,15 @@ function disposeSurface(entry) {
 function disposeMediaSurfaces() {
   for (const entry of [...allMediaRoots]) disposeSurface(entry);
 }
+function mediaSeat(anchor, scroll) {
+  let seat = anchor.closest("[data-chat-turn]") ?? anchor;
+  for (let el = anchor.parentElement; el && el !== scroll; el = el.parentElement)
+    if (el.getAttribute("hidden") === "until-found") seat = el;
+  return seat;
+}
 function placeOutsideFold(entry) {
   if (!entry.anchor?.isConnected) return;
-  let folded = null;
-  for (let el = entry.anchor; el && el !== entry.scroll; el = el.parentElement) if (el.getAttribute("hidden") === "until-found") folded = el;
-  if (!folded) return;
-  const seat = folded.parentElement, parent = seat === entry.scroll ? entry.scroll : seat.parentElement, before = seat === entry.scroll ? null : seat.nextSibling;
+  const seat = mediaSeat(entry.anchor, entry.scroll), parent = seat.parentElement, before = seat.nextSibling;
   if (before === entry.host || !before && parent.lastChild === entry.host) return;
   try {
     if (parent.moveBefore) {
@@ -6926,9 +6942,7 @@ function MediaNodeView({ node, sessionId }) {
       return;
     }
     if (!entry) {
-      let folded = null;
-      for (let el = anchor.current; el && el !== scroll; el = el.parentElement) if (el.getAttribute("hidden") === "until-found") folded = el;
-      const seat = folded?.parentElement ?? anchor.current.closest("[data-chat-turn]") ?? anchor.current;
+      const seat = mediaSeat(anchor.current, scroll);
       const host = document.createElement("div");
       host.dataset.motionMediaTurn = String(state2.turn);
       if (seat === scroll) scroll.append(host);

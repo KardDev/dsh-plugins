@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mediaRecord,mediaAssetUrl,mediaHistoryDefinition as d} from '../src/media-history.js';
+import {visibleMediaRecords,mediaRecord,mediaAssetUrl,mediaHistoryDefinition as d} from '../src/media-history.js';
 const id='11111111-1111-4111-8111-111111111111',documentId='22222222-2222-4222-8222-222222222222';
 const job={id,sessionId:'test session',kind:'render',status:'completed',documentId,nodeId:'film',files:[{name:'video.mp4',url:'https://untrusted.example/movie.mp4',path:'secret'},{name:'source.html'},{name:'project.zip'},{name:'private.json'}],output:{duration:32,width:1920,height:1080,audio:[{codec:'aac'}]}};
 const message=j=>({content:[{type:'text',text:JSON.stringify(j)+'\n[video.mp4](ignored)'}]});
@@ -20,4 +20,16 @@ test('durable media replay publishes immediately, replaces only same canvas, and
  state=d.update({state},{event:event({...job,id:'44444444-4444-4444-8444-444444444444',documentId:'55555555-5555-4555-8555-555555555555'})});assert.equal(state.records.length,2);
  state=d.update({state},{event:event({...job,id:'66666666-6666-4666-8666-666666666666',kind:'process'})});assert.equal(state.records.length,3);
  assert.equal(d.match({...event(job),surfaceOp:'replace'}),null);assert.equal(d.match({type:'assistant/message',data:{turn:3,message:message(job)}}),null);
+});
+
+test('completed assembly replaces only its input clips without leaking paths',()=>{
+ const a=mediaRecord(message(job)),b=mediaRecord(message({...job,id:documentId}));
+ const edit=mediaRecord(message({...job,id:'33333333-3333-4333-8333-333333333333',kind:'process',clips:[{path:'C:\\private\\media\\'+id+'\\video.mp4'},{path:'/media/'+documentId+'/video.mp4'}]}));
+ assert.deepEqual(edit.inputAssetIds,[id,documentId]);
+ assert.ok(!JSON.stringify(edit).includes('private'));
+ const unrelated=mediaRecord(message({...job,id:'44444444-4444-4444-8444-444444444444'}));
+ assert.deepEqual(visibleMediaRecords([a,b,edit,unrelated]).map(r=>r.id),[edit.id,unrelated.id]);
+ const next=mediaRecord(message({...job,id:'55555555-5555-4555-8555-555555555555',kind:'process',clips:[{path:'/media/'+edit.id+'/video.mp4'}]}));
+ assert.deepEqual(visibleMediaRecords([a,b,edit,next]).map(r=>r.id),[next.id]);
+ assert.deepEqual(visibleMediaRecords([a,b]).map(r=>r.id),[id,documentId]);
 });

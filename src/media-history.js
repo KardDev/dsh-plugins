@@ -1,5 +1,19 @@
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 const allowedFiles=new Set(['video.mp4','poster.jpg','source.html','project.zip']);
+function inputAssetIds(value){
+ const clips=value.kind==='process'?(value.clips??value.recipe?.clips):null;
+ if(!Array.isArray(clips))return [];
+ return [...new Set(clips.slice(0,256).flatMap(clip=>{
+  if(typeof clip?.path!=='string')return [];
+  const parts=clip.path.replaceAll('\\','/').split('/'),id=parts.at(-2);
+  return parts.at(-1)==='video.mp4'&&uuid.test(id)?[id]:[];
+ }))];
+}
+// Keep originals for canvas ownership; display their completed edit instead.
+export function visibleMediaRecords(records){
+ const consumed=new Set(records.flatMap(r=>r.inputAssetIds??[]));
+ return records.filter(r=>!consumed.has(r.id));
+}
 // Durable tool output is also available in older conversations. Never execute
 // returned HTML or trust arbitrary URLs/file paths from a result.
 export function mediaRecord(message){
@@ -12,7 +26,7 @@ export function mediaRecord(message){
    const files=(value.files??[]).map(f=>typeof f==='string'?f:f?.name).filter(f=>allowedFiles.has(f));
    if(!files.includes('video.mp4'))continue;
    const output=value.output??{},positive=n=>typeof n==='number'&&Number.isFinite(n)&&n>0?n:null;
-   return {id:value.id,sessionId:value.sessionId,kind:value.kind,files:[...new Set(files)],documentId:uuid.test(value.documentId)?value.documentId:null,documentRevision:Number.isSafeInteger(value.documentRevision)&&value.documentRevision>=0?value.documentRevision:null,nodeId:typeof value.nodeId==='string'?value.nodeId:null,duration:positive(output.duration),width:positive(output.width),height:positive(output.height),hasAudio:Array.isArray(output.audio)?output.audio.length>0:null};
+   return {id:value.id,sessionId:value.sessionId,kind:value.kind,inputAssetIds:inputAssetIds(value),files:[...new Set(files)],documentId:uuid.test(value.documentId)?value.documentId:null,documentRevision:Number.isSafeInteger(value.documentRevision)&&value.documentRevision>=0?value.documentRevision:null,nodeId:typeof value.nodeId==='string'?value.nodeId:null,duration:positive(output.duration),width:positive(output.width),height:positive(output.height),hasAudio:Array.isArray(output.audio)?output.audio.length>0:null};
   }catch{/* Unrelated or malformed tool output remains a normal tool result. */}
  }
  return null;
