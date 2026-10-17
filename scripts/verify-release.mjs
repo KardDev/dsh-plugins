@@ -16,6 +16,7 @@ steps.push(['distinct-visual-grammar',['tests/verify-style-grammar.mjs']]);
 steps.push(['guided-native-style-coverage', ['tests/verify-native-style.mjs']]);
 steps.push(['motion-controls-and-real-state', ['tests/verify-motion.mjs']]);
 steps.push(['mechanism-structure-and-kinematics',['tests/verify-mechanism.mjs']]);
+steps.push(['shadow-card-content-fit-and-audits',['tests/verify-card-layout.mjs']]);
 steps.push(['timeline-control-legibility-and-height',['tests/verify-timeline-controls.mjs']]);
 steps.push(['copyable-text-and-code', ['tests/verify-copy.mjs']]);
 steps.push(['short-scenes-targeted-edit-and-visual-observations',['tests/verify-usability.mjs']]);
