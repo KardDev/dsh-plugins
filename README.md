@@ -6,6 +6,10 @@ Interactive, declarative tool views for **DeepSeek Harness Web / Desktop 0.2.0-r
 
 The plugin adds `render_scene` (short flow/comparison/allocation/budget data), `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
 
+### v0.8.3：控件可读性与阴影卡片排版
+
+改善动画控件的主题对比度，修正画布内边距造成的内部滚动。普通文字卡片保留阴影并随内容自动撑高；SVG 与定位布局增加越界诊断。
+
 ### v0.8.2：适配 DSH 0.2.1-rc.2
 
 更新 SDK、兼容声明与依赖范围，保留旧版支持及现有 UI / 视频功能。Web 与原生 Desktop 已验证设置恢复和历史视频控件。
