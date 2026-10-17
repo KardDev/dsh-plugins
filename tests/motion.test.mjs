@@ -6,7 +6,7 @@ import {promptSections} from '../lib/ui-skill.js';
 import {VISUAL_STYLES,DEFAULT_VISUAL_STYLE} from '../lib/visual-styles.js';
 import {NATIVE_STYLE_CSS} from '../src/native-style.js';
 test('motion recipes validate, remain targeted, and compute exact local values',()=>{
- const list=motionCatalog();assert.equal(list.recipes.length,7);assert.ok(!JSON.stringify(list).includes('nodes'));
+ const list=motionCatalog();assert.equal(list.recipes.length,11);assert.ok(!JSON.stringify(list).includes('nodes'));
  for(const r of MOTION_RECIPES)assert.doesNotThrow(()=>motionCatalog(r.id));
  const plan=motionCatalog('plan').document;assert.equal(evaluate(plan,{months:12,seats:8}).derived.total,2784);
  assert.equal(evaluate(motionCatalog('checklist').document,{readme:true,test:false,license:true}).derived.done,2);

@@ -12,6 +12,8 @@ import {fenceUiDefinition} from './fence-history.js';
 import {FenceNodeView} from './fence-view.js';
 import {setRuntimeActivation} from './runtime-diagnostics.js';
 import {VISUAL_CSS} from './visual-styles.js';
+import {mediaHistoryDefinition} from './media-history.js';
+import {MediaNodeView,MediaToolView,MEDIA_PLAYER_CSS,disposeMediaSurfaces} from './media-player.js';
 export const inject = ['slots', 'sessions', 'conversation', 'uiConversation', 'configForms'];
 export function apply(ctx) {
   setRuntimeActivation({active:true,channel:'会话事件渲染 / 正文围栏定位'});
@@ -22,13 +24,17 @@ export function apply(ctx) {
   ctx.uiConversation.events.register(turnUiDefinition);
   ctx.uiConversation.events.register(streamUiDefinition);
   ctx.uiConversation.events.register(fenceUiDefinition);
+  ctx.uiConversation.events.register(mediaHistoryDefinition);
+  ctx.effect(()=>disposeMediaSurfaces);
+  ctx.slots.inject('conversation.chat.node',()=>ctx.slots.register({name:'conversation.chat.node',key:'dshMotionMedia'},MediaNodeView));
   ctx.slots.inject('conversation.chat.node',()=>ctx.slots.register({name:'conversation.chat.node',key:'dshUiFences',inject:sessionId=>({sendPrompt:prompt=>ctx.sessions.scope(sessionId).get('conversation').send(prompt)})},FenceNodeView));
   ctx.slots.inject('conversation.chat.node',()=>ctx.slots.register({name:'conversation.chat.node',key:'dshUiStream'},StreamNodeView));
   ctx.slots.inject('conversation.chat.turnTail', () => ctx.slots.register({
     name: 'conversation.chat.turnTail', id: 'dsh-generative-ui',
     inject: sessionId => ({ presentationScope:scope,sendPrompt: prompt => ctx.sessions.scope(sessionId).get("conversation").send(prompt) })
   }, TurnUiView));
-  ctx.effect(() => { const style = document.createElement('style'); style.dataset.plugin = 'dsh-generative-ui'; style.textContent = CSS+VISUAL_CSS; document.head.append(style); return () => style.remove(); });
+  ctx.effect(() => { const style = document.createElement('style'); style.dataset.plugin = 'dsh-generative-ui'; style.textContent = CSS+VISUAL_CSS+MEDIA_PLAYER_CSS; document.head.append(style); return () => style.remove(); });
+  for(const name of ['render_video','process_video'])ctx.slots.inject('tool.call.toolview',()=>ctx.slots.register({name:'tool.call.toolview',key:name},MediaToolView));
   for(const name of ['render_ui','render_canvas','render_text','render_mechanism','render_scene'])ctx.slots.inject('tool.call.toolview', () => ctx.slots.register({
     name: 'tool.call.toolview', key: name,
     inject: sessionId => ({ sendPrompt: prompt => ctx.sessions.scope(sessionId).get("conversation").send(prompt) })

@@ -1,10 +1,14 @@
 # DSH Motion UI
 
-为 DeepSeek Harness Web 提供可交互组件、自由 HTML/SVG 图解与动画。引导模式会主动注入设计技能、协议和示例；自由模式让模型自主设计。设置位于首页 → 插件 → dsh-motion-ui。
+为 DeepSeek Harness Web / Desktop 提供可交互组件、自由 HTML/SVG 图解与动画。引导模式会主动注入设计技能、协议和示例；自由模式让模型自主设计。设置位于首页 → 插件 → dsh-motion-ui。
 
-Interactive, declarative tool views for **DeepSeek Harness Web 0.2.0-rc.2**.
+Interactive, declarative tool views for **DeepSeek Harness Web / Desktop 0.2.0-rc.2 / 0.2.1-rc.1**.
 
 The plugin adds `render_scene` (short flow/comparison/allocation/budget data), `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
+
+### v0.8.0：从交互界面到视频成片
+
+新增可定位动效时间轴、分镜预览、MP4 导出、本地视频检查与剪辑，以及 MiniMax 配音和字幕时间戳。模型可以按需读取完整动效设计技能，组织宣传片并交付 MP4、HTML 和可编辑工程 ZIP。聊天内视频支持播放/暂停、拖动、音量、倍速、全屏与下载。视频制作需要本机浏览器、FFmpeg 和 FFprobe；配音需要 MiniMax 认证，日常 UI 不会自动转为视频。
 
 ### v0.7.0：风格、交互与机制图解
 
@@ -333,3 +337,41 @@ render_mechanism({scene:"gears", rpm:20, teeth:32})
 这是教学几何与运动学：简化齿形不能用于加工，隐藏盖板不是任意实体剖切，按层与深度排序不构成精确遮挡/碰撞审计。瞬时动画相位不持久化，用户参数仍保存。
 
 投影和轮廓数学参考并使用 [Anatomy](https://github.com/wheresryan22/anatomy) 的 MIT 代码（固定版本及许可证见 `lib/third-party/anatomy-NOTICE.md`）。插件的状态桥接、机制案例、渲染与交互逻辑为本项目实现，没有引入完整上游工作流或其 3D 引擎。
+
+## 可定位动效与视频制作（v0.8.0）
+
+动效语言适用于所有视觉风格：通过焦点、连续性、因果和阅读停顿组织变化。自由模式不注入这套美术指导。`ui_catalog({topic:"motion"})` 返回简短索引，`scene:"timeline"|"stages"|"path"|"typography"` 按需返回原创例子；`scene:"reference"` 提供参考录屏分析流程，完整代码不会常驻注入每次对话。
+
+画布可用 `DSHUI.timeline({id:"main",duration:6,draw(time,info),chapters:[{time:0,label:"输入"}],autoplay:false})`，返回 `play/pause/seek/replay/chapter/subscribe/dispose`。`draw` 从绝对秒数和当前参数同步绘制，支持倒拖与分步定位；用户参数继续保存，瞬时进度不逐帧写回。现有 `DSHUI.animate` 保留。离屏、后台和减少动态效果适用于新时间轴。
+
+模型可直接使用五个工具完成视频任务：
+
+- `preview_video({documentId,duration,times?,width?,height?,theme?})`：直接从可编辑时间轴抓取关键画面和联系表，先看图修正，再导出全片，不必反复编码 MP4。`complete=false` 返回时间/元素诊断并保留有效帧；无效样本不会伪装成已检查画面，修正后应重新预览。
+- `synthesize_voice({text,voice?,model?,speed?})`：生成真实配音、时长与字幕时间戳，需要用户配置的 MiniMax 认证，调用付费 API。
+- `inspect_video({path,times?:[seconds]})`：读取实际时长、尺寸、帧率和音轨，抽取最多 12 个时间点及联系表。模型应实际读取图片再分析；这不是语音识别、自动目标跟踪或完整视频理解。
+- `render_video({documentId,nodeId?,duration,width?,height?,fps?,theme?,audioTracks?,audioPath?,audioVolume?,captions?})`：将已保存的一个画布导出为可编辑 HTML、文档/参数快照、制作参数和真正的 MP4。画布须有唯一 `#stage` 和唯一 `DSHUI.timeline`，ID 为 `main`，时长与导出一致。舞台外控件不进入视频。支持本地配乐和精确时间字幕；配乐副本随源码保留，下载后放在 HTML 同一目录，可手动开启，并随播放、暂停、定位同步。
+- `process_video({clips:[{path,start?,end?}],width?,height?,fps?,audioPath?,audioVolume?,captions?})`：截取、按顺序拼接、等比适配/补边；保留原音轨，指定配乐时替换原音轨；字幕形如 `{start:0,end:1.5,text:"说明"}`，按输出时间排列，空隙不显示上一条字幕。生成新文件，原素材不覆盖。
+
+视频渲染需要本机 Chrome/Edge 或 Playwright Chromium、FFmpeg、FFprobe。插件仅携带浏览器控制库，不自动下载浏览器/编码器。插件设置中的“检查视频环境”或 `ui_catalog({topic:"video"})` 可以检测；环境变量 `DSH_MOTION_BROWSER`、`DSH_MOTION_FFMPEG`、`DSH_MOTION_FFPROBE` 可指定可执行文件路径。视频需显式请求，普通对话 UI 不自动转成视频。
+
+默认 1920×1080、30fps；允许偶数尺寸 160..3840 × 160..2160、1..60fps、0.1..600 秒，单次最多 36000 帧。超出预算明确报错，可拆成章节，不截断产物。这些是媒体任务预算，不改变模型推理、输出或运行时限。渲染不提供硬性的恶意代码 CPU/内存隔离。
+
+每次导出检查实际尺寸/时长、音轨存在性和完整解码，失败保留源码与真实错误；检查通过不等于美术质量合格。任意 JS 的时间累加、独立 CSS 动画和未设种子的随机状态不会被自动改造成可导出时间轴。配音可使用 `synthesize_voice`；图片和生成式视频素材使用宿主实际提供的工具，插件不虚构素材或模型 API。
+
+工作流参考 [OpenDesign Motion](https://github.com/nexu-io/open-design/pull/8619) 的源码/视频双交付、按需技能和时间轴思路。本项目的时间轴、原创案例及导出/处理实现独立编写，未复制其 GSAP 播放器；完整 motion-design 技能以原文和独立 DSH 适配说明按需提供，来源与许可见下文。
+
+### 一段需求制作宣传片（v0.8.0）
+
+可以请求模型自行组织文案、分镜与 HTML/SVG 动效，再用 `render_video` 交付真实 MP4 和可编辑工程 ZIP。`ui_catalog topic=video scene=promo` 按需提供制作流程，普通对话不加载整套视频手册。
+
+支持两种创作方向：口播讲解按真实语音组织信息；音乐驱动的产品片用大字、贯穿图形变形、能力演示和镜头切换表达产品，不强制添加旁白或字幕。可提供参考片，让模型分析其构图与转场机制，再独立创作。交互数据、机械部件和图形应有可见的因果变化，不能仅靠静态卡片和换色表示能力。
+
+完整内置 OpenDesign 的 `motion-design` 技能，保留原文、固定来源版本与 Apache-2.0 许可，并通过独立 DSH 适配文档映射工具、时间轴和音轨。`ui_catalog({topic:"motion",scene:"motion-design"})` 或 `ui_catalog({topic:"video",scene:"promo"})` 按需返回技能全文，不把正文注入日常对话。上游 OpenDesign CLI/GSAP 播放器协议不作为 DSH 的可调用接口。
+
+`render_video` / `process_video` 的成片在聊天中直接显示播放器，固定控制条提供播放/暂停、进度与时间、音量/静音、倍速和全屏，可下载 MP4、源码和工程。历史工具结果也支持重放为播放器，无需重新生成影片；同一画布的再次导出更新对应播放器，其他影片独立保留。后续正文更新保持播放位置，离开聊天停止声音，多个影片互斥播放。音量和速度在本机记忆；加载失败提供重试与下载入口。
+
+需要本机 Chrome/Edge、FFmpeg、FFprobe。可选的 `synthesize_voice` 调用 MiniMax 付费语音 API，使用官方 mmx 认证或 `MINIMAX_API_KEY`（可选 `MINIMAX_REGION=cn/global`）；不会从 DSH 模型配置中复制密钥。返回真实音频时长及字幕时间戳。通过 `audioTracks` 混合旁白、用户提供的音乐和音效，支持音量、偏移、循环音乐和淡出；旁白不允许循环或被截短。没有配置语音服务时仍可导出无声动效。
+
+示例需求：为我的插件制作一段 30 到 45 秒横屏宣传片，自行写文案和分镜，展示解决的问题和三个核心功能，用中文配音、清晰字幕和不同构图，交付 1080p30 MP4 及可编辑工程。
+
+视频抽帧检查是稀疏视觉观察，不等于完整听审、自动转录或自动剪辑任意素材。外部素材的可用性和授权由提供者负责；不自动下载大型运行时或音乐库。

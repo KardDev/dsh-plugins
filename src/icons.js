@@ -1,6 +1,13 @@
 import React from 'react';
 const h = React.createElement;
 const paths = {
+  play:['m8 4 12 8-12 8V4Z'],
+  pause:['M7 4h3v16H7zM14 4h3v16h-3z'],
+  volume:['M11 4 5 9H2v6h3l6 5V4Z','M15 8a6 6 0 0 1 0 8M18 4a11 11 0 0 1 0 16'],
+  volumeOff:['M11 4 5 9H2v6h3l6 5V4Z','m16 9 6 6m0-6-6 6'],
+  fullscreen:['M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5'],
+  minimize:['M3 8h5V3m8 0v5h5M8 21v-5H3m13 5v-5h5'],
+  download:['M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4'],
   copy:['M9 8h11v13H9z','M15 8V3H4v13h5'],
   external:['M14 4h6v6M20 4l-9 9','M10 4H4v16h16v-6'],
   file:['M14 3H5v18h14V8l-5-5Z','M14 3v5h5M8 13h8M8 17h5'],

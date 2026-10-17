@@ -1,4 +1,8 @@
 import {sceneDocument,SCENE_PARAMETERS,sceneReference} from './lib/scene-entry.js';
+import {registerVideoTools} from './lib/video-tools.js';
+import {VIDEO_GUIDE,PROMO_GUIDE} from './lib/motion-craft.js';
+import {loadMotionDesignSkill,MOTION_DESIGN_REFERENCE} from './lib/motion-design-skill.js';
+import {normalizeNodeEdits} from './lib/refinement.js';
 import {TEXT_GUIDE} from './lib/text-guide.js';
 import {CANVAS_CONTRACT,TOOL_DIRECTORY} from './lib/prompt-contract.js';
 import {mechanismDocument} from './lib/mechanism-entry.js';
@@ -22,7 +26,7 @@ import { toolJson } from './lib/tool-json.js';
 import { DOCUMENT_PARAMETER,TEXT_BLOCKS_PARAMETER } from './lib/tool-schema.js';
 import {textDocument} from './lib/text-document.js';
 import {TEXT_PRESETS} from './lib/typography.js';
-import { inspectRecord } from './lib/inspection.js';
+import { inspectRecord,normalizeNodeIds } from './lib/inspection.js';
 import {QUICK_EXAMPLES,QUICK_GUIDE} from './lib/quick-examples.js';
 import { PROTOCOL_GUIDE, calculatorExample, comparisonExample, budgetExample, curveExample, sceneExamples, bicycleExample, oscillatorExample } from './lib/catalog.js';
 import {VISUAL_GUIDE,VISUAL_EXAMPLES,visualCatalog} from './lib/visual.js';
@@ -42,13 +46,14 @@ function defineRenderTool(options) {
     // string branch that encourages models to manually escape whole documents.
     // Canonicalize adapter quirks before native schema checks, so a lossless
     // items:{item:[...]} wrapper receives the same treatment as stored/replayed UI.
-    const normalized=args&&Object.hasOwn(args,'document')?{...args,document:validateDocument(toolJson(args.document,'document'))}:args&&Object.hasOwn(args,'blocks')?{...args,blocks:textDocument({...args,blocks:toolJson(args.blocks,'blocks')}).nodes}:args;
+    const normalized=args&&Object.hasOwn(args,'document')?{...args,document:validateDocument(toolJson(args.document,'document'))}:args&&Object.hasOwn(args,'blocks')?{...args,blocks:textDocument({...args,blocks:toolJson(args.blocks,'blocks')}).nodes}:args&&Object.hasOwn(args,'changes')?{...args,changes:normalizeNodeEdits(args.changes)}:args&&Object.hasOwn(args,'nodeIds')?{...args,nodeIds:normalizeNodeIds(args.nodeIds)}:args;
     return execute(normalized,exec);
   }};
 }
 export const Config=z.object({autoRepair:z.boolean().default(true).description('自动反馈无法交付的 UI 围栏、渲染失败及仅思考没有正文或工具的空交付，最多两次去重提醒；不限制模型思考。'),visualStyle:z.union(VISUAL_STYLE_IDS).default(DEFAULT_VISUAL_STYLE).description('引导模式的视觉风格；同步原生组件外观、风格提示词与案例，自由模式不应用。'),defaultPreset:z.union(TEXT_PRESETS).default('reading').description('兼容旧配置的保留字段，已停用；排版由模型按内容选择。'),designMode:z.union(['guided','free']).default('guided').description('guided：设计技能与示例引导；free：只注入画布接口与交互约束，由模型自主设计。'),displayMode:z.union(['tail','inline','sidebar']).default('inline').description('兼容旧配置的保留字段，已停用；统一使用正文标记，侧栏随时可打开。'),showDetails:z.boolean().default(false).description('显示参数状态、原始说明、视觉诊断和版本历史。默认关闭，保持界面简洁。')}).volatile();
 export function apply(ctx,config={}) {
   const store = new UiStore(dshHomePath('plugins', 'dsh-generative-ui'));
+
   const settings=()=>typeof config.get==='function'?config.get():config;
   const feedback=registerFenceFeedback(ctx,()=>settings().autoRepair!==false);
   const placement=value=>`\nPlace this exact fenced marker in your answer at the intended UI position:\n\`\`\`dsh-ui\n${value.documentId}\n\`\`\``;
@@ -89,9 +94,11 @@ export function apply(ctx,config={}) {
   })));
   ctx.effect(() => ctx.tools.register(defineTool({
     name: 'ui_catalog', description: "Read one optional reference topic or scene. text=native typography; native=v1 fields/formulas; visual=extended components; canvas=API/construction/examples; style=selected guided style/examples; templates/motion/mechanism=targeted recipes. overview/quick/data/scenes/all remain available; avoid all unless needed.",
-    parameters: { topic: { type: 'string', enum: ['overview','quick','text','native','style','visual','motion','mechanism','templates','canvas','data','scenes','all'], description:'Optional topic; default overview.' },scene:{type:'string',description:'Scene for canvas/templates/motion/mechanism, or explicit style ID for style. Omit to get summaries/current guided style.'} }, output: { schema: { type: 'json' }, render: (_args, value) => [{ type: 'text', text: JSON.stringify(value) }] },
+    parameters: { topic: { type: 'string', enum: ['overview','quick','text','native','style','visual','motion','video','mechanism','templates','canvas','data','scenes','all'], description:'Optional topic; default overview.' },scene:{type:'string',description:'Scene for canvas/templates/motion/mechanism, or explicit style ID for style. Omit to get summaries/current guided style.'} }, output: { schema: { type: 'json' }, render: (_args, value) => [{ type: 'text', text: JSON.stringify(value) }] },
     isConcurrencySafe: () => true,
     async execute({ topic = 'overview',scene } = {}) {
+      if((topic==='motion'||topic==='video')&&scene==='motion-design')return {topic,designSkill:await loadMotionDesignSkill()};
+      if(topic==='video')return{topic,guide:VIDEO_GUIDE,designReference:MOTION_DESIGN_REFERENCE,...(scene==='promo'?{production:PROMO_GUIDE,designSkill:await loadMotionDesignSkill()}:{}),capabilities:await video.capabilities(),workflow:'Author render_canvas with exactly one DSHUI.timeline({id:"main",duration,draw}) and #stage. Then render_video({documentId,duration,...}). For input videos inspect_video then view sampled frames, process_video clips/audio/captions. No unrequested video export. Output URLs are authenticated same-host downloads; HTML sources are attachments, never executed in the Host origin.'};
       if(topic==='text')return {topic,guide:TEXT_GUIDE};
       if(topic==='native')return {topic,protocol:PROTOCOL_GUIDE,components:componentCatalog(),example:calculatorExample};
       if(topic==='style'){if(settings().designMode==='free'&&!scene)return{topic,mode:'free',note:'No style is selected in free mode. An explicit scene equal to a style ID requests reference guidance only.',styles:VISUAL_STYLE_IDS};const id=scene??settings().visualStyle??DEFAULT_VISUAL_STYLE;return{topic,style:id,guide:stylePrompt(id),examples:styleExamples(id)}}
@@ -104,7 +111,7 @@ export function apply(ctx,config={}) {
       if(topic==='quick')return{...sceneReference(),design:QUICK_GUIDE,fullDocuments:QUICK_EXAMPLES};
       if(topic==='templates')return sceneCatalog(scene);
       if(topic==='mechanism')return mechanismCatalog(scene);
-      if(topic==='motion')return motionCatalog(scene);
+      if(topic==='motion')return {...motionCatalog(scene),...(!scene?{designReferences:[MOTION_DESIGN_REFERENCE]}:{})};
       const groups = { overview: [calculatorExample, oscillatorExample], canvas: [bicycleExample, oscillatorExample, architectureExample, scatterExample], data: [calculatorExample, comparisonExample, budgetExample, curveExample, scatterExample], scenes: sceneExamples, all: [calculatorExample, comparisonExample, budgetExample, curveExample, ...sceneExamples, bicycleExample, oscillatorExample, architectureExample, scatterExample] };
       groups.quick=QUICK_EXAMPLES;groups.overview=QUICK_EXAMPLES.slice(0,2);
       groups.visual=VISUAL_EXAMPLES;
@@ -114,19 +121,20 @@ export function apply(ctx,config={}) {
     }
   })));
   ctx.effect(() => ctx.connection.fetch.register({ path: '/api/plugins/dsh-generative-ui/state', methods: ['GET', 'POST'], requestBody: 'buffered', fetch: stateRoute(store) }));
+  const video=registerVideoTools(ctx,store);
   ctx.effect(() => ctx.connection.fetch.register({ path: '/api/plugins/dsh-generative-ui/document', methods: ['GET', 'POST'], requestBody: 'buffered', fetch: documentRoute(store) }));
   ctx.effect(() => ctx.connection.fetch.register({ path: '/api/plugins/dsh-generative-ui/history', methods: ['GET', 'POST'], requestBody: 'buffered', fetch: historyRoute(store) }));
   registerVisualAssets(ctx);
   ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/diagnostics',methods:['GET'],requestBody:'buffered',fetch:diagnosticsRoute(feedback)}));
   ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/fence',methods:['POST'],requestBody:'buffered',fetch:fenceRoute(store)}));
   ctx.effect(()=>ctx.tools.register(defineTool({name:'validate_ui',description:"Validate native or extended UI without saving/displaying. valid with complete=false means rejected components. Returns canonical document/diagnostics; a rendering tool still delivers the UI.",parameters:{document:{type:'json',required:true}},output:{schema:{type:'json'},render:(_a,v)=>[{type:'text',text:JSON.stringify(v)}]},isConcurrencySafe:()=>true,async execute({document}){try{const report=diagnoseDelivery(toolJson(document,'document'));return {...report,...(report.valid?{fallback:fallbackText(report.document)}:{error:report.diagnostics[0].message})}}catch(e){return{valid:false,complete:false,error:e.message}}}})));
-  ctx.effect(()=>ctx.tools.register(defineTool({
+  ctx.effect(()=>ctx.tools.register(defineRenderTool({
     name:'inspect_ui',description:"Read current revision/state/derived and heuristic observations. Summary includes node paths/positions/editable fields. query finds text/labels/types (max200 chars); detail=nodes with query OR nodeIds reads matching source. Full only when needed. Missing observations mean unobserved; do not poll. Inspect before editing.",
-    parameters:{documentId:{type:'string',required:true},detail:{type:'string',enum:['summary','nodes','full']},query:{type:'string',description:'Find by text/label/title/type; mutually exclusive with nodeIds. Up to16 matches; blank means all.'},nodeIds:{type:'json',description:'For nodes detail: up to 16 existing node IDs.'}},
+    parameters:{documentId:{type:'string',required:true},detail:{type:'string',enum:['summary','nodes','full']},query:{type:'string',description:'Find by text/label/title/type; mutually exclusive with nodeIds. Up to16 matches; blank means all.'},nodeIds:{type:'array',items:{type:'string'},description:'For nodes detail: direct array of up to16 existing node IDs, e.g. ["canvas"], not HTML DOM IDs.'}},
     output:{schema:{type:'json'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},isConcurrencySafe:()=>true,
     async execute({documentId,detail='summary',nodeIds=[],query=''},exec){const record=await store.owned(documentId,exec.agent?.id);const saved=await store.readState(documentId,record.sessionId);return inspectRecord(record,saved.state,evaluate(record.document,saved.state).derived,await store.audits(documentId),{detail,nodeIds:toolJson(nodeIds,'nodeIds'),query});}
   })));
-  ctx.effect(()=>ctx.tools.register(defineTool({name:'patch_ui',description:"Edit existing scalar/source properties using the inspected documentRevision. changes:[{id,props}]. IDs/structure/bindings/actions stay unchanged; canvas source replacement restarts that frame. Saved parameters persist. Use update_ui for structure changes.",parameters:{documentId:{type:'string',required:true},documentRevision:{type:'number',required:true},changes:{type:'json',required:true}},output:{schema:{type:'json'},render:(_a,v)=>[{type:'text',text:`Updated ${v.document.title}; documentId=${v.documentId}; documentRevision=${v.documentRevision}. Saved parameters retained.`}],presentationMeta:(_a,v)=>({dshGenerativeUiPatch:v})},async execute({documentId,documentRevision,changes},exec){exec.signal.throwIfAborted();return store.refine(documentId,exec.agent?.id,documentRevision,toolJson(changes,'changes'));}})));
+  ctx.effect(()=>ctx.tools.register(defineRenderTool({name:'patch_ui',description:"Edit existing scalar/source properties using the inspected documentRevision. changes:[{id,props}]. IDs/structure/bindings/actions stay unchanged; canvas source replacement restarts that frame. Saved parameters persist. Use update_ui for structure changes.",parameters:{documentId:{type:'string',required:true},documentRevision:{type:'number',required:true},changes:{type:'array',required:true,description:'Direct array [{id,props}]; combine changed properties for one node in props.',items:{type:'object',additionalProperties:false,properties:{id:{type:'string',required:true},props:{type:'json',required:true}}}}},output:{schema:{type:'json'},render:(_a,v)=>[{type:'text',text:`Updated ${v.document.title}; documentId=${v.documentId}; documentRevision=${v.documentRevision}. Saved parameters retained.`}],presentationMeta:(_a,v)=>({dshGenerativeUiPatch:v})},async execute({documentId,documentRevision,changes},exec){exec.signal.throwIfAborted();return store.refine(documentId,exec.agent?.id,documentRevision,toolJson(changes,'changes'));}})));
   ctx.effect(()=>ctx.tools.register(defineTool({name:'update_ui',description:"Append/replace existing content at the inspected revision, keeping documentId and compatible state. targetId selects a node; an extended fragment appends to the sole visual when unambiguous. Supply a stable operationId; reuse only for an identical retry (latest64 replay IDs). Preserve state/derived definitions; new inputs get defaults.",parameters:{documentId:{type:'string',required:true},documentRevision:{type:'number',required:true},operationId:{type:'string',required:true},mode:{type:'string',enum:['append','replace'],required:true},targetId:{type:'string'},document:{type:'json',required:true}},output:{schema:{type:'json'},render:(_a,v)=>[{type:'text',text:'Updated existing UI '+v.documentId+'; documentRevision='+v.documentRevision+'. Keep its existing inline marker; do not duplicate it.'}],presentationMeta:(_a,v)=>({dshGenerativeUiPatch:v})},async execute({documentId,documentRevision,operationId,mode,targetId,document},exec){exec.signal.throwIfAborted();return store.update(documentId,exec.agent?.id,documentRevision,operationId,{mode,...(targetId?{targetId}:{}),document:toolJson(document,'document')})}})));
   for(const[i,section]of UI_SKILL_SECTIONS.entries())ctx.effect(()=>ctx.systemPrompt.section({...section,text:()=>promptSections(settings().designMode??'guided',settings().visualStyle??DEFAULT_VISUAL_STYLE)[i].text}));
 }

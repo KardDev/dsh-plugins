@@ -55,7 +55,7 @@ try {
   assert.equal(await frame.locator('body').getAttribute('data-identity'), 'stable-frame');
   checks.push('native slider updates SVG and current derived; canvas buttons and native select share state');
   await frame.getByRole('button', { name: '播放轮转', exact: true }).click(); await page.waitForFunction(()=>document.querySelector('input[type=checkbox]')?.checked===true);
-  const before = await frame.locator('[data-wheel=rear]').getAttribute('transform'); await page.waitForTimeout(80); assert.notEqual(await frame.locator('[data-wheel=rear]').getAttribute('transform'), before);
+  const before = await frame.locator('[data-wheel=rear]').getAttribute('transform'); await actualFormatter.waitForFunction(previous=>document.querySelector('[data-wheel=rear]').getAttribute('transform')!==previous,before); assert.notEqual(await frame.locator('[data-wheel=rear]').getAttribute('transform'), before);
   await frame.getByRole('button', { name: '暂停轮转', exact: true }).click(); await page.getByText('参数已保存', { exact: true }).waitFor();
   await page.screenshot({ path: 'test-output/canvas-bicycle-light.png', fullPage: true });
   await page.evaluate(() => document.body.setAttribute('data-ds-dark-theme', '')); await frame.locator('html').evaluate(el => new Promise(resolve => { if(el.style.colorScheme==='dark')resolve();else new MutationObserver((_,o)=>{if(el.style.colorScheme==='dark'){o.disconnect();resolve()}}).observe(el,{attributes:true}); }));

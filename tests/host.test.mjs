@@ -39,7 +39,7 @@ test('Host tools use canonical output, durable presentation metadata and authent
   assert.match(canvas.design, /Diagram grammar/); assert.match(canvas.interface, /DSHUI.animate/);
   assert.ok((await catalog.execute({topic:'native'})).components.sandbox.fields.includes('script'));assert.equal((await catalog.execute({topic:'canvas',scene:'oscillator'})).examples.length,1); assert.ok(JSON.stringify(overview).length < JSON.stringify(all).length / 2);
   await assert.rejects(() => catalog.execute({ topic: 'unknown' }), /topic.*must be one of/);
-  assert.equal(routes[0].path, '/api/plugins/dsh-generative-ui/state');
+  assert.ok(routes.some(r=>r.path==='/api/plugins/dsh-generative-ui/state'));
   const value = await render.execute({ document: calculatorExample }, { callId: 'call-real', agent: { id: 'session-real' }, signal: new AbortController().signal });
   assert.equal(value.sessionId, 'session-real'); assert.equal(value.callId, 'call-real');
   const wrapped={version:1,title:'发布步骤',fallback:'先整理再提交。',nodes:[{id:'flow',type:'steps',items:{item:[{title:'整理文件'},{title:'提交代码'}]}},{id:'more',type:'details',title:'说明',open:'false',children:[]}]};

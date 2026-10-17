@@ -1,4 +1,5 @@
 import {MotionLibrary} from './motion-library.js';
+import {VideoCapabilities} from './video-capabilities.js';
 import React,{useEffect,useRef,useState}from'react';
 import {StyleOptions} from './style-previews.js';
 import {RuntimeDiagnostics} from './runtime-diagnostics.js';
@@ -24,6 +25,6 @@ export function ModeSettings({scope}){
     h('p',null,'默认隐藏底部的参数状态、原始说明、显示检查和版本历史。导出与重置可通过画布右上角操作菜单使用；错误提示始终保留。'),
     h('p',null,'此设置影响当前 profile 后续请求。已有上下文可能保留旧指导，对比模式时请新建会话。'),
     h('label',null,h('input',{type:'checkbox',checked:snapshot.value?.autoRepair!==false,disabled:!ready||busy,onChange:e=>change(e.target.checked,'autoRepair')}),' 自动反馈界面生成问题'),h('p',null,'最多两次去重提醒，不限制模型思考时长；取消生成时不再触发修复。'),
-    h(SceneLibrary),h(MotionLibrary),h(RuntimeDiagnostics),
+    h(SceneLibrary),h(MotionLibrary),h(VideoCapabilities),h(RuntimeDiagnostics),
     !ready&&h('p',{role:'status'},snapshot.status==='unavailable'?'插件设置不可用，请确认宿主已加载新版插件。':'正在读取设置…'),message&&h('p',{role:'status'},message));
 }
