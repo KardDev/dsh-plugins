@@ -1,6 +1,6 @@
 {
   "name": "dsh-motion-ui",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Readable conversational UI, interactive HTML/SVG, editable motion and local MP4 production for DeepSeek Harness.",
   "type": "module",
   "main": "index.js",
