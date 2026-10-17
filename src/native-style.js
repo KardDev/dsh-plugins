@@ -39,7 +39,7 @@ ${root} [data-motion-component=card],${root} [data-motion-component=stat]{border
 ${root} [data-motion-component=stat] [class*="statValue"]{font-size:var(--du-metric-size);font-weight:var(--du-title-weight);line-height:1.15;letter-spacing:-.7px}
 ${root} [data-motion-component=card] [class*="cardTitle"]{font-size:20px;font-weight:var(--du-title-weight)}
 ${root} [data-motion-visual] [class*="block"]{--dsl-g-radius-surface:var(--du-radius-inner);--dsl-g-radius-control:var(--du-action-radius);--dsl-g-font-body:16px;--dsl-g-font-title:18px}
-${root}[data-preset=reading],${root}[data-preset=minimal]{padding:0;border:0;background:transparent;box-shadow:none}
+
 body[data-ds-dark-theme] ${root},${root}[data-preview-theme=dark]{--du-style-color:color-mix(in srgb,var(--du-style-wash) 58%,var(--du-style-base));--du-line:color-mix(in srgb,var(--du-style-color) 24%,var(--du-bg));--du-soft:color-mix(in srgb,var(--du-style-color) 8%,var(--du-bg))}
 body[data-ds-dark-theme] ${root}:not([data-accent]),${root}[data-preview-theme=dark]:not([data-accent]){--du-accent:var(--du-style-color)}
 `+grammar('editorial',`
@@ -113,5 +113,8 @@ body[data-ds-dark-theme] &,&[data-preview-theme=dark]{background:var(--du-soft);
 ${root} .dgui-card[data-surface=featured]{border-color:var(--du-accent)}${root} .dgui-card[data-surface=soft]{background:var(--du-soft)}${root} .dgui-card[data-tone]>.dgui-section-title{color:var(--du-tone)}
 ${root} .dgui-steps li[data-step-status=active]{border-color:var(--du-accent)}${root} .dgui-step-dot .dgui-icon{color:inherit}
 @media(max-width:600px){${root}{padding:16px}${root}[data-preset=reading],${root}[data-preset=minimal]{padding:0}${root} .dgui-card,${root} .dgui-metric{padding:16px}${root} .dgui-control{padding:10px}${root}[data-visual-style=editorial] .dgui-card{padding:12px 0}${root}[data-visual-style=expressive] .dgui-metric{padding:10px 0}${root} .dgui-row:has(>.dgui-metric){flex-wrap:wrap}}
+/* Unframed presets win after every style grammar, including dark preview rules. */
+${root}[data-preset=reading],${root}[data-preset=minimal]{padding:0;border:0;background:transparent;box-shadow:none}
+body[data-ds-dark-theme] ${root}[data-preset=reading],body[data-ds-dark-theme] ${root}[data-preset=minimal],${root}[data-preview-theme=dark][data-preset=reading],${root}[data-preview-theme=dark][data-preset=minimal]{background:transparent}
 @media(forced-colors:active){${root},${root} .dgui-card,${root} .dgui-metric,${root} .dgui-control,${root} .dgui-chart,${root} .motion-copy-block{background:Canvas;color:CanvasText;box-shadow:none;border-color:CanvasText}${root} .dgui-steps li{background:Canvas}}
 `;
