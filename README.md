@@ -2,7 +2,7 @@
 
 为 DeepSeek Harness Web / Desktop 提供可交互组件、自由 HTML/SVG 图解与动画。引导模式会主动注入设计技能、协议和示例；自由模式让模型自主设计。设置位于首页 → 插件 → dsh-motion-ui。
 
-Interactive, declarative tool views for **DeepSeek Harness Web / Desktop 0.2.0-rc.2 / 0.2.1-rc.1**.
+Interactive, declarative tool views for **DeepSeek Harness Web / Desktop 0.2.0-rc.2 / 0.2.1-rc.1 / 0.2.1-rc.2**.
 
 The plugin adds `render_scene` (short flow/comparison/allocation/budget data), `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
 
