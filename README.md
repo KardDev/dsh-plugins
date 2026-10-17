@@ -6,6 +6,10 @@ Interactive, declarative tool views for **DeepSeek Harness Web / Desktop 0.2.0-r
 
 The plugin adds `render_scene` (short flow/comparison/allocation/budget data), `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
 
+### v0.8.2：适配 DSH 0.2.1-rc.2
+
+更新 SDK、兼容声明与依赖范围，保留旧版支持及现有 UI / 视频功能。Web 与原生 Desktop 已验证设置恢复和历史视频控件。
+
 ### v0.8.1：视频播放修复
 
 修复 Desktop 视频无法拖动定位、成片与源画布重复显示，以及转义换行造成的源画布排版问题。Desktop 会先通过原有认证路由载入本地成片，再启用完整定位；离开会话释放载入数据。源画布仍可在智能 UI 侧栏查看，新版本编辑不会被旧成片覆盖。
@@ -256,7 +260,7 @@ Budgets: 128 KiB UI document, 160 nodes, 12 nested component levels, 500 data ro
 
 ## Current scope
 
-- Web only; exact tested runtime 0.2.0-rc.2.
+- Web and Desktop; tested runtimes 0.2.0-rc.2, 0.2.1-rc.1 and 0.2.1-rc.2.
 - Direct native calls have custom UI. PTC/composite calls may omit presentation metadata and retain the text fallback.
 - Generation supports completed-subtree previews from native argument streaming. Nested incomplete cards wait until whole; separate incremental event protocols remain outside this release. The development additions below support validated edits to committed nodes.
 - Tables/charts display supplied datasets or bounded derived rows. Custom local programs, SVG animation and lightweight demonstrations use sandbox nodes; remote resources and host tool access remain outside their scope.
