@@ -6,6 +6,10 @@ Interactive, declarative tool views for **DeepSeek Harness Web / Desktop 0.2.0-r
 
 The plugin adds `render_scene` (short flow/comparison/allocation/budget data), `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
 
+### v0.8.1：视频播放修复
+
+修复 Desktop 视频无法拖动定位、成片与源画布重复显示，以及转义换行造成的源画布排版问题。Desktop 会先通过原有认证路由载入本地成片，再启用完整定位；离开会话释放载入数据。源画布仍可在智能 UI 侧栏查看，新版本编辑不会被旧成片覆盖。
+
 ### v0.8.0：从交互界面到视频成片
 
 新增可定位动效时间轴、分镜预览、MP4 导出、本地视频检查与剪辑，以及 MiniMax 配音和字幕时间戳。模型可以按需读取完整动效设计技能，组织宣传片并交付 MP4、HTML 和可编辑工程 ZIP。聊天内视频支持播放/暂停、拖动、音量、倍速、全屏与下载。视频制作需要本机浏览器、FFmpeg 和 FFprobe；配音需要 MiniMax 认证，日常 UI 不会自动转为视频。

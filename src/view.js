@@ -22,6 +22,7 @@ import {StreamSurface} from './stream-surface.js';
 import {VisualView} from './visual-view.js';
 import {deliveryDiagnostics} from '../lib/delivery.js';
 import {CopyBlock} from './copy-block.js';
+import {useExportedCanvases} from './media-presentation.js';
 const display = value => value === undefined || value === null ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value);
 function NumericInput({ id, spec, value, onChange, invalidChanged, disabled }) {
   const [draft, setDraft] = useState(String(value)), [invalid, setInvalid] = useState(false);
@@ -65,7 +66,8 @@ function Chart({ node, rows }) {
         (data.length <= 12 || i % Math.ceil(data.length / 12) === 0) && h('text', { x: x(i), y: 192, textAnchor: 'middle', fontSize: 14, fill: 'var(--du-muted)' }, String(r[node.labelKey]).slice(0, 12)))))),
     h('div', {hidden:!showData}, h(Table, { rows, columns: [{ key: node.labelKey, label: '项目' }, { key: node.valueKey, label: node.label, unit: node.unit }], id: `${node.id}-data` })));
 }
-export function UiView({ record, sessionId, sendPrompt, openFile, preview = false }) {
+export function UiView({ record, sessionId, sendPrompt, openFile, preview = false,replaceExportedCanvases=false }) {
+  const exportedCanvases=useExportedCanvases(record,sessionId,replaceExportedCanvases);
   const showDetails=useViewDetails();
   const nativeStyle=useNativeStyle();
   const doc = record.document;
@@ -110,6 +112,7 @@ export function UiView({ record, sessionId, sendPrompt, openFile, preview = fals
   }
   const resolve = value => computed.error ? '—' : computed.resolveValue(value);
   function renderNode(n) {
+    if(n.type==='sandbox'&&exportedCanvases.has(n.id))return null;
     const props = { key: n.id, 'data-ui-node': n.id, 'data-tone': n.tone,style:['text','heading','callout'].includes(n.type)?typographyStyle(n):['row','column'].includes(n.type)?{gap:n.gap,...(n.columns?{'--du-columns':n.columns}:{} )}:undefined };
     const copy=()=>n.spans?n.spans.map((span,i)=>h('span',{key:i,style:typographyStyle(span)},span.text)):display(resolve(n.text));
     switch (n.type) {
@@ -150,6 +153,7 @@ export function UiView({ record, sessionId, sendPrompt, openFile, preview = fals
     }
   }
 
+  if(doc.nodes.every(n=>n.type==='sandbox'&&exportedCanvases.has(n.id)))return null;
   return h('section', { ref:root,className: 'dgui-root', 'data-document-revision':record.documentRevision??0,'data-dgui-build': BUILD_INFO.id, 'data-dsh-generative-ui': record.documentId, 'data-preset':doc.presentation?.preset??({comparison:'comparison',guide:'list',report:'reading'}[doc.presentation?.layout]??'brief'), 'data-visual-style':nativeStyle, 'data-layout': doc.presentation?.layout, 'data-accent': doc.presentation?.accent, 'data-density': doc.presentation?.density, 'data-preview': preview || undefined, 'aria-label': doc.title, 'aria-busy': preview || undefined },
     doc.title&&doc.title!=='内容'&&!(doc.nodes[0]?.type==='heading'&&typeof doc.nodes[0].text==='string'&&doc.nodes[0].text.trim()===doc.title.trim())&&h('header', { className: 'dgui-header' }, h('strong', { className: 'dgui-header-title' }, doc.title)),
     !preview&&deliveryDiagnostics(doc).length>0&&h('p',{className:'dgui-tool-error',role:'status'},'部分内容未生成；模型可修复当前界面。'),
@@ -201,7 +205,7 @@ export function TurnUiView(props) {
   return h(React.Fragment,null,stream&&typeof stream==='object'&&!Array.isArray(stream)&&h(StreamSurface,{stream,sessionId:props.sessionId,committedIds:(props.turn.data.get('dshGenerativeUi')??[]).filter(r=>r.displayReady&&!r.isPatch).map(r=>r.raw.documentId)}), (props.turn.data.get('dshGenerativeUi') ?? []).filter(r=>r.displayReady===true).map(r => r.isPatch?h(PatchNotice,{key:`patch-${r.seq}`,raw:r.raw}):h(PresentationView, { key: r.raw.documentId, ...r, sessionId: props.sessionId, sendPrompt: props.sendPrompt,openFile:props.openFile,scope:props.presentationScope })));
 }
 export function PatchNotice({raw}){useEffect(()=>{try{if(raw)publishDocument(raw)}catch{}},[raw]);return h('p',{className:'dgui-copy'},'界面修改已保存；原界面已更新。');}
-export function ValidatedView({ raw, fallback, sessionId, sendPrompt, openFile }) {
+export function ValidatedView({ raw, fallback, sessionId, sendPrompt, openFile,replaceExportedCanvases=false }) {
   const {record:current,status,retry}=useCurrentDocument(raw??{},sessionId);
   const result = useMemo(() => {
     try {
@@ -213,5 +217,5 @@ export function ValidatedView({ raw, fallback, sessionId, sendPrompt, openFile }
   return h(React.Fragment,null,
     status==='error'&&h('div',{className:'dgui-root dgui-document-warning',role:'status'},h('p',null,'未能确认最新界面版本，当前显示已知版本。'),h('button',{type:'button',className:'dgui-secondary',onClick:retry},'重新读取最新界面')),
     status==='loading'&&h('p',{className:'dgui-copy',role:'status'},'正在读取最新界面版本…'),
-    h(UiBoundary, { key: `${result.documentId}:${sessionId}`, fallback:fallback??result.document.fallback }, h(UiView, { key: `${result.documentId}:${sessionId}`, record: result, sessionId, sendPrompt,openFile })));
+    h(UiBoundary, { key: `${result.documentId}:${sessionId}`, fallback:fallback??result.document.fallback }, h(UiView, { key: `${result.documentId}:${sessionId}`, record: result, sessionId, sendPrompt,openFile,replaceExportedCanvases })));
 }

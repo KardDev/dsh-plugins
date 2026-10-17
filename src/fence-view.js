@@ -10,7 +10,7 @@ const h=React.createElement,roots=new WeakMap();
 function FenceContent({document,sessionId,source,settled,sendPrompt}){
  const[record,setRecord]=useState(),[error,setError]=useState('');
  useEffect(()=>{if(!settled)return;let active=true;fetch('/api/plugins/dsh-generative-ui/fence',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({document,sessionId,source})}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error||'界面保存失败');if(active){rememberUi(v,sessionId,sendPrompt);setRecord(v)}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[document,sessionId,source,settled]);
- return h(UiBoundary,{fallback:document.fallback},h(UiView,{record:record??{document,documentId:'fence-preview-'+source},sessionId,sendPrompt,preview:!record}),error&&h('p',{role:'alert'},error));
+ return h(UiBoundary,{fallback:document.fallback},h(UiView,{record:record??{document,documentId:'fence-preview-'+source},sessionId,sendPrompt,preview:!record,replaceExportedCanvases:true}),error&&h('p',{role:'alert'},error));
 }
 function candidates(state){
  const steps=new Map();for(const b of state.blocks){if(!steps.has(b.step))steps.set(b.step,[]);steps.get(b.step).push(b)}

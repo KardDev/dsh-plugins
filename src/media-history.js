@@ -12,7 +12,7 @@ export function mediaRecord(message){
    const files=(value.files??[]).map(f=>typeof f==='string'?f:f?.name).filter(f=>allowedFiles.has(f));
    if(!files.includes('video.mp4'))continue;
    const output=value.output??{},positive=n=>typeof n==='number'&&Number.isFinite(n)&&n>0?n:null;
-   return {id:value.id,sessionId:value.sessionId,kind:value.kind,files:[...new Set(files)],documentId:uuid.test(value.documentId)?value.documentId:null,nodeId:typeof value.nodeId==='string'?value.nodeId:null,duration:positive(output.duration),width:positive(output.width),height:positive(output.height),hasAudio:Array.isArray(output.audio)?output.audio.length>0:null};
+   return {id:value.id,sessionId:value.sessionId,kind:value.kind,files:[...new Set(files)],documentId:uuid.test(value.documentId)?value.documentId:null,documentRevision:Number.isSafeInteger(value.documentRevision)&&value.documentRevision>=0?value.documentRevision:null,nodeId:typeof value.nodeId==='string'?value.nodeId:null,duration:positive(output.duration),width:positive(output.width),height:positive(output.height),hasAudio:Array.isArray(output.audio)?output.audio.length>0:null};
   }catch{/* Unrelated or malformed tool output remains a normal tool result. */}
  }
  return null;

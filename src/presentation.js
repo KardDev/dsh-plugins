@@ -18,7 +18,7 @@ export function PresentationView({raw,sessionId,sendPrompt,openFile,scope}){
     entry.count++;return()=>{if(--entry.count===0){entry.stop();scanners.delete(root)}};
   },[sessionId]);
   useEffect(()=>{const block=host?.uiMarkerBlock;if(!block||!owner)return;const previous=block.style.display;block.style.display='none';return()=>{block.style.display=previous}},[host,owner]);
-  const content=h(ValidatedView,{raw,fallback:raw.document.fallback,sessionId,sendPrompt,openFile});
+  const content=h(ValidatedView,{raw,fallback:raw.document.fallback,sessionId,sendPrompt,openFile,replaceExportedCanvases:true});
   return h('div',{ref:anchor,'data-dgui-presentation':raw.documentId},
     owner&&(host?createPortal(content,host):content),
     showDetails&&owner&&!host&&h('small',{className:'dgui-copy'},'未提供正文标记，界面显示在回答下方。'));

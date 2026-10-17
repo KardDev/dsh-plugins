@@ -1,15 +1,21 @@
+import {useMediaSource} from './media-source.js';
 import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Icon} from './icons.js';
 import {mediaAssetUrl} from './media-history.js';
+import {presentMedia} from './media-presentation.js';
 const h=React.createElement,players=new Set(),preferenceKey='dsh-motion-ui:video-playback';
 export function formatMediaTime(seconds){const s=Math.max(0,Math.floor(Number.isFinite(seconds)?seconds:0));return (s>=3600?Math.floor(s/3600)+':':'')+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 function preferences(){try{const p=JSON.parse(localStorage.getItem(preferenceKey));return{volume:typeof p?.volume==='number'&&Number.isFinite(p.volume)?Math.max(0,Math.min(1,p.volume)):.8,muted:p?.muted===true,rate:[.5,1,1.25,1.5,2].includes(p?.rate)?p.rate:1}}catch{return{volume:.8,muted:false,rate:1}}}
 function remember(v){try{localStorage.setItem(preferenceKey,JSON.stringify({volume:v.volume,muted:v.muted,rate:v.playbackRate}))}catch{}}
 export function VideoPlayer({record}){
  const video=useRef(null),root=useRef(null),[prefs]=useState(preferences),[playing,setPlaying]=useState(false),[time,setTime]=useState(0),[duration,setDuration]=useState(record.duration??0),[ready,setReady]=useState(false),[volume,setVolume]=useState(prefs.volume),[muted,setMuted]=useState(prefs.muted),[rate,setRate]=useState(prefs.rate),[fullscreen,setFullscreen]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const src=mediaAssetUrl(record,'video.mp4'),poster=mediaAssetUrl(record,'poster.jpg');
+ const mediaUrl=mediaAssetUrl(record,'video.mp4'),transport=useMediaSource(mediaUrl),src=transport.src,poster=mediaAssetUrl(record,'poster.jpg'),playbackError=error||transport.error;
  const lastVolume=useRef(prefs.volume||.8);
+ const drag=useRef(null),pendingSeek=useRef(null);
+ function beginSeek(e){const v=video.current;if(!v||!ready)return;drag.current={resume:!v.paused,value:Number(e.currentTarget.value)};v.pause();e.currentTarget.setPointerCapture?.(e.pointerId)}
+ function changeSeek(value){if(drag.current){drag.current.value=Number(value);setTime(Number(value))}else seek(value)}
+ function endSeek(cancel=false){const active=drag.current;if(!active)return;drag.current=null;if(cancel)setTime(video.current.currentTime);else seek(active.value);if(active.resume)video.current.play().catch(()=>{})}
  useEffect(()=>{
   const v=video.current,container=root.current;if(!v)return;
   players.add(v);v.volume=prefs.volume;v.muted=prefs.muted;v.playbackRate=prefs.rate;
@@ -18,32 +24,33 @@ export function VideoPlayer({record}){
   return()=>{stop();players.delete(v);document.removeEventListener('visibilitychange',hidden);window.removeEventListener('pagehide',stop);document.removeEventListener('fullscreenchange',fs)};
  },[src]);
  async function toggle(){const v=video.current;if(!v)return;setNotice('');if(!v.paused){v.pause();return}try{if(v.ended)v.currentTime=0;await v.play()}catch(e){if(e.name!=='AbortError')setNotice('暂时无法播放，请重试或下载视频。')}}
- function seek(value){const v=video.current;if(!v||!ready||!Number.isFinite(duration)||duration<=0)return;v.currentTime=Math.max(0,Math.min(duration,Number(value)));setTime(v.currentTime)}
+ function seek(value){const v=video.current;if(!v||!ready||!Number.isFinite(duration)||duration<=0)return;const target=Math.max(0,Math.min(duration,Number(value)));pendingSeek.current=target;v.currentTime=target;setTime(target)}
  function mute(){const v=video.current;if(v.volume===0){v.volume=lastVolume.current;v.muted=false}else v.muted=!v.muted}
  async function full(){setNotice('');try{if(document.fullscreenElement===root.current)await document.exitFullscreen();else if(root.current.requestFullscreen)await root.current.requestFullscreen();else if(video.current.webkitEnterFullscreen)video.current.webkitEnterFullscreen();else setNotice('此浏览器不支持全屏。')}catch{setNotice('暂时无法进入全屏，请重试。')}}
  function key(e){if(e.target!==video.current&&e.target!==root.current)return;const k=e.key.toLowerCase();if([' ','k','m','f','arrowleft','arrowright'].includes(k)){e.preventDefault();if(k===' '||k==='k')toggle();else if(k==='m')mute();else if(k==='f')full();else seek((video.current?.currentTime??0)+(k==='arrowleft'?-5:5))}}
  const button=(name,icon,fn,extra={})=>h('button',{type:'button','aria-label':name,title:name,onClick:fn,...extra},h(Icon,{name:icon}));
  return h('section',{ref:root,className:'motion-video-player','data-motion-video':record.id,'aria-label':'视频播放器',onKeyDown:key},
-  h('video',{ref:video,src,poster:poster??undefined,preload:'metadata',playsInline:true,controls:false,tabIndex:0,'aria-label':'视频画面',
+  h('video',{ref:video,src:src??undefined,poster:poster??undefined,preload:'metadata',playsInline:true,controls:false,tabIndex:0,'aria-label':'视频画面',
    onLoadedMetadata:e=>{const v=e.currentTarget;setReady(true);setError('');if(Number.isFinite(v.duration))setDuration(v.duration)},
-   onTimeUpdate:e=>setTime(e.currentTarget.currentTime),onDurationChange:e=>{if(Number.isFinite(e.currentTarget.duration))setDuration(e.currentTarget.duration)},
+   onTimeUpdate:e=>{if(!drag.current&&pendingSeek.current===null)setTime(e.currentTarget.currentTime)},onSeeked:e=>{pendingSeek.current=null;if(!drag.current)setTime(e.currentTarget.currentTime)},onDurationChange:e=>{if(Number.isFinite(e.currentTarget.duration))setDuration(e.currentTarget.duration)},
    onPlay:e=>{for(const other of players)if(other!==e.currentTarget)other.pause();setPlaying(true);setError('')},onPause:()=>setPlaying(false),onEnded:()=>setPlaying(false),
    onVolumeChange:e=>{if(e.currentTarget.volume>0)lastVolume.current=e.currentTarget.volume;setVolume(e.currentTarget.volume);setMuted(e.currentTarget.muted);remember(e.currentTarget)},onRateChange:e=>{setRate(e.currentTarget.playbackRate);remember(e.currentTarget)},
    onError:()=>{setError('无法播放此视频。可以重试或下载后打开。');setReady(false);setPlaying(false)},onClick:toggle,onDoubleClick:full}),
   h('div',{className:'motion-video-controls'},
-   h('input',{className:'motion-video-seek',type:'range',min:0,max:duration||1,step:.05,value:Math.min(time,duration||1),disabled:!ready,'aria-label':'播放进度（秒）','aria-valuetext':formatMediaTime(time)+' / '+formatMediaTime(duration),onChange:e=>seek(e.currentTarget.value)}),
-   button(playing?'暂停视频':'播放视频',playing?'pause':'play',toggle,{disabled:!!error}),
+   h('input',{className:'motion-video-seek',type:'range',min:0,max:duration||1,step:.05,value:Math.min(time,duration||1),disabled:!ready,'aria-label':'播放进度（秒）','aria-valuetext':formatMediaTime(time)+' / '+formatMediaTime(duration),onPointerDown:beginSeek,onPointerUp:()=>endSeek(),onPointerCancel:()=>endSeek(true),onLostPointerCapture:()=>endSeek(true),onChange:e=>changeSeek(e.currentTarget.value)}),
+   button(playing?'暂停视频':'播放视频',playing?'pause':'play',toggle,{disabled:!!playbackError||!src}),
    h('output',{className:'motion-video-time','aria-label':'播放时间'},formatMediaTime(time)+' / '+formatMediaTime(duration)),
    h('div',{className:'motion-video-volume'},button(muted||volume===0?'取消静音':'静音视频',muted||volume===0?'volumeOff':'volume',mute,{'aria-pressed':muted||volume===0}),h('input',{type:'range',min:0,max:1,step:.05,value:muted?0:volume,'aria-label':'视频音量','aria-valuetext':Math.round((muted?0:volume)*100)+'%',onChange:e=>{const v=video.current;v.volume=Number(e.currentTarget.value);v.muted=v.volume===0}})),
    h('select',{'aria-label':'播放速度',title:'播放速度',value:rate,onChange:e=>{video.current.playbackRate=Number(e.currentTarget.value)}},[.5,1,1.25,1.5,2].map(v=>h('option',{key:v,value:v},v+'×'))),
    button(fullscreen?'退出全屏':'全屏播放',fullscreen?'minimize':'fullscreen',full),
-   h('a',{href:src,download:'video.mp4','aria-label':'下载视频',title:'下载视频'},h(Icon,{name:'download'})),
+   h('a',{href:mediaUrl,download:'video.mp4','aria-label':'下载视频',title:'下载视频'},h(Icon,{name:'download'})),
    record.files.includes('source.html')&&h('a',{className:'motion-video-source',href:mediaAssetUrl(record,'source.html'),download:'source.html'},'源码'),
    record.files.includes('project.zip')&&h('a',{className:'motion-video-source',href:mediaAssetUrl(record,'project.zip'),download:'project.zip'},'工程')),
-  error&&h('div',{className:'motion-video-message',role:'alert'},h('span',null,error),h('button',{type:'button',onClick:()=>{setError('');video.current.load()}},'重新加载')),
+  transport.loading&&h('p',{className:'motion-video-message',role:'status'},'正在载入视频，完成后可拖动定位…'),
+  playbackError&&h('div',{className:'motion-video-message',role:'alert'},h('span',null,playbackError),h('button',{type:'button',onClick:()=>{setError('');transport.native?transport.retry():video.current.load()}},'重新加载')),
   notice&&h('p',{className:'motion-video-message',role:'status'},notice));
 }
-function MediaRecords({records,sessionId}){return h(React.Fragment,null,records.filter(r=>r.sessionId===sessionId).map(record=>h(VideoPlayer,{key:record.id,record})))}
+function MediaRecords({records,sessionId}){const owner=useRef({});useLayoutEffect(()=>presentMedia(owner.current,sessionId,records),[records,sessionId]);return h(React.Fragment,null,records.filter(r=>r.sessionId===sessionId).map(record=>h(VideoPlayer,{key:record.id,record})))}
 const mediaRoots=new WeakMap(),allMediaRoots=new Set();
 function disposeSurface(entry){if(entry.disposed)return;entry.disposed=true;entry.observer.disconnect();entry.host.remove();entry.entries.delete(entry.key);allMediaRoots.delete(entry);queueMicrotask(()=>entry.root.unmount())}
 export function disposeMediaSurfaces(){for(const entry of [...allMediaRoots])disposeSurface(entry)}
