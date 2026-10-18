@@ -1,5 +1,6 @@
 import React,{useEffect,useRef,useState} from 'react';
 import {Icon} from './icons.js';
+import {recordNativeGeometry} from './host-boundary.js';
 const h=React.createElement;
 export async function copyContent(text){
  try{if(typeof navigator.clipboard?.writeText==='function'){await navigator.clipboard.writeText(text);return true}}catch{/* Fall back for older or insecure hosts. */}
@@ -7,7 +8,7 @@ export async function copyContent(text){
  const field=document.createElement('textarea');field.value=text;field.readOnly=true;field.style.cssText='position:fixed;left:-10000px;top:0;opacity:0';document.body.append(field);
  try{field.select();return document.execCommand('copy')===true}catch{return false}finally{field.remove();active?.focus?.({preventScroll:true});if(selection){selection.removeAllRanges();for(const range of ranges)try{selection.addRange(range)}catch{}}}
 }
-export const COPY_BLOCK_CSS=`
+export const COPY_BLOCK_CSS=recordNativeGeometry(`
 .motion-copy-block{position:relative;min-width:0;border:1px solid var(--du-line,var(--dsw-alias-border-default,#ddd));border-radius:24px;padding:18px 22px;color:var(--du-ink,var(--dsw-alias-label-primary,inherit));background:var(--du-bg,var(--dsw-alias-bg-layer-1,transparent));overflow:hidden;margin:8px 0}
 .motion-copy-block[data-code]{background:var(--du-soft,var(--dsw-alias-bg-layer-2,#8881))}
 .motion-copy-bar{display:flex;align-items:center;gap:10px;min-height:30px;margin-bottom:12px;color:var(--du-muted,var(--dsw-alias-label-secondary,#888));font-size:14px;line-height:1.4}
@@ -17,7 +18,7 @@ export const COPY_BLOCK_CSS=`
 .motion-copy-button[data-status=done] .dgui-icon{animation:motion-copy-confirm 420ms cubic-bezier(.34,1.45,.64,1)}.motion-copy-button[data-status=done] path{stroke-dasharray:28;animation:motion-check-draw 450ms ease-out}@keyframes motion-check-draw{from{stroke-dashoffset:28}to{stroke-dashoffset:0}}@keyframes motion-copy-confirm{from{opacity:.5;transform:scale(.8)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.motion-copy-button .dgui-icon,.motion-copy-button path{animation:none!important;transition:none!important}}
 @media(max-width:600px){.motion-copy-block{padding:14px 16px;border-radius:20px}}
-`;
+`);
 export function CopyBlock({text,children,title,lang,code=false,wrap=false,disabled=false,style,nodeId,copyLabel,copiedLabel}){
  const[status,setStatus]=useState('idle'),timer=useRef();useEffect(()=>()=>clearTimeout(timer.current),[]);
  const label=status==='done'?(copiedLabel??'已复制'):status==='error'?'复制失败，请手动选择内容':copyLabel??(code?'复制代码':'复制文本');

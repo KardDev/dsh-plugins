@@ -1,5 +1,25 @@
 import {STYLE_SYSTEM} from '../lib/style-system.js';
 
+// Include secondary native surfaces as well as the large containers. Keep this
+// scoped to renderer-owned elements; never blanket-reset the conversation DOM.
+const surfaces=[
+ '.dgui-card','.dgui-metric','.dgui-control','.dgui-chart','.dgui-table-wrap',
+ '.dgui-steps li','.dgui-step-dot','.dgui-copy','.dgui-header','.dgui-heading-icon',
+ '.dgui-badge','.dgui-tag','.dgui-details','.dgui-progress','.dgui-progress progress',
+ '.dgui-button','.dgui-secondary','.dgui-toggle','.dgui-control output',
+ '.dgui-control input:not([type=range]):not([type=checkbox])','.dgui-control select',
+ '.dgui-root textarea','.dgui-root pre','.dgui-plot','.dgui-menu-trigger',
+ '.dgui-menu-content','.dgui-menu-content button','.dgui-canvas-loading',
+ '.dgui-canvas-spinner','.dgui-canvas-placeholder','.dgui-canvas-issue',
+ '.dgui-canvas-stage iframe','.dgui-version-preview','.dgui-segmented',
+ '.dgui-segment-indicator','.dgui-segmented button','.dgui-action-orb',
+ '.dgui-elastic','.dgui-stepper','.dgui-stepper>button',
+ '.dgui-card>.dgui-section-title','.dgui-row:has(>.dgui-metric)',
+ '.motion-copy-block','.motion-copy-button',
+ '[data-motion-component=card]','[data-motion-component=stat]',
+];
+const descendants=surfaces.map(s=>s.replace(/^\.dgui-root /,'')).join(',');
+
 // The portal seat is transport, not another card. Protect only plugin-owned
 // boundaries from generic host/skin section/div resets; never style the iframe DOM.
 // Record the winning geometry from our own stylesheet, including asymmetric
@@ -8,14 +28,18 @@ import {STYLE_SYSTEM} from '../lib/style-system.js';
 export function nativeGeometryCss(css){
  // A component with no radius declaration starts at CSS's initial 0px;
  // it must not inherit the document shell's saved geometry.
- const defaults=':where(.dgui-root .dgui-card,.dgui-root .dgui-metric,.dgui-root .dgui-control,.dgui-root .dgui-chart,.dgui-root .dgui-table-wrap,.dgui-root .dgui-control input,.dgui-root .dgui-control select,.dgui-root .dgui-canvas-stage iframe){--du-component-radius:0px}\n';
- return defaults+css.replace(/border-radius\s*:\s*([^;}]+)/g,(rule,value)=>rule+';--du-component-radius:'+value.replaceAll('var(--du-radius-inner','var(--du-owned-radius-inner').replaceAll('var(--du-radius','var(--du-owned-radius'));
+ const defaults=`:where(.dgui-root :is(${descendants})){--du-component-radius:0px}\n.dgui-toggle::before{--du-component-radius:0px}\n`;
+ return defaults+recordNativeGeometry(css);
+}
+// Lazy native styles must record their own geometry too, so free-mode copy
+// blocks keep their desktop/mobile radii instead of inheriting a card's token.
+export function recordNativeGeometry(css){
+ return css.replace(/border-radius\s*:\s*([^;}]+)/g,(rule,value)=>rule+';--du-component-radius:'+value.replaceAll('var(--du-radius-inner','var(--du-owned-radius-inner').replaceAll('var(--du-radius','var(--du-owned-radius'));
 }
 const root='.dgui-root[data-preset]:not(.dgui-style-preview)';
 export const INTERNAL_BOUNDARY_CSS=`
-${root} :is(.dgui-card,.dgui-metric,.dgui-control,.dgui-chart,.dgui-table-wrap){border-radius:var(--du-component-radius,16px)!important;corner-shape:round}
-${root} .dgui-control :is(input:not([type=range]):not([type=checkbox]),select){border-radius:var(--du-component-radius,12px)!important;corner-shape:round}
-${root} .dgui-canvas-stage iframe{border-radius:var(--du-component-radius,16px)!important;corner-shape:round}
+${root} :is(${descendants}){border-radius:var(--du-component-radius,0px)!important;corner-shape:round}
+${root} .dgui-toggle::before{border-radius:var(--du-component-radius,50%)!important;corner-shape:round}
 `;
 export const HOST_BOUNDARY_CSS=`
 ${root}{--du-owned-radius:16px;--du-owned-radius-inner:12px;border-radius:var(--du-shell-radius,16px)!important;corner-shape:round}

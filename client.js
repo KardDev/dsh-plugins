@@ -4260,7 +4260,7 @@ function Sandbox({ node, document: doc, state: state2, data, derived, disabled, 
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.8.6", "id": "0.8.6+abc82f77fff0", "sourceHash": "abc82f77fff0a88db9bcb310da873a62e3d184faf8872a220db98e87cc956fb1" });
+var BUILD_INFO = Object.freeze({ "version": "0.8.7", "id": "0.8.7+b49a94e536b0", "sourceHash": "b49a94e536b010c02561479d3e8daffea6997fe97b0c711057cdffa554998761" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38", clippedText: "\u6587\u5B57\u53EF\u80FD\u88AB\u9690\u85CF\u6216\u88C1\u5207", cardTextOverflow: "\u6587\u5B57\u8D85\u51FA\u5361\u7247\u5185\u5BB9\u8FB9\u754C\uFF1B\u8BF7\u4FDD\u7559\u9634\u5F71\u5E76\u8C03\u6574\u5BB9\u5668\u5C3A\u5BF8\u3001\u5185\u8FB9\u8DDD\u6216\u6587\u5B57\u6392\u7248", bottomWhitespace: "\u5185\u5BB9\u4E0B\u65B9\u5B58\u5728\u660E\u663E\u7A7A\u767D" });
@@ -5177,8 +5177,8 @@ function StreamSurface({ stream, sessionId, committedIds = [] }) {
         clearTimeout(entry.timer);
         entry.timer = null;
         entry.finishing = () => {
-          const surfaces = [...scroll.querySelectorAll("[data-dsh-generative-ui]")].filter((el) => committedIds.includes(el.dataset.dshGenerativeUi) && !el.hasAttribute("data-preview"));
-          if (!committedIds.length || surfaces.length === committedIds.length && surfaces.every((el) => !el.querySelector("[data-canvas-phase=loading]"))) dispose(entry);
+          const surfaces2 = [...scroll.querySelectorAll("[data-dsh-generative-ui]")].filter((el) => committedIds.includes(el.dataset.dshGenerativeUi) && !el.hasAttribute("data-preview"));
+          if (!committedIds.length || surfaces2.length === committedIds.length && surfaces2.every((el) => !el.querySelector("[data-canvas-phase=loading]"))) dispose(entry);
         };
         entry.finishing();
       }
@@ -5392,6 +5392,80 @@ function resolveSourceFence(raw, { svg = false } = {}) {
 
 // src/copy-block.js
 var import_react16 = __toESM(require("react"), 1);
+
+// src/host-boundary.js
+var surfaces = [
+  ".dgui-card",
+  ".dgui-metric",
+  ".dgui-control",
+  ".dgui-chart",
+  ".dgui-table-wrap",
+  ".dgui-steps li",
+  ".dgui-step-dot",
+  ".dgui-copy",
+  ".dgui-header",
+  ".dgui-heading-icon",
+  ".dgui-badge",
+  ".dgui-tag",
+  ".dgui-details",
+  ".dgui-progress",
+  ".dgui-progress progress",
+  ".dgui-button",
+  ".dgui-secondary",
+  ".dgui-toggle",
+  ".dgui-control output",
+  ".dgui-control input:not([type=range]):not([type=checkbox])",
+  ".dgui-control select",
+  ".dgui-root textarea",
+  ".dgui-root pre",
+  ".dgui-plot",
+  ".dgui-menu-trigger",
+  ".dgui-menu-content",
+  ".dgui-menu-content button",
+  ".dgui-canvas-loading",
+  ".dgui-canvas-spinner",
+  ".dgui-canvas-placeholder",
+  ".dgui-canvas-issue",
+  ".dgui-canvas-stage iframe",
+  ".dgui-version-preview",
+  ".dgui-segmented",
+  ".dgui-segment-indicator",
+  ".dgui-segmented button",
+  ".dgui-action-orb",
+  ".dgui-elastic",
+  ".dgui-stepper",
+  ".dgui-stepper>button",
+  ".dgui-card>.dgui-section-title",
+  ".dgui-row:has(>.dgui-metric)",
+  ".motion-copy-block",
+  ".motion-copy-button",
+  "[data-motion-component=card]",
+  "[data-motion-component=stat]"
+];
+var descendants = surfaces.map((s) => s.replace(/^\.dgui-root /, "")).join(",");
+function nativeGeometryCss(css) {
+  const defaults = `:where(.dgui-root :is(${descendants})){--du-component-radius:0px}
+.dgui-toggle::before{--du-component-radius:0px}
+`;
+  return defaults + recordNativeGeometry(css);
+}
+function recordNativeGeometry(css) {
+  return css.replace(/border-radius\s*:\s*([^;}]+)/g, (rule, value) => rule + ";--du-component-radius:" + value.replaceAll("var(--du-radius-inner", "var(--du-owned-radius-inner").replaceAll("var(--du-radius", "var(--du-owned-radius"));
+}
+var root = ".dgui-root[data-preset]:not(.dgui-style-preview)";
+var INTERNAL_BOUNDARY_CSS = `
+${root} :is(${descendants}){border-radius:var(--du-component-radius,0px)!important;corner-shape:round}
+${root} .dgui-toggle::before{border-radius:var(--du-component-radius,50%)!important;corner-shape:round}
+`;
+var HOST_BOUNDARY_CSS = `
+${root}{--du-owned-radius:16px;--du-owned-radius-inner:12px;border-radius:var(--du-shell-radius,16px)!important;corner-shape:round}
+` + Object.entries(STYLE_SYSTEM).map(([id2, { native }]) => `${root}[data-visual-style=${id2}]{--du-shell-radius:${id2 === "editorial" ? 0 : id2 === "soft" ? 30 : native.radius}px;--du-owned-radius:${native.radius}px;--du-owned-radius-inner:${native.radius - 4}px}`).join("\n") + `
+` + INTERNAL_BOUNDARY_CSS + `
+${root}:is([data-preset=reading],[data-preset=minimal]){--du-shell-radius:0px}
+.dgui-marker[data-dgui-marker]{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:0!important;min-width:0;box-sizing:border-box}
+`;
+
+// src/copy-block.js
 var h11 = import_react16.default.createElement;
 async function copyContent(text3) {
   try {
@@ -5424,7 +5498,7 @@ async function copyContent(text3) {
     }
   }
 }
-var COPY_BLOCK_CSS = `
+var COPY_BLOCK_CSS = recordNativeGeometry(`
 .motion-copy-block{position:relative;min-width:0;border:1px solid var(--du-line,var(--dsw-alias-border-default,#ddd));border-radius:24px;padding:18px 22px;color:var(--du-ink,var(--dsw-alias-label-primary,inherit));background:var(--du-bg,var(--dsw-alias-bg-layer-1,transparent));overflow:hidden;margin:8px 0}
 .motion-copy-block[data-code]{background:var(--du-soft,var(--dsw-alias-bg-layer-2,#8881))}
 .motion-copy-bar{display:flex;align-items:center;gap:10px;min-height:30px;margin-bottom:12px;color:var(--du-muted,var(--dsw-alias-label-secondary,#888));font-size:14px;line-height:1.4}
@@ -5434,7 +5508,7 @@ var COPY_BLOCK_CSS = `
 .motion-copy-button[data-status=done] .dgui-icon{animation:motion-copy-confirm 420ms cubic-bezier(.34,1.45,.64,1)}.motion-copy-button[data-status=done] path{stroke-dasharray:28;animation:motion-check-draw 450ms ease-out}@keyframes motion-check-draw{from{stroke-dashoffset:28}to{stroke-dashoffset:0}}@keyframes motion-copy-confirm{from{opacity:.5;transform:scale(.8)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.motion-copy-button .dgui-icon,.motion-copy-button path{animation:none!important;transition:none!important}}
 @media(max-width:600px){.motion-copy-block{padding:14px 16px;border-radius:20px}}
-`;
+`);
 function CopyBlock({ text: text3, children, title, lang, code = false, wrap = false, disabled = false, style, nodeId, copyLabel, copiedLabel }) {
   const [status, setStatus] = (0, import_react16.useState)("idle"), timer = (0, import_react16.useRef)();
   (0, import_react16.useEffect)(() => () => clearTimeout(timer.current), []);
@@ -5873,25 +5947,6 @@ var streamUiDefinition = {
     return { key: context.key, id: context.id, kind: "dshUiStream", target: "chat", anchorSeq: state2.anchorSeq ?? context.start?.event.seq ?? 0, location: context.start?.location ?? context.matches[0]?.location ?? { kind: "unresolved" }, visibility: state2.settled || state2.anchorSeq === void 0 ? "hidden" : "visible", data: state2 };
   }
 };
-
-// src/host-boundary.js
-function nativeGeometryCss(css) {
-  const defaults = ":where(.dgui-root .dgui-card,.dgui-root .dgui-metric,.dgui-root .dgui-control,.dgui-root .dgui-chart,.dgui-root .dgui-table-wrap,.dgui-root .dgui-control input,.dgui-root .dgui-control select,.dgui-root .dgui-canvas-stage iframe){--du-component-radius:0px}\n";
-  return defaults + css.replace(/border-radius\s*:\s*([^;}]+)/g, (rule, value) => rule + ";--du-component-radius:" + value.replaceAll("var(--du-radius-inner", "var(--du-owned-radius-inner").replaceAll("var(--du-radius", "var(--du-owned-radius"));
-}
-var root = ".dgui-root[data-preset]:not(.dgui-style-preview)";
-var INTERNAL_BOUNDARY_CSS = `
-${root} :is(.dgui-card,.dgui-metric,.dgui-control,.dgui-chart,.dgui-table-wrap){border-radius:var(--du-component-radius,16px)!important;corner-shape:round}
-${root} .dgui-control :is(input:not([type=range]):not([type=checkbox]),select){border-radius:var(--du-component-radius,12px)!important;corner-shape:round}
-${root} .dgui-canvas-stage iframe{border-radius:var(--du-component-radius,16px)!important;corner-shape:round}
-`;
-var HOST_BOUNDARY_CSS = `
-${root}{--du-owned-radius:16px;--du-owned-radius-inner:12px;border-radius:var(--du-shell-radius,16px)!important;corner-shape:round}
-` + Object.entries(STYLE_SYSTEM).map(([id2, { native }]) => `${root}[data-visual-style=${id2}]{--du-shell-radius:${id2 === "editorial" ? 0 : id2 === "soft" ? 30 : native.radius}px;--du-owned-radius:${native.radius}px;--du-owned-radius-inner:${native.radius - 4}px}`).join("\n") + `
-` + INTERNAL_BOUNDARY_CSS + `
-${root}:is([data-preset=reading],[data-preset=minimal]){--du-shell-radius:0px}
-.dgui-marker[data-dgui-marker]{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:0!important;min-width:0;box-sizing:border-box}
-`;
 
 // src/native-style.js
 var root2 = ".dgui-root[data-preset][data-visual-style]";
