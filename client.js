@@ -4260,7 +4260,7 @@ function Sandbox({ node, document: doc, state: state2, data, derived, disabled, 
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.8.5", "id": "0.8.5+64909b292cda", "sourceHash": "64909b292cda52745fc063409ac48c8c665d9be60ca7212ca716748c0f8fe5fd" });
+var BUILD_INFO = Object.freeze({ "version": "0.8.5", "id": "0.8.5+f92961c885f0", "sourceHash": "f92961c885f05b2ab4f3b0dfaf5961fc5be51957e3ea1235179a9ac7a5be4214" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38", clippedText: "\u6587\u5B57\u53EF\u80FD\u88AB\u9690\u85CF\u6216\u88C1\u5207", cardTextOverflow: "\u6587\u5B57\u8D85\u51FA\u5361\u7247\u5185\u5BB9\u8FB9\u754C\uFF1B\u8BF7\u4FDD\u7559\u9634\u5F71\u5E76\u8C03\u6574\u5BB9\u5668\u5C3A\u5BF8\u3001\u5185\u8FB9\u8DDD\u6216\u6587\u5B57\u6392\u7248", bottomWhitespace: "\u5185\u5BB9\u4E0B\u65B9\u5B58\u5728\u660E\u663E\u7A7A\u767D" });
@@ -5875,10 +5875,20 @@ var streamUiDefinition = {
 };
 
 // src/host-boundary.js
+function nativeGeometryCss(css) {
+  const defaults = ":where(.dgui-root .dgui-card,.dgui-root .dgui-metric,.dgui-root .dgui-control,.dgui-root .dgui-chart,.dgui-root .dgui-table-wrap,.dgui-root .dgui-control input,.dgui-root .dgui-control select,.dgui-root .dgui-canvas-stage iframe){--du-component-radius:0px}\n";
+  return defaults + css.replace(/border-radius\s*:\s*([^;}]+)/g, (rule, value) => rule + ";--du-component-radius:" + value.replaceAll("var(--du-radius-inner", "var(--du-owned-radius-inner").replaceAll("var(--du-radius", "var(--du-owned-radius"));
+}
 var root = ".dgui-root[data-preset]:not(.dgui-style-preview)";
+var INTERNAL_BOUNDARY_CSS = `
+${root} :is(.dgui-card,.dgui-metric,.dgui-control,.dgui-chart,.dgui-table-wrap){border-radius:var(--du-component-radius,16px)!important;corner-shape:round}
+${root} .dgui-control :is(input:not([type=range]):not([type=checkbox]),select){border-radius:var(--du-component-radius,12px)!important;corner-shape:round}
+${root} .dgui-canvas-stage iframe{border-radius:var(--du-component-radius,16px)!important;corner-shape:round}
+`;
 var HOST_BOUNDARY_CSS = `
-${root}{border-radius:var(--du-shell-radius,16px)!important;corner-shape:round}
-` + Object.entries(STYLE_SYSTEM).map(([id2, { native }]) => `${root}[data-visual-style=${id2}]{--du-shell-radius:${id2 === "editorial" ? 0 : id2 === "soft" ? 30 : native.radius}px}`).join("\n") + `
+${root}{--du-owned-radius:16px;--du-owned-radius-inner:12px;border-radius:var(--du-shell-radius,16px)!important;corner-shape:round}
+` + Object.entries(STYLE_SYSTEM).map(([id2, { native }]) => `${root}[data-visual-style=${id2}]{--du-shell-radius:${id2 === "editorial" ? 0 : id2 === "soft" ? 30 : native.radius}px;--du-owned-radius:${native.radius}px;--du-owned-radius-inner:${native.radius - 4}px}`).join("\n") + `
+` + INTERNAL_BOUNDARY_CSS + `
 ${root}:is([data-preset=reading],[data-preset=minimal]){--du-shell-radius:0px}
 .dgui-marker[data-dgui-marker]{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;padding:0!important;min-width:0;box-sizing:border-box}
 `;
@@ -6190,7 +6200,7 @@ var READING_CSS = `
 `;
 
 // src/styles.js
-var CSS2 = `
+var CSS2 = nativeGeometryCss(`
 .dgui-chart-data-button{margin-left:auto;border:0;background:transparent;color:var(--du-muted);font:inherit;cursor:pointer;padding:4px 8px}.dgui-chart-data-button:hover{color:var(--du-accent)}.dgui-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}.dgui-canvas{position:relative}.dgui-action-menu{position:absolute;top:6px;right:6px;z-index:2}.dgui-menu-trigger{width:32px;height:32px;border:1px solid var(--du-line);border-radius:8px;background:var(--du-bg);color:var(--du-muted);font-size:24px;line-height:1;cursor:pointer}.dgui-menu-content{position:absolute;top:38px;right:0;display:grid;min-width:156px;padding:5px;border:1px solid var(--du-line);border-radius:10px;background:var(--du-bg);box-shadow:0 6px 20px #0002}.dgui-menu-content button{border:0;border-radius:6px;background:transparent;color:var(--du-ink);padding:9px 12px;text-align:left;font:inherit;white-space:nowrap;cursor:pointer}.dgui-menu-content button:hover{background:var(--du-soft)}.dgui-menu-content button:disabled{opacity:.45;cursor:default}.dgui-action-menu button:focus-visible{outline:2px solid var(--du-accent);outline-offset:2px}
 .dgui-root.dgui-settings{border:0;border-radius:0;box-shadow:none;background:transparent;padding:0;margin:0;max-width:720px;display:flex;flex-direction:column;gap:14px;font-size:13px;line-height:1.65}
 .dgui-settings h3{font-size:14px;font-weight:600;margin:0}.dgui-settings label{font-weight:500}.dgui-settings p{color:var(--du-muted)}
@@ -6214,7 +6224,7 @@ body[data-ds-dark-theme] .dgui-root,.dgui-root[data-preview-theme=dark]{--du-acc
 .dgui-panel{padding:16px;min-width:0;overflow:auto;height:100%;box-sizing:border-box}.dgui-panel>.dgui-root{margin-bottom:16px}.dgui-panel label{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.dgui-panel select{max-width:100%;flex:1;min-width:120px;border:1px solid var(--du-line);border-radius:8px;padding:8px;background:var(--du-bg);color:var(--du-ink)}
 .dgui-history-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--du-line)}.dgui-history-row>span{flex:1;min-width:140px}.dgui-version-preview{margin-top:14px;border:1px solid var(--du-line);border-radius:12px;padding:12px}.dgui-version-preview .dgui-root{margin-top:12px}
 [data-dgui-presentation]>.dgui-secondary{margin:8px 0}[data-dgui-marker]{min-width:0}
-` + SOFT_CSS + READING_CSS + NATIVE_STYLE_CSS + MOTION_CSS + EXPRESSIVE_CSS + STYLE_SETTINGS_CSS + HOST_BOUNDARY_CSS;
+` + SOFT_CSS + READING_CSS + NATIVE_STYLE_CSS + MOTION_CSS + EXPRESSIVE_CSS + STYLE_SETTINGS_CSS) + HOST_BOUNDARY_CSS;
 
 // src/motion-library.js
 var import_react20 = __toESM(require("react"), 1);
