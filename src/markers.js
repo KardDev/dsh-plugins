@@ -23,7 +23,7 @@ export function startUiMarkers(root,sessionId){
       // Keep one live view and hide redundant same-session UUID plumbing.
       // Restore/promote a later reference if its primary marker disappears.
       if([...claims.values()].some(c=>c.id===id)){if(!references.has(block))references.set(block,{id,display:block.style.display});block.style.display='none';continue;}
-      const host=block.ownerDocument.createElement('div');host.dataset.dguiMarker=id;host.uiMarkerBlock=block;
+      const host=block.ownerDocument.createElement('div');host.dataset.dguiMarker=id;host.className='dgui-marker';host.uiMarkerBlock=block;
       block.before(host);claims.set(block,{id,host,display:block.style.display});setMarkerLocation(id,host);
     }
   };

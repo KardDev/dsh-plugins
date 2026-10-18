@@ -1,3 +1,4 @@
+import {HOST_BOUNDARY_CSS} from './host-boundary.js';
 import {EXPRESSIVE_CSS} from './expressive-controls.js';
 import {MOTION_CSS} from './motion-controls.js';
 import {NATIVE_STYLE_CSS} from './native-style.js';
@@ -31,7 +32,7 @@ body[data-ds-dark-theme] .dgui-root,.dgui-root[data-preview-theme=dark]{--du-acc
 .dgui-panel{padding:16px;min-width:0;overflow:auto;height:100%;box-sizing:border-box}.dgui-panel>.dgui-root{margin-bottom:16px}.dgui-panel label{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.dgui-panel select{max-width:100%;flex:1;min-width:120px;border:1px solid var(--du-line);border-radius:8px;padding:8px;background:var(--du-bg);color:var(--du-ink)}
 .dgui-history-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--du-line)}.dgui-history-row>span{flex:1;min-width:140px}.dgui-version-preview{margin-top:14px;border:1px solid var(--du-line);border-radius:12px;padding:12px}.dgui-version-preview .dgui-root{margin-top:12px}
 [data-dgui-presentation]>.dgui-secondary{margin:8px 0}[data-dgui-marker]{min-width:0}
-` + SOFT_CSS + READING_CSS + NATIVE_STYLE_CSS + MOTION_CSS + EXPRESSIVE_CSS + STYLE_SETTINGS_CSS;
+` + SOFT_CSS + READING_CSS + NATIVE_STYLE_CSS + MOTION_CSS + EXPRESSIVE_CSS + STYLE_SETTINGS_CSS + HOST_BOUNDARY_CSS;
 
 
 

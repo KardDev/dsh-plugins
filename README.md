@@ -6,6 +6,10 @@ Interactive, declarative tool views for **DeepSeek Harness Web / Desktop 0.2.0-r
 
 The plugin adds `render_scene` (short flow/comparison/allocation/budget data), `render_text` (quick native typography), `render_ui` (validated components), `render_canvas` (HTML/SVG), `render_mechanism` (compact assembly/kinematics scenes), and `ui_catalog` (protocol + examples). It saves per-document input state on the Host and sends explicit follow-up requests with the current parameter snapshot.
 
+### v0.8.5：文档外壳与皮肤兼容
+
+保护文档外壳的风格圆角，避免宿主／皮肤通用重置造成直角；标记承载节点保持透明、不添加第二层卡片。阅读／极简、设置预览和模型画布内部样式保持独立。
+
 ### v0.8.4：阅读阴影与跨轮视频修复
 
 修复阅读／极简排版露出偏移阴影，保留内部卡片样式。历史视频留在所属回复，拼接成功后只展示成片及独立视频，并修复多轮播放器互相触发定位导致页面卡住的问题。

@@ -13,6 +13,7 @@ steps.push(['visual-style-settings-previews', ['tests/verify-style-settings.mjs'
 steps.push(['progressive-stable-preview', ['tests/verify-progressive.mjs']]);
 steps.push(['extended-visuals-fences-and-lazy-engines', ['tests/verify-visual.mjs']]);
 steps.push(['distinct-visual-grammar',['tests/verify-style-grammar.mjs']]);
+steps.push(['host-skin-boundary-geometry',['tests/verify-host-boundary.mjs']]);
 steps.push(['unframed-reading-shell-cascade',['tests/verify-reading-shell.mjs']]);
 steps.push(['guided-native-style-coverage', ['tests/verify-native-style.mjs']]);
 steps.push(['motion-controls-and-real-state', ['tests/verify-motion.mjs']]);
