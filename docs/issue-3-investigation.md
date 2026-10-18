@@ -21,3 +21,19 @@ The reporter confirmed the 0.8.5 document shell fix in issuecomment-6245207297, 
 The Web fix extends the owned boundary to native cards, metrics, controls, charts, table wrappers, form fields and the iframe element. Trusted plugin CSS records its own per-element radius declaration in a private token; the final priority guard uses that token. This preserves asymmetric, nth-child, responsive, zero-radius and free-mode geometry rather than assigning a universal 20px. Nodes without a radius declaration retain CSS's initial zero instead of inheriting the parent shell radius. The original radius variables are isolated behind owned per-style values so an external legacy-variable reset cannot flatten internal surfaces. Model-authored iframe CSS and settings previews remain unchanged.
 
 `tests/verify-internal-boundary.mjs` checks 1,728 combinations using the supplied complete skin, both loading orders, all six styles/eight presets, three widths, both themes, and no reset / important radius reset / legacy-variable reset. It additionally checks free mode, previews and authored iframe content. The real portal test checks internal geometry, iframe identity and saved inputs under overrides. All 149 unit/integration tests and 29 build/browser groups passed. This is a local Web test build, not a new npm or GitHub release; Desktop remains unchanged. Passing these cases does not establish the source of the reporter's original override.
+
+## Confirmed source: skin-center patches
+
+In [issuecomment-6246719039](https://github.com/Scorp1o117/dsh-motion-ui/issues/3#issuecomment-6246719039), the reporter identified the actual injected rule:
+
+```css
+html[data-dsh-skin="orca-link"] [data-chat-flow] *,
+html[data-dsh-skin="orca-link"] [data-chat-flow] ::before,
+html[data-dsh-skin="orca-link"] [data-chat-flow] ::after {
+  border-radius: 0px !important;
+}
+```
+
+The diagnostic confirms the existing inner radius variable is 20px; it is the important declaration from skin-center's patches stylesheet that forces the computed radius to zero. The supplied skin.css alone was therefore insufficient to reproduce the conflict.
+
+The regression now applies the exact reported selector with the matching HTML skin attribute and chat-flow ancestor. It reproduces zero-radius cards without the internal boundary and passes 2,304 combinations with the local fix, including the original generic reset and legacy-variable reset cases. The actual installed Web build 0.8.5+f92961c885f0 additionally passes 12 exact-rule cases across six styles and two themes, preserving iframe identity. No production-code change was needed after this evidence: the existing unreleased internal boundary already handles the reported rule. This confirms the CSS conflict and its local fix; it is not confirmation from the reporter's full runtime. Issue #3 remains open pending a published fix and reporter validation. Desktop remains untouched.
