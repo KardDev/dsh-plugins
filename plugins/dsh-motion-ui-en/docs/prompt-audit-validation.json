@@ -1,0 +1,203 @@
+{
+  "model": "MiniMax-M3.1-Flash-Preview",
+  "workspace": "测试结果",
+  "naturalCompletion": true,
+  "noNewInferenceCaps": true,
+  "unitTests": {
+    "passed": 119,
+    "failed": 0
+  },
+  "cases": [
+    {
+      "id": "short-flow",
+      "elapsedMs": 45822,
+      "toolCalls": [
+        "render_text",
+        "render_text"
+      ],
+      "toolErrors": [
+        "Error: DSH UI: unknown field node._text_1.copyable; allowed fields at node._text_1: id, type, code, lang, title, wrap."
+      ],
+      "visuals": 1,
+      "mode": "guided",
+      "style": "prismframe"
+    },
+    {
+      "id": "budget",
+      "elapsedMs": 36599,
+      "toolCalls": [
+        "render_ui",
+        "ui_catalog",
+        "render_ui"
+      ],
+      "toolErrors": [
+        "Error: DSH UI: invalid value at chart rows"
+      ],
+      "visuals": 1,
+      "mode": "guided",
+      "style": "prismframe"
+    },
+    {
+      "id": "gears",
+      "elapsedMs": 196125,
+      "toolCalls": [
+        "ui_catalog",
+        "render_mechanism",
+        "render_canvas",
+        "render_text"
+      ],
+      "toolErrors": [],
+      "visuals": 3,
+      "mode": "guided",
+      "style": "technical"
+    },
+    {
+      "id": "free-svg",
+      "elapsedMs": 233308,
+      "toolCalls": [
+        "render_canvas"
+      ],
+      "toolErrors": [],
+      "visuals": 1,
+      "mode": "free",
+      "style": "prismframe"
+    }
+  ],
+  "requestInjection": [
+    {
+      "name": "budget",
+      "exactSectionsPresent": [
+        {
+          "name": "generative-ui:design-skill",
+          "present": true
+        },
+        {
+          "name": "generative-ui:protocol",
+          "present": true
+        },
+        {
+          "name": "generative-ui:worked-examples",
+          "present": true
+        }
+      ],
+      "motionToolNames": [
+        "inspect_ui",
+        "patch_ui",
+        "render_canvas",
+        "render_mechanism",
+        "render_text",
+        "render_ui",
+        "ui_catalog",
+        "update_ui",
+        "validate_ui"
+      ],
+      "hasSelectedStyle": true,
+      "hasGuidedExamples": true
+    },
+    {
+      "name": "gears",
+      "exactSectionsPresent": [
+        {
+          "name": "generative-ui:design-skill",
+          "present": true
+        },
+        {
+          "name": "generative-ui:protocol",
+          "present": true
+        },
+        {
+          "name": "generative-ui:worked-examples",
+          "present": true
+        }
+      ],
+      "motionToolNames": [
+        "inspect_ui",
+        "patch_ui",
+        "render_canvas",
+        "render_mechanism",
+        "render_text",
+        "render_ui",
+        "ui_catalog",
+        "update_ui",
+        "validate_ui"
+      ],
+      "hasSelectedStyle": true,
+      "hasGuidedExamples": true
+    },
+    {
+      "name": "free-svg",
+      "exactSectionsPresent": [
+        {
+          "name": "generative-ui:design-skill",
+          "present": true
+        }
+      ],
+      "motionToolNames": [
+        "inspect_ui",
+        "patch_ui",
+        "render_canvas",
+        "render_mechanism",
+        "render_text",
+        "render_ui",
+        "ui_catalog",
+        "update_ui",
+        "validate_ui"
+      ],
+      "hasSelectedStyle": false,
+      "hasGuidedExamples": false
+    }
+  ],
+  "local": {
+    "build": "0.7.0+45277dc37fec",
+    "profiles": [
+      {
+        "profile": "web",
+        "authenticatedDiagnostics": true,
+        "buildMatches": true,
+        "localAssets": true,
+        "feedbackHook": true,
+        "nativeSidebar": true,
+        "scenePreview": true,
+        "globalNativeControls": true,
+        "noExtraPreviewButton": true,
+        "sixGrammarPreviews": true
+      },
+      {
+        "profile": "desktop",
+        "authenticatedDiagnostics": true,
+        "buildMatches": true,
+        "localAssets": true,
+        "feedbackHook": true,
+        "nativeSidebar": true,
+        "scenePreview": true,
+        "globalNativeControls": true,
+        "noExtraPreviewButton": true,
+        "sixGrammarPreviews": true
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  "settings": {
+    "settings": [
+      {
+        "profile": "web",
+        "mode": "guided",
+        "style": "prismframe"
+      },
+      {
+        "profile": "desktop",
+        "mode": "guided",
+        "style": "aurora"
+      }
+    ],
+    "errors": [],
+    "moonControls": {
+      "angle": 180,
+      "illumination": "100%",
+      "pausesOnSeek": true,
+      "originalStateRestored": true
+    },
+    "passed": true
+  }
+}

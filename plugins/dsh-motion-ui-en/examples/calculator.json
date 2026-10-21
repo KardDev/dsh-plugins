@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "title": "理论权重体积计算器",
+  "fallback": "27B 参数、4 bit 时纯权重理论体积约 12.57 GiB。这是理论估算，不是实测文件大小或运行显存；不含量化元数据、混合精度层、KV cache 和运行缓冲区。",
+  "state": {
+    "parametersB": {
+      "type": "number",
+      "default": 27,
+      "min": 1,
+      "max": 200,
+      "step": 1
+    },
+    "bits": {
+      "type": "number",
+      "default": 4,
+      "min": 2,
+      "max": 16,
+      "step": 1
+    }
+  },
+  "data": {},
+  "derived": {
+    "weightGiB": {
+      "op": "div",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "ref": "state.parametersB"
+            },
+            {
+              "const": 1000000000
+            },
+            {
+              "ref": "state.bits"
+            }
+          ]
+        },
+        {
+          "const": 8589934592
+        }
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "parameters",
+      "type": "input",
+      "label": "参数量 B（十亿）",
+      "bind": "state.parametersB"
+    },
+    {
+      "id": "bits",
+      "type": "slider",
+      "label": "假设有效位宽 bit",
+      "bind": "state.bits"
+    },
+    {
+      "id": "weight",
+      "type": "metric",
+      "label": "纯权重理论体积",
+      "value": {
+        "ref": "derived.weightGiB"
+      },
+      "unit": "GiB",
+      "decimals": 2,
+      "icon": "database",
+      "tone": "accent"
+    },
+    {
+      "id": "note",
+      "type": "text",
+      "text": "理论估算，不是实际 GGUF 大小或推理显存。",
+      "tone": "warning"
+    },
+    {
+      "id": "followup",
+      "type": "button",
+      "text": "按当前参数继续分析",
+      "action": "analyze"
+    }
+  ],
+  "actions": {
+    "analyze": {
+      "type": "agent.followup",
+      "intent": "分析当前参数下的量化选择，区分理论权重体积与真实运行开销；缺少信息时说明不确定性。",
+      "stateKeys": [
+        "parametersB",
+        "bits"
+      ]
+    }
+  }
+}

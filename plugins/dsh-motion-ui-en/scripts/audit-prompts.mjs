@@ -1,0 +1,18 @@
+import {BUILD_INFO} from '../lib/build-info.js';
+import {REPAIR_GUIDANCE} from '../lib/fence-feedback.js';
+import {apply} from '../index.js';
+import {VISUAL_STYLES,DEFAULT_VISUAL_STYLE} from '../lib/visual-styles.js';
+import {writeFile,mkdir} from 'node:fs/promises';import{dirname,resolve}from'node:path';import{pathToFileURL}from'node:url';
+const output=process.argv[2]??'test-output/prompt-audit/current.json';
+let encoder=null;if(process.env.MOTION_TOKENIZER_MODULE){const m=await import(pathToFileURL(resolve(process.env.MOTION_TOKENIZER_MODULE)).href);encoder=m.getEncoding('o200k_base')}
+const measure=text=>({characters:[...text].length,utf8Bytes:Buffer.byteLength(text),referenceTokens:encoder?encoder.encode(text).length:null});
+function capture(mode,style){const sections=[],tools=[];apply({effect:f=>f(),tools:{register:t=>tools.push(t)},connection:{fetch:{register:()=>{}}},systemPrompt:{section:s=>sections.push(s)}},{get:()=>({designMode:mode,visualStyle:style})});return{sections:sections.map(s=>({name:s.name,text:typeof s.text==='function'?s.text():s.text})),tools}}
+const scenarios=[],first=capture('guided',DEFAULT_VISUAL_STYLE),definitions=first.tools.map(({name,description,parameters})=>({name,description,parameters})),toolJson=JSON.stringify(definitions);
+for(const mode of['guided','free'])for(const style of(mode==='guided'?VISUAL_STYLES:[VISUAL_STYLES.find(s=>s.id===DEFAULT_VISUAL_STYLE)])){
+ const {sections}=capture(mode,style.id),active=sections.filter(s=>s.text.trim()),text=active.map(s=>s.text).join('\n\n');scenarios.push({mode,style:mode==='free'?null:style.id,styleName:mode==='free'?'自主设计':style.name,registeredSections:sections.length,activeSections:active.length,sections:sections.map(s=>({name:s.name,...measure(s.text),text:s.text})),systemText:measure(text),systemAndTools:measure(text+'\n\n'+toolJson)});
+}
+const catalog=first.tools.find(t=>t.name==='ui_catalog'),onDemand=[];
+for(const topic of['overview','quick','text','native','style','canvas','visual','data','scenes','templates','motion','video','mechanism','all']){const value=await catalog.execute({topic});onDemand.push({topic,...measure(JSON.stringify(value))})}
+const report={generatedAt:new Date().toISOString(),build:BUILD_INFO,measurement:{characters:'Unicode code points',referenceTokens:encoder?'o200k_base BPE reference count; estimate for other models, not provider billing':null,scope:'Resolved actual Host systemPrompt sections including Host suffixes; registered plugin tool descriptions and JSON schemas counted separately. Catalog tool results are on demand and excluded from always-present totals. Host/provider wrappers, user/history, other plugins and conditional repair notices are excluded. Tool visibility can depend on the selected DSH agent.'},conditionalRepair:{maxRoundsPerRequest:2,templates:Object.fromEntries(Object.entries(REPAIR_GUIDANCE).map(([name,text])=>[name,measure(text)])),note:'Not initially injected. Failed-field diagnostics are variable (up to four excerpts of 1200 characters); count them only in requests where a notice actually occurs.'},toolCount:definitions.length,tools:definitions.map(d=>({name:d.name,description:measure(d.description),schema:measure(JSON.stringify(d.parameters)),serialized:measure(JSON.stringify(d))})),toolDefinitions:measure(toolJson),scenarios,onDemand};
+await mkdir(dirname(output),{recursive:true});await writeFile(output,JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({output,toolCount:report.toolCount,tools:report.toolDefinitions,scenarios:scenarios.map(({mode,style,activeSections,systemText,systemAndTools})=>({mode,style,activeSections,systemText,systemAndTools}))},null,2));

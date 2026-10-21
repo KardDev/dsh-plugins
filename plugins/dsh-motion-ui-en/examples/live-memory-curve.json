@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "title": "上下文与理论内存曲线",
+  "fallback": "理论估算，只计算纯权重与 KV cache，不包含运行缓冲、量化元数据或多卡分配。默认 27B、4.25 bpw、32K 上下文、48 KiB/token KV，权重约 13.36 GiB，权重加 KV 约 14.86 GiB。",
+  "state": {
+    "parametersB": {
+      "type": "number",
+      "default": 27,
+      "min": 1,
+      "max": 200,
+      "step": 1
+    },
+    "bits": {
+      "type": "number",
+      "default": 4.25,
+      "min": 2,
+      "max": 8,
+      "step": 0.25
+    },
+    "contextK": {
+      "type": "number",
+      "default": 32,
+      "min": 8,
+      "max": 128,
+      "step": 8
+    },
+    "kvKib": {
+      "type": "number",
+      "default": 48,
+      "min": 8,
+      "max": 192,
+      "step": 8
+    }
+  },
+  "data": {
+    "samples": [
+      {
+        "fraction": 0.25
+      },
+      {
+        "fraction": 0.5
+      },
+      {
+        "fraction": 0.75
+      },
+      {
+        "fraction": 1
+      }
+    ]
+  },
+  "derived": {
+    "weightGiB": {
+      "op": "div",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "ref": "state.parametersB"
+            },
+            {
+              "const": 1000000000
+            },
+            {
+              "ref": "state.bits"
+            }
+          ]
+        },
+        {
+          "const": 8589934592
+        }
+      ]
+    },
+    "totalGiB": {
+      "op": "add",
+      "args": [
+        {
+          "ref": "derived.weightGiB"
+        },
+        {
+          "op": "div",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "ref": "state.contextK"
+                },
+                {
+                  "ref": "state.kvKib"
+                }
+              ]
+            },
+            {
+              "const": 1024
+            }
+          ]
+        }
+      ]
+    },
+    "curve": {
+      "map": {
+        "source": "data.samples",
+        "fields": {
+          "contextK": {
+            "op": "mul",
+            "args": [
+              {
+                "ref": "state.contextK"
+              },
+              {
+                "ref": "item.fraction"
+              }
+            ]
+          },
+          "totalGiB": {
+            "op": "add",
+            "args": [
+              {
+                "ref": "derived.weightGiB"
+              },
+              {
+                "op": "div",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "ref": "state.contextK"
+                      },
+                      {
+                        "ref": "item.fraction"
+                      },
+                      {
+                        "ref": "state.kvKib"
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1024
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "nodes": [
+    {
+      "id": "note",
+      "type": "text",
+      "tone": "warning",
+      "text": "理论值，不是实测推理显存。仅计纯权重 + KV cache，不含运行缓冲、量化元数据或多卡分配。"
+    },
+    {
+      "id": "controls",
+      "type": "card",
+      "title": "参数调整",
+      "icon": "sliders",
+      "children": [
+        {
+          "id": "parameters",
+          "type": "input",
+          "label": "参数量 B（十亿）",
+          "bind": "state.parametersB"
+        },
+        {
+          "id": "bits",
+          "type": "slider",
+          "label": "假设有效位宽 bit",
+          "bind": "state.bits"
+        },
+        {
+          "id": "context",
+          "type": "slider",
+          "label": "最大上下文 K tokens",
+          "bind": "state.contextK"
+        },
+        {
+          "id": "kv",
+          "type": "slider",
+          "label": "每 token KV 开销 KiB",
+          "bind": "state.kvKib"
+        }
+      ]
+    },
+    {
+      "id": "metric",
+      "type": "metric",
+      "label": "最大上下文下的理论权重 + KV",
+      "icon": "database",
+      "value": {
+        "ref": "derived.totalGiB"
+      },
+      "unit": "GiB",
+      "decimals": 2
+    },
+    {
+      "id": "curveChart",
+      "type": "chart",
+      "kind": "line",
+      "xScale": "linear",
+      "label": "上下文 K tokens → 权重 + KV",
+      "unit": "GiB",
+      "rows": {
+        "ref": "derived.curve"
+      },
+      "labelKey": "contextK",
+      "valueKey": "totalGiB"
+    },
+    {
+      "id": "curveTable",
+      "type": "table",
+      "rows": {
+        "ref": "derived.curve"
+      },
+      "columns": [
+        {
+          "key": "contextK",
+          "label": "上下文",
+          "unit": "K tokens"
+        },
+        {
+          "key": "totalGiB",
+          "label": "理论内存",
+          "unit": "GiB"
+        }
+      ]
+    },
+    {
+      "id": "followup",
+      "type": "button",
+      "text": "按当前曲线继续分析",
+      "action": "analyze"
+    }
+  ],
+  "actions": {
+    "analyze": {
+      "type": "agent.followup",
+      "intent": "依据当前参数与 derived.curve 理论曲线分析上下文和内存取舍，说明尚未计入的实际运行开销。",
+      "stateKeys": [
+        "parametersB",
+        "bits",
+        "contextK",
+        "kvKib"
+      ]
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "build": {
+    "version": "0.7.0",
+    "id": "0.7.0+9069fca0d517",
+    "sourceHash": "9069fca0d517014a721ff34242781df96f7b6cc0e5121a122055cdb31ebcbbc1"
+  },
+  "model": {
+    "model": "MiniMax-M3.1-Flash-Preview",
+    "build": {
+      "version": "0.7.0",
+      "id": "0.7.0+48206b3a8d28",
+      "sourceHash": "48206b3a8d2876280273cb47e3f93a811085930d24624eca209ab0ffa34b2d77"
+    },
+    "cases": [
+      {
+        "name": "plain-fact",
+        "passed": true,
+        "elapsedMs": 3335,
+        "firstVisibleMs": null,
+        "toolCalls": [],
+        "toolErrors": [],
+        "visibleUiCount": 0
+      },
+      {
+        "name": "proactive-flow",
+        "passed": true,
+        "elapsedMs": 11427,
+        "firstVisibleMs": 6684,
+        "toolCalls": [
+          "render_scene"
+        ],
+        "toolErrors": [],
+        "visibleUiCount": 1
+      },
+      {
+        "name": "multiple-and-budget",
+        "passed": true,
+        "elapsedMs": 9436,
+        "firstVisibleMs": 5682,
+        "toolCalls": [
+          "render_scene",
+          "render_scene"
+        ],
+        "toolErrors": [],
+        "visibleUiCount": 2
+      },
+      {
+        "name": "targeted-followup",
+        "passed": true,
+        "elapsedMs": 7421,
+        "firstVisibleMs": null,
+        "toolCalls": [
+          "inspect_ui",
+          "patch_ui"
+        ],
+        "toolErrors": [],
+        "visibleUiCount": 2,
+        "parametersRetained": true,
+        "reloadRetained": true
+      }
+    ],
+    "settingsRestored": true
+  },
+  "browser": {
+    "passed": true,
+    "checks": [
+      "four complete scenes; static flow/comparison and reactive allocation/budget work without model-authored nodes",
+      "query locates exact total; local patch keeps document id, persisted people and survives reload",
+      "four scenes fit desktop and narrow widths",
+      "alpha-composited contrast, local targets, clipping and bottom whitespace are observed; deliberate scrolling and readable text are not misreported",
+      "truncated observations never infer blank space from unscanned content"
+    ],
+    "audit": {
+      "width": 1200,
+      "theme": "light",
+      "coverage": [
+        {
+          "nodeId": "canvas",
+          "elements": 8,
+          "truncated": false,
+          "contrastChecked": 4,
+          "contrastUncovered": 1
+        }
+      ],
+      "issues": [
+        {
+          "code": "contrast",
+          "nodeId": "canvas",
+          "message": "文字与背景对比度偏低",
+          "target": {
+            "selector": "#low",
+            "text": "透明背景上的低对比度文字",
+            "tag": "p"
+          },
+          "value": 3.17
+        },
+        {
+          "code": "clippedText",
+          "nodeId": "canvas",
+          "message": "文字可能被隐藏或裁切",
+          "target": {
+            "selector": "#clipped",
+            "text": "这是一段会被裁切的很长的文字",
+            "tag": "span"
+          }
+        },
+        {
+          "code": "bottomWhitespace",
+          "nodeId": "canvas",
+          "message": "内容下方存在明显空白",
+          "target": {
+            "selector": "#canvas",
+            "text": "清楚的正文透明背景上的低对比度文字这是一段会被裁切的很长的文字这是一段允许用户横向滚动的很长文字复杂背景不推断通过",
+            "tag": "div"
+          },
+          "value": 434
+        }
+      ]
+    },
+    "errors": []
+  },
+  "unitTests": {
+    "passed": 129,
+    "failed": 0
+  },
+  "fullRegressionGroups": 24,
+  "installed": {
+    "build": "0.7.0+9069fca0d517",
+    "profiles": [
+      {
+        "profile": "web",
+        "settings": {
+          "mode": "guided",
+          "style": "prismframe"
+        },
+        "authenticatedDiagnostics": true,
+        "buildMatches": true,
+        "localAssets": true,
+        "feedbackHook": true,
+        "nativeSidebar": true,
+        "scenePreview": true,
+        "globalNativeControls": true,
+        "noExtraPreviewButton": true,
+        "sixGrammarPreviews": true
+      },
+      {
+        "profile": "desktop",
+        "settings": {
+          "mode": "guided",
+          "style": "aurora"
+        },
+        "authenticatedDiagnostics": true,
+        "buildMatches": true,
+        "localAssets": true,
+        "feedbackHook": true,
+        "nativeSidebar": true,
+        "scenePreview": true,
+        "globalNativeControls": true,
+        "noExtraPreviewButton": true,
+        "sixGrammarPreviews": true
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  "installedPackageFilesPerProfile": 197
+}

@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+import { readFile, writeFile } from 'node:fs/promises';
+const require = createRequire(import.meta.url);
+const { chromium } = require(process.env.DSH_PLAYWRIGHT ?? 'playwright');
+const url = (await readFile(process.env.DSH_WEB_LOG, 'utf8')).match(/http:\/\/127\.0\.0\.1:3080\/\S*/)?.[0];
+assert.ok(url, 'Web ready URL');
+const browser = await chromium.launch({ headless:true, channel:'msedge' });
+try {
+  const page = await browser.newPage({viewport:{width:1365,height:900}});
+  const errors=[];
+  page.on('pageerror', e=>errors.push(e.message));
+  page.on('console', m=> {if(m.type()==='error' && !m.text().includes('Failed to load resource')) errors.push(m.text());});
+  await page.goto(url); await page.waitForLoadState('networkidle');
+  await page.getByText('理论权重体积计算器UI验收',{exact:true}).first().click();
+  const uis=page.locator('[data-dsh-generative-ui]');
+  await uis.nth(1).waitFor();
+  const first=uis.first(); await first.getByText('已恢复保存的参数',{exact:true}).waitFor();
+  assert.equal(await first.getByRole('slider').inputValue(),'8');
+  await first.getByRole('spinbutton').fill('');
+  assert.equal(await first.getByRole('button').isDisabled(),true);
+  await first.getByRole('spinbutton').fill('27');
+  assert.equal(await first.getByRole('button').isDisabled(),false);
+  const id=await first.getAttribute('data-dsh-generative-ui');
+  const deniedOrigin=await page.request.post('http://127.0.0.1:3080/api/plugins/dsh-generative-ui/state',{headers:{Origin:'https://untrusted.example'},data:{documentId:id,sessionId:'test',revision:0,state:{parametersB:27,bits:8}}});
+  assert.equal(deniedOrigin.status(),403);
+  await first.scrollIntoViewIfNeeded();
+  await first.screenshot({path:'test-output/final-calculator.png'});
+  await uis.nth(1).scrollIntoViewIfNeeded();
+  await uis.nth(1).screenshot({path:'test-output/final-comparison.png'});
+  await page.reload(); await uis.nth(1).waitFor();
+  await first.getByText('已恢复保存的参数',{exact:true}).waitFor();
+  assert.equal(await first.getByRole('slider').inputValue(),'8');
+  assert.deepEqual(errors,[]);
+  const result={installedVersion:'0.1.2',checks:['two real-model UIs replay after host restart','edited inputs restored','invalid numeric draft blocks followup','invalid Origin rejected with 403','refresh retains both independent turn-tail UIs'],errors};
+  await writeFile('test-output/installed-verification.json',JSON.stringify(result,null,2)); console.log(JSON.stringify(result));
+} finally {await browser.close();}

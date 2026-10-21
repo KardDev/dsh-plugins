@@ -1,0 +1,152 @@
+/* TemplateDrawer: the GenUI template center inside the session panel body.
+   Tokens mirror GenuiBlock.module.css (--dsw-alias-* sheets, fallbacks last). */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ---- achievements tab ---- */
+.achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ---- category chips ---- */
+.cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cat {
+  padding: 4px 12px;
+  border: 1px solid var(--dsw-alias-border-l1, rgba(255, 255, 255, 0.12));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary, var(--dsl-g-font-muted-fallback, rgba(255, 255, 255, 0.6)));
+  font-size: 12px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.cat:hover {
+  background: var(--dsw-alias-fill-hover, rgba(255, 255, 255, 0.06));
+}
+
+.catActive {
+  border-color: var(--dsw-alias-state-business-primary, #4f8ef7);
+  color: var(--dsw-alias-state-business-primary, #4f8ef7);
+  background: color-mix(in srgb, var(--dsw-alias-state-business-primary, #4f8ef7) 14%, transparent);
+}
+
+/* ---- template cards ---- */
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--dsw-alias-border-l1, rgba(255, 255, 255, 0.12));
+  border-radius: var(--dsl-g-radius-surface, 12px);
+  background: var(--dsw-alias-bg-layer-2, rgba(255, 255, 255, 0.04));
+  color: var(--dsw-alias-label-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.card:hover {
+  border-color: var(--dsw-alias-border-l2, rgba(255, 255, 255, 0.2));
+}
+
+.cardActive {
+  border-color: var(--dsw-alias-state-business-primary, #4f8ef7);
+}
+
+.cardName {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.cardMeta {
+  font-size: 11px;
+  color: var(--dsw-alias-label-tertiary, rgba(255, 255, 255, 0.45));
+}
+
+.cardDesc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--dsw-alias-label-secondary, rgba(255, 255, 255, 0.6));
+}
+
+/* ---- detail preview ---- */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--dsw-alias-border-l1, rgba(255, 255, 255, 0.12));
+  padding-top: 12px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbarTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+}
+
+.try,
+.copy {
+  padding: 5px 12px;
+  border-radius: var(--dsl-g-radius-control, 8px);
+  border: 1px solid transparent;
+  font-size: 12px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.try {
+  border-color: var(--dsw-alias-state-business-primary, #4f8ef7);
+  color: var(--dsw-alias-state-business-primary, #4f8ef7);
+  background: color-mix(in srgb, var(--dsw-alias-state-business-primary, #4f8ef7) 14%, transparent);
+}
+
+.try:hover {
+  background: color-mix(in srgb, var(--dsw-alias-state-business-primary, #4f8ef7) 22%, transparent);
+}
+
+.copy {
+  border-color: var(--dsw-alias-border-l1, rgba(255, 255, 255, 0.12));
+  background: transparent;
+  color: var(--dsw-alias-label-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.preview {
+  border: 1px solid var(--dsw-alias-border-l1, rgba(255, 255, 255, 0.12));
+  border-radius: var(--dsl-g-radius-surface, 12px);
+  padding: 12px;
+  min-height: 0;
+  overflow: auto;
+  background: var(--dsw-alias-bg-layer-1, rgba(0, 0, 0, 0.08));
+}

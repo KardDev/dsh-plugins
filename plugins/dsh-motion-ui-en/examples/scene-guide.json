@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "title": "步骤指南 · 开发环境准备",
+  "fallback": "这是布局与交互示例，数据为演示数据；不代表实际测试、任务进度或推荐结论。",
+  "presentation": {
+    "layout": "guide",
+    "accent": "amber"
+  },
+  "nodes": [
+    {
+      "id": "tag",
+      "type": "badge",
+      "text": "操作清单示例",
+      "tone": "neutral",
+      "icon": "target"
+    },
+    {
+      "id": "note",
+      "type": "text",
+      "text": "步骤状态仅用于演示；插件不会自动执行这些操作。"
+    },
+    {
+      "id": "steps",
+      "type": "steps",
+      "items": [
+        {
+          "title": "确认版本",
+          "description": "记录宿主版本、插件版本和所用配置目录。",
+          "status": "pending"
+        },
+        {
+          "title": "准备隔离环境",
+          "description": "备份配置，使用独立开发会话和演示数据。",
+          "status": "pending"
+        },
+        {
+          "title": "构建并验收",
+          "description": "验证交互、刷新恢复、深浅主题和窄屏布局。",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "details",
+      "type": "details",
+      "title": "验收时记录什么",
+      "children": [
+        {
+          "id": "criteria",
+          "type": "text",
+          "text": "记录明确的输入、可观察结果、错误以及尚未验证的范围。"
+        }
+      ]
+    }
+  ]
+}

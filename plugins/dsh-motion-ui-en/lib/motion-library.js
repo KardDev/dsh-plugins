@@ -1,0 +1,19 @@
+import {EXPRESSIVE_EXAMPLES} from './expressive-examples.js';
+import {validateDocument} from './protocol.js';
+import {craftCatalog,MOTION_CRAFT_GUIDE} from './motion-craft.js';
+const ref=key=>({ref:key}),constant=value=>({const:value});
+export const MOTION_RECIPES=Object.freeze([
+ ...EXPRESSIVE_EXAMPLES,
+ {id:'plan',name:'方案切换',description:'分段选择、本地计算与精确指标',document:{version:1,title:'订阅预算 · 示例',fallback:'示例单价 29 元/人/月，按月数和人数计算，不是真实报价。',presentation:{preset:'brief'},state:{months:{type:'number',default:1,min:1,max:12,step:1,options:[1,3,12]},seats:{type:'number',default:2,min:1,max:8,step:1}},derived:{total:{op:'mul',args:[constant(29),ref('state.months'),ref('state.seats')]}},nodes:[{id:'period',type:'select',label:'购买月数',bind:'state.months',variant:'segmented'},{id:'seats',type:'slider',label:'使用人数',bind:'state.seats'},{id:'total',type:'metric',label:'示例合计',value:ref('derived.total'),unit:'元',decimals:0},{id:'budget',type:'progress',label:'占 3000 元预算',value:ref('derived.total'),max:3000,unit:'元'},{id:'note',type:'text',text:'示例单价 29 元/人/月，不是真实报价。'}]}},
+ {id:'checklist',name:'任务勾选',description:'真实勾选状态联动完成进度',document:{version:1,title:'发布前自查 · 示例',fallback:'勾选实际完成的检查项，进度在本地更新。',presentation:{preset:'brief'},state:{readme:{type:'boolean',default:false},test:{type:'boolean',default:false},license:{type:'boolean',default:false}},derived:{done:{op:'add',args:['readme','test','license'].map(k=>({op:'if',args:[ref('state.'+k),constant(1),constant(0)]}))}},nodes:[{id:'readme',type:'toggle',label:'说明文档已检查',bind:'state.readme'},{id:'test',type:'toggle',label:'实际测试已完成',bind:'state.test'},{id:'license',type:'toggle',label:'许可证已确认',bind:'state.license'},{id:'done',type:'progress',label:'已完成检查',value:ref('derived.done'),max:3,unit:'项'},{id:'note',type:'text',text:'仅记录用户勾选，不代表插件已执行这些检查。'}]}},
+ {id:'copy',name:'复制反馈',description:'复用文本/代码，成功或失败均有反馈',document:{version:1,title:'可直接使用的内容',fallback:'git status\ngit diff',nodes:[{id:'draft',type:'text',title:'提交说明',text:'补充使用说明并修复交互问题。',copyable:true},{id:'code',type:'code',title:'检查本地改动',lang:'bash',code:'git status\ngit diff'}]}},
+ {id:'plot',name:'参数图解',description:'安全函数表达式，本地实时重绘',document:{title:'振幅探索',items:[{type:'plot',title:'y = a sin(x)',xMin:-6.28,xMax:6.28,series:[{expr:'a*sin(x)',label:'正弦',params:[{name:'a',value:1,min:0,max:3,step:0.1}]}]},{type:'text',content:'调整 a 改变振幅。函数在浏览器本地绘制，无需再次调用模型。'}]}}
+]);
+export function motionCatalog(id){
+ if(!id)return{...craftCatalog(),recipes:[...MOTION_RECIPES.map(({id,name,description})=>({id,name,description})),...craftCatalog().recipes],usage:'ui_catalog({topic:"motion",scene:"timeline"}) returns one complete example; adapt real content and selected guided style. Do not load every recipe.'};
+ const craft=craftCatalog(id);if(craft)return craft;
+ const recipe=MOTION_RECIPES.find(r=>r.id===id);if(!recipe)throw Error('Unknown motion recipe; choose '+MOTION_RECIPES.map(r=>r.id).join(', '));
+ return{...recipe,document:validateDocument(recipe.document),guidance:'All feedback follows actual state/results. Native controls and graph transitions are built in; no extra JS is needed. Preview is read-only until turn end. Do not copy sample prices as real data or simulate success with a timer.'};
+}
+export const MOTION_GUIDE='Native controls already provide local feedback: segmented select for2..8 short options, slider fill, numeric stepper, elastic toggle, button/link hover and real copy confirmation. Values stay exact immediately; related graphics may transition. No custom script is required for native feedback. For richer motion retrieve one motion recipe; choose animation that explains a real change, honor reduced motion, never simulate task success.\n'+MOTION_CRAFT_GUIDE;
+export const MOTION_INTERFACE='Native control feedback is built in and respects reduced motion; canvas animation is model-authored. No palette or layout is imposed.';

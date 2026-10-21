@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "title": "理论权重预算比较",
+  "fallback": "这是纯权重理论预算比较，不包含实际推理运行开销。默认 27B、4 bit、20 GiB 理论预算，权重约 12.57 GiB。",
+  "state": {
+    "parametersB": {
+      "type": "number",
+      "default": 27,
+      "min": 1,
+      "max": 200,
+      "step": 1
+    },
+    "bits": {
+      "type": "number",
+      "default": 4,
+      "min": 2,
+      "max": 16,
+      "step": 1
+    },
+    "budgetGiB": {
+      "type": "number",
+      "default": 20,
+      "min": 1,
+      "max": 96,
+      "step": 1
+    }
+  },
+  "data": {},
+  "derived": {
+    "weightGiB": {
+      "op": "div",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "ref": "state.parametersB"
+            },
+            {
+              "const": 1000000000
+            },
+            {
+              "ref": "state.bits"
+            }
+          ]
+        },
+        {
+          "const": 8589934592
+        }
+      ]
+    },
+    "verdict": {
+      "op": "if",
+      "args": [
+        {
+          "op": "gt",
+          "args": [
+            {
+              "ref": "derived.weightGiB"
+            },
+            {
+              "ref": "state.budgetGiB"
+            }
+          ]
+        },
+        {
+          "const": "超过纯权重理论预算；请降低位宽或提高预算。"
+        },
+        {
+          "const": "在纯权重理论预算内；仍需另计运行开销。"
+        }
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "assumptions",
+      "type": "text",
+      "tone": "warning",
+      "text": "以下均为理论估算，不能直接据此判断模型能否在显卡上运行。"
+    },
+    {
+      "id": "settings",
+      "type": "card",
+      "title": "调整参数",
+      "icon": "sliders",
+      "children": [
+        {
+          "id": "parameters",
+          "type": "input",
+          "label": "参数量 B（十亿）",
+          "bind": "state.parametersB"
+        },
+        {
+          "id": "bits",
+          "type": "slider",
+          "label": "假设有效位宽 bit",
+          "bind": "state.bits"
+        },
+        {
+          "id": "budget",
+          "type": "slider",
+          "label": "纯权重理论预算 GiB",
+          "bind": "state.budgetGiB"
+        }
+      ]
+    },
+    {
+      "id": "results",
+      "type": "row",
+      "children": [
+        {
+          "id": "weight",
+          "type": "metric",
+          "label": "纯权重理论体积",
+          "value": {
+            "ref": "derived.weightGiB"
+          },
+          "unit": "GiB",
+          "decimals": 2,
+          "icon": "database",
+          "tone": "accent"
+        },
+        {
+          "id": "budgetMetric",
+          "type": "metric",
+          "label": "理论预算",
+          "icon": "target",
+          "tone": "neutral",
+          "value": {
+            "ref": "state.budgetGiB"
+          },
+          "unit": "GiB",
+          "decimals": 0
+        }
+      ]
+    },
+    {
+      "id": "verdictText",
+      "type": "text",
+      "icon": "info",
+      "text": {
+        "ref": "derived.verdict"
+      }
+    }
+  ],
+  "actions": {}
+}

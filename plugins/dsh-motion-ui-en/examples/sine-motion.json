@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "title": "正弦运动 · 参数实验",
+  "fallback": "数学动画示意：位置 x = A sin(2πft)。振幅 A 与频率 f 可调；不是弹簧物理仿真。刷新保留参数，动画时间重新开始。",
+  "state": {
+    "amplitude": {
+      "type": "number",
+      "default": 90,
+      "min": 10,
+      "max": 150,
+      "step": 10
+    },
+    "frequency": {
+      "type": "number",
+      "default": 1,
+      "min": 0.25,
+      "max": 2,
+      "step": 0.25
+    }
+  },
+  "nodes": [
+    {
+      "id": "wave",
+      "type": "sandbox",
+      "title": "可调正弦运动",
+      "height": 260,
+      "fallback": "圆点沿水平轴做正弦运动。振幅决定最大偏移，频率决定每秒往复次数；减少动态效果开启时显示静止示意。",
+      "stateKeys": [
+        "amplitude",
+        "frequency"
+      ],
+      "html": "<div class=\"lab\"><p>POSITION / TIME</p><svg viewBox=\"0 0 500 150\" role=\"img\" aria-label=\"圆点沿水平轴正弦运动\"><path d=\"M50 75H450\"/><path d=\"M250 60V90\"/><circle id=\"mass\" cx=\"250\" cy=\"75\" r=\"18\"/></svg><output id=\"equation\"></output></div>",
+      "css": ".lab{padding:20px;background:var(--canvas-soft);border-radius:14px}.lab p{font-size:10px;letter-spacing:2px;color:var(--canvas-muted);margin:0}.lab svg{width:100%;display:block}.lab path{stroke:var(--canvas-line);fill:none}.lab circle{fill:var(--canvas-accent)}.lab output{font-size:13px;font-variant-numeric:tabular-nums}",
+      "script": "let s=DSHUI.snapshot;DSHUI.subscribe(v=>{s=v;document.getElementById('equation').textContent='x = '+s.state.amplitude+' sin(2π × '+s.state.frequency+' × t)'});DSHUI.animate(({time,reducedMotion})=>{const x=reducedMotion?0:s.state.amplitude*Math.sin(2*Math.PI*s.state.frequency*time);document.getElementById('mass').setAttribute('cx',250+x)});"
+    },
+    {
+      "id": "amplitude",
+      "type": "slider",
+      "label": "振幅 A（示意坐标单位）",
+      "bind": "state.amplitude"
+    },
+    {
+      "id": "frequency",
+      "type": "slider",
+      "label": "频率 f（Hz）",
+      "bind": "state.frequency"
+    }
+  ]
+}

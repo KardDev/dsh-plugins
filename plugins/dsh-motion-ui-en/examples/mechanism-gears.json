@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "title": "齿轮传动 · 简化直齿轮示意",
+  "fallback": "外啮合齿轮反向转动。主动轮16齿、20 rpm，从动轮默认32齿、-10 rpm，中心距由模数和齿数确定。齿形为简化示意，不用于加工。",
+  "state": {
+    "explode": {
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    "selected": {
+      "type": "string",
+      "default": "all"
+    },
+    "cutaway": {
+      "type": "boolean",
+      "default": true
+    },
+    "rpm": {
+      "type": "number",
+      "default": 20,
+      "min": 0,
+      "max": 90,
+      "step": 1
+    },
+    "running": {
+      "type": "boolean",
+      "default": false
+    },
+    "angle": {
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 360,
+      "step": 1
+    },
+    "teeth": {
+      "type": "number",
+      "default": 32,
+      "min": 16,
+      "max": 48,
+      "step": 1
+    }
+  },
+  "nodes": [
+    {
+      "id": "mechanism",
+      "type": "sandbox",
+      "title": "齿轮传动 · 简化直齿轮示意",
+      "fallback": "外啮合齿轮反向转动。主动轮16齿、20 rpm，从动轮默认32齿、-10 rpm，中心距由模数和齿数确定。齿形为简化示意，不用于加工。",
+      "height": 560,
+      "libraries": [
+        "mechanism"
+      ],
+      "stateKeys": [
+        "explode",
+        "selected",
+        "cutaway",
+        "rpm",
+        "running",
+        "angle",
+        "teeth"
+      ],
+      "html": "<div id=\"diagram\"><section class=\"mui-mechanism\"><svg class=\"mui-mechanism-svg\" viewBox=\"0 0 600 340\" role=\"img\" aria-label=\"结构轮廓预览；完成后显示立体细节\"><path data-material=\"metal\" data-tone=\"0\" d=\"M498.1 118.6L504.8 122.5L508.2 128.5L507.5 135.2L437.6 292.7L432.9 298.1L425.5 301L417.4 300.4L101.9 206.3L95.2 202.5L91.8 196.4L92.5 189.8L162.4 32.3L167.1 26.8L174.5 24L182.6 24.6Z\" fill-rule=\"evenodd\"/><path data-material=\"dark\" data-tone=\"0\" d=\"M250.7 128.2L247.5 133.2L242.9 137.3L237.1 140.3L230.6 142L223.8 142.3L217.1 141.1L211 138.5L206 134.7L202.3 130L200.2 124.6L199.9 119L201.4 113.5L204.6 108.5L209.2 104.4L215 101.4L221.5 99.7L228.3 99.5L235 100.7L241.1 103.3L246.1 107.1L249.8 111.8L251.9 117.1L252.2 122.7ZM236.5 121.6L236.4 119.4L235.6 117.2L234.1 115.3L232.1 113.8L229.6 112.8L227 112.3L224.2 112.4L221.6 113.1L219.3 114.3L217.5 115.9L216.2 117.9L215.6 120.1L215.7 122.4L216.5 124.5L218 126.4L220 127.9L222.5 128.9L225.1 129.4L227.9 129.3L230.5 128.7L232.8 127.5L234.6 125.8L235.9 123.8ZM339.4 154.7L336.3 159.7L331.7 163.8L325.9 166.8L319.3 168.5L312.5 168.7L305.8 167.5L299.7 164.9L294.7 161.1L291 156.4L289 151.1L288.7 145.5L290.1 140L293.3 135L297.9 130.9L303.7 127.9L310.2 126.2L317.1 125.9L323.8 127.1L329.8 129.7L334.9 133.5L338.6 138.2L340.6 143.6L340.9 149.2ZM325.2 148.1L325.1 145.8L324.3 143.7L322.8 141.8L320.8 140.3L318.4 139.3L315.7 138.8L313 138.9L310.4 139.5L308 140.7L306.2 142.4L304.9 144.4L304.3 146.6L304.5 148.8L305.3 151L306.8 152.9L308.8 154.4L311.2 155.4L313.9 155.9L316.6 155.8L319.2 155.1L321.5 153.9L323.4 152.3L324.6 150.3ZM257.2 69.8L256.3 71.3L254.9 72.5L253.2 73.4L251.2 73.9L249.1 74L247.1 73.6L245.3 72.9L243.8 71.7L242.7 70.3L242.1 68.7L242 67L242.4 65.4L243.4 63.9L244.8 62.6L246.5 61.7L248.5 61.2L250.5 61.2L252.5 61.5L254.3 62.3L255.9 63.4L257 64.9L257.6 66.5L257.7 68.1ZM415 116.8L414 118.3L412.6 119.5L410.9 120.5L409 121L406.9 121L404.9 120.7L403.1 119.9L401.6 118.8L400.5 117.3L399.8 115.7L399.7 114L400.2 112.4L401.1 110.9L402.5 109.7L404.3 108.8L406.2 108.3L408.3 108.2L410.3 108.6L412.1 109.3L413.6 110.5L414.7 111.9L415.3 113.5L415.4 115.2ZM199.8 199L198.9 200.5L197.5 201.7L195.7 202.6L193.8 203.2L191.7 203.2L189.7 202.9L187.9 202.1L186.4 200.9L185.3 199.5L184.7 197.9L184.6 196.2L185 194.6L186 193.1L187.4 191.9L189.1 191L191 190.5L193.1 190.4L195.1 190.7L196.9 191.5L198.4 192.7L199.5 194.1L200.2 195.7L200.3 197.4ZM357.6 246L356.6 247.5L355.2 248.8L353.5 249.7L351.5 250.2L349.5 250.3L347.5 249.9L345.7 249.1L344.1 248L343 246.6L342.4 245L342.3 243.3L342.8 241.6L343.7 240.1L345.1 238.9L346.8 238L348.8 237.5L350.9 237.4L352.9 237.8L354.7 238.6L356.2 239.7L357.3 241.1L357.9 242.7L358 244.4Z\" fill-rule=\"evenodd\"/><path data-material=\"metal\" data-tone=\"0\" d=\"M235.4 93.6L234.2 95.5L232.5 97L230.3 98.2L227.8 98.8L225.2 98.9L222.6 98.5L220.3 97.5L218.4 96L217 94.2L216.2 92.2L216.1 90.1L216.7 88L217.9 86.1L219.6 84.5L221.8 83.4L224.3 82.7L226.9 82.6L229.5 83.1L231.8 84.1L233.7 85.5L235.1 87.3L235.9 89.4L236 91.5ZM324.2 120L323 121.9L321.2 123.5L319 124.6L316.5 125.3L313.9 125.4L311.4 124.9L309.1 123.9L307.2 122.5L305.8 120.7L305 118.7L304.9 116.5L305.4 114.4L306.6 112.6L308.4 111L310.6 109.8L313.1 109.2L315.7 109.1L318.2 109.6L320.5 110.5L322.4 112L323.8 113.8L324.6 115.8L324.7 117.9Z\" fill-rule=\"evenodd\"/><path data-material=\"accent\" data-tone=\"0\" d=\"M253.9 104.1L253.5 105.7L258.9 108.4L257.4 111.9L251.1 111.1L250.1 112.5L249 113.9L252.8 118.1L249.7 120.8L244.2 118.1L242.7 119.1L241 120.1L242.6 125.1L238.4 126.7L234.7 122.5L232.7 122.9L230.8 123.3L229.8 128.4L225.3 128.6L223.7 123.5L221.8 123.3L219.8 123L216.5 127.5L212.2 126.2L213.2 121.1L211.5 120.3L209.8 119.4L204.7 122.5L201.3 119.9L204.6 115.5L203.4 114.2L202.2 112.8L196.1 114.1L194.1 110.7L199.3 107.6L198.7 106L198.3 104.4L192 103.6L191.8 99.9L198 98.7L198.2 97.1L198.6 95.5L193.2 92.7L194.7 89.2L201 90L202 88.6L203.1 87.2L199.3 83L202.4 80.3L207.9 83L209.4 82L211.1 81.1L209.5 76L213.7 74.4L217.5 78.6L219.4 78.2L221.3 77.8L222.3 72.7L226.8 72.5L228.4 77.6L230.3 77.8L232.3 78.1L235.6 73.6L239.9 74.9L238.9 80.1L240.6 80.9L242.3 81.8L247.4 78.7L250.8 81.2L247.5 85.7L248.7 86.9L249.9 88.3L256 87L258 90.4L252.8 93.5L253.4 95.1L253.8 96.7L260.1 97.5L260.3 101.2L254.1 102.4ZM236.5 101.3L236.5 100.8L236.5 99.6L236.4 99.1L236.2 98.5L236 97.9L235.8 97.5L235.2 96.4L234.9 96L234.5 95.5L234.1 95L233.6 94.6L232.6 93.8L232.1 93.5L231.5 93.2L230.8 92.9L230.3 92.7L229 92.3L228.4 92.2L227.6 92.1L226.9 92L226.3 92L224.9 92L224.3 92.1L223.6 92.2L222.8 92.4L222.3 92.5L221 93L220.5 93.3L219.8 93.6L219.3 94L218.8 94.3L217.9 95.2L217.5 95.6L217.1 96.1L216.7 96.6L216.5 97.1L216 98.2L215.8 98.7L215.7 99.3L215.6 99.9L215.6 100.4L215.6 101.5L215.7 102L215.9 102.6L216.1 103.2L216.3 103.7L216.9 104.7L217.2 105.1L217.6 105.6L218.1 106.1L218.5 106.5L219.5 107.3L220 107.6L220.6 107.9L221.3 108.2L221.8 108.4L223.1 108.8L223.7 108.9L224.5 109.1L225.2 109.1L225.8 109.2L227.2 109.1L227.8 109L228.5 108.9L229.3 108.7L229.8 108.6L231.1 108.1L231.6 107.8L232.3 107.5L232.8 107.1L233.3 106.8L234.2 105.9L234.6 105.5L235 105L235.4 104.5L235.7 104L236.1 103L236.3 102.5L236.4 101.9Z\" fill-rule=\"evenodd\"/><path data-material=\"cool\" data-tone=\"0\" d=\"M255.9 119.6L256.2 117.9L250.6 115.4L251.7 111.9L258.1 111.9L258.8 110.3L259.5 108.7L254.6 105.4L256.5 102.1L262.8 103.2L263.8 101.7L265 100.2L260.9 96.2L263.6 93.3L269.4 95.3L270.8 94L272.3 92.8L269.3 88.2L272.6 85.8L277.9 88.7L279.5 87.6L281.3 86.6L279.4 81.6L283.2 79.8L287.7 83.5L289.6 82.8L291.5 82.1L290.9 76.9L295.1 75.7L298.6 80L300.6 79.6L302.7 79.2L303.3 74L307.7 73.5L310.1 78.3L312.2 78.2L314.3 78.2L316.2 73.2L320.6 73.4L321.8 78.5L323.9 78.8L325.9 79L329 74.5L333.2 75.4L333.2 80.6L335.2 81.1L337.1 81.7L341.2 77.7L345.2 79.3L343.9 84.4L345.7 85.3L347.5 86.2L352.4 82.9L356 85.1L353.5 89.9L355.1 91L356.6 92.2L362.2 89.8L365.2 92.4L361.6 96.8L362.9 98.1L364.1 99.6L370.2 98.1L372.4 101.2L367.9 104.8L368.8 106.4L369.7 108L376 107.5L377.5 110.9L372.2 113.7L372.7 115.4L373.2 117.1L379.5 117.6L380.1 121.2L374.2 123.2L374.3 124.9L374.4 126.6L380.5 128.2L380.2 131.7L374 132.7L373.7 134.4L373.3 136.1L379 138.6L377.9 142.1L371.5 142.1L370.8 143.7L370 145.3L375 148.7L373.1 151.9L366.8 150.9L365.8 152.3L364.6 153.8L368.6 157.9L366 160.7L360.1 158.7L358.7 160L357.3 161.3L360.3 165.9L357 168.3L351.7 165.3L350 166.4L348.3 167.4L350.1 172.4L346.4 174.2L341.9 170.5L340 171.3L338.1 172L338.6 177.2L334.5 178.4L331 174L329 174.4L326.9 174.8L326.2 180L321.9 180.5L319.5 175.7L317.4 175.8L315.3 175.8L313.4 180.8L309 180.6L307.8 175.5L305.7 175.3L303.6 175L300.6 179.6L296.4 178.7L296.4 173.5L294.4 172.9L292.4 172.3L288.4 176.3L284.4 174.7L285.7 169.6L283.9 168.8L282.1 167.8L277.1 171.1L273.6 169L276.1 164.2L274.5 163L273 161.8L267.4 164.3L264.4 161.6L268 157.3L266.7 155.9L265.5 154.5L259.4 156L257.2 152.9L261.7 149.2L260.8 147.7L259.9 146.1L253.6 146.6L252.1 143.2L257.4 140.3L256.9 138.6L256.4 136.9L250.1 136.4L249.5 132.8L255.4 130.9L255.2 129.1L255.2 127.4L249.1 125.9L249.3 122.3L255.6 121.3ZM304.4 126L304.3 126.3L304.3 126.8L304.3 127.1L304.3 127.4L304.3 127.7L304.4 127.9L304.5 128.5L304.5 128.8L304.6 129.1L304.7 129.4L304.8 129.6L305 130.1L305.1 130.4L305.3 130.6L305.4 130.9L305.6 131.1L305.9 131.6L306.1 131.9L306.3 132.1L306.6 132.3L306.7 132.5L307.2 133L307.4 133.1L307.7 133.4L308 133.6L308.2 133.7L308.8 134.1L309 134.2L309.3 134.4L309.7 134.5L309.9 134.6L310.6 134.9L310.9 135L311.2 135.1L311.6 135.2L311.8 135.3L312.5 135.4L312.8 135.5L313.2 135.5L313.6 135.6L313.9 135.6L314.6 135.6L314.9 135.6L315.2 135.6L315.6 135.6L315.9 135.6L316.6 135.5L316.9 135.4L317.3 135.4L317.6 135.3L317.9 135.2L318.6 135L318.9 134.9L319.2 134.8L319.6 134.7L319.8 134.6L320.4 134.3L320.7 134.1L321 133.9L321.3 133.8L321.5 133.6L322.1 133.2L322.3 133L322.5 132.8L322.8 132.6L323 132.4L323.4 131.9L323.6 131.7L323.8 131.5L323.9 131.2L324.1 131L324.4 130.5L324.5 130.2L324.6 130L324.8 129.7L324.9 129.4L325 128.9L325.1 128.6L325.2 128.3L325.2 128L325.2 127.8L325.3 127.2L325.3 126.9L325.3 126.6L325.2 126.3L325.2 126.1L325.1 125.5L325.1 125.3L325 125L324.9 124.7L324.8 124.4L324.6 123.9L324.4 123.7L324.3 123.4L324.1 123.1L324 122.9L323.6 122.4L323.5 122.2L323.3 121.9L323 121.7L322.8 121.5L322.4 121.1L322.1 120.9L321.9 120.7L321.6 120.5L321.4 120.3L320.8 120L320.5 119.8L320.2 119.7L319.9 119.5L319.6 119.4L319 119.1L318.7 119L318.4 118.9L318 118.8L317.7 118.8L317.1 118.6L316.8 118.6L316.4 118.5L316 118.5L315.7 118.5L315 118.4L314.7 118.4L314.3 118.4L314 118.4L313.7 118.5L313 118.6L312.7 118.6L312.3 118.7L311.9 118.7L311.6 118.8L311 119L310.7 119.1L310.4 119.2L310 119.4L309.7 119.5L309.1 119.8L308.9 119.9L308.6 120.1L308.3 120.3L308.1 120.4L307.5 120.8L307.3 121L307.1 121.2L306.8 121.4L306.6 121.6L306.2 122.1L306 122.3L305.8 122.6L305.6 122.8L305.5 123L305.2 123.6L305.1 123.8L304.9 124.1L304.8 124.4L304.7 124.6L304.5 125.2L304.5 125.4L304.4 125.7Z\" fill-rule=\"evenodd\"/><path data-material=\"warm\" data-tone=\"0\" d=\"M240.8 95.2L238.9 98.2L236.2 100.7L232.7 102.5L228.8 103.5L224.7 103.6L220.7 102.9L217 101.3L214 99.1L211.8 96.2L210.6 93L210.4 89.7L211.3 86.4L213.2 83.4L215.9 80.9L219.4 79.1L223.3 78.1L227.4 77.9L231.4 78.7L235.1 80.2L238.1 82.5L240.3 85.3L241.6 88.5L241.7 91.9ZM236 91.5L235.9 89.4L235.1 87.3L233.7 85.5L231.8 84.1L229.5 83.1L226.9 82.6L224.3 82.7L221.8 83.4L219.6 84.5L217.9 86.1L216.7 88L216.1 90.1L216.2 92.2L217 94.2L218.4 96L220.3 97.5L222.6 98.5L225.2 98.9L227.8 98.8L230.3 98.2L232.5 97L234.2 95.5L235.4 93.6ZM329.6 121.6L327.7 124.6L324.9 127.1L321.4 128.9L317.5 129.9L313.4 130.1L309.4 129.4L305.8 127.8L302.7 125.5L300.5 122.7L299.3 119.5L299.1 116.1L300 112.8L301.9 109.8L304.7 107.4L308.1 105.6L312.1 104.5L316.2 104.4L320.2 105.1L323.8 106.7L326.8 108.9L329.1 111.8L330.3 115L330.5 118.4ZM324.7 117.9L324.6 115.8L323.8 113.8L322.4 112L320.5 110.5L318.2 109.6L315.7 109.1L313.1 109.2L310.6 109.8L308.4 111L306.6 112.6L305.4 114.4L304.9 116.5L305 118.7L305.8 120.7L307.2 122.5L309.1 123.9L311.4 124.9L313.9 125.4L316.5 125.3L319 124.6L321.2 123.5L323 121.9L324.2 120Z\" fill-rule=\"evenodd\"/></svg><p>外啮合齿轮反向转动。主动轮16齿、20 rpm，从动轮默认32齿、-10 rpm，中心距由模数和齿数确定。齿形为简化示意，不用于加工。</p></section></div>",
+      "css": "\n.mui-mechanism{font:15px/1.7 system-ui,sans-serif;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:24px;padding:20px;max-width:100%;box-sizing:border-box}.mui-mechanism *{box-sizing:border-box}.mui-mechanism h2{font-size:22px;line-height:1.35;margin:0 0 8px;font-weight:750}.mui-mechanism p{margin:0;color:var(--canvas-muted)}\n.mui-mechanism-svg{display:block;width:100%;height:auto;max-height:420px;touch-action:pan-y}.mui-mechanism-svg path{stroke:color-mix(in srgb,var(--canvas-ink) 38%,var(--canvas-bg));stroke-width:.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;fill:var(--mech-base,var(--canvas-soft))}.mui-mechanism-svg [data-material=metal]{--mech-base:color-mix(in srgb,var(--canvas-muted) 32%,var(--canvas-bg))}.mui-mechanism-svg [data-material=dark]{--mech-base:color-mix(in srgb,var(--canvas-ink) 78%,var(--canvas-bg))}.mui-mechanism-svg [data-material=accent]{--mech-base:var(--canvas-accent)}.mui-mechanism-svg [data-material=cool]{--mech-base:color-mix(in srgb,#22998a 70%,var(--canvas-bg))}.mui-mechanism-svg [data-material=warm]{--mech-base:color-mix(in srgb,#dd9c42 75%,var(--canvas-bg))}\n.mui-mechanism-svg [data-tone=\"0\"]{fill:color-mix(in srgb,var(--mech-base) 74%,var(--canvas-bg))}.mui-mechanism-svg [data-tone=\"1\"]{fill:var(--mech-base)}.mui-mechanism-svg [data-tone=\"2\"]{fill:color-mix(in srgb,var(--mech-base) 85%,var(--canvas-ink))}.mui-mechanism-svg [data-tone=\"3\"]{fill:color-mix(in srgb,var(--mech-base) 68%,var(--canvas-ink))}.mui-mechanism-svg [data-line]{fill:none;stroke:var(--mech-base);stroke-width:2}.mui-mechanism-svg [data-active=false]{opacity:.2}.mui-mechanism-svg [data-active=true]{opacity:1}\n.mui-mechanism-nav{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px}.mui-mechanism button{font:inherit;color:var(--canvas-ink);background:var(--canvas-bg);border:1px solid var(--canvas-line);border-radius:999px;padding:6px 13px;cursor:pointer;min-height:36px}.mui-mechanism button[aria-pressed=true]{color:var(--canvas-bg);background:var(--canvas-ink);border-color:var(--canvas-ink)}.mui-mechanism button:focus-visible,.mui-mechanism input:focus-visible{outline:2px solid var(--canvas-accent);outline-offset:3px}.mui-mechanism button:disabled{opacity:.5;cursor:default}\n.mui-mechanism-controls{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:12px 14px;border-radius:16px;background:var(--canvas-soft);margin:8px 0}.mui-mechanism-controls label{display:flex;align-items:center;gap:9px;flex:1 1 180px;min-width:0}.mui-mechanism-controls input[type=range]{flex:1;min-width:70px;accent-color:var(--canvas-accent)}.mui-mechanism-controls input[type=checkbox]{accent-color:var(--canvas-accent)}.mui-mechanism-controls output{font-variant-numeric:tabular-nums;min-width:40px;text-align:right;font-weight:650}.mui-mechanism-readout{display:block;padding:10px 0;font-weight:700;font-variant-numeric:tabular-nums;color:var(--canvas-ink)}.mui-mechanism-description{min-height:0;font-size:14px}\n.mui-mechanism[data-style=editorial]{border:0;border-top:1px solid var(--canvas-line);border-radius:0;padding:16px 0}.mui-mechanism[data-style=editorial] h2{font-family:ui-serif,Georgia,serif;font-weight:650}.mui-mechanism[data-style=editorial] .mui-mechanism-controls{border-radius:0;background:transparent;border-block:1px solid var(--canvas-line)}\n.mui-mechanism[data-style=technical]{border-radius:10px}.mui-mechanism[data-style=technical] button,.mui-mechanism[data-style=technical] .mui-mechanism-controls{border-radius:6px}.mui-mechanism[data-style=technical] .mui-mechanism-readout{font-family:ui-monospace,Consolas,monospace}\n.mui-mechanism[data-style=soft]{border:0;background:var(--canvas-soft);border-radius:28px 28px 28px 10px}.mui-mechanism[data-style=soft] .mui-mechanism-controls{background:var(--canvas-bg);border-radius:22px}.mui-mechanism[data-style=expressive] h2{font-size:28px;font-weight:850;border-left:5px solid var(--canvas-accent);padding-left:14px}.mui-mechanism[data-style=expressive]{border:0;border-radius:0}.mui-mechanism[data-style=prismframe]{border:1.5px solid var(--canvas-line);box-shadow:4px 5px 0 color-mix(in srgb,var(--canvas-accent) 14%,var(--canvas-bg))}.mui-mechanism[data-style=aurora]{border-radius:28px;box-shadow:0 16px 30px -25px #30204d66}.mui-mechanism[data-style=aurora] .mui-mechanism-controls{border-radius:24px}\n@media(max-width:500px){.mui-mechanism{padding:14px;border-radius:20px}.mui-mechanism h2{font-size:20px}.mui-mechanism-controls{padding:10px}.mui-mechanism-nav{gap:5px}.mui-mechanism button{padding:6px 10px;font-size:14px}}\n@media(prefers-reduced-motion:reduce){.mui-mechanism *{animation:none!important;transition:none!important}}\n@media(forced-colors:active){.mui-mechanism-svg path{fill:Canvas;stroke:CanvasText}.mui-mechanism button[aria-pressed=true]{background:Highlight;color:HighlightText}}\n",
+      "script": "const diagram=DSHUI.mechanism.mountDemo(\"#diagram\",\"gears\",{title:\"\",bind:{\"explode\":\"explode\",\"selected\":\"selected\",\"cutaway\":\"cutaway\",\"rpm\":\"rpm\",\"running\":\"running\",\"angle\":\"angle\",\"teeth\":\"teeth\"}});addEventListener(\"pagehide\",()=>diagram.destroy(),{once:true});"
+    },
+    {
+      "id": "teeth",
+      "type": "slider",
+      "label": "从动轮齿数（主动轮16齿）",
+      "bind": "state.teeth"
+    },
+    {
+      "id": "rpm",
+      "type": "slider",
+      "label": "输入转速（rpm）",
+      "bind": "state.rpm"
+    },
+    {
+      "id": "angle",
+      "type": "slider",
+      "label": "手动角度（°，暂停时调节）",
+      "bind": "state.angle"
+    },
+    {
+      "id": "running",
+      "type": "toggle",
+      "label": "运行机械示意",
+      "bind": "state.running"
+    },
+    {
+      "id": "accuracy",
+      "type": "text",
+      "text": "外啮合齿轮反向转动。主动轮16齿、20 rpm，从动轮默认32齿、-10 rpm，中心距由模数和齿数确定。齿形为简化示意，不用于加工。"
+    }
+  ],
+  "data": {},
+  "derived": {},
+  "actions": {}
+}

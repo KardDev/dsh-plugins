@@ -1,0 +1,339 @@
+{
+  "baseline": {
+    "commit": "add0a96",
+    "build": "0.7.0+6adc22f63978",
+    "toolDefinitions": {
+      "characters": 14444,
+      "utf8Bytes": 14452,
+      "referenceTokens": 3201
+    },
+    "scenarios": [
+      {
+        "mode": "guided",
+        "style": "editorial",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 50789,
+          "utf8Bytes": 66840,
+          "referenceTokens": 16089
+        },
+        "systemAndTools": {
+          "characters": 65235,
+          "utf8Bytes": 81294,
+          "referenceTokens": 19290
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "soft",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 51128,
+          "utf8Bytes": 67159,
+          "referenceTokens": 16197
+        },
+        "systemAndTools": {
+          "characters": 65574,
+          "utf8Bytes": 81613,
+          "referenceTokens": 19398
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "technical",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 51106,
+          "utf8Bytes": 67213,
+          "referenceTokens": 16209
+        },
+        "systemAndTools": {
+          "characters": 65552,
+          "utf8Bytes": 81667,
+          "referenceTokens": 19410
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "expressive",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 51113,
+          "utf8Bytes": 67206,
+          "referenceTokens": 16186
+        },
+        "systemAndTools": {
+          "characters": 65559,
+          "utf8Bytes": 81660,
+          "referenceTokens": 19387
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "prismframe",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 51364,
+          "utf8Bytes": 67521,
+          "referenceTokens": 16319
+        },
+        "systemAndTools": {
+          "characters": 65810,
+          "utf8Bytes": 81975,
+          "referenceTokens": 19520
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "aurora",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 53182,
+          "utf8Bytes": 69321,
+          "referenceTokens": 16808
+        },
+        "systemAndTools": {
+          "characters": 67628,
+          "utf8Bytes": 83775,
+          "referenceTokens": 20009
+        }
+      },
+      {
+        "mode": "free",
+        "style": null,
+        "activeSections": 1,
+        "systemText": {
+          "characters": 14907,
+          "utf8Bytes": 18215,
+          "referenceTokens": 4105
+        },
+        "systemAndTools": {
+          "characters": 29353,
+          "utf8Bytes": 32669,
+          "referenceTokens": 7306
+        }
+      }
+    ]
+  },
+  "current": {
+    "build": {
+      "version": "0.7.0",
+      "id": "0.7.0+45277dc37fec",
+      "sourceHash": "45277dc37fec54f847d9a95dbe03a059c5ec9058e673d7b45944a9c9877e1313"
+    },
+    "toolCount": 9,
+    "toolDefinitions": {
+      "characters": 11358,
+      "utf8Bytes": 11358,
+      "referenceTokens": 2554
+    },
+    "scenarios": [
+      {
+        "mode": "guided",
+        "style": "editorial",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 12212,
+          "utf8Bytes": 15693,
+          "referenceTokens": 3738
+        },
+        "systemAndTools": {
+          "characters": 23572,
+          "utf8Bytes": 27053,
+          "referenceTokens": 6292
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "soft",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 12222,
+          "utf8Bytes": 15683,
+          "referenceTokens": 3749
+        },
+        "systemAndTools": {
+          "characters": 23582,
+          "utf8Bytes": 27043,
+          "referenceTokens": 6303
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "technical",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 12222,
+          "utf8Bytes": 15759,
+          "referenceTokens": 3756
+        },
+        "systemAndTools": {
+          "characters": 23582,
+          "utf8Bytes": 27119,
+          "referenceTokens": 6310
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "expressive",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 12283,
+          "utf8Bytes": 15802,
+          "referenceTokens": 3770
+        },
+        "systemAndTools": {
+          "characters": 23643,
+          "utf8Bytes": 27162,
+          "referenceTokens": 6324
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "prismframe",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 12269,
+          "utf8Bytes": 15812,
+          "referenceTokens": 3772
+        },
+        "systemAndTools": {
+          "characters": 23629,
+          "utf8Bytes": 27172,
+          "referenceTokens": 6326
+        }
+      },
+      {
+        "mode": "guided",
+        "style": "aurora",
+        "activeSections": 3,
+        "systemText": {
+          "characters": 12231,
+          "utf8Bytes": 15736,
+          "referenceTokens": 3773
+        },
+        "systemAndTools": {
+          "characters": 23591,
+          "utf8Bytes": 27096,
+          "referenceTokens": 6327
+        }
+      },
+      {
+        "mode": "free",
+        "style": null,
+        "activeSections": 1,
+        "systemText": {
+          "characters": 9080,
+          "utf8Bytes": 9708,
+          "referenceTokens": 2195
+        },
+        "systemAndTools": {
+          "characters": 20440,
+          "utf8Bytes": 21068,
+          "referenceTokens": 4749
+        }
+      }
+    ],
+    "onDemand": [
+      {
+        "topic": "overview",
+        "characters": 1738,
+        "utf8Bytes": 2024,
+        "referenceTokens": 475
+      },
+      {
+        "topic": "quick",
+        "characters": 2028,
+        "utf8Bytes": 2956,
+        "referenceTokens": 791
+      },
+      {
+        "topic": "text",
+        "characters": 2058,
+        "utf8Bytes": 2148,
+        "referenceTokens": 512
+      },
+      {
+        "topic": "native",
+        "characters": 15704,
+        "utf8Bytes": 16054,
+        "referenceTokens": 3759
+      },
+      {
+        "topic": "style",
+        "characters": 2637,
+        "utf8Bytes": 3913,
+        "referenceTokens": 1114
+      },
+      {
+        "topic": "canvas",
+        "characters": 10976,
+        "utf8Bytes": 11533,
+        "referenceTokens": 2424
+      },
+      {
+        "topic": "visual",
+        "characters": 27519,
+        "utf8Bytes": 27717,
+        "referenceTokens": 7170
+      },
+      {
+        "topic": "data",
+        "characters": 23894,
+        "utf8Bytes": 25472,
+        "referenceTokens": 6534
+      },
+      {
+        "topic": "scenes",
+        "characters": 20257,
+        "utf8Bytes": 22095,
+        "referenceTokens": 5358
+      },
+      {
+        "topic": "templates",
+        "characters": 617,
+        "utf8Bytes": 833,
+        "referenceTokens": 201
+      },
+      {
+        "topic": "motion",
+        "characters": 623,
+        "utf8Bytes": 923,
+        "referenceTokens": 224
+      },
+      {
+        "topic": "mechanism",
+        "characters": 3500,
+        "utf8Bytes": 3696,
+        "referenceTokens": 930
+      },
+      {
+        "topic": "all",
+        "characters": 47708,
+        "utf8Bytes": 53595,
+        "referenceTokens": 14210
+      }
+    ],
+    "conditionalRepair": {
+      "maxRoundsPerRequest": 2,
+      "templates": {
+        "empty": {
+          "characters": 234,
+          "utf8Bytes": 234,
+          "referenceTokens": 48
+        },
+        "tool": {
+          "characters": 296,
+          "utf8Bytes": 296,
+          "referenceTokens": 58
+        },
+        "fence": {
+          "characters": 288,
+          "utf8Bytes": 288,
+          "referenceTokens": 51
+        }
+      },
+      "note": "Not initially injected. Failed-field diagnostics are variable (up to four excerpts of 1200 characters); count them only in requests where a notice actually occurs."
+    }
+  }
+}

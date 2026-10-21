@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "title": "看清速度与内存的取舍",
+  "presentation": {
+    "layout": "dashboard",
+    "accent": "teal"
+  },
+  "fallback": "全部为演示数据，不能据此推荐真实模型。方案 A：12 GiB、35 tokens/s；B：20 GiB、60 tokens/s；C：28 GiB、45 tokens/s。倍率只做假设计算，内存固定。",
+  "state": {
+    "multiplier": {
+      "type": "number",
+      "default": 1,
+      "min": 1,
+      "max": 3,
+      "step": 0.25
+    }
+  },
+  "data": {
+    "samples": [
+      {
+        "name": "A",
+        "memory": 12,
+        "speed": 35
+      },
+      {
+        "name": "B",
+        "memory": 20,
+        "speed": 60
+      },
+      {
+        "name": "C",
+        "memory": 28,
+        "speed": 45
+      }
+    ]
+  },
+  "derived": {
+    "series": {
+      "map": {
+        "source": "data.samples",
+        "fields": {
+          "name": {
+            "ref": "item.name"
+          },
+          "memory": {
+            "ref": "item.memory"
+          },
+          "speed": {
+            "op": "mul",
+            "args": [
+              {
+                "ref": "item.speed"
+              },
+              {
+                "ref": "state.multiplier"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "nodes": [
+    {
+      "id": "notice",
+      "type": "text",
+      "tone": "warning",
+      "text": "演示数据，不是模型实测。假设吞吐倍率不代表真实优化收益。"
+    },
+    {
+      "id": "scatter",
+      "type": "sandbox",
+      "title": "内存与速度散点图",
+      "height": 330,
+      "derivedKeys": [
+        "series"
+      ],
+      "fallback": "横轴为演示内存 GiB，纵轴为演示速度 tokens/s。三个方案各一个点，右侧表格提供当前精确数值；倍率提高时速度按同一公式变化。",
+      "html": "<div class=\"plot\"><div class=\"caption\"><strong>空间与速度</strong><span>假设数据 · 同一计算结果</span></div><div class=\"scatter-scroll\" tabindex=\"0\" role=\"region\" aria-label=\"散点图，窄屏可横向滚动\"><svg viewBox=\"0 0 600 300\" role=\"img\" aria-label=\"演示内存与速度散点图，当前精确值见下方表格\"><g id=\"axes\"></g><g id=\"points\"></g><text class=\"axis-label\" x=\"330\" y=\"292\" text-anchor=\"middle\">演示内存 / GiB</text><text class=\"axis-label\" x=\"18\" y=\"145\" transform=\"rotate(-90 18 145)\" text-anchor=\"middle\">演示速度 / tokens/s</text></svg></div></div>",
+      "css": ".plot{padding:12px 0}.scatter-scroll{max-width:100%;overflow-x:auto}.scatter-scroll svg{min-width:520px}.caption{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}.caption strong{font-size:16px}.caption span{font-size:11px;color:var(--canvas-muted)}svg{display:block;width:100%;margin-top:8px}.grid{stroke:var(--canvas-line);stroke-dasharray:3 5}.tick,.axis-label{fill:var(--canvas-muted);font-size:12px}.value{fill:var(--canvas-ink);font-size:13px;font-variant-numeric:tabular-nums}.dot{fill:var(--canvas-accent);stroke:var(--canvas-bg);stroke-width:2}",
+      "script": "const NS='http://www.w3.org/2000/svg',axes=document.getElementById('axes'),points=document.getElementById('points');const add=(tag,attrs,text,parent)=>{const el=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))el.setAttribute(k,v);if(text!==undefined)el.textContent=text;parent.append(el);return el};for(const value of[0,60,120,180]){const y=250-value/180*216;add('line',{x1:65,x2:570,y1:y,y2:y,class:'grid'},undefined,axes);add('text',{x:54,y:y+4,'text-anchor':'end',class:'tick'},value,axes)}for(const value of[0,8,16,24,32])add('text',{x:65+value/32*505,y:272,'text-anchor':'middle',class:'tick'},value,axes);DSHUI.subscribe(s=>{points.replaceChildren();for(const row of s.derived.series){const x=65+row.memory/32*505,y=250-row.speed/180*216;const circle=add('circle',{cx:x,cy:y,r:7,class:'dot'},undefined,points);add('title',{},row.name+': '+row.memory+' GiB, '+row.speed+' tokens/s',circle);add('text',{x:x+11,y:y-11,class:'value'},row.name+' · '+row.speed,points)}});"
+    },
+    {
+      "id": "multiplier",
+      "type": "slider",
+      "label": "假设吞吐倍率（内存固定）",
+      "bind": "state.multiplier"
+    },
+    {
+      "id": "values",
+      "type": "table",
+      "rows": {
+        "ref": "derived.series"
+      },
+      "columns": [
+        {
+          "key": "name",
+          "label": "演示方案"
+        },
+        {
+          "key": "memory",
+          "label": "演示内存",
+          "unit": "GiB"
+        },
+        {
+          "key": "speed",
+          "label": "假设速度",
+          "unit": "tokens/s"
+        }
+      ]
+    }
+  ]
+}

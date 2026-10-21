@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.tgz binary
+*.png binary
+skills/motion-design/SKILL.md -text
+skills/motion-design/SOURCES.md -text
+skills/motion-design/LICENSE -text

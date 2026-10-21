@@ -1,0 +1,4 @@
+node_modules/
+*.tgz
+test-output/
+build-tmp/

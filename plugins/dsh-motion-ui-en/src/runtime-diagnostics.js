@@ -1,0 +1,9 @@
+import React,{useState} from 'react';
+import {BUILD_INFO} from '../lib/build-info.js';
+const h=React.createElement;
+let activation={active:false,channel:'Inactive',sidebar:false};
+export function setRuntimeActivation(patch){activation={...activation,...patch}}
+export function RuntimeDiagnostics(){const[report,setReport]=useState(),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ const check=async()=>{setBusy(true);setError('');try{const response=await fetch('/api/plugins/dsh-generative-ui/diagnostics',{credentials:'same-origin',cache:'no-store'});if(!response.ok)throw Error('Host diagnostics request failed: HTTP '+response.status);const value=await response.json();const asset=await fetch('/api/plugins/dsh-generative-ui/assets/visual.css?rev='+BUILD_INFO.id,{credentials:'same-origin',cache:'no-store'});if(asset.body)await asset.body.cancel();setReport({...value,assetRouteOK:asset.ok});}catch(e){setError(e.message)}finally{setBusy(false)}};
+ return h('section',{'aria-label':'Runtime status'},h('h4',null,'Runtime status'),h('p',null,'Client: '+(activation.active?'Active':'Activating')+' · '+activation.channel),h('button',{className:'dgui-secondary',type:'button',disabled:busy,onClick:check},busy?'Checking…':'Check runtime status'),report&&h(React.Fragment,null,h('p',null,'Build: '+report.build.id+(report.build.id===BUILD_INFO.id?' · frontend and backend match':' · frontend and backend differ; restart the host and refresh')),h('p',null,'Local assets: '+(report.assets.every(a=>a.available)&&report.assetRouteOK?'OK':'Missing assets or unavailable route')),h('p',null,'In-turn fix hook: '+(report.feedbackHookRegistered?'Registered':'Unavailable on this host')+' · Native sidebar: '+(activation.sidebar?'Connected':'Not provided by this host')),h('p',null,'Controls and model scripts are enabled after the turn ends; host permissions are unchanged.')),error&&h('p',{role:'alert'},error));
+}

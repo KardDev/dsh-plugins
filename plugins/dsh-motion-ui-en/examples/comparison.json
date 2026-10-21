@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "title": "示例数据比较",
+  "fallback": "仅用于演示：A 为 12，B 为 18，C 为 15；不是实测性能。",
+  "data": {
+    "results": [
+      {
+        "name": "A",
+        "value": 12
+      },
+      {
+        "name": "B",
+        "value": 18
+      },
+      {
+        "name": "C",
+        "value": 15
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "note",
+      "type": "text",
+      "text": "以下为演示数据，不是实测性能。",
+      "tone": "warning"
+    },
+    {
+      "id": "chart",
+      "type": "chart",
+      "kind": "bar",
+      "rows": {
+        "ref": "data.results"
+      },
+      "labelKey": "name",
+      "valueKey": "value",
+      "label": "示例分数",
+      "unit": "分"
+    },
+    {
+      "id": "table",
+      "type": "table",
+      "rows": {
+        "ref": "data.results"
+      },
+      "columns": [
+        {
+          "key": "name",
+          "label": "方案"
+        },
+        {
+          "key": "value",
+          "label": "示例分数",
+          "unit": "分"
+        }
+      ]
+    }
+  ]
+}
