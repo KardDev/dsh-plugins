@@ -1,7 +1,7 @@
 import React,{useId,useState} from 'react';
 import {VISUAL_STYLES} from '../lib/visual-styles.js';
 const h=React.createElement;
-export const PREVIEW_LAYOUTS=[['text','文字说明'],['comparison','双列对比'],['list','分隔列表'],['summary','数据摘要'],['controls','控件表单'],['flow','流程图解']];
+export const PREVIEW_LAYOUTS=[['text','Text'],['comparison','Comparison'],['list','Separated list'],['summary','Data summary'],['controls','Controls form'],['flow','Flow diagram']];
 const header=text=>h('div',{className:'dgui-header'},h('strong',{className:'dgui-header-title'},text));
 const copy=text=>h('p',{className:'dgui-copy'},text);
 const card=(title,text)=>h('div',{key:title,className:'dgui-card'},h('strong',{className:'dgui-section-title'},title),copy(text));
@@ -11,24 +11,24 @@ const metric=(number,label)=>h('div',{key:label,className:'dgui-metric'},h('span
 export function StyleSample({styleId,layout='text'}){
  let body,title;
  if(layout==='text'){
-  title='先交付一个可用版本';const content=h('div',{className:'dgui-column'},copy('把目标缩小，把关键体验做好。'),h('p',{className:'dgui-copy dgui-sample-note'},'先验证，再逐步完善。'));
-  body=styleId==='soft'?card('今天的重点', '把目标缩小，把关键体验做好。'):content;
-  if(styleId==='soft')body=h(React.Fragment,null,body,h('p',{className:'dgui-copy dgui-sample-note'},'先验证，再逐步完善。'));
+  title='Ship a usable version first';const content=h('div',{className:'dgui-column'},copy('Narrow the goal; get the core experience right.'),h('p',{className:'dgui-copy dgui-sample-note'},'Validate first, then refine.'));
+  body=styleId==='soft'?card('Today’s focus', 'Narrow the goal; get the core experience right.'):content;
+  if(styleId==='soft')body=h(React.Fragment,null,body,h('p',{className:'dgui-copy dgui-sample-note'},'Validate first, then refine.'));
  }else if(layout==='comparison'){
-  title='两种推进方式';body=h('div',{className:'dgui-row'},card('先做小版本','验证重点'),card('先铺全功能','覆盖需求'));
+  title='Two ways to proceed';body=h('div',{className:'dgui-row'},card('Small version first','Validate the core'),card('Full feature set first','Cover requirements'));
  }else if(layout==='summary'){
-  title='让重点一眼可见';body=h('div',{className:'dgui-row'},metric('3','推进阶段'),metric('1','核心目标'));
+  title='Make the point visible at a glance';body=h('div',{className:'dgui-row'},metric('3','Stage'),metric('1','Core goal'));
  }else if(layout==='controls'){
-  title='让参数直接说话';body=h('div',{className:'dgui-column'},h('div',{className:'dgui-control'},h('span',{className:'dgui-control-label'},'每周投入'),h('output',null,'12 小时'),h('span',{className:'dgui-sample-track'},h('i'))),h('div',{className:'dgui-sample-options'},['轻量','均衡','深入'].map((t,i)=>h('span',{key:t,'data-selected':i===1||undefined},t))));
+  title='Let the numbers speak';body=h('div',{className:'dgui-column'},h('div',{className:'dgui-control'},h('span',{className:'dgui-control-label'},'Weekly effort'),h('output',null,'12 hours'),h('span',{className:'dgui-sample-track'},h('i'))),h('div',{className:'dgui-sample-options'},['Light','Balanced','Deep'].map((t,i)=>h('span',{key:t,'data-selected':i===1||undefined},t))));
  }else{
-  title='把复杂问题讲清楚';body=h('ol',{className:'dgui-steps','data-sample-layout':layout},['明确目标','解释关系','给出行动'].map((text,i)=>h('li',{key:text},h('span',{className:'dgui-step-dot'},layout==='list'?'✓':String(i+1).padStart(2,'0')),h('div',null,h('strong',null,text),layout==='list'&&h('p',null,['先抓住重点','用图形说明','收成下一步'][i])))));
+  title='Explain a complex problem';body=h('ol',{className:'dgui-steps','data-sample-layout':layout},['Clarify the goal','Show the relationship','Give the next step'].map((text,i)=>h('li',{key:text},h('span',{className:'dgui-step-dot'},layout==='list'?'✓':String(i+1).padStart(2,'0')),h('div',null,h('strong',null,text),layout==='list'&&h('p',null,['Start with the core','Explain with a diagram','End on a next step'][i])))));
  }
  return h('div',{className:'dgui-root dgui-style-preview','data-preset':'brief','data-visual-style':styleId,'data-layout':layout,'aria-hidden':true},header(title),h('div',{className:'dgui-content'},body));
 }
 export function StyleOptions({value,disabled,onChange}){
  const[layout,setLayout]=useState('text'),id=useId();
- return h('div',null,h('div',{className:'dgui-preview-tabs',role:'tablist','aria-label':'排版预览'},PREVIEW_LAYOUTS.map(([key,label],i)=>h('button',{key,type:'button',role:'tab',id:id+'-'+key,'aria-selected':layout===key,'aria-controls':id+'-panel',tabIndex:layout===key?0:-1,onClick:()=>setLayout(key),onKeyDown:e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?PREVIEW_LAYOUTS.length-1:(i+(e.key==='ArrowLeft'?-1:1)+PREVIEW_LAYOUTS.length)%PREVIEW_LAYOUTS.length;setLayout(PREVIEW_LAYOUTS[n][0]);e.currentTarget.parentElement.children[n].focus()}},label))),
- h('div',{role:'tabpanel',id:id+'-panel','aria-labelledby':id+'-'+layout},h('div',{className:'dgui-style-options',role:'radiogroup','aria-label':'视觉风格'},VISUAL_STYLES.map((s,i)=>h('button',{key:s.id,type:'button',role:'radio','aria-checked':value===s.id,'aria-label':s.name,disabled,tabIndex:value===s.id?0:-1,className:'dgui-style-option','data-style':s.id,onClick:()=>onChange(s.id),onKeyDown:e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?VISUAL_STYLES.length-1:(i+(['ArrowLeft','ArrowUp'].includes(e.key)?-1:1)+VISUAL_STYLES.length)%VISUAL_STYLES.length;e.currentTarget.parentElement.children[n].focus();onChange(VISUAL_STYLES[n].id)}},h(StyleSample,{styleId:s.id,layout}),h('div',{className:'dgui-style-name'},s.name,h('span',{'aria-hidden':true},value===s.id?'✓':'')),h('div',{className:'dgui-style-description'},s.description))))));
+ return h('div',null,h('div',{className:'dgui-preview-tabs',role:'tablist','aria-label':'Layout preview'},PREVIEW_LAYOUTS.map(([key,label],i)=>h('button',{key,type:'button',role:'tab',id:id+'-'+key,'aria-selected':layout===key,'aria-controls':id+'-panel',tabIndex:layout===key?0:-1,onClick:()=>setLayout(key),onKeyDown:e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?PREVIEW_LAYOUTS.length-1:(i+(e.key==='ArrowLeft'?-1:1)+PREVIEW_LAYOUTS.length)%PREVIEW_LAYOUTS.length;setLayout(PREVIEW_LAYOUTS[n][0]);e.currentTarget.parentElement.children[n].focus()}},label))),
+ h('div',{role:'tabpanel',id:id+'-panel','aria-labelledby':id+'-'+layout},h('div',{className:'dgui-style-options',role:'radiogroup','aria-label':'Visual style'},VISUAL_STYLES.map((s,i)=>h('button',{key:s.id,type:'button',role:'radio','aria-checked':value===s.id,'aria-label':s.name,disabled,tabIndex:value===s.id?0:-1,className:'dgui-style-option','data-style':s.id,onClick:()=>onChange(s.id),onKeyDown:e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?VISUAL_STYLES.length-1:(i+(['ArrowLeft','ArrowUp'].includes(e.key)?-1:1)+VISUAL_STYLES.length)%VISUAL_STYLES.length;e.currentTarget.parentElement.children[n].focus();onChange(VISUAL_STYLES[n].id)}},h(StyleSample,{styleId:s.id,layout}),h('div',{className:'dgui-style-name'},s.name,h('span',{'aria-hidden':true},value===s.id?'✓':'')),h('div',{className:'dgui-style-description'},s.description))))));
 }
 export const STYLE_SETTINGS_CSS=`
 .dgui-settings .dgui-style-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 16px}

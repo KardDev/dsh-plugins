@@ -9,7 +9,7 @@ import {resolveSourceFence} from '../lib/delivery.js';
 const h=React.createElement,roots=new WeakMap();
 function FenceContent({document,sessionId,source,settled,sendPrompt}){
  const[record,setRecord]=useState(),[error,setError]=useState('');
- useEffect(()=>{if(!settled)return;let active=true;fetch('/api/plugins/dsh-generative-ui/fence',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({document,sessionId,source})}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error||'界面保存失败');if(active){rememberUi(v,sessionId,sendPrompt);setRecord(v)}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[document,sessionId,source,settled]);
+ useEffect(()=>{if(!settled)return;let active=true;fetch('/api/plugins/dsh-generative-ui/fence',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({document,sessionId,source})}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error||'Failed to save interface');if(active){rememberUi(v,sessionId,sendPrompt);setRecord(v)}}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[document,sessionId,source,settled]);
  return h(UiBoundary,{fallback:document.fallback},h(UiView,{record:record??{document,documentId:'fence-preview-'+source},sessionId,sendPrompt,preview:!record,replaceExportedCanvases:true}),error&&h('p',{role:'alert'},error));
 }
 function candidates(state){
@@ -31,7 +31,7 @@ export function FenceNodeView({node,sessionId,sendPrompt}){
     for(const candidate of current){
      let v=e.views.get(candidate.key);if(!v){const host=document.createElement('div');host.dataset.motionFence=candidate.key;(e.seat.isConnected?e.seat:scroll.lastElementChild??scroll).after(host);v={host,root:createRoot(host)};e.views.set(candidate.key,v)}
      const fingerprint=JSON.stringify(candidate.document)+':'+candidate.error+':'+e.state.settled;
-     if(v.fingerprint!==fingerprint){v.fingerprint=fingerprint;v.root.render(candidate.error?h('p',{className:'dgui-tool-error',role:'alert'},'界面未完成：'+candidate.error):h(FenceContent,{document:candidate.document,source:candidate.key,sessionId,settled:e.state.settled,sendPrompt:e.sendPrompt}))}
+     if(v.fingerprint!==fingerprint){v.fingerprint=fingerprint;v.root.render(candidate.error?h('p',{className:'dgui-tool-error',role:'alert'},'Interface incomplete: '+candidate.error):h(FenceContent,{document:candidate.document,source:candidate.key,sessionId,settled:e.state.settled,sendPrompt:e.sendPrompt}))}
      const block=[...scroll.querySelectorAll('div.md-code-block,.code-block,.code-block-small,pre')].find(b=>!b.closest('[data-dsh-generative-ui]')&&String(b.closest('[data-chat-turn]')?.dataset.chatTurn)===String(e.state.turn)&&(b.querySelector('code')?.textContent??b.querySelector('pre')?.textContent??(b.matches('pre')?b.textContent:'')).trim()===candidate.raw.trim());
      if(block){if(v.block!==block){if(v.block)v.block.style.display=v.display;v.block=block;v.display=block.style.display}if(e.state.settled&&v.host.nextSibling!==block)block.before(v.host);if(block.style.display!=='none')block.style.display='none'}
     }

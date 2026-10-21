@@ -23,31 +23,31 @@ export function VideoPlayer({record}){
   document.addEventListener('visibilitychange',hidden);window.addEventListener('pagehide',stop);document.addEventListener('fullscreenchange',fs);
   return()=>{stop();players.delete(v);document.removeEventListener('visibilitychange',hidden);window.removeEventListener('pagehide',stop);document.removeEventListener('fullscreenchange',fs)};
  },[src]);
- async function toggle(){const v=video.current;if(!v)return;setNotice('');if(!v.paused){v.pause();return}try{if(v.ended)v.currentTime=0;await v.play()}catch(e){if(e.name!=='AbortError')setNotice('暂时无法播放，请重试或下载视频。')}}
+ async function toggle(){const v=video.current;if(!v)return;setNotice('');if(!v.paused){v.pause();return}try{if(v.ended)v.currentTime=0;await v.play()}catch(e){if(e.name!=='AbortError')setNotice('Playback is unavailable right now. Try again or download the video.')}}
  function seek(value){const v=video.current;if(!v||!ready||!Number.isFinite(duration)||duration<=0)return;const target=Math.max(0,Math.min(duration,Number(value)));pendingSeek.current=target;v.currentTime=target;setTime(target)}
  function mute(){const v=video.current;if(v.volume===0){v.volume=lastVolume.current;v.muted=false}else v.muted=!v.muted}
- async function full(){setNotice('');try{if(document.fullscreenElement===root.current)await document.exitFullscreen();else if(root.current.requestFullscreen)await root.current.requestFullscreen();else if(video.current.webkitEnterFullscreen)video.current.webkitEnterFullscreen();else setNotice('此浏览器不支持全屏。')}catch{setNotice('暂时无法进入全屏，请重试。')}}
+ async function full(){setNotice('');try{if(document.fullscreenElement===root.current)await document.exitFullscreen();else if(root.current.requestFullscreen)await root.current.requestFullscreen();else if(video.current.webkitEnterFullscreen)video.current.webkitEnterFullscreen();else setNotice('This browser does not support fullscreen.')}catch{setNotice('Could not enter fullscreen right now. Try again.')}}
  function key(e){if(e.target!==video.current&&e.target!==root.current)return;const k=e.key.toLowerCase();if([' ','k','m','f','arrowleft','arrowright'].includes(k)){e.preventDefault();if(k===' '||k==='k')toggle();else if(k==='m')mute();else if(k==='f')full();else seek((video.current?.currentTime??0)+(k==='arrowleft'?-5:5))}}
  const button=(name,icon,fn,extra={})=>h('button',{type:'button','aria-label':name,title:name,onClick:fn,...extra},h(Icon,{name:icon}));
- return h('section',{ref:root,className:'motion-video-player','data-motion-video':record.id,'aria-label':'视频播放器',onKeyDown:key},
-  h('video',{ref:video,src:src??undefined,poster:poster??undefined,preload:'metadata',playsInline:true,controls:false,tabIndex:0,'aria-label':'视频画面',
+ return h('section',{ref:root,className:'motion-video-player','data-motion-video':record.id,'aria-label':'Video player',onKeyDown:key},
+  h('video',{ref:video,src:src??undefined,poster:poster??undefined,preload:'metadata',playsInline:true,controls:false,tabIndex:0,'aria-label':'Video',
    onLoadedMetadata:e=>{const v=e.currentTarget;setReady(true);setError('');if(Number.isFinite(v.duration))setDuration(v.duration)},
    onTimeUpdate:e=>{if(!drag.current&&pendingSeek.current===null)setTime(e.currentTarget.currentTime)},onSeeked:e=>{pendingSeek.current=null;if(!drag.current)setTime(e.currentTarget.currentTime)},onDurationChange:e=>{if(Number.isFinite(e.currentTarget.duration))setDuration(e.currentTarget.duration)},
    onPlay:e=>{for(const other of players)if(other!==e.currentTarget)other.pause();setPlaying(true);setError('')},onPause:()=>setPlaying(false),onEnded:()=>setPlaying(false),
    onVolumeChange:e=>{if(e.currentTarget.volume>0)lastVolume.current=e.currentTarget.volume;setVolume(e.currentTarget.volume);setMuted(e.currentTarget.muted);remember(e.currentTarget)},onRateChange:e=>{setRate(e.currentTarget.playbackRate);remember(e.currentTarget)},
-   onError:()=>{setError('无法播放此视频。可以重试或下载后打开。');setReady(false);setPlaying(false)},onClick:toggle,onDoubleClick:full}),
+   onError:()=>{setError('Cannot play this video. Try again, or download it and open the file.');setReady(false);setPlaying(false)},onClick:toggle,onDoubleClick:full}),
   h('div',{className:'motion-video-controls'},
-   h('input',{className:'motion-video-seek',type:'range',min:0,max:duration||1,step:.05,value:Math.min(time,duration||1),disabled:!ready,'aria-label':'播放进度（秒）','aria-valuetext':formatMediaTime(time)+' / '+formatMediaTime(duration),onPointerDown:beginSeek,onPointerUp:()=>endSeek(),onPointerCancel:()=>endSeek(true),onLostPointerCapture:()=>endSeek(true),onChange:e=>changeSeek(e.currentTarget.value)}),
-   button(playing?'暂停视频':'播放视频',playing?'pause':'play',toggle,{disabled:!!playbackError||!src}),
-   h('output',{className:'motion-video-time','aria-label':'播放时间'},formatMediaTime(time)+' / '+formatMediaTime(duration)),
-   h('div',{className:'motion-video-volume'},button(muted||volume===0?'取消静音':'静音视频',muted||volume===0?'volumeOff':'volume',mute,{'aria-pressed':muted||volume===0}),h('input',{type:'range',min:0,max:1,step:.05,value:muted?0:volume,'aria-label':'视频音量','aria-valuetext':Math.round((muted?0:volume)*100)+'%',onChange:e=>{const v=video.current;v.volume=Number(e.currentTarget.value);v.muted=v.volume===0}})),
-   h('select',{'aria-label':'播放速度',title:'播放速度',value:rate,onChange:e=>{video.current.playbackRate=Number(e.currentTarget.value)}},[.5,1,1.25,1.5,2].map(v=>h('option',{key:v,value:v},v+'×'))),
-   button(fullscreen?'退出全屏':'全屏播放',fullscreen?'minimize':'fullscreen',full),
-   h('a',{href:mediaUrl,download:'video.mp4','aria-label':'下载视频',title:'下载视频'},h(Icon,{name:'download'})),
-   record.files.includes('source.html')&&h('a',{className:'motion-video-source',href:mediaAssetUrl(record,'source.html'),download:'source.html'},'源码'),
-   record.files.includes('project.zip')&&h('a',{className:'motion-video-source',href:mediaAssetUrl(record,'project.zip'),download:'project.zip'},'工程')),
-  transport.loading&&h('p',{className:'motion-video-message',role:'status'},'正在载入视频，完成后可拖动定位…'),
-  playbackError&&h('div',{className:'motion-video-message',role:'alert'},h('span',null,playbackError),h('button',{type:'button',onClick:()=>{setError('');transport.native?transport.retry():video.current.load()}},'重新加载')),
+   h('input',{className:'motion-video-seek',type:'range',min:0,max:duration||1,step:.05,value:Math.min(time,duration||1),disabled:!ready,'aria-label':'Playback position (seconds)','aria-valuetext':formatMediaTime(time)+' / '+formatMediaTime(duration),onPointerDown:beginSeek,onPointerUp:()=>endSeek(),onPointerCancel:()=>endSeek(true),onLostPointerCapture:()=>endSeek(true),onChange:e=>changeSeek(e.currentTarget.value)}),
+   button(playing?'Pause video':'Play video',playing?'pause':'play',toggle,{disabled:!!playbackError||!src}),
+   h('output',{className:'motion-video-time','aria-label':'Playback time'},formatMediaTime(time)+' / '+formatMediaTime(duration)),
+   h('div',{className:'motion-video-volume'},button(muted||volume===0?'Unmute':'Mute video',muted||volume===0?'volumeOff':'volume',mute,{'aria-pressed':muted||volume===0}),h('input',{type:'range',min:0,max:1,step:.05,value:muted?0:volume,'aria-label':'Video volume','aria-valuetext':Math.round((muted?0:volume)*100)+'%',onChange:e=>{const v=video.current;v.volume=Number(e.currentTarget.value);v.muted=v.volume===0}})),
+   h('select',{'aria-label':'Playback speed',title:'Playback speed',value:rate,onChange:e=>{video.current.playbackRate=Number(e.currentTarget.value)}},[.5,1,1.25,1.5,2].map(v=>h('option',{key:v,value:v},v+'×'))),
+   button(fullscreen?'Exit fullscreen':'Enter fullscreen',fullscreen?'minimize':'fullscreen',full),
+   h('a',{href:mediaUrl,download:'video.mp4','aria-label':'Download video',title:'Download video'},h(Icon,{name:'download'})),
+   record.files.includes('source.html')&&h('a',{className:'motion-video-source',href:mediaAssetUrl(record,'source.html'),download:'source.html'},'Source'),
+   record.files.includes('project.zip')&&h('a',{className:'motion-video-source',href:mediaAssetUrl(record,'project.zip'),download:'project.zip'},'Project')),
+  transport.loading&&h('p',{className:'motion-video-message',role:'status'},'Loading video; you can drag to seek when it is ready…'),
+  playbackError&&h('div',{className:'motion-video-message',role:'alert'},h('span',null,playbackError),h('button',{type:'button',onClick:()=>{setError('');transport.native?transport.retry():video.current.load()}},'Reload')),
   notice&&h('p',{className:'motion-video-message',role:'status'},notice));
 }
 function MediaRecords({records,sessionId}){const owner=useRef({});useLayoutEffect(()=>presentMedia(owner.current,sessionId,records),[records,sessionId]);return h(React.Fragment,null,visibleMediaRecords(records.filter(r=>r.sessionId===sessionId)).map(record=>h(VideoPlayer,{key:record.id,record})))}
@@ -95,7 +95,7 @@ export function MediaNodeView({node,sessionId}){
  },[state,sessionId]);
  return h(React.Fragment,null,h('span',{ref:anchor,hidden:true}),inline&&h(MediaRecords,{records:state.records??[],sessionId}));
 }
-export function MediaToolView({block,phase}){if(block?.isError)return h('p',{className:'dgui-tool-error',role:'alert'},(block.content??[]).filter(c=>c.type==='text').map(c=>c.text).join('\n'));return h('p',{className:'dgui-pending',role:'status'},phase==='preparing'||phase==='start'||typeof block?.argsRaw==='string'?'正在制作视频…':'视频已生成，可在对话中播放。')}
+export function MediaToolView({block,phase}){if(block?.isError)return h('p',{className:'dgui-tool-error',role:'alert'},(block.content??[]).filter(c=>c.type==='text').map(c=>c.text).join('\n'));return h('p',{className:'dgui-pending',role:'status'},phase==='preparing'||phase==='start'||typeof block?.argsRaw==='string'?'Creating video…':'Video created; play it in the conversation.')}
 export const MEDIA_PLAYER_CSS=`
 .motion-video-player{position:relative;min-width:0;width:100%;margin:16px 0;border:1px solid #34363d;border-radius:22px;overflow:hidden;background:#101114;color:#f5f6f8;box-shadow:0 10px 26px -20px #0009;color-scheme:dark}
 .motion-video-player video{display:block;width:100%;max-height:72vh;aspect-ratio:16/9;object-fit:contain;background:#000;cursor:pointer}.motion-video-player video:focus-visible{outline:2px solid #a7c4ff;outline-offset:-3px}

@@ -1,7 +1,7 @@
 {
-  "name": "dsh-motion-ui",
+  "name": "dsh-motion-ui-en",
   "version": "0.8.7",
-  "description": "Readable conversational UI, interactive HTML/SVG, editable motion and local MP4 production for DeepSeek Harness.",
+  "description": "English-localized derivative of dsh-motion-ui: readable conversational UI, interactive HTML/SVG, editable motion and local MP4 production for DeepSeek Harness.",
   "type": "module",
   "main": "index.js",
   "exports": {
@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:client": "node scripts/build-client.mjs",
     "test": "node --test tests/*.test.mjs",
     "verify:release": "node scripts/verify-release.mjs",
     "check": "node --check index.js && node --check client.js"
@@ -76,13 +77,16 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Scorp1o117/dsh-motion-ui.git"
+    "url": "git+https://github.com/KardDev/dsh-plugins.git"
   },
-  "homepage": "https://github.com/Scorp1o117/dsh-motion-ui#readme",
+  "homepage": "https://github.com/KardDev/dsh-plugins#readme",
   "bugs": {
-    "url": "https://github.com/Scorp1o117/dsh-motion-ui/issues"
+    "url": "https://github.com/KardDev/dsh-plugins/issues"
   },
-  "author": "Scorp1o117",
+  "contributors": [
+    "Scorp1o117 (original dsh-motion-ui)"
+  ],
+  "author": "KardDev",
   "keywords": [
     "dsh",
     "deepseek-harness",

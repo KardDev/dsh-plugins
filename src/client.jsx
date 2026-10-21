@@ -16,7 +16,7 @@ import {mediaHistoryDefinition} from './media-history.js';
 import {MediaNodeView,MediaToolView,MEDIA_PLAYER_CSS,disposeMediaSurfaces} from './media-player.js';
 export const inject = ['slots', 'sessions', 'conversation', 'uiConversation', 'configForms'];
 export function apply(ctx) {
-  setRuntimeActivation({active:true,channel:'会话事件渲染 / 正文围栏定位'});
+  setRuntimeActivation({active:true,channel:'Conversation event rendering / body fence positioning'});
   console.info('[motion-ui] client active; channel=conversation-events/fence-dom');
   const scope=ctx.configForms.get('motion-ui');
   configureViewSettings(scope);
@@ -44,9 +44,9 @@ export function apply(ctx) {
   ctx.inject?.(['sidebarRightTabs','sidebarRight'],panel=>{
     setRuntimeActivation({sidebar:true});
     const id='dsh-generative-ui:panel',kind='dsh-generative-ui';
-    panel.sidebarRightTabs.register({id,kind,title:()=> '智能 UI',guide:[{id:id+':entry',order:43,title:()=> '智能 UI',description:()=> '当前会话的交互界面'}]});
+    panel.sidebarRightTabs.register({id,kind,title:()=> 'Smart UI',guide:[{id:id+':entry',order:43,title:()=> 'Smart UI',description:()=> 'Interactive interfaces in this session'}]});
     panel.slots.inject('sidebar.right.pane.tab',()=>panel.slots.register({name:'sidebar.right.pane.tab',key:id,inject:sessionId=>({sendPrompt:prompt=>ctx.sessions.scope(sessionId).get('conversation').send(prompt)})},UiPanel));
-    panel.slots.inject('sidebar.right.pane.tab.title',()=>panel.slots.register({name:'sidebar.right.pane.tab.title',key:id},()=> '智能 UI'));
+    panel.slots.inject('sidebar.right.pane.tab.title',()=>panel.slots.register({name:'sidebar.right.pane.tab.title',key:id},()=> 'Smart UI'));
     panel.effect(()=>setPanelOpener((documentId,sessionId)=>{focusUi(documentId,sessionId);panel.sidebarRight.openTab(kind)}));
   });
 }

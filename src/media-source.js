@@ -18,7 +18,7 @@ export function useMediaSource(url){
     const blob=await response.blob();if(!active)return;
     objectUrl=URL.createObjectURL(blob);
     setState({src:objectUrl,loading:false,error:''});
-   }catch(e){if(active&&e.name!=='AbortError')setState({src:null,loading:false,error:'视频未能载入，请重试。'})}
+   }catch(e){if(active&&e.name!=='AbortError')setState({src:null,loading:false,error:'The video could not be loaded. Try again.'})}
   })();
   return()=>{active=false;controller.abort();if(objectUrl)URL.revokeObjectURL(objectUrl)};
  },[url,native,attempt]);

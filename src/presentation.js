@@ -21,13 +21,13 @@ export function PresentationView({raw,sessionId,sendPrompt,openFile,scope}){
   const content=h(ValidatedView,{raw,fallback:raw.document.fallback,sessionId,sendPrompt,openFile,replaceExportedCanvases:true});
   return h('div',{ref:anchor,'data-dgui-presentation':raw.documentId},
     owner&&(host?createPortal(content,host):content),
-    showDetails&&owner&&!host&&h('small',{className:'dgui-copy'},'未提供正文标记，界面显示在回答下方。'));
+    showDetails&&owner&&!host&&h('small',{className:'dgui-copy'},'No body marker was provided; the interface is shown below the answer.'));
 }
 export function UiPanel({sessionId,sendPrompt}){
   const records=useUiRegistry().filter(r=>r.sessionId===sessionId),[selected,setSelected]=useState(focused.get(sessionId));
   useEffect(()=>subscribeUi(()=>setSelected(focused.get(sessionId))),[sessionId]);
   const record=records.find(r=>r.raw.documentId===selected)??records.at(-1);
-  return h('div',{className:'dgui-panel'},h('div',{className:'dgui-root'},h('label',null,'本会话界面',h('select',{'aria-label':'本会话界面',value:record?.raw.documentId??'',onChange:e=>{focused.set(sessionId,e.target.value);setSelected(e.target.value)}},records.map(r=>h('option',{key:r.raw.documentId,value:r.raw.documentId},r.raw.document.title))))),
-    record?h(ValidatedView,{key:record.raw.documentId,raw:record.raw,sessionId,sendPrompt:sendPrompt??record.sendPrompt,openFile:record.openFile}):h('p',null,'当前会话还没有生成界面。'));
+  return h('div',{className:'dgui-panel'},h('div',{className:'dgui-root'},h('label',null,'Session interface',h('select',{'aria-label':'Session interface',value:record?.raw.documentId??'',onChange:e=>{focused.set(sessionId,e.target.value);setSelected(e.target.value)}},records.map(r=>h('option',{key:r.raw.documentId,value:r.raw.documentId},r.raw.document.title))))),
+    record?h(ValidatedView,{key:record.raw.documentId,raw:record.raw,sessionId,sendPrompt:sendPrompt??record.sendPrompt,openFile:record.openFile}):h('p',null,'No interface has been generated in this session yet.'));
 }
 export function focusUi(id,sessionId){focused.set(sessionId,id);notifyUi()}

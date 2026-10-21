@@ -18,7 +18,7 @@ export function ElasticToggle({id,checked,disabled,onChange}){
 }
 export function Stepper({value,spec,label,disabled,onChange,children}){
  const step=direction=>onChange(Math.max(spec.min,Math.min(spec.max,Number((value+direction*spec.step).toPrecision(15)))));
- return h('div',{className:'dgui-stepper'},h('button',{type:'button',disabled:disabled||value<=spec.min,'aria-label':'减少'+label,onClick:()=>step(-1)},'−'),children,h('button',{type:'button',disabled:disabled||value>=spec.max,'aria-label':'增加'+label,onClick:()=>step(1)},'+'));
+ return h('div',{className:'dgui-stepper'},h('button',{type:'button',disabled:disabled||value<=spec.min,'aria-label':'Decrease '+label,onClick:()=>step(-1)},'−'),children,h('button',{type:'button',disabled:disabled||value>=spec.max,'aria-label':'Increase '+label,onClick:()=>step(1)},'+'));
 }
 export const EXPRESSIVE_CSS=`
 .dgui-root .dgui-expressive-action[data-variant=primary]{position:relative;isolation:isolate;overflow:hidden;gap:14px;padding:8px 8px 8px 20px!important;min-height:48px;font-size:inherit;font-weight:700;translate:calc(var(--du-mx,0px) * var(--du-motion-gain,1)) calc(var(--du-my,0px) * var(--du-motion-gain,1));transition:translate .7s cubic-bezier(.34,1.45,.64,1),box-shadow .5s,transform .4s}
