@@ -130,6 +130,10 @@ export function apply(ctx,config={}) {
   ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/diagnostics',methods:['GET'],requestBody:'buffered',fetch:diagnosticsRoute(feedback)}));
   ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/fence',methods:['POST'],requestBody:'buffered',fetch:fenceRoute(store)}));
   ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/review',methods:['GET','POST'],requestBody:'buffered',fetch:reviewRoute(reviews)}));
+  ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/documents',methods:['GET'],requestBody:'buffered',fetch:async request=>{
+    try{const url=new URL(request.url);return Response.json({items:await store.listSession(url.searchParams.get('sessionId'))},{headers:{'Cache-Control':'no-store'}})}
+    catch(e){return Response.json({error:e.message},{status:e.status??500})}
+  }}));
   ctx.effect(()=>ctx.tools.register(defineTool({
     name:'list_reviews',
     description:'Read human frame or range annotations left on a rendered video in the player. Read these before re-rendering so the next version answers the actual feedback rather than a guess. Entries carry scope, anchor (frame or start/end), category, critique and status.',

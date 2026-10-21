@@ -24,8 +24,21 @@ export function PresentationView({raw,sessionId,sendPrompt,openFile,scope}){
     showDetails&&owner&&!host&&h('small',{className:'dgui-copy'},'No body marker was provided; the interface is shown below the answer.'));
 }
 export function UiPanel({sessionId,sendPrompt}){
-  const records=useUiRegistry().filter(r=>r.sessionId===sessionId),[selected,setSelected]=useState(focused.get(sessionId));
+  const registry=useUiRegistry().filter(r=>r.sessionId===sessionId),[selected,setSelected]=useState(focused.get(sessionId));
+  const [remote,setRemote]=useState(null);
+  // The registry is in-memory only, so after a host restart it is empty until
+  // an interface renders inline again. Rehydrate this session from the store.
+  useEffect(()=>{
+    if(registry.length){setRemote(null);return}
+    let alive=true;
+    fetch('/api/plugins/dsh-generative-ui/documents?sessionId='+encodeURIComponent(sessionId),{credentials:'same-origin',cache:'no-store'})
+      .then(r=>r.json())
+      .then(v=>{if(alive&&Array.isArray(v.items))setRemote(v.items.map(raw=>({raw,sessionId,sendPrompt})))})
+      .catch(()=>{});
+    return()=>{alive=false};
+  },[sessionId,registry.length]);
   useEffect(()=>subscribeUi(()=>setSelected(focused.get(sessionId))),[sessionId]);
+  const records=registry.length?registry:(remote??[]);
   const record=records.find(r=>r.raw.documentId===selected)??records.at(-1);
   return h('div',{className:'dgui-panel'},h('div',{className:'dgui-root'},h('label',null,'Session interface',h('select',{'aria-label':'Session interface',value:record?.raw.documentId??'',onChange:e=>{focused.set(sessionId,e.target.value);setSelected(e.target.value)}},records.map(r=>h('option',{key:r.raw.documentId,value:r.raw.documentId},r.raw.document.title))))),
     record?h(ValidatedView,{key:record.raw.documentId,raw:record.raw,sessionId,sendPrompt:sendPrompt??record.sendPrompt,openFile:record.openFile}):h('p',null,'No interface has been generated in this session yet.'));

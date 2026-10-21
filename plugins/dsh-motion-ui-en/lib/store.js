@@ -43,6 +43,23 @@ export class UiStore {
     } catch (e) { if (e.code !== 'ENOENT') throw e; return { version: 1, revision: 0, state: initialState(record.document) }; }
   }
   async owned(id,sessionId){const record=await this.readDocument(id);if(record.sessionId!==sessionId)throw new UiStoreError(403,'UI belongs to another conversation');return record;}
+  // Session-scoped listing for surfaces that must survive a host restart: the
+  // client registry is in-memory only, so the sidebar rehydrates from here.
+  async listSession(sessionId){
+    if(typeof sessionId!=='string'||!sessionId)throw new UiStoreError(400,'Invalid session');
+    let names=[];
+    try{names=await readdir(this.directory)}catch(e){if(e.code!=='ENOENT')throw e}
+    const items=[];
+    for(const name of names){
+      if(!name.endsWith('.json')||name.includes('-audit-')||name.startsWith('state-'))continue;
+      try{
+        const record=JSON.parse(await readFile(join(this.directory,name),'utf8'));
+        if(!record||record.sessionId!==sessionId||!record.document)continue;
+        items.push({documentId:record.documentId,documentRevision:record.documentRevision??0,document:record.document});
+      }catch{}
+    }
+    return items;
+  }
   historyPath(id, revision) {
     this.documentPath(id);
     if (!Number.isSafeInteger(revision) || revision < 0) throw new UiStoreError(400, 'Invalid history revision');
