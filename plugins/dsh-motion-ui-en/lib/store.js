@@ -55,7 +55,13 @@ export class UiStore {
       try{
         const record=JSON.parse(await readFile(join(this.directory,name),'utf8'));
         if(!record||record.sessionId!==sessionId||!record.document)continue;
-        items.push({documentId:record.documentId,documentRevision:record.documentRevision??0,document:record.document});
+        items.push({
+          version: record.version ?? 1,
+          documentId: record.documentId,
+          documentRevision: record.documentRevision ?? 0,
+          callId: typeof record.callId === 'string' ? record.callId : `stored-${record.documentId}`,
+          document: record.document
+        });
       }catch{}
     }
     return items;
