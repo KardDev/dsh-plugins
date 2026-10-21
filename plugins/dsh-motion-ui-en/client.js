@@ -4260,7 +4260,7 @@ function Sandbox({ node, document: doc, state: state2, data, derived, disabled, 
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.8.7", "id": "0.8.7+5c34bbd1ffc3", "sourceHash": "5c34bbd1ffc3c2cc0a57cf4a996d9c0f62cfa38e0c64bb158ad861392fd396df" });
+var BUILD_INFO = Object.freeze({ "version": "0.8.7", "id": "0.8.7+1f2fb9e58f08", "sourceHash": "1f2fb9e58f08491d94c2e0b740283adf20fb3599be194a8641fcd749118d3ea2" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38", clippedText: "\u6587\u5B57\u53EF\u80FD\u88AB\u9690\u85CF\u6216\u88C1\u5207", cardTextOverflow: "\u6587\u5B57\u8D85\u51FA\u5361\u7247\u5185\u5BB9\u8FB9\u754C\uFF1B\u8BF7\u4FDD\u7559\u9634\u5F71\u5E76\u8C03\u6574\u5BB9\u5668\u5C3A\u5BF8\u3001\u5185\u8FB9\u8DDD\u6216\u6587\u5B57\u6392\u7248", bottomWhitespace: "\u5185\u5BB9\u4E0B\u65B9\u5B58\u5728\u660E\u663E\u7A7A\u767D" });
@@ -6779,6 +6779,7 @@ function ReviewBar({ record, time, duration, ready, onSeek }) {
   const total = Math.max(1, Math.round((Number(duration) || 0) * fps));
   const frame2 = Math.max(0, Math.round((Number(time) || 0) * fps));
   const [open, setOpen] = (0, import_react27.useState)(false), [items, setItems] = (0, import_react27.useState)([]), [error, setError] = (0, import_react27.useState)(""), [text3, setText] = (0, import_react27.useState)(""), [category, setCategory] = (0, import_react27.useState)("motion"), [mark, setMark] = (0, import_react27.useState)({ a: null, b: null }), [saving, setSaving] = (0, import_react27.useState)(false);
+  const dragRef = (0, import_react27.useRef)(null), [sel, setSel] = (0, import_react27.useState)(null);
   const base2 = documentId && sessionId ? "/api/plugins/dsh-generative-ui/review?documentId=" + encodeURIComponent(documentId) + "&revision=" + revision3 + "&sessionId=" + encodeURIComponent(sessionId) : null;
   (0, import_react27.useEffect)(() => {
     if (!open || !base2) return;
@@ -6803,6 +6804,39 @@ function ReviewBar({ record, time, duration, ready, onSeek }) {
   const seekFrame = (f) => {
     if (ready && onSeek) onSeek(Math.max(0, Math.min(total - 1, f)) / fps);
   };
+  const frameAt = (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    return Math.max(0, Math.min(total - 1, Math.round((e.clientX - r.left) / r.width * (total - 1))));
+  };
+  function dragStart(e) {
+    if (e.button !== void 0 && e.button !== 0) return;
+    e.preventDefault();
+    const f = frameAt(e);
+    dragRef.current = { a: f, b: f };
+    setSel({ a: f, b: f });
+    try {
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    } catch {
+    }
+  }
+  function dragMove(e) {
+    const d = dragRef.current;
+    if (!d) return;
+    d.b = frameAt(e);
+    setSel({ a: d.a, b: d.b });
+  }
+  function dragEnd() {
+    const d = dragRef.current;
+    if (!d) return;
+    dragRef.current = null;
+    setSel(null);
+    const lo = Math.min(d.a, d.b), hi = Math.max(d.a, d.b);
+    if (hi > lo) setMark({ a: lo, b: hi });
+    else {
+      setMark({ a: null, b: null });
+      seekFrame(lo);
+    }
+  }
   async function save() {
     const critique = text3.trim();
     if (!critique) return;
@@ -6846,17 +6880,20 @@ function ReviewBar({ record, time, duration, ready, onSeek }) {
       h20(
         "div",
         {
-          className: "motion-review-strip",
+          className: "motion-review-strip" + (sel ? " is-selecting" : ""),
           role: "slider",
           tabIndex: 0,
           "aria-valuemin": 0,
           "aria-valuemax": total - 1,
           "aria-valuenow": frame2,
-          onClick: (e) => {
-            const r = e.currentTarget.getBoundingClientRect();
-            seekFrame(Math.round((e.clientX - r.left) / r.width * (total - 1)));
-          }
+          "aria-valuetext": mark.a !== null ? "selection frames " + start + " to " + (end ?? start) : "frame " + frame2,
+          onPointerDown: dragStart,
+          onPointerMove: dragMove,
+          onPointerUp: dragEnd,
+          onPointerCancel: dragEnd,
+          onLostPointerCapture: dragEnd
         },
+        sel && Math.max(sel.a, sel.b) > Math.min(sel.a, sel.b) && h20("div", { className: "motion-review-band preview", style: { left: pct(Math.min(sel.a, sel.b)) + "%", width: Math.max(0, pct(Math.max(sel.a, sel.b)) - pct(Math.min(sel.a, sel.b))) + "%" } }),
         end !== null && h20("div", { className: "motion-review-band", style: { left: pct(start) + "%", width: Math.max(0, pct(end) - pct(start)) + "%" } }),
         h20("div", { className: "motion-review-playhead", style: { left: pct(frame2) + "%" } }),
         items.map((n2, i) => {
@@ -7179,7 +7216,9 @@ var MEDIA_PLAYER_CSS = `
 .motion-review-tc{font:12px ui-monospace,Consolas,monospace;color:#8b93a7;margin-right:auto;font-variant-numeric:tabular-nums}
 .motion-review-head button{background:#24262d;color:inherit;border:1px solid #3a3f4b;border-radius:8px;padding:4px 9px;font:inherit;font-size:12px;cursor:pointer}
 .motion-review-head button:hover{border-color:#5EEAD4}
-.motion-review-strip{position:relative;height:36px;background:#171a20;border:1px solid #2b303a;border-radius:9px;cursor:crosshair;overflow:hidden}
+.motion-review-strip{position:relative;height:36px;background:#171a20;border:1px solid #2b303a;border-radius:9px;cursor:crosshair;overflow:hidden;touch-action:none}
+.motion-review-strip.is-selecting{cursor:ew-resize;border-color:#5EEAD4}
+.motion-review-band.preview{background:rgba(255,255,255,.18);border-color:#fff;border-style:dashed}
 .motion-review-strip:focus-visible{outline:2px solid #5EEAD4;outline-offset:2px}
 .motion-review-band{position:absolute;top:0;bottom:0;background:rgba(94,234,212,.18);border-left:2px solid #5EEAD4;border-right:2px solid #5EEAD4}
 .motion-review-playhead{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;opacity:.85}

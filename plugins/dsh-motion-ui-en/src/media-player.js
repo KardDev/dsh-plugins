@@ -17,6 +17,7 @@ export function ReviewBar({record,time,duration,ready,onSeek}){
  const [open,setOpen]=useState(false),[items,setItems]=useState([]),[error,setError]=useState(''),
   [text,setText]=useState(''),[category,setCategory]=useState('motion'),
   [mark,setMark]=useState({a:null,b:null}),[saving,setSaving]=useState(false);
+ const dragRef=useRef(null),[sel,setSel]=useState(null);
  const base=documentId&&sessionId?'/api/plugins/dsh-generative-ui/review?documentId='+encodeURIComponent(documentId)+'&revision='+revision+'&sessionId='+encodeURIComponent(sessionId):null;
  useEffect(()=>{
   if(!open||!base)return;let alive=true;
@@ -27,6 +28,12 @@ export function ReviewBar({record,time,duration,ready,onSeek}){
  const start=mark.a!==null?mark.a:frame,end=mark.b;
  const pct=f=>Math.max(0,Math.min(100,f/total*100));
  const seekFrame=f=>{if(ready&&onSeek)onSeek(Math.max(0,Math.min(total-1,f))/fps)};
+ const frameAt=e=>{const r=e.currentTarget.getBoundingClientRect();return Math.max(0,Math.min(total-1,Math.round((e.clientX-r.left)/r.width*(total-1))))};
+ function dragStart(e){if(e.button!==undefined&&e.button!==0)return;e.preventDefault();const f=frameAt(e);dragRef.current={a:f,b:f};setSel({a:f,b:f});try{e.currentTarget.setPointerCapture?.(e.pointerId)}catch{}}
+ function dragMove(e){const d=dragRef.current;if(!d)return;d.b=frameAt(e);setSel({a:d.a,b:d.b})}
+ function dragEnd(){const d=dragRef.current;if(!d)return;dragRef.current=null;setSel(null);
+  const lo=Math.min(d.a,d.b),hi=Math.max(d.a,d.b);
+  if(hi>lo)setMark({a:lo,b:hi});else{setMark({a:null,b:null});seekFrame(lo)}}
  async function save(){
   const critique=text.trim();if(!critique)return;
   const scope=end!==null&&end>=start?'range':'frame';
@@ -47,8 +54,10 @@ export function ReviewBar({record,time,duration,ready,onSeek}){
     h('button',{type:'button',onClick:()=>setMark(m=>({a:frame,b:m.b!==null&&m.b<=frame?null:m.b}))},'In'),
     h('button',{type:'button',onClick:()=>setMark(m=>({a:m.a===null?frame:m.a,b:Math.max(frame,m.a===null?frame:m.a)}))},'Out'),
     h('button',{type:'button',onClick:()=>setMark({a:null,b:null})},'Clear')),
-   h('div',{className:'motion-review-strip',role:'slider',tabIndex:0,'aria-valuemin':0,'aria-valuemax':total-1,'aria-valuenow':frame,
-    onClick:e=>{const r=e.currentTarget.getBoundingClientRect();seekFrame(Math.round((e.clientX-r.left)/r.width*(total-1)))}},
+   h('div',{className:'motion-review-strip'+(sel?' is-selecting':''),role:'slider',tabIndex:0,'aria-valuemin':0,'aria-valuemax':total-1,'aria-valuenow':frame,
+    'aria-valuetext':mark.a!==null?'selection frames '+start+' to '+(end??start):'frame '+frame,
+    onPointerDown:dragStart,onPointerMove:dragMove,onPointerUp:dragEnd,onPointerCancel:dragEnd,onLostPointerCapture:dragEnd},
+    sel&&Math.max(sel.a,sel.b)>Math.min(sel.a,sel.b)&&h('div',{className:'motion-review-band preview',style:{left:pct(Math.min(sel.a,sel.b))+'%',width:Math.max(0,pct(Math.max(sel.a,sel.b))-pct(Math.min(sel.a,sel.b)))+'%'}}),
     end!==null&&h('div',{className:'motion-review-band',style:{left:pct(start)+'%',width:Math.max(0,pct(end)-pct(start))+'%'}}),
     h('div',{className:'motion-review-playhead',style:{left:pct(frame)+'%'}}),
     items.map((n,i)=>{const f=n.anchor?.frame??n.anchor?.startFrame??0;return h('button',{key:n.id,type:'button',className:'motion-review-pin',style:{left:pct(f)+'%'},title:(n.category+': '+(n.critique||'')).slice(0,140),onClick:e=>{e.stopPropagation();seekFrame(f)}},String(i+1))})),
@@ -168,7 +177,9 @@ export const MEDIA_PLAYER_CSS=`
 .motion-review-tc{font:12px ui-monospace,Consolas,monospace;color:#8b93a7;margin-right:auto;font-variant-numeric:tabular-nums}
 .motion-review-head button{background:#24262d;color:inherit;border:1px solid #3a3f4b;border-radius:8px;padding:4px 9px;font:inherit;font-size:12px;cursor:pointer}
 .motion-review-head button:hover{border-color:#5EEAD4}
-.motion-review-strip{position:relative;height:36px;background:#171a20;border:1px solid #2b303a;border-radius:9px;cursor:crosshair;overflow:hidden}
+.motion-review-strip{position:relative;height:36px;background:#171a20;border:1px solid #2b303a;border-radius:9px;cursor:crosshair;overflow:hidden;touch-action:none}
+.motion-review-strip.is-selecting{cursor:ew-resize;border-color:#5EEAD4}
+.motion-review-band.preview{background:rgba(255,255,255,.18);border-color:#fff;border-style:dashed}
 .motion-review-strip:focus-visible{outline:2px solid #5EEAD4;outline-offset:2px}
 .motion-review-band{position:absolute;top:0;bottom:0;background:rgba(94,234,212,.18);border-left:2px solid #5EEAD4;border-right:2px solid #5EEAD4}
 .motion-review-playhead{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;opacity:.85}
