@@ -12,6 +12,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools';
 import { dshHomePath } from '@deepseek-ai/dsh-home-paths';
 import { validateDocument, fallbackText } from './lib/protocol.js';
 import { UiStore, stateRoute, documentRoute, historyRoute } from './lib/store.js';
+import { ReviewStore, reviewRoute } from './lib/review-store.js';
 import { evaluate } from './lib/protocol.js';
 import { componentCatalog } from './lib/components.js';
 import {CANVAS_SYSTEM_GUIDE} from './lib/canvas-system.js';
@@ -53,6 +54,7 @@ function defineRenderTool(options) {
 export const Config=z.object({autoRepair:z.boolean().default(true).description('Auto-feedback for undeliverable UI fences, render failures, and empty deliveries with no text or tool calls. At most two de-duplicated reminders; model thinking time is never capped.'),visualStyle:z.union(VISUAL_STYLE_IDS).default(DEFAULT_VISUAL_STYLE).description('Visual style for guided mode. Syncs native component appearance, the style prompt and examples; not applied in free mode.'),defaultPreset:z.union(TEXT_PRESETS).default('reading').description('Retained for legacy config and no longer used; typography is chosen by the model per block.'),designMode:z.union(['guided','free']).default('guided').description('guided: design skill and example-driven guidance; free: injects only the canvas interface and interaction constraints, leaving design to the model.'),displayMode:z.union(['tail','inline','sidebar']).default('inline').description('Retained for legacy config and no longer used; inline markers are always used, and the sidebar can be opened at any time.'),showDetails:z.boolean().default(false).description('Show parameter state, original description, visual diagnostics and version history. Off by default to keep the interface clean.')}).volatile();
 export function apply(ctx,config={}) {
   const store = new UiStore(dshHomePath('plugins', 'dsh-generative-ui'));
+  const reviews = new ReviewStore(dshHomePath('plugins', 'dsh-generative-ui'), store);
 
   const settings=()=>typeof config.get==='function'?config.get():config;
   const feedback=registerFenceFeedback(ctx,()=>settings().autoRepair!==false);
@@ -127,6 +129,19 @@ export function apply(ctx,config={}) {
   registerVisualAssets(ctx);
   ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/diagnostics',methods:['GET'],requestBody:'buffered',fetch:diagnosticsRoute(feedback)}));
   ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/fence',methods:['POST'],requestBody:'buffered',fetch:fenceRoute(store)}));
+  ctx.effect(()=>ctx.connection.fetch.register({path:'/api/plugins/dsh-generative-ui/review',methods:['GET','POST'],requestBody:'buffered',fetch:reviewRoute(reviews)}));
+  ctx.effect(()=>ctx.tools.register(defineTool({
+    name:'list_reviews',
+    description:'Read human frame or range annotations left on a rendered video in the player. Read these before re-rendering so the next version answers the actual feedback rather than a guess. Entries carry scope, anchor (frame or start/end), category, critique and status.',
+    parameters:{documentId:{type:'string',required:true},revision:{type:'number',description:'Document revision to read; defaults to the latest.'}},
+    output:{schema:{type:'json'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},
+    isConcurrencySafe:()=>true,
+    async execute({documentId,revision},exec){
+      const record=await store.owned(documentId,exec.agent?.id);
+      const rev=Number.isInteger(revision)?revision:(record.documentRevision??0);
+      return reviews.list(documentId,rev,record.sessionId);
+    }
+  })));
   ctx.effect(()=>ctx.tools.register(defineTool({name:'validate_ui',description:"Validate native or extended UI without saving/displaying. valid with complete=false means rejected components. Returns canonical document/diagnostics; a rendering tool still delivers the UI.",parameters:{document:{type:'json',required:true}},output:{schema:{type:'json'},render:(_a,v)=>[{type:'text',text:JSON.stringify(v)}]},isConcurrencySafe:()=>true,async execute({document}){try{const report=diagnoseDelivery(toolJson(document,'document'));return {...report,...(report.valid?{fallback:fallbackText(report.document)}:{error:report.diagnostics[0].message})}}catch(e){return{valid:false,complete:false,error:e.message}}}})));
   ctx.effect(()=>ctx.tools.register(defineRenderTool({
     name:'inspect_ui',description:"Read current revision/state/derived and heuristic observations. Summary includes node paths/positions/editable fields. query finds text/labels/types (max200 chars); detail=nodes with query OR nodeIds reads matching source. Full only when needed. Missing observations mean unobserved; do not poll. Inspect before editing.",

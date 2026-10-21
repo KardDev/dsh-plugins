@@ -4260,7 +4260,7 @@ function Sandbox({ node, document: doc, state: state2, data, derived, disabled, 
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.8.7", "id": "0.8.7+30088512ccff", "sourceHash": "30088512ccffd3d64a329ac1e55e0f6e730a268391d7422c772174ed9b37cb2c" });
+var BUILD_INFO = Object.freeze({ "version": "0.8.7", "id": "0.8.7+5c34bbd1ffc3", "sourceHash": "5c34bbd1ffc3c2cc0a57cf4a996d9c0f62cfa38e0c64bb158ad861392fd396df" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38", clippedText: "\u6587\u5B57\u53EF\u80FD\u88AB\u9690\u85CF\u6216\u88C1\u5207", cardTextOverflow: "\u6587\u5B57\u8D85\u51FA\u5361\u7247\u5185\u5BB9\u8FB9\u754C\uFF1B\u8BF7\u4FDD\u7559\u9634\u5F71\u5E76\u8C03\u6574\u5BB9\u5668\u5C3A\u5BF8\u3001\u5185\u8FB9\u8DDD\u6216\u6587\u5B57\u6392\u7248", bottomWhitespace: "\u5185\u5BB9\u4E0B\u65B9\u5B58\u5728\u660E\u663E\u7A7A\u767D" });
@@ -6772,6 +6772,118 @@ function remember(v2) {
   } catch {
   }
 }
+var REVIEW_CATEGORIES = ["copy", "layout", "motion", "color", "timing"];
+function ReviewBar({ record, time, duration, ready, onSeek }) {
+  const documentId = record?.documentId, sessionId = record?.sessionId, revision3 = record?.documentRevision ?? 0;
+  const fps = Number(record?.spec?.fps) || 30;
+  const total = Math.max(1, Math.round((Number(duration) || 0) * fps));
+  const frame2 = Math.max(0, Math.round((Number(time) || 0) * fps));
+  const [open, setOpen] = (0, import_react27.useState)(false), [items, setItems] = (0, import_react27.useState)([]), [error, setError] = (0, import_react27.useState)(""), [text3, setText] = (0, import_react27.useState)(""), [category, setCategory] = (0, import_react27.useState)("motion"), [mark, setMark] = (0, import_react27.useState)({ a: null, b: null }), [saving, setSaving] = (0, import_react27.useState)(false);
+  const base2 = documentId && sessionId ? "/api/plugins/dsh-generative-ui/review?documentId=" + encodeURIComponent(documentId) + "&revision=" + revision3 + "&sessionId=" + encodeURIComponent(sessionId) : null;
+  (0, import_react27.useEffect)(() => {
+    if (!open || !base2) return;
+    let alive = true;
+    (async () => {
+      try {
+        const r = await fetch(base2, { credentials: "same-origin", cache: "no-store" });
+        const v2 = await r.json();
+        if (!r.ok) throw new Error(v2.error || "HTTP " + r.status);
+        if (alive) setItems(Array.isArray(v2.items) ? v2.items : []);
+      } catch (e) {
+        if (alive) setError(e.message);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [open, base2]);
+  if (!base2) return null;
+  const start = mark.a !== null ? mark.a : frame2, end = mark.b;
+  const pct = (f) => Math.max(0, Math.min(100, f / total * 100));
+  const seekFrame = (f) => {
+    if (ready && onSeek) onSeek(Math.max(0, Math.min(total - 1, f)) / fps);
+  };
+  async function save() {
+    const critique = text3.trim();
+    if (!critique) return;
+    const scope2 = end !== null && end >= start ? "range" : "frame";
+    setSaving(true);
+    setError("");
+    try {
+      const r = await fetch(base2, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scope: scope2, fps, category, critique, assetId: record.id, anchor: scope2 === "range" ? { startFrame: start, endFrame: end } : { frame: start } })
+      });
+      const v2 = await r.json();
+      if (!r.ok) throw new Error(v2.error || "HTTP " + r.status);
+      setItems((list) => [...list, v2.entry]);
+      setText("");
+      setMark({ a: null, b: null });
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+  return h20(
+    "div",
+    { className: "motion-review" },
+    h20("button", { type: "button", className: "motion-review-toggle", "aria-expanded": open, onClick: () => setOpen((v2) => !v2) }, open ? "Hide frame review" : "Review frames"),
+    open && h20(
+      "div",
+      { className: "motion-review-body" },
+      h20(
+        "div",
+        { className: "motion-review-head" },
+        h20("span", { className: "motion-review-frame" }, "F" + String(start).padStart(4, "0") + (end !== null ? "\u2013F" + String(end).padStart(4, "0") : "")),
+        h20("span", { className: "motion-review-tc" }, formatMediaTime(time || 0) + " / " + formatMediaTime(duration || 0)),
+        h20("button", { type: "button", onClick: () => setMark((m2) => ({ a: frame2, b: m2.b !== null && m2.b <= frame2 ? null : m2.b })) }, "In"),
+        h20("button", { type: "button", onClick: () => setMark((m2) => ({ a: m2.a === null ? frame2 : m2.a, b: Math.max(frame2, m2.a === null ? frame2 : m2.a) })) }, "Out"),
+        h20("button", { type: "button", onClick: () => setMark({ a: null, b: null }) }, "Clear")
+      ),
+      h20(
+        "div",
+        {
+          className: "motion-review-strip",
+          role: "slider",
+          tabIndex: 0,
+          "aria-valuemin": 0,
+          "aria-valuemax": total - 1,
+          "aria-valuenow": frame2,
+          onClick: (e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            seekFrame(Math.round((e.clientX - r.left) / r.width * (total - 1)));
+          }
+        },
+        end !== null && h20("div", { className: "motion-review-band", style: { left: pct(start) + "%", width: Math.max(0, pct(end) - pct(start)) + "%" } }),
+        h20("div", { className: "motion-review-playhead", style: { left: pct(frame2) + "%" } }),
+        items.map((n2, i) => {
+          const f = n2.anchor?.frame ?? n2.anchor?.startFrame ?? 0;
+          return h20("button", { key: n2.id, type: "button", className: "motion-review-pin", style: { left: pct(f) + "%" }, title: (n2.category + ": " + (n2.critique || "")).slice(0, 140), onClick: (e) => {
+            e.stopPropagation();
+            seekFrame(f);
+          } }, String(i + 1));
+        })
+      ),
+      h20(
+        "div",
+        { className: "motion-review-compose" },
+        h20("select", { "aria-label": "Review category", value: category, onChange: (e) => setCategory(e.currentTarget.value) }, REVIEW_CATEGORIES.map((c) => h20("option", { key: c, value: c }, c))),
+        h20("textarea", { "aria-label": "Review note", rows: 2, placeholder: "What should change here?", value: text3, onChange: (e) => setText(e.currentTarget.value) }),
+        h20("button", { type: "button", className: "motion-review-save", disabled: saving, onClick: save }, saving ? "Saving\u2026" : "Save note")
+      ),
+      error && h20("p", { className: "motion-review-error", role: "alert" }, error),
+      h20("div", { className: "motion-review-list" }, items.length ? items.slice(-6).map((n2) => h20(
+        "p",
+        { key: n2.id },
+        h20("strong", null, (n2.scope === "range" ? "F" + String(n2.anchor.startFrame).padStart(4, "0") + "\u2013F" + String(n2.anchor.endFrame).padStart(4, "0") : "F" + String(n2.anchor.frame).padStart(4, "0")) + " \xB7 " + n2.category),
+        " \u2014 " + n2.critique
+      )) : h20("p", { className: "motion-review-empty" }, "No frame notes yet."))
+    )
+  );
+}
 function VideoPlayer({ record }) {
   const video = (0, import_react27.useRef)(null), root3 = (0, import_react27.useRef)(null), [prefs] = (0, import_react27.useState)(preferences), [playing, setPlaying] = (0, import_react27.useState)(false), [time, setTime] = (0, import_react27.useState)(0), [duration, setDuration] = (0, import_react27.useState)(record.duration ?? 0), [ready, setReady] = (0, import_react27.useState)(false), [volume, setVolume] = (0, import_react27.useState)(prefs.volume), [muted, setMuted] = (0, import_react27.useState)(prefs.muted), [rate, setRate] = (0, import_react27.useState)(prefs.rate), [fullscreen, setFullscreen] = (0, import_react27.useState)(false), [error, setError] = (0, import_react27.useState)(""), [notice, setNotice] = (0, import_react27.useState)("");
   const mediaUrl = mediaAssetUrl(record, "video.mp4"), transport = useMediaSource(mediaUrl), src = transport.src, poster = mediaAssetUrl(record, "poster.jpg"), playbackError = error || transport.error;
@@ -6950,7 +7062,8 @@ function VideoPlayer({ record }) {
       setError("");
       transport.native ? transport.retry() : video.current.load();
     } }, "Reload")),
-    notice && h20("p", { className: "motion-video-message", role: "status" }, notice)
+    notice && h20("p", { className: "motion-video-message", role: "status" }, notice),
+    h20(ReviewBar, { record, time, duration, ready, onSeek: seek })
   );
 }
 function MediaRecords({ records: records2, sessionId }) {
@@ -7057,6 +7170,32 @@ var MEDIA_PLAYER_CSS = `
 .motion-video-player:fullscreen{display:flex;flex-direction:column;justify-content:center;width:100%;height:100%;border:0;border-radius:0;background:#000}.motion-video-player:fullscreen video{flex:1;min-height:0;max-height:none;aspect-ratio:auto;object-fit:contain}.motion-video-player:fullscreen .motion-video-controls{flex-shrink:0;background:#101114}
 @media(max-width:600px){.motion-video-controls{gap:6px;padding:8px 10px}.motion-video-volume input{width:62px}.motion-video-time{font-size:11px}.motion-video-player{border-radius:18px}.motion-video-controls button,.motion-video-controls a{min-width:32px;min-height:32px}}
 @media(forced-colors:active){.motion-video-player{border:1px solid CanvasText}.motion-video-controls button,.motion-video-controls a,.motion-video-controls select{border:1px solid ButtonText}.motion-video-controls input[type=range]{appearance:auto}}
+.motion-review{display:flex;flex-direction:column;gap:8px;padding:0 16px 12px;border-top:1px solid #262a33}
+.motion-review-toggle{align-self:flex-start;margin-top:10px;background:#24262d;color:inherit;border:1px solid #3a3f4b;border-radius:10px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.motion-review-toggle:hover{background:#2b2f39}
+.motion-review-body{display:flex;flex-direction:column;gap:8px}
+.motion-review-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.motion-review-frame{font:600 13px ui-monospace,Consolas,monospace;color:#9fe8d8;letter-spacing:.5px}
+.motion-review-tc{font:12px ui-monospace,Consolas,monospace;color:#8b93a7;margin-right:auto;font-variant-numeric:tabular-nums}
+.motion-review-head button{background:#24262d;color:inherit;border:1px solid #3a3f4b;border-radius:8px;padding:4px 9px;font:inherit;font-size:12px;cursor:pointer}
+.motion-review-head button:hover{border-color:#5EEAD4}
+.motion-review-strip{position:relative;height:36px;background:#171a20;border:1px solid #2b303a;border-radius:9px;cursor:crosshair;overflow:hidden}
+.motion-review-strip:focus-visible{outline:2px solid #5EEAD4;outline-offset:2px}
+.motion-review-band{position:absolute;top:0;bottom:0;background:rgba(94,234,212,.18);border-left:2px solid #5EEAD4;border-right:2px solid #5EEAD4}
+.motion-review-playhead{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;opacity:.85}
+.motion-review-pin{position:absolute;top:2px;transform:translateX(-50%);width:16px;height:16px;padding:0;border-radius:50%;border:0;background:#FBBF24;color:#241A05;font:600 9px/16px ui-monospace,Consolas,monospace;cursor:pointer}
+.motion-review-compose{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:8px;align-items:start}
+.motion-review-compose select,.motion-review-compose textarea{background:#171a20;border:1px solid #2b303a;border-radius:8px;color:inherit;font:inherit;font-size:13px;padding:6px 8px}
+.motion-review-compose textarea{resize:vertical;min-height:38px}
+.motion-review-save{background:#5EEAD4;color:#04211C;border:0;border-radius:8px;padding:8px 12px;font:inherit;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap}
+.motion-review-save:disabled{opacity:.6;cursor:default}
+.motion-review-error{margin:0;font-size:12px;color:#fca5a5}
+.motion-review-list{display:flex;flex-direction:column;gap:4px;max-height:110px;overflow:auto;font-size:12px;color:#c3cbdb}
+.motion-review-list p{margin:0;line-height:1.4}
+.motion-review-list strong{color:#9fe8d8;font-weight:600;font-family:ui-monospace,Consolas,monospace;font-size:11px}
+.motion-review-empty{margin:0;font-size:12px;color:#7d8598}
+.motion-video-player:fullscreen .motion-review{display:none}
+@media(max-width:600px){.motion-review-compose{grid-template-columns:1fr}}
 `;
 
 // src/client.jsx
