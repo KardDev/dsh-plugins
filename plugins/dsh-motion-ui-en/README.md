@@ -22,8 +22,12 @@ It is a localization, not a redesign. If you want a different feature set, fork 
 
 ## Install
 
+This plugin lives inside the [dsh-plugins](https://github.com/KardDev/dsh-plugins) collection, so install it from a checkout (package managers resolve Git dependencies at the repository root, not at a subdirectory):
+
 ```sh
-dsh plugin add github:YOURNAME/dsh-motion-ui-en
+git clone https://github.com/KardDev/dsh-plugins.git
+cd dsh-plugins && pnpm install
+dsh plugin add ./plugins/dsh-motion-ui-en
 ```
 
 Restart the DSH host, then reload the browser page. Settings live under **Home → Plugins → dsh-motion-ui-en**.
@@ -94,10 +98,29 @@ If the host sandbox blocks the build with `spawn EPERM`, that is Node's `child_p
 
 ## Upstream updates
 
+This plugin lives in a subdirectory of the [dsh-plugins](https://github.com/KardDev/dsh-plugins) collection, and the upstream history was imported as a subtree. Pull upstream releases from the **repository root**:
+
 ```sh
+cd dsh-plugins
 git remote add upstream https://github.com/Scorp1o117/dsh-motion-ui.git   # once
 git fetch upstream --tags
-git merge upstream/main
+git subtree pull --prefix=plugins/dsh-motion-ui-en upstream main
+```
+
+If `git subtree` is unavailable or crashes on your platform, the equivalent manual import is:
+
+```sh
+git fetch upstream main
+git merge --allow-unrelated-histories -s ours --no-commit upstream/main
+git read-tree --prefix=plugins/dsh-motion-ui-en/ -u upstream/main
+git commit -m "Update dsh-motion-ui-en from upstream"
+```
+
+Either way, then rebuild and re-test:
+
+```sh
+pnpm --filter dsh-motion-ui-en build
+pnpm --filter dsh-motion-ui-en test
 ```
 
 Expect conflicts in `src/settings.js`, `src/view.js` and the other localized files. That is the ongoing cost of this derivative — keep translation edits confined to string literals so merges stay tractable.
