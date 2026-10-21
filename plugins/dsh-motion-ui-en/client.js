@@ -4260,7 +4260,7 @@ function Sandbox({ node, document: doc, state: state2, data, derived, disabled, 
 }
 
 // lib/build-info.js
-var BUILD_INFO = Object.freeze({ "version": "0.8.7", "id": "0.8.7+1f2fb9e58f08", "sourceHash": "1f2fb9e58f08491d94c2e0b740283adf20fb3599be194a8641fcd749118d3ea2" });
+var BUILD_INFO = Object.freeze({ "version": "0.8.7", "id": "0.8.7+faf319fc8a59", "sourceHash": "faf319fc8a59264581aceace8a4219ebe4f10783a6ec68310f7fe190d477c09a" });
 
 // lib/refinement.js
 var AUDIT_MESSAGES = Object.freeze({ overflow: "\u5185\u5BB9\u8D85\u51FA\u89C6\u53E3\u5BBD\u5EA6", smallText: "\u6587\u5B57\u5B9E\u9645\u663E\u793A\u5C3A\u5BF8\u5C0F\u4E8E 12px", contrast: "\u6587\u5B57\u4E0E\u80CC\u666F\u5BF9\u6BD4\u5EA6\u504F\u4F4E", missingLabel: "\u4EA4\u4E92\u63A7\u4EF6\u7F3A\u5C11\u53EF\u8BBF\u95EE\u540D\u79F0", runtimeError: "\u753B\u5E03\u62A5\u544A\u8FD0\u884C\u5F02\u5E38", clippedText: "\u6587\u5B57\u53EF\u80FD\u88AB\u9690\u85CF\u6216\u88C1\u5207", cardTextOverflow: "\u6587\u5B57\u8D85\u51FA\u5361\u7247\u5185\u5BB9\u8FB9\u754C\uFF1B\u8BF7\u4FDD\u7559\u9634\u5F71\u5E76\u8C03\u6574\u5BB9\u5668\u5C3A\u5BF8\u3001\u5185\u8FB9\u8DDD\u6216\u6587\u5B57\u6392\u7248", bottomWhitespace: "\u5185\u5BB9\u4E0B\u65B9\u5B58\u5728\u660E\u663E\u7A7A\u767D" });
@@ -6780,6 +6780,7 @@ function ReviewBar({ record, time, duration, ready, onSeek }) {
   const frame2 = Math.max(0, Math.round((Number(time) || 0) * fps));
   const [open, setOpen] = (0, import_react27.useState)(false), [items, setItems] = (0, import_react27.useState)([]), [error, setError] = (0, import_react27.useState)(""), [text3, setText] = (0, import_react27.useState)(""), [category, setCategory] = (0, import_react27.useState)("motion"), [mark, setMark] = (0, import_react27.useState)({ a: null, b: null }), [saving, setSaving] = (0, import_react27.useState)(false);
   const dragRef = (0, import_react27.useRef)(null), [sel, setSel] = (0, import_react27.useState)(null);
+  const stripRef = (0, import_react27.useRef)(null), cleanupRef = (0, import_react27.useRef)(null);
   const base2 = documentId && sessionId ? "/api/plugins/dsh-generative-ui/review?documentId=" + encodeURIComponent(documentId) + "&revision=" + revision3 + "&sessionId=" + encodeURIComponent(sessionId) : null;
   (0, import_react27.useEffect)(() => {
     if (!open || !base2) return;
@@ -6798,44 +6799,59 @@ function ReviewBar({ record, time, duration, ready, onSeek }) {
       alive = false;
     };
   }, [open, base2]);
+  (0, import_react27.useEffect)(() => () => {
+    try {
+      cleanupRef.current?.();
+    } catch {
+    }
+  }, []);
   if (!base2) return null;
   const start = mark.a !== null ? mark.a : frame2, end = mark.b;
   const pct = (f) => Math.max(0, Math.min(100, f / total * 100));
   const seekFrame = (f) => {
     if (ready && onSeek) onSeek(Math.max(0, Math.min(total - 1, f)) / fps);
   };
-  const frameAt = (e) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    return Math.max(0, Math.min(total - 1, Math.round((e.clientX - r.left) / r.width * (total - 1))));
+  const frameFromX = (x) => {
+    const el = stripRef.current;
+    if (!el) return 0;
+    const r = el.getBoundingClientRect();
+    return Math.max(0, Math.min(total - 1, Math.round((x - r.left) / r.width * (total - 1))));
   };
   function dragStart(e) {
     if (e.button !== void 0 && e.button !== 0) return;
     e.preventDefault();
-    const f = frameAt(e);
-    dragRef.current = { a: f, b: f };
-    setSel({ a: f, b: f });
-    try {
-      e.currentTarget.setPointerCapture?.(e.pointerId);
-    } catch {
+    const anchor = frameFromX(e.clientX);
+    dragRef.current = { a: anchor, b: anchor };
+    setSel({ a: anchor, b: anchor });
+    let done = false;
+    function move(ev) {
+      const d = dragRef.current;
+      if (!d) return;
+      d.b = frameFromX(ev.clientX);
+      setSel({ a: d.a, b: d.b });
     }
-  }
-  function dragMove(e) {
-    const d = dragRef.current;
-    if (!d) return;
-    d.b = frameAt(e);
-    setSel({ a: d.a, b: d.b });
-  }
-  function dragEnd() {
-    const d = dragRef.current;
-    if (!d) return;
-    dragRef.current = null;
-    setSel(null);
-    const lo = Math.min(d.a, d.b), hi = Math.max(d.a, d.b);
-    if (hi > lo) setMark({ a: lo, b: hi });
-    else {
-      setMark({ a: null, b: null });
-      seekFrame(lo);
+    function finish() {
+      if (done) return;
+      done = true;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+      cleanupRef.current = null;
+      const d = dragRef.current;
+      dragRef.current = null;
+      setSel(null);
+      if (!d) return;
+      const lo = Math.min(d.a, d.b), hi = Math.max(d.a, d.b);
+      if (hi > lo) setMark({ a: lo, b: hi });
+      else {
+        setMark({ a: null, b: null });
+        seekFrame(lo);
+      }
     }
+    cleanupRef.current = finish;
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
   }
   async function save() {
     const critique = text3.trim();
@@ -6880,18 +6896,16 @@ function ReviewBar({ record, time, duration, ready, onSeek }) {
       h20(
         "div",
         {
+          ref: stripRef,
           className: "motion-review-strip" + (sel ? " is-selecting" : ""),
           role: "slider",
           tabIndex: 0,
+          title: "Drag to select a frame range; click to seek",
           "aria-valuemin": 0,
           "aria-valuemax": total - 1,
           "aria-valuenow": frame2,
           "aria-valuetext": mark.a !== null ? "selection frames " + start + " to " + (end ?? start) : "frame " + frame2,
-          onPointerDown: dragStart,
-          onPointerMove: dragMove,
-          onPointerUp: dragEnd,
-          onPointerCancel: dragEnd,
-          onLostPointerCapture: dragEnd
+          onPointerDown: dragStart
         },
         sel && Math.max(sel.a, sel.b) > Math.min(sel.a, sel.b) && h20("div", { className: "motion-review-band preview", style: { left: pct(Math.min(sel.a, sel.b)) + "%", width: Math.max(0, pct(Math.max(sel.a, sel.b)) - pct(Math.min(sel.a, sel.b))) + "%" } }),
         end !== null && h20("div", { className: "motion-review-band", style: { left: pct(start) + "%", width: Math.max(0, pct(end) - pct(start)) + "%" } }),
@@ -7216,12 +7230,12 @@ var MEDIA_PLAYER_CSS = `
 .motion-review-tc{font:12px ui-monospace,Consolas,monospace;color:#8b93a7;margin-right:auto;font-variant-numeric:tabular-nums}
 .motion-review-head button{background:#24262d;color:inherit;border:1px solid #3a3f4b;border-radius:8px;padding:4px 9px;font:inherit;font-size:12px;cursor:pointer}
 .motion-review-head button:hover{border-color:#5EEAD4}
-.motion-review-strip{position:relative;height:36px;background:#171a20;border:1px solid #2b303a;border-radius:9px;cursor:crosshair;overflow:hidden;touch-action:none}
+.motion-review-strip{position:relative;height:40px;background:#171a20;border:1px solid #2b303a;border-radius:9px;cursor:crosshair;overflow:hidden;touch-action:none}
 .motion-review-strip.is-selecting{cursor:ew-resize;border-color:#5EEAD4}
 .motion-review-band.preview{background:rgba(255,255,255,.18);border-color:#fff;border-style:dashed}
 .motion-review-strip:focus-visible{outline:2px solid #5EEAD4;outline-offset:2px}
-.motion-review-band{position:absolute;top:0;bottom:0;background:rgba(94,234,212,.18);border-left:2px solid #5EEAD4;border-right:2px solid #5EEAD4}
-.motion-review-playhead{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;opacity:.85}
+.motion-review-band{position:absolute;top:0;bottom:0;background:rgba(94,234,212,.18);border-left:2px solid #5EEAD4;border-right:2px solid #5EEAD4;pointer-events:none}
+.motion-review-playhead{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;opacity:.85;pointer-events:none}
 .motion-review-pin{position:absolute;top:2px;transform:translateX(-50%);width:16px;height:16px;padding:0;border-radius:50%;border:0;background:#FBBF24;color:#241A05;font:600 9px/16px ui-monospace,Consolas,monospace;cursor:pointer}
 .motion-review-compose{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:8px;align-items:start}
 .motion-review-compose select,.motion-review-compose textarea{background:#171a20;border:1px solid #2b303a;border-radius:8px;color:inherit;font:inherit;font-size:13px;padding:6px 8px}
