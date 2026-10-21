@@ -77,9 +77,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KardDev/dsh-plugins.git"
+    "url": "git+https://github.com/KardDev/dsh-plugins.git",
+    "directory": "plugins/dsh-motion-ui-en"
   },
-  "homepage": "https://github.com/KardDev/dsh-plugins#readme",
+  "homepage": "https://github.com/KardDev/dsh-plugins/tree/main/plugins/dsh-motion-ui-en#readme",
   "bugs": {
     "url": "https://github.com/KardDev/dsh-plugins/issues"
   },

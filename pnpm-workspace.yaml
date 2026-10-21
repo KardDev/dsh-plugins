@@ -4,4 +4,7 @@ packages:
 # The plugin build shells out to esbuild through Node's child_process. On Windows
 # a symlinked (isolated) node_modules layout does not resolve from the package
 # directory, so dependencies are hoisted to the workspace root instead.
+allowBuilds:
+  esbuild: false
+
 nodeLinker: hoisted

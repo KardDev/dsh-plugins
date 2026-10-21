@@ -6,7 +6,7 @@ settings:
 
 importers:
 
-  .:
+  plugins/dsh-motion-ui-en:
     dependencies:
       '@deepseek-ai/schemastery':
         specifier: ^3.18.4
@@ -1059,7 +1059,7 @@ snapshots:
     dependencies:
       '@deepseek-ai/cordis': 4.0.5
       '@deepseek-ai/dsh-brand': 0.2.1-rc.2(@deepseek-ai/cordis@4.0.5)
-      zod: 4.6.7
+      zod: 4.4.3
 
   '@deepseek-ai/dsh-user-approval@0.2.1-rc.2(7c74ae09be77145a81b9b3cef273e232)':
     dependencies:
