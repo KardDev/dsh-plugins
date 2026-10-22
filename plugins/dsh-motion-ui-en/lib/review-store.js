@@ -65,6 +65,22 @@ export class ReviewStore{
   }
 }
 
+// The frame-editor canvas keeps notes as {frame|a,b, category, note}. Map that
+// shape onto review entries so canvas work can be filed as trajectory data
+// without the caller translating it by hand.
+export function canvasNotesToEntries(notes){
+  if(!Array.isArray(notes))return [];
+  return notes.map(n=>{
+    if(!n||typeof n!=='object')return null;
+    if(n.scope&&n.anchor)return n;
+    if(Number.isFinite(Number(n.a))&&Number.isFinite(Number(n.b)))
+      return {scope:'range',anchor:{startFrame:Number(n.a),endFrame:Number(n.b)},category:n.category,critique:n.note};
+    if(Number.isFinite(Number(n.frame)))
+      return {scope:'frame',anchor:{frame:Number(n.frame)},category:n.category,critique:n.note};
+    return null;
+  }).filter(Boolean);
+}
+
 export function reviewRoute(reviews){
   return async request=>{
     const respond=(value,status=200)=>Response.json(value,{status,headers:{'Cache-Control':'no-store'}});

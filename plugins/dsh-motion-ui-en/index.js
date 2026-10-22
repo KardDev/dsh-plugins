@@ -12,7 +12,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools';
 import { dshHomePath } from '@deepseek-ai/dsh-home-paths';
 import { validateDocument, fallbackText } from './lib/protocol.js';
 import { UiStore, stateRoute, documentRoute, historyRoute } from './lib/store.js';
-import { ReviewStore, reviewRoute } from './lib/review-store.js';
+import { ReviewStore, reviewRoute, canvasNotesToEntries } from './lib/review-store.js';
 import { evaluate } from './lib/protocol.js';
 import { componentCatalog } from './lib/components.js';
 import {CANVAS_SYSTEM_GUIDE} from './lib/canvas-system.js';
@@ -144,6 +144,30 @@ export function apply(ctx,config={}) {
       const record=await store.owned(documentId,exec.agent?.id);
       const rev=Number.isInteger(revision)?revision:(record.documentRevision??0);
       return reviews.list(documentId,rev,record.sessionId);
+    }
+  })));
+  ctx.effect(()=>ctx.tools.register(defineTool({
+    name:'record_review',
+    description:'File human frame/range annotations held in a saved frame-editor canvas into the durable review store for the video document they belong to. Pass the canvas notes as read from inspect_ui state.notes, or already-shaped entries. Returns the stored entries; read them back with list_reviews.',
+    parameters:{
+      documentId:{type:'string',required:true,description:'Canvas document holding the annotations'},
+      entries:{type:'json',required:true,description:'Array of canvas notes ({frame|a,b, category, note}) or review entries ({scope, anchor, category, critique})'},
+      subjectDocumentId:{type:'string',description:'Video document the annotations belong to; defaults to the canvas documentId'},
+      revision:{type:'number',description:'Video document revision; defaults to its latest'},
+      fps:{type:'number',description:'Frame rate used to derive times; default 30'}
+    },
+    output:{schema:{type:'json'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},
+    async execute({documentId,entries,subjectDocumentId,revision,fps},exec){
+      const canvas=await store.owned(documentId,exec.agent?.id);
+      const subjectId=typeof subjectDocumentId==='string'&&subjectDocumentId?subjectDocumentId:documentId;
+      const subject=subjectId===documentId?canvas:await store.owned(subjectId,exec.agent?.id);
+      const rev=Number.isInteger(revision)?revision:(subject.documentRevision??0);
+      const rate=Number.isFinite(Number(fps))&&Number(fps)>0?Number(fps):30;
+      const mapped=canvasNotesToEntries(entries);
+      if(!mapped.length)throw Error('record_review: no usable entries (need frame, or a/b range, plus category and note)');
+      const written=[];
+      for(const entry of mapped)written.push(await reviews.append(subjectId,rev,subject.sessionId,{...entry,fps:rate}));
+      return {documentId:subjectId,revision:rev,count:written.length,items:written};
     }
   })));
   ctx.effect(()=>ctx.tools.register(defineTool({name:'validate_ui',description:"Validate native or extended UI without saving/displaying. valid with complete=false means rejected components. Returns canonical document/diagnostics; a rendering tool still delivers the UI.",parameters:{document:{type:'json',required:true}},output:{schema:{type:'json'},render:(_a,v)=>[{type:'text',text:JSON.stringify(v)}]},isConcurrencySafe:()=>true,async execute({document}){try{const report=diagnoseDelivery(toolJson(document,'document'));return {...report,...(report.valid?{fallback:fallbackText(report.document)}:{error:report.diagnostics[0].message})}}catch(e){return{valid:false,complete:false,error:e.message}}}})));
