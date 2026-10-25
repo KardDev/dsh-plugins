@@ -1,0 +1,9 @@
+- insert:
+    - id: dsh-cost-usage
+      name: dsh-cost-usage
+      config:
+        # Currency symbol for display
+        currency: "$"
+        # Per-model pricing configuration (users override this in their profile)
+        # See README.md for examples
+        pricing: {}
