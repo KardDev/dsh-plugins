@@ -39,10 +39,12 @@ Restart the DSH host, then reload the browser page. Settings live under **Home â
 | Requirement | Notes |
 |---|---|
 | Node.js | `>= 22.19` |
-| DSH | `0.2.0-rc.2`, `0.2.1-rc.1` or `0.2.1-rc.2` |
+| DSH | Development target: `0.2.1-rc.5`; also supports `0.2.0-rc.2`, `0.2.1-rc.1`, `0.2.1-rc.2` and `0.2.1-rc.3` |
 | Chrome, Edge or Chromium | Only for video export and canvas rendering at export time |
 | FFmpeg + FFprobe | Only for video export and processing; never downloaded automatically |
 | MiniMax credentials | Only for `synthesize_voice`, which calls a paid API |
+
+See [rc.5 compatibility checks](docs/compatibility-0.2.1-rc.5.md) for the migration validation and limits.
 
 Override binary locations with `DSH_MOTION_BROWSER`, `DSH_MOTION_FFMPEG` and `DSH_MOTION_FFPROBE`.
 

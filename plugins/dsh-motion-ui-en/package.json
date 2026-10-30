@@ -21,7 +21,8 @@
     "LICENSE",
     "DESIGN.zh-CN.md",
     "RELEASE-PLAN.zh-CN.md",
-    "VERIFICATION.md"
+    "VERIFICATION.md",
+    "docs/compatibility-0.2.1-rc.5.md"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -38,7 +39,7 @@
       "platform": "web"
     },
     "compatibility": {
-      "dsh": "0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
+      "dsh": "0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.5",
       "node": ">=22.19",
       "profiles": [
         "web",
@@ -47,13 +48,15 @@
       "dshReleases": {
         "0.2.0-rc.2": "compatible",
         "0.2.1-rc.1": "compatible",
-        "0.2.1-rc.2": "compatible"
+        "0.2.1-rc.2": "compatible",
+        "0.2.1-rc.3": "compatible",
+        "0.2.1-rc.5": "compatible"
       }
     }
   },
   "peerDependencies": {
-    "@deepseek-ai/dsh-home-paths": "0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
-    "@deepseek-ai/dsh-tools": "0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2",
+    "@deepseek-ai/dsh-home-paths": "0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.5",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.5",
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },
@@ -67,8 +70,10 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "three": "^0.180.0",
-    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-home-paths": "0.2.1-rc.2"
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-home-paths": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-system-prompt": "0.2.1-rc.5",
+    "@deepseek-ai/cordis": "~4.0.5"
   },
   "dependencies": {
     "@deepseek-ai/schemastery": "^3.18.4",
@@ -102,5 +107,9 @@
     "echarts-wordcloud": {
       "echarts": "$echarts"
     }
+  },
+  "engines": {
+    "node": ">=22.19",
+    "dsh": "0.2.0-rc.2 || 0.2.1-rc.1 || 0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.5"
   }
 }

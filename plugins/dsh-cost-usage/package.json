@@ -23,6 +23,14 @@
       "inject": [
         "@deepseek-ai/dsh-api-session-controller"
       ]
+    },
+    "compatibility": {
+      "dsh": ">=0.2.0-rc.2 <0.3.0 || 0.2.1-rc.3 || 0.2.1-rc.5",
+      "node": ">=22.19",
+      "profiles": [
+        "web",
+        "desktop"
+      ]
     }
   },
   "files": [
@@ -32,14 +40,15 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22.19",
+    "dsh": ">=0.2.0-rc.2 <0.3.0 || 0.2.1-rc.3 || 0.2.1-rc.5"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.4",
-    "@deepseek-ai/dsh-session": ">=0.2.0-rc.2 <0.3.0",
-    "@deepseek-ai/dsh-session-projection": ">=0.2.0-rc.2 <0.3.0",
-    "@deepseek-ai/dsh-llm": ">=0.2.0-rc.2 <0.3.0",
-    "@deepseek-ai/dsh-api-session-controller": ">=0.2.0-rc.2 <0.3.0"
+    "@deepseek-ai/dsh-session": ">=0.2.0-rc.2 <0.3.0 || 0.2.1-rc.3 || 0.2.1-rc.5",
+    "@deepseek-ai/dsh-session-projection": ">=0.2.0-rc.2 <0.3.0 || 0.2.1-rc.3 || 0.2.1-rc.5",
+    "@deepseek-ai/dsh-llm": ">=0.2.0-rc.2 <0.3.0 || 0.2.1-rc.3 || 0.2.1-rc.5",
+    "@deepseek-ai/dsh-api-session-controller": ">=0.2.0-rc.2 <0.3.0 || 0.2.1-rc.3 || 0.2.1-rc.5"
   },
   "keywords": [
     "deepseek",
@@ -62,6 +71,16 @@
     "url": "https://github.com/KardDev/dsh-plugins/issues"
   },
   "scripts": {
-    "check": "node --check lib/index.js && node --check lib/client.js"
+    "check": "node --check lib/index.js && node --check lib/client.js",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-session": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-session-projection": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-llm": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-api-session-controller": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-brand": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-fs": "0.2.1-rc.5"
   }
 }

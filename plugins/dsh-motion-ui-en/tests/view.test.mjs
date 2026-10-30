@@ -18,7 +18,7 @@ test('static steps render an ordered guide without invented task status',()=>{
   const doc={version:1,title:'五步流程',fallback:'规划说明',nodes:[{id:'flow',type:'steps',items:{item:[{title:'准备',description:'核对文件。'},{title:'提交'},{title:'发布',status:'active'}]}}]};
   const html=renderToStaticMarkup(h(ValidatedView,{raw:record(doc),sessionId:'s1'}));
   assert.match(html,/<ol[^>]+dgui-steps/);assert.equal((html.match(/class="dgui-step-state"/g)??[]).length,1);
-  assert.doesNotMatch(html,/待进行|undefined/);assert.match(html,/当前步骤/);
+  assert.doesNotMatch(html,/待进行|undefined/);assert.match(html,/Current step/);
 });
 test('missing, unsupported and malformed metadata retains plain text fallback', () => {
   for (const meta of [undefined, {}, { dshGenerativeUi: record({ ...calculatorExample, version: 2 }) }]) {
@@ -32,7 +32,7 @@ test('calculator renders controls, computed values, accessible labels and a disa
 });
 test('chart exposes a labelled SVG and exact data in an accessible table', () => {
   const result = renderToStaticMarkup(h(ValidatedView, { raw: record(comparisonExample), sessionId: 's1' }));
-  assert.match(result, /role="img"/); assert.match(result, /图表数据/); assert.match(result, /B<\/td><td[^>]*>18<\/td>/);
+  assert.match(result, /role="img"/); assert.match(result, /Chart data/); assert.match(result, /B<\/td><td[^>]*>18<\/td>/);
 });
 
 

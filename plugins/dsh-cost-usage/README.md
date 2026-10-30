@@ -18,8 +18,7 @@ Track LLM API spending per session by configuring per-model token pricing you de
 
 ## Installation
 
-Requires DSH 0.2.x: the peer range is `>=0.2.0-rc.2 <0.3.0`, verified against
-0.2.0-rc.2 and 0.2.1-rc.2. Older or newer DSH majors are refused by the
+Targets **DSH 0.2.1-rc.5** with development SDKs pinned to that release and Node >=22.19. The peer range is `>=0.2.0-rc.2 <0.3.0 || 0.2.1-rc.3 || 0.2.1-rc.5`, retaining the existing range and explicitly admitting the new prerelease. Earlier checks covered 0.2.0-rc.2 and 0.2.1-rc.2. Unsupported DSH versions are refused by the
 plugin manager rather than activated.
 
 ### 1. Install the package
@@ -197,6 +196,10 @@ const { values } = ctx.sessionProjections.snapshot(session, ['costUsage']);
 ## License
 
 MIT
+
+## Development verification
+
+Run `npm test` and `npm run check` from this package after the workspace install. The SDK test uses the real rc.5 Session/projection registry to check token-cost accounting, historical replay, live events, repeated reads, unpriced models and unload/reload. It does not contact a model or pricing endpoint. Its rc.3 intermediate run also passed.
 
 ## Contributing
 

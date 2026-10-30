@@ -1,5 +1,15 @@
 # 验证记录
 
+## DSH 0.2.1-rc.5 collection migration - 2026-10-30
+
+- All 150 unit/integration tests pass on the verified rc.5 SDK cohort, including a new real registry lifecycle test. The intermediate rc.3 target also passed all 150.
+- Fixed four pre-existing stale assertions in the English derivative (17 tools; English preview/current-step/chart-data labels).
+- Browser client and build identity regenerated with existing vendored assets preserved; module exports, syntax and source hash verified.
+- Local browser steps/error checks pass at 1920px and 1365px in light/dark themes with no page errors.
+- The desktop rc.5 compatibility gate accepts the package without exemptions. Full Electron/video acceptance is not claimed; the unrelated external Auto Review Luna package still has an rc.2 version declaration.
+
+See [compatibility details](docs/compatibility-0.2.1-rc.5.md). The remaining entries describe historical verification.
+
 ## v0.8.5 发布验证（2026-10-18）
 
 - 149 项单元／集成测试、28 组构建与浏览器回归，保留 20 项播放器检查及多轮定位循环回归。

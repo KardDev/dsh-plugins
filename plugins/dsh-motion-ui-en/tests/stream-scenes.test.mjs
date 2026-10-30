@@ -55,7 +55,7 @@ test('stream preview is disabled and error/settled phases cannot preserve previe
   const raw = JSON.stringify({ document: calculatorExample });
   const html = renderToStaticMarkup(React.createElement(StreamingPreview, { raw, callId: 'one', sessionId: 's' }));
   assert.match(html, /data-preview="true"/); assert.match(html, /aria-busy="true"/);
-  assert.match(html, /生成预览/); for (const control of html.match(/<(?:input|button|select)\b[^>]*>/g)) assert.match(control, /disabled/);
+  assert.match(html, /Generated preview/); for (const control of html.match(/<(?:input|button|select)\b[^>]*>/g)) assert.match(control, /disabled/);
   const failed = renderToStaticMarkup(React.createElement(ToolView, { phase: 'result', block: { isError: true, content: [{ type: 'text', text: 'interrupted' }] } }));
   assert.doesNotMatch(failed, /data-preview|<input|<button/); assert.match(failed, /interrupted/);
 });
