@@ -1,5 +1,11 @@
 # DSH Motion UI
 
+## Unreleased - DSH 0.2.1-rc.5 compatibility
+
+- Target rc.5 in development dependencies and include it explicitly in compatibility declarations, retaining prior supported releases.
+- Verify native tool registration/execution/metadata/disposal against the real SDK and align stale test expectations with this derivative's English interface and review tools.
+- Rebuild the client/source identity with vendored assets preserved; 150 tests and local desktop-size browser checks pass.
+
 ## 0.8.7 — 2026-10-18
 
 ### 补齐原生组件的皮肤兼容

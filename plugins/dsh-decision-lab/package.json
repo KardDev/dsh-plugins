@@ -1,0 +1,71 @@
+{
+  "name": "dsh-decision-lab",
+  "version": "0.1.1",
+  "description": "Interactive what-would-change-my-mind cards for DeepSeek Harness: priority sliders, bounded uncertainty and sensitivity analysis.",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib",
+    "cordis.patch.yml",
+    "examples",
+    "README.md",
+    "VERIFICATION.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.19",
+    "dsh": "0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.5"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node --check index.js && node --check client.js && node --check lib/engine.js",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "node scripts/verify-browser.mjs",
+    "demo": "node scripts/demo.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2 || 0.2.1-rc.3 || 0.2.1-rc.5",
+    "react": "^18.3.1 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-system-prompt": "0.2.1-rc.5",
+    "@deepseek-ai/cordis": "~4.0.4",
+    "esbuild": "^0.25.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "playwright-core": "1.64.1"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KardDev/dsh-plugins.git",
+    "directory": "plugins/dsh-decision-lab"
+  },
+  "homepage": "https://github.com/KardDev/dsh-plugins/tree/main/plugins/dsh-decision-lab#readme",
+  "bugs": {
+    "url": "https://github.com/KardDev/dsh-plugins/issues"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "decision-analysis",
+    "sensitivity",
+    "interactive-ui"
+  ]
+}

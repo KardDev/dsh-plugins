@@ -1,5 +1,6 @@
 # DSH Motion UI
 
+> Current development target: **DSH 0.2.1-rc.5**. Earlier release notes below are historical; see [rc.5 compatibility](docs/compatibility-0.2.1-rc.5.md) for current checks.
 为 DeepSeek Harness Web / Desktop 提供可交互组件、自由 HTML/SVG 图解与动画。引导模式会主动注入设计技能、协议和示例；自由模式让模型自主设计。设置位于首页 → 插件 → dsh-motion-ui。
 
 Interactive, declarative tool views for **DeepSeek Harness Web / Desktop 0.2.0-rc.2 / 0.2.1-rc.1 / 0.2.1-rc.2**.

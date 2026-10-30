@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { fixture } from './fixture.mjs';
+
+test('JSON and Markdown exports reflect current weights and preserve original evidence', async () => {
+  const exports = await import('../lib/export.js').catch(() => null);
+  assert.equal(typeof exports?.buildExport, 'function', 'buildExport must exist');
+  const decision = fixture();
+  const weights = { speed: 0, care: 30 };
+  const before = JSON.stringify({ decision, weights });
+  const json = exports.buildExport(decision, weights, 'json');
+  assert.equal(json.filename, 'decision-lab.json');
+  assert.equal(json.mime, 'application/json;charset=utf-8');
+  const payload = JSON.parse(json.text);
+  assert.equal(payload.version, 1);
+  assert.deepEqual(payload.decision, decision);
+  assert.deepEqual(payload.weights, weights);
+  assert.deepEqual(payload.analysis.leaders, ['pilot']);
+  assert.equal(payload.decision.criteria[0].weight, 70);
+  assert.equal(JSON.stringify({ decision, weights }), before);
+  const md = exports.buildExport(decision, weights, 'markdown');
+  assert.equal(md.filename, 'decision-lab.md');
+  assert.equal(md.mime, 'text/markdown;charset=utf-8');
+  assert.match(md.text, /Leaders: Careful pilot/);
+  assert.match(md.text, /Input provenance/);
+  assert.match(md.text, /Fictional test input/);
+  assert.match(md.text, /Limitations/);
+  assert.throws(() => exports.buildExport(decision, weights, 'html'), /format/);
+  assert.throws(() => exports.buildExport(decision, { speed: 0, care: 0 }, 'json'), /nonzero/);
+});

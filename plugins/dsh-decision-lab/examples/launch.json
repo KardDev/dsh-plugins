@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "title": "Choose a launch strategy",
+  "question": "For the next release, should we run an invite-only pilot, a public beta, or a staged regional rollout?",
+  "criteria": [
+    {
+      "id": "learning",
+      "label": "Learning value",
+      "weight": 40,
+      "description": "Higher scores mean more actionable feedback from the intended audience."
+    },
+    {
+      "id": "readiness",
+      "label": "Operational readiness",
+      "weight": 35,
+      "description": "Higher scores mean a more manageable support and reliability burden."
+    },
+    {
+      "id": "reach",
+      "label": "Audience reach",
+      "weight": 25,
+      "description": "Higher scores mean broader access for potential users in this launch window."
+    }
+  ],
+  "options": [
+    {
+      "id": "pilot",
+      "label": "Invite-only pilot",
+      "scores": {
+        "learning": { "value": 8, "low": 6, "high": 9, "basis": "estimate", "note": "Illustrative estimate: interviews with a small cohort may generate detailed feedback." },
+        "readiness": { "value": 9, "low": 8, "high": 10, "basis": "assumption", "note": "Assumes the team can personally support a capped cohort." },
+        "reach": { "value": 3, "low": 2, "high": 4, "basis": "estimate", "note": "Illustrative low reach score for an invitation-only release." }
+      }
+    },
+    {
+      "id": "public_beta",
+      "label": "Public beta",
+      "scores": {
+        "learning": { "value": 9, "low": 6, "high": 10, "basis": "estimate", "note": "Illustrative estimate: more diverse users, but feedback quality could vary." },
+        "readiness": { "value": 4, "low": 2, "high": 6, "basis": "assumption", "note": "Assumes open enrollment creates substantial support and incident risk." },
+        "reach": { "value": 10, "low": 8, "high": 10, "basis": "estimate", "note": "Illustrative high reach score; not a forecast of acquisition or conversion." }
+      }
+    },
+    {
+      "id": "staged",
+      "label": "Staged regional rollout",
+      "scores": {
+        "learning": { "value": 7, "low": 5, "high": 8, "basis": "estimate", "note": "Illustrative estimate: regional feedback may be useful but less representative." },
+        "readiness": { "value": 8, "low": 6, "high": 9, "basis": "assumption", "note": "Assumes feature gates and rollback procedures are ready before launch." },
+        "reach": { "value": 6, "low": 4, "high": 8, "basis": "estimate", "note": "Illustrative middle reach score for limited geographic availability." }
+      }
+    }
+  ],
+  "assumptions": [
+    "This is a fictional, illustrative example. No scores or ranges are factual measurements.",
+    "All criteria are oriented so higher is better and use a shared 0–10 preference scale.",
+    "Options are assessed for the same release window, staffing level, and budget.",
+    "Criterion contributions are additive; interactions and changing scores are not modeled."
+  ]
+}
